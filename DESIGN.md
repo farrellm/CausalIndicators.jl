@@ -184,21 +184,33 @@ b. **A bar-count look-back for `addrollingcolumns`:** `Bars(n)` as a window
      `Mean(:x)` and `Std(:x)` under the same `Bars(20)` share one `Sum(:x)`. A
      wrapper would fold each inner dependency closure privately.
 
-c. **A recency-weighted sum** `Σₖ k·yₖ`, where `k` is the number of bars since
-   that row (0 for the newest). It carries its own count and `Σy`, because a
-   state cannot read a sibling state during `update!`.
-   - `update!` adds `Σy` to the weighted sum, then adds `y` to `Σy`.
-   - `downdate!` removes the **oldest** row by subtracting `(n−1)·y`. It is not
-     valid for any other row. This is a new, documented law. CausalFrames'
-     running mode and the count-window helper (g) only ever evict oldest-first,
-     so it is sound there.
-   - `combine!(a, b)` gives `a.S₂ + a.S₁·b.n + b.S₂`.
-   - It uses the sum family's representation: compensated for fixed-precision
-     floats, and counting nonfinite and `missing` terms, so rolling windows
-     recover.
+c. **The oldest-first `downdate!` law, and two groups under it.**
+   CausalFrames' `downdate!` contract removes *any* previously folded row. Its
+   running modes (`addrollingcolumns`, `summarizewindows`) and the count-window
+   helper (g) only ever evict oldest-first, though, so a new, documented law
+   lets a group rely on that. Two summarizers need it:
+   - **A recency-weighted sum** `Σₖ k·yₖ`, where `k` is the number of bars
+     since that row (0 for the newest). It carries its own count and `Σy`,
+     because a state cannot read a sibling state during `update!`.
+     - `update!` adds `Σy` to the weighted sum, then adds `y` to `Σy`.
+     - `downdate!` removes the oldest row by subtracting `(n−1)·y`.
+     - `combine!(a, b)` gives `a.S₂ + a.S₁·b.n + b.S₂`.
+     - It uses the sum family's representation: compensated for
+       fixed-precision floats, and counting nonfinite and `missing` terms, so
+       rolling windows recover.
 
-   With `Count` and `Sum` it gives `WMA` and the whole `LINEARREG` family,
-   including `TSF`, as dependents.
+     With `Count` and `Sum` it gives `WMA` and the whole `LINEARREG` family,
+     including `TSF`, as dependents.
+   - **`Last` as a group.** Evicting the oldest row never changes the last
+     value unless it empties the window, so `Last` keeps a live-row count and
+     its `downdate!` decrements it, clearing the value at zero. A count rather
+     than the last row's time is what makes ties unambiguous. `Last` leaves
+     the state it shares with `Min`/`Max`/`First`. `First` cannot follow: the
+     oldest row is exactly the one it reports.
+
+     This moves every dependent that reads only `Last` and group accumulators
+     into the Group tier: the bar-local price transforms, `RVOL` and
+     `PercentRank`.
 
 d. **`MaxIndex`/`MinIndex` monoids.** Each is the arg-extreme, carried as a
    value plus a bars-since position that `combine!` shifts by the right
@@ -227,7 +239,7 @@ e. **Row-expression terms for the sum family.** `Sum` and `DotProduct` can
    `addcolumns` step before them.
 
 f. **A sorted-multiset accumulator**, with dependents `Quantile(:x, p)` and
-   `PercentRank(:x)`, the rank of the newest value in the window.
+   `PercentRank(:x)`, the rank of the newest value (`Last`) in the window.
    - **Structure.** Insertion and deletion are inverses and `combine!` is a
      merge, so it is a `GroupSummarizer`.
    - **Size.** Its state is O(window). It documents that, as `CountDistinct`
@@ -236,6 +248,9 @@ f. **A sorted-multiset accumulator**, with dependents `Quantile(:x, p)` and
      TA-Lib's rule must be one of its values.
    - **Allocation.** The accumulator's own value is a borrowed read-only view,
      like the segment tree's query result, so emitting it does not allocate.
+   - **Newest value.** `PercentRank` reads it from `Last`, which must be a
+     group (c): a monoid in the call would demote it from running mode to tree
+     mode, where each `combine!` of this state is an O(window) merge.
 
    `Percentile` and `PercentRank` are then case 2 in the Group tier.
 
@@ -384,12 +399,15 @@ Every indicator is placed in the most structured tier it can lawfully claim.
 The name table's "Tier" column records it.
 
 - **Group** (`GroupSummarizer`, running O(1) with `downdate!`). The value is a
-  function of invertible sums, or of the sorted multiset:
+  function of invertible sums, the sorted multiset, or `Last` (c):
   - `SMA`, `SUM`, `VAR`, `StdDev`, `Correl`, `VWMA`
   - `WMA`, the `LINEARREG` family
   - `CMF`, `ADR`, `QStick`, `IMI`, `AccBands`, `AD`, `VWAP`
   - `BollingerBands()` (SMA middle band)
   - `Percentile`, `PercentRank`
+  - `RVOL` (`Sum` and `Last`)
+  - the bar-local price transforms (`AvgPrice`, `MedPrice`, `TypPrice`,
+    `WclPrice`, `BOP`, `MarketFI`), which are `Last`-dependents
 
   By the no-duplication rule, each of these is a CausalFrames summarizer or a
   dependent over CausalFrames accumulators. A dependent is automatically a
@@ -401,9 +419,6 @@ The name table's "Tier" column records it.
   - `MidPoint`, `MidPrice`, `Donchian`, `WillR`, `Aroon`/`AroonOsc`
   - `MOM`/`ROC*` (`First`/`Last`)
   - `TRange` (`First`/`Last` under `Bars(2)`)
-  - `RVOL` (`Sum` and `Last`)
-  - the bar-local price transforms (`AvgPrice`, `MedPrice`, `TypPrice`,
-    `WclPrice`, `BOP`, `MarketFI`), which are `Last`-dependents
 - **Plain** (`Summarizer`). These have no lawful `combine!`, so they are folded
   row by row:
   - recursive filters: the EMA family, Wilder smoothing, `MACD`, `KAMA`, `T3`,
@@ -437,9 +452,11 @@ uniformly-spaced time forms against each other.
 TA-Lib's default window is listed as `window: Bars(n)` in the name table.
 
 - **Previous-bar functions.** The functions that compare with the bar `period`
-  back (`MOM`, the `ROC` family) and `RVOL` read `First`/`Last` over the whole
-  window. TA-Lib's `period = p` is therefore `Bars(p + 1)`, and their docstrings
-  say so.
+  back (`MOM`, the `ROC` family) read `First`/`Last` over the whole window.
+  `RVOL`, which compares the current bar with the mean of the `period` bars
+  before it, reads `Sum` and `Last` and computes that mean as
+  `(Sum − Last) / period`. In both cases the window includes the current bar, so
+  TA-Lib's `period = p` is `Bars(p + 1)`, and their docstrings say so.
 - **`TRange`** is fixed at `Bars(2)`. Its TA-Lib lookback of 1 comes from the
   partial-window rule.
 
@@ -589,7 +606,8 @@ README rows together, and updates this document where reality differs.
   "Upstream prerequisites".
   - `warmup`
   - the `Bars` look-back
-  - the recency-weighted sum
+  - the oldest-first `downdate!` law, with the recency-weighted sum and `Last`
+    as a group
   - `MaxIndex`/`MinIndex`
   - row-expression sum terms
   - the sorted multiset with `Quantile`/`PercentRank`
@@ -650,7 +668,7 @@ All 182 in-scope TA-Lib functions. The table is generated from the pinned YAML.
 
 | TA-Lib | Julia | Stage | Relation to CausalFrames | Tier | Inputs | Keywords (defaults) | Output suffixes |
 |---|---|---|---|---|---|---|---|
-| `AVGPRICE` | `AvgPrice` | S1 | dependent: `Last` | Monoid | open, high, low, close | any window (bar-local) | (one column) |
+| `AVGPRICE` | `AvgPrice` | S1 | dependent: `Last` | Group | open, high, low, close | any window (bar-local) | (one column) |
 | `CUMSUM` | `Sum(:x)` | S1 | CausalFrames only: `Sum` (no window) | Group | real | no window (`addsummarycolumns`) | (one column) |
 | `DEMA` | `DEMA` | S1 | new state | plain | real | period=30 | (one column) |
 | `EMA` | `EMA` | S1 | new state | plain | real | period=30 | (one column) |
@@ -660,7 +678,7 @@ All 182 in-scope TA-Lib functions. The table is generated from the pinned YAML.
 | `MAVP` | `MAVP` | S1 | new state | plain | real, periods | minperiod=2, maxperiod=30, matype=:sma | (one column) |
 | `MAX` | `Max(:x)` | S1 | CausalFrames only: `Max` | Monoid | real | window: Bars(30) | (one column) |
 | `MAXINDEX` | `RollingMaxIndex` | S1 | dependent (upstream): `MaxIndex` | Monoid | real | window: Bars(30) | (one column) |
-| `MEDPRICE` | `MedPrice` | S1 | dependent: `Last` | Monoid | high, low | any window (bar-local) | (one column) |
+| `MEDPRICE` | `MedPrice` | S1 | dependent: `Last` | Group | high, low | any window (bar-local) | (one column) |
 | `MIDPOINT` | `MidPoint` | S1 | dependent: `Max`, `Min` | Monoid | real | window: Bars(14) | (one column) |
 | `MIDPRICE` | `MidPrice` | S1 | dependent: `Max`, `Min` | Monoid | high, low | window: Bars(14) | (one column) |
 | `MIN` | `Min(:x)` | S1 | CausalFrames only: `Min` | Monoid | real | window: Bars(30) | (one column) |
@@ -673,15 +691,15 @@ All 182 in-scope TA-Lib functions. The table is generated from the pinned YAML.
 | `T3` | `T3` | S1 | new state | plain | real | period=5, vfactor=0.7 | (one column) |
 | `TEMA` | `TEMA` | S1 | new state | plain | real | period=30 | (one column) |
 | `TRIMA` | `TRIMA` | S1 | new state (nested `Mean` windows) | plain | real | period=30 | (one column) |
-| `TYPPRICE` | `TypPrice` | S1 | dependent: `Last` | Monoid | high, low, close | any window (bar-local) | (one column) |
+| `TYPPRICE` | `TypPrice` | S1 | dependent: `Last` | Group | high, low, close | any window (bar-local) | (one column) |
 | `VWMA` | `VWMA` | S1 | dependent: `DotProduct`, `Sum` | Group | real, volume | window: Bars(30) | (one column) |
-| `WCLPRICE` | `WclPrice` | S1 | dependent: `Last` | Monoid | high, low, close | any window (bar-local) | (one column) |
+| `WCLPRICE` | `WclPrice` | S1 | dependent: `Last` | Group | high, low, close | any window (bar-local) | (one column) |
 | `WMA` | `WMA` | S1 | dependent (upstream): recency sum, `Sum`, `Count` | Group | real | window: Bars(30) | (one column) |
 | `ZLEMA` | `ZLEMA` | S1 | new state | plain | real | period=30 | (one column) |
 | `APO` | `APO` | S2 | new state | plain | real | fastperiod=12, slowperiod=26, matype=:ema | (one column) |
 | `AROON` | `Aroon` | S2 | dependent (upstream): `MaxIndex`, `MinIndex` | Monoid | high, low | window: Bars(14) | aroondown, aroonup |
 | `AROONOSC` | `AroonOsc` | S2 | dependent (upstream): `MaxIndex`, `MinIndex` | Monoid | high, low | window: Bars(14) | (one column) |
-| `BOP` | `BOP` | S2 | dependent: `Last` | Monoid | open, high, low, close | any window (bar-local) | (one column) |
+| `BOP` | `BOP` | S2 | dependent: `Last` | Group | open, high, low, close | any window (bar-local) | (one column) |
 | `CCI` | `CCI` | S2 | new state (mean deviation needs the window) | plain | high, low, close | period=14 | (one column) |
 | `CMO` | `CMO` | S2 | new state | plain | real | period=14 | (one column) |
 | `MACD` | `MACD` | S2 | new state | plain | real | fastperiod=12, slowperiod=26, signalperiod=9 | macd, macdsignal, macdhist |
@@ -735,7 +753,7 @@ All 182 in-scope TA-Lib functions. The table is generated from the pinned YAML.
 | `LINEARREG_ANGLE` | `LinearRegAngle` | S4 | dependent (upstream): recency sum, `Sum`, `Count` | Group | real | window: Bars(14) | (one column) |
 | `LINEARREG_INTERCEPT` | `LinearRegIntercept` | S4 | dependent (upstream): recency sum, `Sum`, `Count` | Group | real | window: Bars(14) | (one column) |
 | `LINEARREG_SLOPE` | `LinearRegSlope` | S4 | dependent (upstream): recency sum, `Sum`, `Count` | Group | real | window: Bars(14) | (one column) |
-| `MARKETFI` | `MarketFI` | S4 | dependent: `Last` | Monoid | high, low, volume | any window (bar-local) | (one column) |
+| `MARKETFI` | `MarketFI` | S4 | dependent: `Last` | Group | high, low, volume | any window (bar-local) | (one column) |
 | `NVI` | `NVI` | S4 | new state | plain | close, volume | — | (one column) |
 | `OBV` | `OBV` | S4 | new state (previous close) | plain | real, volume | — | (one column) |
 | `PERCENTILE` | `Percentile` | S4 | dependent (upstream): sorted multiset | Group | real | window: Bars(30), percentile=50 | (one column) |
@@ -743,7 +761,7 @@ All 182 in-scope TA-Lib functions. The table is generated from the pinned YAML.
 | `PVI` | `PVI` | S4 | new state | plain | close, volume | — | (one column) |
 | `PVO` | `PVO` | S4 | new state | plain | volume | fastperiod=12, slowperiod=26, matype=:ema | (one column) |
 | `PVT` | `PVT` | S4 | new state | plain | close, volume | — | (one column) |
-| `RVOL` | `RVOL` | S4 | dependent: `Sum`, `Last` over n+1 bars | Monoid | volume | window: Bars(21) | (one column) |
+| `RVOL` | `RVOL` | S4 | dependent: `Sum`, `Last` over n+1 bars | Group | volume | window: Bars(21) | (one column) |
 | `TSF` | `TSF` | S4 | dependent (upstream): recency sum, `Sum`, `Count` | Group | real | window: Bars(14) | (one column) |
 | `VWAP` | `VWAP` | S4 | dependent (upstream): row-term `Sum`, `Sum` (no window) | Group | high, low, close, volume | no window (`addsummarycolumns`) | (one column) |
 | `AC` | `AC` | S5 | new state | plain | high, low | fastperiod=5, slowperiod=34, signalperiod=5 | (one column) |
