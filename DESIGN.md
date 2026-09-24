@@ -452,9 +452,11 @@ uniformly-spaced time forms against each other.
 TA-Lib's default window is listed as `window: Bars(n)` in the name table.
 
 - **Previous-bar functions.** The functions that compare with the bar `period`
-  back (`MOM`, the `ROC` family) and `RVOL` read `First`/`Last` over the whole
-  window. TA-Lib's `period = p` is therefore `Bars(p + 1)`, and their docstrings
-  say so.
+  back (`MOM`, the `ROC` family) read `First`/`Last` over the whole window.
+  `RVOL`, which compares the current bar with the mean of the `period` bars
+  before it, reads `Sum` and `Last` and computes that mean as
+  `(Sum − Last) / period`. In both cases the window includes the current bar, so
+  TA-Lib's `period = p` is `Bars(p + 1)`, and their docstrings say so.
 - **`TRange`** is fixed at `Bars(2)`. Its TA-Lib lookback of 1 comes from the
   partial-window rule.
 
