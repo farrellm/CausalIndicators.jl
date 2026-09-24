@@ -236,6 +236,11 @@ f. **A sorted-multiset accumulator**, with dependents `Quantile(:x, p)` and
      TA-Lib's rule must be one of its values.
    - **Allocation.** The accumulator's own value is a borrowed read-only view,
      like the segment tree's query result, so emitting it does not allocate.
+   - **Newest value.** The state records the newest value it folded, so
+     `PercentRank` reads it there rather than depending on `Last`. `Last` is
+     only a monoid, and one monoid in the call demotes it from running mode to
+     tree mode, where each `combine!` of this state is an O(window) merge. The
+     record is valid because eviction is oldest-first, the same law as (c).
 
    `Percentile` and `PercentRank` are then case 2 in the Group tier.
 
@@ -627,7 +632,7 @@ prerequisites" in the same PR.
   follows.
 - **`PERCENTILE`'s interpolation rule** at the pin, and whether `PercentRank`'s
   definition is generic enough for CausalFrames. If it is not, it becomes a
-  dependent here, over the upstream sorted multiset and `Last`.
+  dependent here, over the upstream sorted multiset and its newest value.
 
 ## Name table
 
@@ -739,7 +744,7 @@ All 182 in-scope TA-Lib functions. The table is generated from the pinned YAML.
 | `NVI` | `NVI` | S4 | new state | plain | close, volume | — | (one column) |
 | `OBV` | `OBV` | S4 | new state (previous close) | plain | real, volume | — | (one column) |
 | `PERCENTILE` | `Percentile` | S4 | dependent (upstream): sorted multiset | Group | real | window: Bars(30), percentile=50 | (one column) |
-| `PERCENTRANK` | `PercentRank` | S4 | dependent (upstream): sorted multiset, `Last` | Group | real | window: Bars(100) | (one column) |
+| `PERCENTRANK` | `PercentRank` | S4 | dependent (upstream): sorted multiset (with its newest value) | Group | real | window: Bars(100) | (one column) |
 | `PVI` | `PVI` | S4 | new state | plain | close, volume | — | (one column) |
 | `PVO` | `PVO` | S4 | new state | plain | volume | fastperiod=12, slowperiod=26, matype=:ema | (one column) |
 | `PVT` | `PVT` | S4 | new state | plain | close, volume | — | (one column) |
