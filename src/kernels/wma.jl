@@ -83,6 +83,11 @@ mutable struct HMAKernel{T,K}
     const half::K
     const full::K
     const root::K
+    # An explicit inner constructor: the default one would bind `T` only
+    # through `out::Union{Missing,T}`, an unbound parameter when `out` is
+    # `missing` (Aqua flags it on Julia 1.10).
+    HMAKernel{T,K}(period, n, out, half, full, root) where {T,K} =
+        new{T,K}(period, n, out, half, full, root)
 end
 
 """
