@@ -94,7 +94,10 @@ end
 Bytes `f(args...)` allocates, measured after a warm-up call. The function
 barrier keeps the measurement free of the caller's dynamism.
 """
-@noinline allocs(f, args...) = (f(args...); @allocated f(args...))
+# `Vararg{Any,N}` forces specialization: Julia 1.10 compiles a bare `args...`
+# generically when the call is dispatched dynamically, boxing the arguments.
+@noinline allocs(f::F, args::Vararg{Any,N}) where {F,N} =
+    (f(args...); @allocated f(args...))
 
 """
     chunked(table, sizes) -> CausalPipeline
