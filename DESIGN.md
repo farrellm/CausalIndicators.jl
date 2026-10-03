@@ -42,8 +42,8 @@ This emits `:b20_close_mean`, `:b20_close_std`, `:b20_midprice`, `:b20_willr`,
 The structured indicators (sums, extrema, and their dependents) go under
 `addrollingcolumns` with a bar-count window, where CausalFrames' running and
 tree fast paths apply. The recursive ones go under `addsummarycolumns`. They are
-kept in separate calls because a single plain summarizer in an
-`addrollingcolumns` call puts the whole call on the re-fold path.
+kept in separate calls because a plain summarizer under `addrollingcolumns`
+re-folds every window from a fresh state, a cold start per window.
 
 ## Scope
 
@@ -98,8 +98,9 @@ table records which:
    `Mean(:x)`. The name table maps each such function to its CausalFrames
    spelling, and the README gives the same list.
    - `SMA` → `Mean`, `SUM` → `Sum`, `MAX`/`MIN`/`MINMAX` → `Max`/`Min`,
-     `VAR` → `Variance(corrected = false)`, `CORREL` → `Correlation`, all under
-     `Bars(period)`
+     `VAR` → `Variance(corrected = false)`, `CORREL` → `Correlation`,
+     `PERCENTILE` → `Quantile(percentile / 100; interpolation = :nearestrank)`,
+     all under `Bars(period)`
    - `CUMSUM` → `Sum` under `addsummarycolumns`, with no window
 
    CausalFrames bakes `corrected` into the state type, not the output name. So
@@ -120,6 +121,7 @@ table records which:
    - `TRange` reads `Last(:high)`, `Last(:low)` and `First(:close)` over
      `Bars(2)`.
    - `AvgPrice` reads `Last` of four columns.
+   - `PercentRank100` is `100 · PercentRank` over `Bars(period + 1)`.
 3. **Move it into CausalFrames.** If an indicator needs a *generic* accumulator
    or operator that CausalFrames lacks, it is first added to CausalFrames as a
    prerequisite PR, with its own tests, docs and DESIGN.md entry. The indicator
@@ -132,39 +134,34 @@ The rule also binds internal code:
 
 - **Windows inside recursive indicators.** Some recursive indicators need a
   window sum, mean or extremum, such as KAMA's volatility sum, CCI's mean, AO's
-  two means and Stoch's %K range. They embed CausalFrames states through the
-  upstream count-window helper. They never hand-roll a compensated sum, a ring
+  two means and Stoch's %K range. They embed CausalFrames states through
+  `CausalFrames.barwindow` (g). They never hand-roll a compensated sum, a ring
   buffer or a monotone deque.
 - **Linear regression.** CausalFrames already has `LinearRegression`, but it
   regresses on predictor *columns*. The `LINEARREG` family regresses on the bar
   position, which is not a column. Its closed forms in `n` (`Σx`, `Σx²`) are
   therefore the only regression code here, and they sit on the upstream
-  recency-weighted sum.
+  `AgeWeightedSum`.
 
 ### Upstream prerequisites
 
-These are added to CausalFrames before the stages that need them (stage S0).
-The exact public names and output suffixes are settled in their CausalFrames
-PRs (see "Open questions").
+These were added to CausalFrames as stage S0, which is complete as of
+CausalFrames `1e1442d`. Each entry gives the public name it landed under.
 
-a. **`warmup(lookback, transform)`.** This is a transform of transforms:
-   it runs `transform(p)` over `[start − lookback, stop)` and drops the output
-   rows with `time < start`.
+a. **`warmup(lookback, f)`** (#84). This is a transform of transforms: it runs
+   `f(p)` over `[start − lookback, stop)` and drops the output rows with
+   `time < start`.
    - **Causality.** An output row at `t` still depends only on input rows at or
      before `t`.
    - **Why it is generic.** Every stateful transform loses the
      chunk-concatenation property over split contexts, not only indicators.
-     This includes `addsummarycolumns` (a cumulative `Sum` or a running `Mean`),
-     `forwardfill` and bar-count windows. `warmup` restores the property once
-     `lookback` covers the state's effective memory.
-   - **Where it goes.** It sits in the "Causality and streaming" section, next to
-     `lag`/`lagcontext`, whose context-shifting it mirrors. It is lowercase,
-     following CausalFrames' naming rule.
-   - **Chunk protocol.** It keeps the no-empty-chunk rule.
+     This includes `addsummarycolumns` (a running `Mean`), `forwardfill` and
+     bar-count windows. `warmup` restores the property once `lookback` covers
+     the state's effective memory.
+   - **Composition.** Nested warm-ups add their lookbacks.
 
-b. **A bar-count look-back for `addrollingcolumns`:** `Bars(n)` as a window
-   value, as in `(b20 = Bars(20),)`, which can be mixed with time look-backs in
-   one call.
+b. **`Bars(n)`, a bar-count look-back for `addrollingcolumns`** (#81), as in
+   `(b20 = Bars(20),)`. It can be mixed with time look-backs in one call.
    - **Membership.** The window holds the last `n` summarized rows with
      `time ≤ t` under the row's key.
    - **Ties.** Rows sharing a timestamp share a window, as they do under time
@@ -174,100 +171,89 @@ b. **A bar-count look-back for `addrollingcolumns`:** `Bars(n)` as a window
      for every output, even for `Sum` and `Count`, whose empty value is `0`.
      This is exactly TA-Lib's lookback, and it makes the columns
      `Union{Missing, T}`.
-   - **Context.** A bar count has no time span, so the context is not widened.
-     `warmup` is the documented remedy.
-   - **Fast paths.** Running mode evicts the oldest row once a window exceeds
-     `n` rows. Tree mode's head index is `count − n`. Re-fold mode is
-     unchanged.
-   - **Why a look-back rather than a `Bars(n, s)` summarizer wrapper.**
-     Dependency expansion and name-keyed deduplication work unchanged, so
-     `Mean(:x)` and `Std(:x)` under the same `Bars(20)` share one `Sum(:x)`. A
-     wrapper would fold each inner dependency closure privately.
+   - **Context.** A bar count has no time span, so it does not widen the
+     context, and `warmup` is the remedy. A time look-back in the same call
+     does widen it, and the `Bars` window then counts those earlier rows too.
+   - **Why a look-back rather than a summarizer wrapper.** Dependency
+     expansion and name-keyed deduplication work unchanged, so `Mean(:x)` and
+     `Std(:x)` under the same `Bars(20)` share one `Sum(:x)`.
 
-c. **The oldest-first `downdate!` law, and two groups under it.**
-   CausalFrames' `downdate!` contract removes *any* previously folded row. Its
-   running modes (`addrollingcolumns`, `summarizewindows`) and the count-window
-   helper (g) only ever evict oldest-first, though, so a new, documented law
-   lets a group rely on that. Two summarizers need it:
-   - **A recency-weighted sum** `Σₖ k·yₖ`, where `k` is the number of bars
-     since that row (0 for the newest). It carries its own count and `Σy`,
-     because a state cannot read a sibling state during `update!`.
-     - `update!` adds `Σy` to the weighted sum, then adds `y` to `Σy`.
-     - `downdate!` removes the oldest row by subtracting `(n−1)·y`.
-     - `combine!(a, b)` gives `a.S₂ + a.S₁·b.n + b.S₂`.
-     - It uses the sum family's representation: compensated for
-       fixed-precision floats, and counting nonfinite and `missing` terms, so
-       rolling windows recover.
+c. **The oldest-first `downdate!` law, and per-accumulator tiers** (#74).
+   `downdate!` now only ever removes the oldest folded row, and a group may
+   rely on that. The window transforms choose their algorithm per accumulator,
+   not per call: groups slide running states, other monoids use a segment
+   tree, plain summarizers re-fold, and dependents sit in no tier. The weakest
+   summarizer in a call therefore slows only itself. Under the law:
+   - **`AgeWeightedSum(:y)`** folds `Σₖ k·yₖ` into `:y_ageweightedsum`, where
+     `k` is the row's age in bars (0 for the newest). It uses the sum family's
+     representation, compensated and counting nonfinite and `missing` terms,
+     so rolling windows recover. With `Count` and `Sum` it gives `WMA` and the
+     whole `LINEARREG` family, including `TSF`, as dependents.
+   - **`Min`, `Max`, `First`, `Last` and `CountDistinct` are groups.** A
+     summarizer can give the running tier its own windowed state
+     (`freshwindowed`). `Min` and `Max` slide a monotone deque, `First` keeps
+     the window's values (O(window) memory), and `Last` keeps a live-row count
+     and the newest value.
 
-     With `Count` and `Sum` it gives `WMA` and the whole `LINEARREG` family,
-     including `TSF`, as dependents.
-   - **`Last` as a group.** Evicting the oldest row never changes the last
-     value unless it empties the window, so `Last` keeps a live-row count and
-     its `downdate!` decrements it, clearing the value at zero. A count rather
-     than the last row's time is what makes ties unambiguous. `Last` leaves
-     the state it shares with `Min`/`Max`/`First`. `First` cannot follow: the
-     oldest row is exactly the one it reports.
+   Every window extremum and every `First`/`Last` dependent is therefore in the
+   Group tier (see "Structure and fast paths").
 
-     This moves every dependent that reads only `Last` and group accumulators
-     into the Group tier: the bar-local price transforms, `RVOL` and
-     `PercentRank`.
+d. **`MaxIndex`/`MinIndex`** (#85), with `MaxWithIndex`/`MinWithIndex`, which
+   emit the extreme and its index from one state. Each reports the `Int` bars
+   since the extreme (0 for the newest), and all four are groups.
+   - **Tie-break: most recent wins.** TA-Lib's rule cannot be reproduced by
+     any summarizer of the window's contents, because it depends on the path.
+     A new bar takes over the extreme on `>=`, so the newest tie wins, but when
+     the extreme leaves the window TA-Lib rescans with `>`, so the oldest tie
+     wins. With period 3, the window `[5, 1, 5]` reports the newest 5 after
+     `[1, 1, 5, 1, 5]` but the oldest after `[9, 5, 1, 5]`.
+   - **Resolution.** The index indicators keep the upstream rule and differ
+     from TA-Lib only on rows whose window holds a tied extreme. Their
+     docstrings say so, and their golden and table tests skip those rows (see
+     "Testing"). The extreme's *value* is unaffected.
+   - **Users.** `RollingMaxIndex`, `RollingMinIndex`, `RollingMinMaxIndex`,
+     `Aroon` and `AroonOsc`.
 
-d. **`MaxIndex`/`MinIndex` monoids.** Each is the arg-extreme, carried as a
-   value plus a bars-since position that `combine!` shifts by the right
-   operand's count.
-   - **Tie-break.** It is defined upstream as most recent wins, meaning the
-     smallest bars-since. That is expected to match TA-Lib's `>=` scans, and
-     must be checked against the pinned source before the upstream PR, since
-     CausalFrames cannot depend on TA-Lib goldens.
-   - **Users.** These give `RollingMaxIndex`, `RollingMinIndex`,
-     `RollingMinMaxIndex`, `Aroon` and `AroonOsc`.
-
-e. **Row-expression terms for the sum family.** `Sum` and `DotProduct` can
-   fold a named row function (`Sum(:mfv => r -> clv(r) * r.volume)`) as well as
-   a column. The output name is the given name.
-   - **Accumulator type.** It is `sumtype(Base.promote_op(f, rowtype))`, so the
-     term is formed at accumulator width like the existing term functors.
-   - **Deduplication.** Deduplication is by output name, so `Sum(:mfv => f)`
-     and `Sum(:mfv => g)` would silently merge. The function's type is part of
-     the configuration: equal names with different functions are an
-     `ArgumentError`.
+e. **Row terms** (#80). Every summarizer that reads a column also accepts a
+   named row function (`Sum(:mfv => r -> clv(r) * r.volume)`). The output is
+   named after the given name.
+   - **Accumulator type.** The term is typed from `Base.promote_op(f, rowtype)`
+     and formed at accumulator width.
+   - **Deduplication.** It is by output name, so two row terms with the same
+     name and different functions are an `ArgumentError`.
    - **Names.** The dependents here namespace their hidden terms (`:cmf_mfv`)
      so that they never collide with the user's.
 
    This keeps `CMF`, `AD`, `VWAP`, `ADR`, `QStick`, `IMI` and `AccBands` as
-   pure dependents, rather than needing their own sum states or an
-   `addcolumns` step before them.
+   pure dependents, with no sum states of their own and no `addcolumns` step
+   before them.
 
-f. **A sorted-multiset accumulator**, with dependents `Quantile(:x, p)` and
-   `PercentRank(:x)`, the rank of the newest value (`Last`) in the window.
-   - **Structure.** Insertion and deletion are inverses and `combine!` is a
-     merge, so it is a `GroupSummarizer`.
-   - **Size.** Its state is O(window). It documents that, as `CountDistinct`
-     does.
-   - **Interpolation.** `Quantile`'s interpolation rule is a keyword, and
-     TA-Lib's rule must be one of its values.
-   - **Allocation.** The accumulator's own value is a borrowed read-only view,
-     like the segment tree's query result, so emitting it does not allocate.
-   - **Newest value.** `PercentRank` reads it from `Last`, which must be a
-     group (c): a monoid in the call would demote it from running mode to tree
-     mode, where each `combine!` of this state is an O(window) merge.
+f. **`CausalFrames.SortedValues`, a sorted-multiset group** (#76), with
+   dependents `Quantile`, `Median` and `PercentRank`. Its state is O(window),
+   and emitting its borrowed value does not allocate.
+   - **`Quantile(:x, p; interpolation = :nearestrank)`** is exactly TA-Lib's
+     `PERCENTILE` at `p = percentile / 100`. `PERCENTILE` is therefore
+     CausalFrames only (case 1).
+   - **`PercentRank(:x)`** is `count(< newest) / (n − 1)`, reading the newest
+     value from `Last`. TA-Lib's `PERCENTRANK` counts the `period` bars
+     *before* the current one and scales by 100, so it equals
+     `100 · PercentRank` under `Bars(period + 1)`. That is not an identical
+     value, so it is a dependent here (case 2) named `PercentRank100`, after
+     TA-Lib's `ROCR100`, to keep clear of the CausalFrames export.
 
-   `Percentile` and `PercentRank` are then case 2 in the Group tier.
+g. **`CausalFrames.barwindow(s, n, intypes)`, a count-window state** (#81),
+   unexported extension API for embedding inside other states. It wraps any
+   `MonoidSummarizer` `s` over the last `n` rows folded, expanding and sharing
+   its dependencies as the window transforms do.
+   - **Cost.** Groups slide over a ring of the live rows in O(1) per row, and
+     other monoids use a two-stack queue in O(1) amortized. Neither allocates.
+   - **Missing.** Every value column is `missing` until `n` rows have arrived.
+   - **Type.** The state's type depends on `s`, `n` and `intypes`, so an outer
+     state holding one takes its type as a type parameter.
 
-g. **A count-window state helper**, unexported extension API like `fresh` and
-   `update!`, for embedding inside other states. It wraps a structured state
-   over the last `n` rows:
-   - **Group state.** A typed ring buffer of the `n` live rows. Each new row is
-     `update!`d and the evicted row `downdate!`d, so each row costs O(1).
-   - **Monoid state.** A two-stack queue of `combine!`d states, with all of them
-     preallocated, O(1) amortized per row.
-   - **Missing.** It reports `missing` until `n` rows have arrived.
-
-   Now that bar windows are a transform, recursive states cannot get a window
-   through one, so they need this helper. Its users are KAMA, CCI, AvgDev, AO,
-   TRIMA, the Stoch family's %K, `MAKernel`'s `:sma`, non-SMA
-   `BollingerBands` and `CandleAverages`. It also serves (b) internally if that
-   proves simpler, so there is one ring buffer in the two packages.
+   Recursive states cannot get a window through a transform, so they use this.
+   Its users are KAMA, CCI, AvgDev, AO, TRIMA, the Stoch family's %K,
+   `MAKernel`'s `:sma`, non-SMA `BollingerBands` and `CandleAverages`.
 
 ## Model
 
@@ -398,27 +384,29 @@ A bar count cannot be turned into a time span in general, so the caller chooses
 Every indicator is placed in the most structured tier it can lawfully claim.
 The name table's "Tier" column records it.
 
-- **Group** (`GroupSummarizer`, running O(1) with `downdate!`). The value is a
-  function of invertible sums, the sorted multiset, or `Last` (c):
+- **Group** (`GroupSummarizer`, running O(1) amortized with `downdate!`). The
+  value is a function of invertible sums, the sorted multiset, the windowed
+  extrema or `First`/`Last` (c):
   - `SMA`, `SUM`, `VAR`, `StdDev`, `Correl`, `VWMA`
   - `WMA`, the `LINEARREG` family
   - `CMF`, `ADR`, `QStick`, `IMI`, `AccBands`, `AD`, `VWAP`
   - `BollingerBands()` (SMA middle band)
-  - `Percentile`, `PercentRank`
+  - `PERCENTILE` (`Quantile`), `PercentRank100`
   - `RVOL` (`Sum` and `Last`)
   - the bar-local price transforms (`AvgPrice`, `MedPrice`, `TypPrice`,
     `WclPrice`, `BOP`, `MarketFI`), which are `Last`-dependents
+  - `MAX`/`MIN`/`MINMAX` and the index forms
+  - `MidPoint`, `MidPrice`, `Donchian`, `WillR`, `Aroon`/`AroonOsc`
+  - `MOM`/`ROC*` (`First`/`Last`)
+  - `TRange` (`First`/`Last` under `Bars(2)`)
 
   By the no-duplication rule, each of these is a CausalFrames summarizer or a
   dependent over CausalFrames accumulators. A dependent is automatically a
   group, because its effective structure is its dependencies'.
-- **Monoid** (`MonoidSummarizer`, segment tree O(log n) with `combine!`). The
-  value is combinable over ordered sub-ranges:
-  - `MAX`/`MIN`/`MINMAX`
-  - the index forms
-  - `MidPoint`, `MidPrice`, `Donchian`, `WillR`, `Aroon`/`AroonOsc`
-  - `MOM`/`ROC*` (`First`/`Last`)
-  - `TRange` (`First`/`Last` under `Bars(2)`)
+- **Monoid** (`MonoidSummarizer`, segment tree O(log n) with `combine!`). No
+  indicator is currently in this tier: every CausalFrames accumulator the
+  structured indicators read is a group. CausalFrames tiers per accumulator, so
+  a monoid in a call would slow only itself.
 - **Plain** (`Summarizer`). These have no lawful `combine!`, so they are folded
   row by row:
   - recursive filters: the EMA family, Wilder smoothing, `MACD`, `KAMA`, `T3`,
@@ -432,7 +420,7 @@ The name table's "Tier" column records it.
   - candlesticks
 
   A plain indicator that needs a window takes TA-Lib's `period` keyword and
-  embeds it through the count-window helper (g).
+  embeds it through `CausalFrames.barwindow` (g).
 
 ### Windows
 
@@ -455,7 +443,8 @@ TA-Lib's default window is listed as `window: Bars(n)` in the name table.
   back (`MOM`, the `ROC` family) read `First`/`Last` over the whole window.
   `RVOL`, which compares the current bar with the mean of the `period` bars
   before it, reads `Sum` and `Last` and computes that mean as
-  `(Sum − Last) / period`. In both cases the window includes the current bar, so
+  `(Sum − Last) / period`. `PercentRank100` ranks the current bar against the
+  `period` bars before it. In every case the window includes the current bar, so
   TA-Lib's `period = p` is `Bars(p + 1)`, and their docstrings say so.
 - **`TRange`** is fixed at `Bars(2)`. Its TA-Lib lookback of 1 comes from the
   partial-window rule.
@@ -472,12 +461,12 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
   - `MAKernel{M}`: the moving-average family behind a type parameter.
     - It is used by `MA`, `MACDExt`, `APO`/`PPO`/`PVO`, `Stoch*`, `KDJ` and
       non-SMA `BollingerBands`.
-    - Its `:sma` form is the count-window helper around `Mean`.
+    - Its `:sma` form is `barwindow` around `Mean`.
   - `CandleAverages`: TA-Lib's per-setting body and shadow averages, built on
     count-windowed CausalFrames `Mean` states.
 
   Window sums, extrema and the ring buffer are never kernels. They are
-  CausalFrames states and the upstream count-window helper.
+  CausalFrames states and `CausalFrames.barwindow`.
 - **State layout.** States compose kernels as concrete fields, with no `Any` and
   no abstract field types.
   - `update!` allocates nothing, and `fresh!` zeroes everything in place.
@@ -578,6 +567,10 @@ the goldens check every bar.
     also fail on the gap between compensated sums and TA-Lib's drifting running
     sums.
   - Integer outputs must match exactly.
+  - The index forms (`MAXINDEX`, `MININDEX`, `MINMAXINDEX`, `AROON`,
+    `AROONOSC`) skip rows whose window holds a tied extreme, where TA-Lib's
+    path-dependent tie-break and the upstream most-recent rule may differ (see
+    (d)). The extracted table rows skip them too.
 - **Running it.** The generator runs by hand when the pin moves. It is not
   built in CI, so CI needs no C toolchain.
 
@@ -602,16 +595,16 @@ Aqua runs as in CausalFrames.
 One PR per stage. Each lands its code, extracted tables, goldens, docs and
 README rows together, and updates this document where reality differs.
 
-- **S0, upstream prerequisites (CausalFrames PRs):** items (a)–(g) under
-  "Upstream prerequisites".
-  - `warmup`
-  - the `Bars` look-back
-  - the oldest-first `downdate!` law, with the recency-weighted sum and `Last`
-    as a group
-  - `MaxIndex`/`MinIndex`
-  - row-expression sum terms
-  - the sorted multiset with `Quantile`/`PercentRank`
-  - the count-window helper
+- **S0, upstream prerequisites (CausalFrames PRs): complete** as of
+  CausalFrames `1e1442d`. Items (a)–(g) under "Upstream prerequisites":
+  - `warmup` (#84)
+  - `Bars` (#81)
+  - the oldest-first `downdate!` law, per-accumulator tiers, `AgeWeightedSum`
+    and the windowed `Min`/`Max`/`First`/`Last` groups (#74)
+  - `MaxIndex`/`MinIndex` (#85)
+  - row terms (#80)
+  - `SortedValues` with `Quantile`/`Median`/`PercentRank` (#76)
+  - `barwindow` (#81)
 - **S0′, scaffolding:**
   - the CausalFrames dependency. It is unregistered, so this uses `[sources]`
     on Julia ≥ 1.11 plus a CI `Pkg.develop(url = …)` step on 1.10.
@@ -640,12 +633,6 @@ prerequisites" in the same PR.
 
 - **Registering CausalFrames**, which would replace the `[sources]` and CI
   workaround with a plain `[compat]` entry.
-- **The exact public shape of the upstream additions**, meaning type names and
-  output suffixes. This is settled in their CausalFrames PRs, and the name table
-  follows.
-- **`PERCENTILE`'s interpolation rule** at the pin, and whether `PercentRank`'s
-  definition is generic enough for CausalFrames. If it is not, it becomes a
-  dependent here, over the upstream sorted multiset and `Last`.
 
 ## Name table
 
@@ -676,15 +663,15 @@ All 182 in-scope TA-Lib functions. The table is generated from the pinned YAML.
 | `KAMA` | `KAMA` | S1 | new state | plain | real | period=30 | (one column) |
 | `MA` | `MA` | S1 | constructor (dispatches on `matype`) | per MA type | real | period=30, matype=:sma | (one column) |
 | `MAVP` | `MAVP` | S1 | new state | plain | real, periods | minperiod=2, maxperiod=30, matype=:sma | (one column) |
-| `MAX` | `Max(:x)` | S1 | CausalFrames only: `Max` | Monoid | real | window: Bars(30) | (one column) |
-| `MAXINDEX` | `RollingMaxIndex` | S1 | dependent (upstream): `MaxIndex` | Monoid | real | window: Bars(30) | (one column) |
+| `MAX` | `Max(:x)` | S1 | CausalFrames only: `Max` | Group | real | window: Bars(30) | (one column) |
+| `MAXINDEX` | `RollingMaxIndex` | S1 | dependent (upstream): `MaxIndex` | Group | real | window: Bars(30) | (one column) |
 | `MEDPRICE` | `MedPrice` | S1 | dependent: `Last` | Group | high, low | any window (bar-local) | (one column) |
-| `MIDPOINT` | `MidPoint` | S1 | dependent: `Max`, `Min` | Monoid | real | window: Bars(14) | (one column) |
-| `MIDPRICE` | `MidPrice` | S1 | dependent: `Max`, `Min` | Monoid | high, low | window: Bars(14) | (one column) |
-| `MIN` | `Min(:x)` | S1 | CausalFrames only: `Min` | Monoid | real | window: Bars(30) | (one column) |
-| `MININDEX` | `RollingMinIndex` | S1 | dependent (upstream): `MinIndex` | Monoid | real | window: Bars(30) | (one column) |
-| `MINMAX` | `Min(:x)`, `Max(:x)` | S1 | CausalFrames only: `Min`, `Max` | Monoid | real | window: Bars(30) | min, max |
-| `MINMAXINDEX` | `RollingMinMaxIndex` | S1 | dependent (upstream): `MinIndex`, `MaxIndex` | Monoid | real | window: Bars(30) | minidx, maxidx |
+| `MIDPOINT` | `MidPoint` | S1 | dependent: `Max`, `Min` | Group | real | window: Bars(14) | (one column) |
+| `MIDPRICE` | `MidPrice` | S1 | dependent: `Max`, `Min` | Group | high, low | window: Bars(14) | (one column) |
+| `MIN` | `Min(:x)` | S1 | CausalFrames only: `Min` | Group | real | window: Bars(30) | (one column) |
+| `MININDEX` | `RollingMinIndex` | S1 | dependent (upstream): `MinIndex` | Group | real | window: Bars(30) | (one column) |
+| `MINMAX` | `Min(:x)`, `Max(:x)` | S1 | CausalFrames only: `Min`, `Max` | Group | real | window: Bars(30) | min, max |
+| `MINMAXINDEX` | `RollingMinMaxIndex` | S1 | dependent (upstream): `MinIndex`, `MaxIndex` | Group | real | window: Bars(30) | minidx, maxidx |
 | `RMA` | `RMA` | S1 | new state | plain | real | period=30 | (one column) |
 | `SMA` | `Mean(:x)` | S1 | CausalFrames only: `Mean` | Group | real | window: Bars(30) | (one column) |
 | `SUM` | `Sum(:x)` | S1 | CausalFrames only: `Sum` | Group | real | window: Bars(30) | (one column) |
@@ -694,11 +681,11 @@ All 182 in-scope TA-Lib functions. The table is generated from the pinned YAML.
 | `TYPPRICE` | `TypPrice` | S1 | dependent: `Last` | Group | high, low, close | any window (bar-local) | (one column) |
 | `VWMA` | `VWMA` | S1 | dependent: `DotProduct`, `Sum` | Group | real, volume | window: Bars(30) | (one column) |
 | `WCLPRICE` | `WclPrice` | S1 | dependent: `Last` | Group | high, low, close | any window (bar-local) | (one column) |
-| `WMA` | `WMA` | S1 | dependent (upstream): recency sum, `Sum`, `Count` | Group | real | window: Bars(30) | (one column) |
+| `WMA` | `WMA` | S1 | dependent (upstream): `AgeWeightedSum`, `Sum`, `Count` | Group | real | window: Bars(30) | (one column) |
 | `ZLEMA` | `ZLEMA` | S1 | new state | plain | real | period=30 | (one column) |
 | `APO` | `APO` | S2 | new state | plain | real | fastperiod=12, slowperiod=26, matype=:ema | (one column) |
-| `AROON` | `Aroon` | S2 | dependent (upstream): `MaxIndex`, `MinIndex` | Monoid | high, low | window: Bars(14) | aroondown, aroonup |
-| `AROONOSC` | `AroonOsc` | S2 | dependent (upstream): `MaxIndex`, `MinIndex` | Monoid | high, low | window: Bars(14) | (one column) |
+| `AROON` | `Aroon` | S2 | dependent (upstream): `MaxIndex`, `MinIndex` | Group | high, low | window: Bars(14) | aroondown, aroonup |
+| `AROONOSC` | `AroonOsc` | S2 | dependent (upstream): `MaxIndex`, `MinIndex` | Group | high, low | window: Bars(14) | (one column) |
 | `BOP` | `BOP` | S2 | dependent: `Last` | Group | open, high, low, close | any window (bar-local) | (one column) |
 | `CCI` | `CCI` | S2 | new state (mean deviation needs the window) | plain | high, low, close | period=14 | (one column) |
 | `CMO` | `CMO` | S2 | new state | plain | real | period=14 | (one column) |
@@ -706,19 +693,19 @@ All 182 in-scope TA-Lib functions. The table is generated from the pinned YAML.
 | `MACDEXT` | `MACDExt` | S2 | new state | plain | real | fastperiod=12, fastmatype=:sma, slowperiod=26, slowmatype=:sma, signalperiod=9, signalmatype=:sma | macd, macdsignal, macdhist |
 | `MACDFIX` | `MACDFix` | S2 | new state | plain | real | signalperiod=9 | macd, macdsignal, macdhist |
 | `MFI` | `MFI` | S2 | new state | plain | high, low, close, volume | period=14 | (one column) |
-| `MOM` | `MOM` | S2 | dependent: `First`, `Last` | Monoid | real | window: Bars(11) | (one column) |
+| `MOM` | `MOM` | S2 | dependent: `First`, `Last` | Group | real | window: Bars(11) | (one column) |
 | `PPO` | `PPO` | S2 | new state | plain | real | fastperiod=12, slowperiod=26, matype=:ema | (one column) |
-| `ROC` | `ROC` | S2 | dependent: `First`, `Last` | Monoid | real | window: Bars(11) | (one column) |
-| `ROCP` | `ROCP` | S2 | dependent: `First`, `Last` | Monoid | real | window: Bars(11) | (one column) |
-| `ROCR` | `ROCR` | S2 | dependent: `First`, `Last` | Monoid | real | window: Bars(11) | (one column) |
-| `ROCR100` | `ROCR100` | S2 | dependent: `First`, `Last` | Monoid | real | window: Bars(11) | (one column) |
+| `ROC` | `ROC` | S2 | dependent: `First`, `Last` | Group | real | window: Bars(11) | (one column) |
+| `ROCP` | `ROCP` | S2 | dependent: `First`, `Last` | Group | real | window: Bars(11) | (one column) |
+| `ROCR` | `ROCR` | S2 | dependent: `First`, `Last` | Group | real | window: Bars(11) | (one column) |
+| `ROCR100` | `ROCR100` | S2 | dependent: `First`, `Last` | Group | real | window: Bars(11) | (one column) |
 | `RSI` | `RSI` | S2 | new state | plain | real | period=14 | (one column) |
 | `STOCH` | `Stoch` | S2 | new state | plain | high, low, close | fastkperiod=5, slowkperiod=3, slowkmatype=:sma, slowdperiod=3, slowdmatype=:sma | slowk, slowd |
 | `STOCHF` | `StochF` | S2 | new state (%K is `WillR`'s dependent) | plain | high, low, close | fastkperiod=5, fastdperiod=3, fastdmatype=:sma | fastk, fastd |
 | `STOCHRSI` | `StochRSI` | S2 | new state | plain | real | period=14, fastkperiod=5, fastdperiod=3, fastdmatype=:sma | fastk, fastd |
 | `TRIX` | `TRIX` | S2 | new state | plain | real | period=30 | (one column) |
 | `ULTOSC` | `ULTOSC` | S2 | new state | plain | high, low, close | timeperiod1=7, timeperiod2=14, timeperiod3=28 | (one column) |
-| `WILLR` | `WillR` | S2 | dependent: `Max`, `Min`, `Last` | Monoid | high, low, close | window: Bars(14) | (one column) |
+| `WILLR` | `WillR` | S2 | dependent: `Max`, `Min`, `Last` | Group | high, low, close | window: Bars(14) | (one column) |
 | `ACCBANDS` | `AccBands` | S3 | dependent (upstream): row-term `Sum`, `Count` | Group | high, low, close | window: Bars(20) | upperband, middleband, lowerband |
 | `ADR` | `ADR` | S3 | dependent (upstream): row-term `Sum`, `Count` | Group | high, low | window: Bars(14) | (one column) |
 | `ADX` | `ADX` | S3 | new state | plain | high, low, close | period=14 | (one column) |
@@ -727,7 +714,7 @@ All 182 in-scope TA-Lib functions. The table is generated from the pinned YAML.
 | `AVGDEV` | `AvgDev` | S3 | new state (mean deviation needs the window) | plain | real | period=14 | (one column) |
 | `BBANDS` | `BollingerBands` | S3 | dependent: `Mean`, `Std` (no `matype`); new state with `matype` | Group / plain | real | window: Bars(20), nbdevup=2, nbdevdn=2; with `matype`: period=20, matype=:sma | upperband, middleband, lowerband |
 | `CVI` | `CVI` | S3 | new state | plain | high, low | period=10, rocperiod=10 | (one column) |
-| `DONCHIAN` | `Donchian` | S3 | dependent: `Max`, `Min` | Monoid | high, low | window: Bars(20) | upperband, middleband, lowerband |
+| `DONCHIAN` | `Donchian` | S3 | dependent: `Max`, `Min` | Group | high, low | window: Bars(20) | upperband, middleband, lowerband |
 | `DX` | `DX` | S3 | new state | plain | high, low, close | period=14 | (one column) |
 | `KC` | `KeltnerChannels` | S3 | new state | plain | high, low, close | period=20, atrperiod=10, nbdev=2 | upperband, middleband, lowerband |
 | `MASSI` | `MassIndex` | S3 | new state | plain | high, low | fastperiod=9, slowperiod=25 | (one column) |
@@ -741,7 +728,7 @@ All 182 in-scope TA-Lib functions. The table is generated from the pinned YAML.
 | `SAREXT` | `SARExt` | S3 | new state | plain | high, low | startvalue=0, offsetonreverse=0, accelerationinitlong=0.02, accelerationlong=0.02, accelerationmaxlong=0.2, accelerationinitshort=0.02, accelerationshort=0.02, accelerationmaxshort=0.2 | (one column) |
 | `STDDEV` | `StdDev` | S3 | dependent: `Std(corrected=false)` | Group | real | window: Bars(5), nbdev=1 | (one column) |
 | `SUPERTREND` | `SuperTrend` | S3 | new state | plain | high, low, close | period=10, multiplier=3.0 | supertrend, trend |
-| `TRANGE` | `TRange` | S3 | dependent: `Last`, `First` | Monoid | high, low, close | window: Bars(2) (fixed) | (one column) |
+| `TRANGE` | `TRange` | S3 | dependent: `Last`, `First` | Group | high, low, close | window: Bars(2) (fixed) | (one column) |
 | `VAR` | `Variance(:x; corrected=false)` | S3 | CausalFrames only: `Variance(corrected=false)` | Group | real | window: Bars(5) (TA-Lib ignores nbdev) | (one column) |
 | `AD` | `AD` | S4 | dependent (upstream): row-term `Sum` (no window) | Group | high, low, close, volume | no window (`addsummarycolumns`) | (one column) |
 | `ADOSC` | `ADOSC` | S4 | new state | plain | high, low, close, volume | fastperiod=3, slowperiod=10 | (one column) |
@@ -749,20 +736,20 @@ All 182 in-scope TA-Lib functions. The table is generated from the pinned YAML.
 | `CMF` | `CMF` | S4 | dependent (upstream): row-term `Sum`, `Sum` | Group | high, low, close, volume | window: Bars(20) | (one column) |
 | `CORREL` | `Correlation(:a, :b)` | S4 | CausalFrames only: `Correlation` | Group | real0, real1 | window: Bars(30) | (one column) |
 | `EFI` | `EFI` | S4 | new state | plain | close, volume | period=13 | (one column) |
-| `LINEARREG` | `LinearReg` | S4 | dependent (upstream): recency sum, `Sum`, `Count` | Group | real | window: Bars(14) | (one column) |
-| `LINEARREG_ANGLE` | `LinearRegAngle` | S4 | dependent (upstream): recency sum, `Sum`, `Count` | Group | real | window: Bars(14) | (one column) |
-| `LINEARREG_INTERCEPT` | `LinearRegIntercept` | S4 | dependent (upstream): recency sum, `Sum`, `Count` | Group | real | window: Bars(14) | (one column) |
-| `LINEARREG_SLOPE` | `LinearRegSlope` | S4 | dependent (upstream): recency sum, `Sum`, `Count` | Group | real | window: Bars(14) | (one column) |
+| `LINEARREG` | `LinearReg` | S4 | dependent (upstream): `AgeWeightedSum`, `Sum`, `Count` | Group | real | window: Bars(14) | (one column) |
+| `LINEARREG_ANGLE` | `LinearRegAngle` | S4 | dependent (upstream): `AgeWeightedSum`, `Sum`, `Count` | Group | real | window: Bars(14) | (one column) |
+| `LINEARREG_INTERCEPT` | `LinearRegIntercept` | S4 | dependent (upstream): `AgeWeightedSum`, `Sum`, `Count` | Group | real | window: Bars(14) | (one column) |
+| `LINEARREG_SLOPE` | `LinearRegSlope` | S4 | dependent (upstream): `AgeWeightedSum`, `Sum`, `Count` | Group | real | window: Bars(14) | (one column) |
 | `MARKETFI` | `MarketFI` | S4 | dependent: `Last` | Group | high, low, volume | any window (bar-local) | (one column) |
 | `NVI` | `NVI` | S4 | new state | plain | close, volume | — | (one column) |
 | `OBV` | `OBV` | S4 | new state (previous close) | plain | real, volume | — | (one column) |
-| `PERCENTILE` | `Percentile` | S4 | dependent (upstream): sorted multiset | Group | real | window: Bars(30), percentile=50 | (one column) |
-| `PERCENTRANK` | `PercentRank` | S4 | dependent (upstream): sorted multiset, `Last` | Group | real | window: Bars(100) | (one column) |
+| `PERCENTILE` | `Quantile(:x, 0.5; interpolation=:nearestrank)` | S4 | CausalFrames only: `Quantile(percentile / 100; interpolation=:nearestrank)` | Group | real | window: Bars(30), percentile=50 | (one column) |
+| `PERCENTRANK` | `PercentRank100` | S4 | dependent (upstream): `PercentRank` | Group | real | window: Bars(101) (period + 1) | (one column) |
 | `PVI` | `PVI` | S4 | new state | plain | close, volume | — | (one column) |
 | `PVO` | `PVO` | S4 | new state | plain | volume | fastperiod=12, slowperiod=26, matype=:ema | (one column) |
 | `PVT` | `PVT` | S4 | new state | plain | close, volume | — | (one column) |
 | `RVOL` | `RVOL` | S4 | dependent: `Sum`, `Last` over n+1 bars | Group | volume | window: Bars(21) | (one column) |
-| `TSF` | `TSF` | S4 | dependent (upstream): recency sum, `Sum`, `Count` | Group | real | window: Bars(14) | (one column) |
+| `TSF` | `TSF` | S4 | dependent (upstream): `AgeWeightedSum`, `Sum`, `Count` | Group | real | window: Bars(14) | (one column) |
 | `VWAP` | `VWAP` | S4 | dependent (upstream): row-term `Sum`, `Sum` (no window) | Group | high, low, close, volume | no window (`addsummarycolumns`) | (one column) |
 | `AC` | `AC` | S5 | new state | plain | high, low | fastperiod=5, slowperiod=34, signalperiod=5 | (one column) |
 | `AO` | `AO` | S5 | new state (two `Mean` windows) | plain | high, low | fastperiod=5, slowperiod=34 | (one column) |
