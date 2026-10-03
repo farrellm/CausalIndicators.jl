@@ -1,0 +1,163 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_ha.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_ha.c"
+
+[arrays.haZeroSignBits]
+type = "int"
+values = [[1, 0, 1, 0], [0, 1, 0, 0], [0, 1, 1, 0], [0, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0]]
+
+[structs.HaGolden]
+fields = ["bar", "open", "high", "low", "close"]
+types = ["int", "double", "double", "double", "double"]
+
+[tables.haSeedOracle]
+type = "HaGolden"
+
+    [[tables.haSeedOracle.rows]]
+    bar = 0
+    close = 99.75
+    high = 102
+    low = 98
+    open = 99.5
+    [[tables.haSeedOracle.rows]]
+    bar = 1
+    close = 101.8125
+    high = 103.75
+    low = 99.5
+    open = 99.625
+    [[tables.haSeedOracle.rows]]
+    bar = 2
+    close = 103.3125
+    high = 105.5
+    low = 100.71875
+    open = 100.71875
+    [[tables.haSeedOracle.rows]]
+    bar = 3
+    close = 104.8125
+    high = 107.25
+    low = 102.015625
+    open = 102.015625
+    [[tables.haSeedOracle.rows]]
+    bar = 4
+    close = 106.3125
+    high = 109
+    low = 103.4140625
+    open = 103.4140625
+    [[tables.haSeedOracle.rows]]
+    bar = 5
+    close = 100.53125
+    high = 104.86328125
+    low = 98.125
+    open = 104.86328125
+    [[tables.haSeedOracle.rows]]
+    bar = 8
+    close = 104.8125
+    high = 107.125
+    low = 102.625
+    open = 102.83837890625
+    [[tables.haSeedOracle.rows]]
+    bar = 13
+    close = 105.03125
+    high = 107.875
+    low = 102.75
+    open = 102.97346496582031
+    [[tables.haSeedOracle.rows]]
+    bar = 21
+    close = 102.03125
+    high = 104.125
+    low = 100
+    open = 103.15480357408524
+    [[tables.haSeedOracle.rows]]
+    bar = 34
+    close = 107.3125
+    high = 110
+    low = 104.67228681073902
+    open = 104.67228681073902
+    [[tables.haSeedOracle.rows]]
+    bar = 55
+    close = 101.75
+    high = 106.26900576819745
+    low = 99.375
+    open = 106.26900576819745
+    [[tables.haSeedOracle.rows]]
+    bar = 63
+    close = 106.03125
+    high = 108.375
+    low = 104
+    open = 104.22639260065702
+
+[tables.haSrefOracle]
+type = "HaGolden"
+
+    [[tables.haSrefOracle.rows]]
+    bar = 0
+    close = 92
+    high = 93.25
+    low = 90.75
+    open = 92
+    [[tables.haSrefOracle.rows]]
+    bar = 1
+    close = 93.165
+    high = 94.94
+    low = 91.405
+    open = 92
+    [[tables.haSrefOracle.rows]]
+    bar = 2
+    close = 95.03875
+    high = 96.375
+    low = 92.58250000000001
+    open = 92.58250000000001
+    [[tables.haSrefOracle.rows]]
+    bar = 3
+    close = 94.68875
+    high = 96.19
+    low = 93.5
+    open = 93.810625
+    [[tables.haSrefOracle.rows]]
+    bar = 7
+    close = 91.93
+    high = 93.9969921875
+    low = 89.75
+    open = 93.9969921875
+    [[tables.haSrefOracle.rows]]
+    bar = 17
+    close = 89.6325
+    high = 91.64866893768311
+    low = 88.78
+    open = 91.64866893768311
+    [[tables.haSrefOracle.rows]]
+    bar = 50
+    close = 89.445
+    high = 90.57463583027958
+    low = 89
+    open = 90.57463583027958
+    [[tables.haSrefOracle.rows]]
+    bar = 100
+    close = 115.545
+    high = 116.87
+    low = 112.62
+    open = 113.9245584532806
+    [[tables.haSrefOracle.rows]]
+    bar = 137
+    close = 128.28
+    high = 132.94134950057648
+    low = 126.87
+    open = 132.94134950057648
+    [[tables.haSrefOracle.rows]]
+    bar = 199
+    close = 107.1725
+    high = 109
+    low = 104.69
+    open = 107.68744846790369
+    [[tables.haSrefOracle.rows]]
+    bar = 250
+    close = 109.375
+    high = 110.5
+    low = 108.56
+    open = 109.59657997536647
+    [[tables.haSrefOracle.rows]]
+    bar = 251
+    close = 108.295
+    high = 109.5
+    low = 106.62
+    open = 109.48578998768323

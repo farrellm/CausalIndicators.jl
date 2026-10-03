@@ -1,0 +1,147 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_tsi.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_tsi.c"
+
+[arrays.tsiStartGrid]
+type = "int"
+values = [0, 1, 60, 100, 175, 251]
+
+[arrays.tsiUnstGrid]
+type = "int"
+values = [0, 1, 3, 7]
+
+[structs.TsiGolden]
+fields = ["first", "second", "bar", "want"]
+types = ["int", "int", "int", "double"]
+
+[structs.TsiTail]
+fields = ["bar", "want"]
+types = ["int", "double"]
+
+[tables.tsiOracle]
+type = "TsiGolden"
+
+    [[tables.tsiOracle.rows]]
+    bar = 37
+    first = 25
+    second = 13
+    want = -0.4146122982459584
+    [[tables.tsiOracle.rows]]
+    bar = 38
+    first = 25
+    second = 13
+    want = -1.672713855773069
+    [[tables.tsiOracle.rows]]
+    bar = 90
+    first = 25
+    second = 13
+    want = 44.54191483202263
+    [[tables.tsiOracle.rows]]
+    bar = 144
+    first = 25
+    second = 13
+    want = 2.431088712674226
+    [[tables.tsiOracle.rows]]
+    bar = 183
+    first = 25
+    second = 13
+    want = 0.03179988476504059
+    [[tables.tsiOracle.rows]]
+    bar = 198
+    first = 25
+    second = 13
+    want = -28.613219734438267
+    [[tables.tsiOracle.rows]]
+    bar = 251
+    first = 25
+    second = 13
+    want = 7.321461455903427
+    [[tables.tsiOracle.rows]]
+    bar = 37
+    first = 13
+    second = 25
+    want = -8.4110519229398
+    [[tables.tsiOracle.rows]]
+    bar = 38
+    first = 13
+    second = 25
+    want = -9.362121509652944
+    [[tables.tsiOracle.rows]]
+    bar = 90
+    first = 13
+    second = 25
+    want = 44.42272254722673
+    [[tables.tsiOracle.rows]]
+    bar = 144
+    first = 13
+    second = 25
+    want = 2.429188249114649
+    [[tables.tsiOracle.rows]]
+    bar = 183
+    first = 13
+    second = 25
+    want = 0.0317280296696862
+    [[tables.tsiOracle.rows]]
+    bar = 198
+    first = 13
+    second = 25
+    want = -28.613241033713955
+    [[tables.tsiOracle.rows]]
+    bar = 251
+    first = 13
+    second = 25
+    want = 7.32146109299142
+    [[tables.tsiOracle.rows]]
+    bar = 7
+    first = 5
+    second = 3
+    want = 5.667436997909117
+    [[tables.tsiOracle.rows]]
+    bar = 8
+    first = 5
+    second = 3
+    want = -27.889130683770507
+    [[tables.tsiOracle.rows]]
+    bar = 68
+    first = 5
+    second = 3
+    want = -22.227345909791396
+    [[tables.tsiOracle.rows]]
+    bar = 129
+    first = 5
+    second = 3
+    want = 79.02722194354665
+    [[tables.tsiOracle.rows]]
+    bar = 190
+    first = 5
+    second = 3
+    want = -4.6779110594927
+    [[tables.tsiOracle.rows]]
+    bar = 219
+    first = 5
+    second = 3
+    want = 0.6885995046153934
+    [[tables.tsiOracle.rows]]
+    bar = 251
+    first = 5
+    second = 3
+    want = -33.99359826832133
+
+[tables.tsiTradingSignals]
+type = "TsiTail"
+
+    [[tables.tsiTradingSignals.rows]]
+    bar = 100
+    want = 7.624990325525326
+    [[tables.tsiTradingSignals.rows]]
+    bar = 150
+    want = -2.34926201042872
+    [[tables.tsiTradingSignals.rows]]
+    bar = 200
+    want = -40.48871219233019
+    [[tables.tsiTradingSignals.rows]]
+    bar = 240
+    want = -43.17771424476171
+    [[tables.tsiTradingSignals.rows]]
+    bar = 251
+    want = -33.99359826832133

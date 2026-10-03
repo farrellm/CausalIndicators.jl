@@ -1,0 +1,235 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_dpo.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_dpo.c"
+
+[arrays.dpoAtozVecIn]
+type = "double"
+values = [21.6562, 21.625, 21.5312, 22, 21.5, 21.9375, 22.8438, 23.0625, 22.8125, 23.4375, 19.9375, 20.4688, 20.0625, 19.75]
+
+[arrays.dpoAtozVecOut]
+type = "double"
+values = [-0.0833, -0.3751, -0.1458, -0.8594, -0.6615, 0.5053, 0.9687, 1.1823, 2.3594]
+
+[arrays.dpoPeriods]
+type = "int"
+values = [2, 3, 4, 5, 6, 20, 21, 100]
+
+[arrays.dpoTulipVecIn]
+type = "double"
+values = [81.59, 81.06, 82.87, 83.0, 83.61, 83.15, 82.84, 83.99, 84.55, 84.36, 85.53, 86.54, 86.89, 87.77, 87.29]
+
+[arrays.dpoTulipVecOut]
+type = "double"
+values = [-1.366, 0.132, -0.094, 0.292, -0.478, -0.938, -0.264, -0.444, -1.214, -0.688, -0.264]
+
+[structs.DpoBookVector]
+fields = ["source", "period", "nbIn", "in", "nbOut", "out", "decimals"]
+types = ["char *", "int", "int", "double *", "int", "double *", "int"]
+
+[structs.DpoGolden]
+fields = ["period", "bar", "tulip", "pandas"]
+types = ["int", "int", "double", "double"]
+
+[tables.dpoBookVectors]
+type = "DpoBookVector"
+
+    [[tables.dpoBookVectors.rows]]
+    decimals = 3
+    in = "dpoTulipVecIn"
+    nbIn = 15
+    nbOut = 11
+    out = "dpoTulipVecOut"
+    period = 5
+    source = "Tulip Indicators 0.9.2 tests/untest.txt:162"
+    [[tables.dpoBookVectors.rows]]
+    decimals = 4
+    in = "dpoAtozVecIn"
+    nbIn = 14
+    nbOut = 9
+    out = "dpoAtozVecOut"
+    period = 6
+    source = "Achelis, TA from A to Z p.119 (atoz.txt:95)"
+
+[tables.dpoOracle]
+type = "DpoGolden"
+
+    [[tables.dpoOracle.rows]]
+    bar = 2
+    pandas = -2.0633333333333326
+    period = 3
+    tulip = -2.0633333333333326
+    [[tables.dpoOracle.rows]]
+    bar = 3
+    pandas = 0.05333333333334167
+    period = 3
+    tulip = 0.05333333333334167
+    [[tables.dpoOracle.rows]]
+    bar = 46
+    pandas = 1.4210854715202004e-14
+    period = 3
+    tulip = 2.842170943040401e-14
+    [[tables.dpoOracle.rows]]
+    bar = 64
+    pandas = -0.27000000000001023
+    period = 3
+    tulip = -0.27000000000003865
+    [[tables.dpoOracle.rows]]
+    bar = 76
+    pandas = -8.415000000000006
+    period = 3
+    tulip = -8.41500000000002
+    [[tables.dpoOracle.rows]]
+    bar = 127
+    pandas = 0.22999999999998977
+    period = 3
+    tulip = 0.2300000000000182
+    [[tables.dpoOracle.rows]]
+    bar = 189
+    pandas = 1.4599999999999937
+    period = 3
+    tulip = 1.4599999999999653
+    [[tables.dpoOracle.rows]]
+    bar = 203
+    pandas = 9.686666666666667
+    period = 3
+    tulip = 9.686666666666639
+    [[tables.dpoOracle.rows]]
+    bar = 251
+    pandas = 0.45999999999999375
+    period = 3
+    tulip = 0.45999999999997954
+    [[tables.dpoOracle.rows]]
+    bar = 3
+    pandas = -2.446249999999992
+    period = 4
+    tulip = -2.446249999999992
+    [[tables.dpoOracle.rows]]
+    bar = 4
+    pandas = 0.2987499999999983
+    period = 4
+    tulip = 0.2987500000000125
+    [[tables.dpoOracle.rows]]
+    bar = 65
+    pandas = -0.585000000000008
+    period = 4
+    tulip = -0.585000000000008
+    [[tables.dpoOracle.rows]]
+    bar = 77
+    pandas = -11.061250000000001
+    period = 4
+    tulip = -11.061250000000001
+    [[tables.dpoOracle.rows]]
+    bar = 112
+    pandas = 0.017499999999984084
+    period = 4
+    tulip = 0.017499999999984084
+    [[tables.dpoOracle.rows]]
+    bar = 127
+    pandas = -0.7650000000000148
+    period = 4
+    tulip = -0.7650000000000432
+    [[tables.dpoOracle.rows]]
+    bar = 189
+    pandas = 0.3900000000000148
+    period = 4
+    tulip = 0.3899999999999011
+    [[tables.dpoOracle.rows]]
+    bar = 204
+    pandas = 10.547499999999985
+    period = 4
+    tulip = 10.547499999999886
+    [[tables.dpoOracle.rows]]
+    bar = 251
+    pandas = 0.9525000000000148
+    period = 4
+    tulip = 0.9524999999999295
+    [[tables.dpoOracle.rows]]
+    bar = 19
+    pandas = -2.5759999999999934
+    period = 20
+    tulip = -2.5760000000000076
+    [[tables.dpoOracle.rows]]
+    bar = 20
+    pandas = -0.26474999999999227
+    period = 20
+    tulip = -0.2647500000000065
+    [[tables.dpoOracle.rows]]
+    bar = 28
+    pandas = 0.0072499999999990905
+    period = 20
+    tulip = 0.0072499999999990905
+    [[tables.dpoOracle.rows]]
+    bar = 77
+    pandas = 2.132499999999993
+    period = 20
+    tulip = 2.132499999999993
+    [[tables.dpoOracle.rows]]
+    bar = 83
+    pandas = -12.087999999999994
+    period = 20
+    tulip = -12.088000000000008
+    [[tables.dpoOracle.rows]]
+    bar = 101
+    pandas = 9.66024999999999
+    period = 20
+    tulip = 9.66024999999999
+    [[tables.dpoOracle.rows]]
+    bar = 135
+    pandas = 0.4130000000000109
+    period = 20
+    tulip = 0.4130000000000109
+    [[tables.dpoOracle.rows]]
+    bar = 193
+    pandas = -1.9339999999999975
+    period = 20
+    tulip = -1.9339999999999975
+    [[tables.dpoOracle.rows]]
+    bar = 251
+    pandas = -3.5700000000000074
+    period = 20
+    tulip = -3.5699999999999648
+    [[tables.dpoOracle.rows]]
+    bar = 20
+    pandas = -0.20595238095238244
+    period = 21
+    tulip = -0.20595238095236823
+    [[tables.dpoOracle.rows]]
+    bar = 21
+    pandas = 3.633571428571429
+    period = 21
+    tulip = 3.633571428571443
+    [[tables.dpoOracle.rows]]
+    bar = 78
+    pandas = -0.015714285714295784
+    period = 21
+    tulip = -0.015714285714281573
+    [[tables.dpoOracle.rows]]
+    bar = 83
+    pandas = -11.89928571428571
+    period = 21
+    tulip = -11.89928571428571
+    [[tables.dpoOracle.rows]]
+    bar = 101
+    pandas = 10.076666666666654
+    period = 21
+    tulip = 10.076666666666696
+    [[tables.dpoOracle.rows]]
+    bar = 136
+    pandas = 1.7742857142857247
+    period = 21
+    tulip = 1.774285714285753
+    [[tables.dpoOracle.rows]]
+    bar = 160
+    pandas = -0.008095238095236823
+    period = 21
+    tulip = -0.00809523809519419
+    [[tables.dpoOracle.rows]]
+    bar = 194
+    pandas = 1.527142857142863
+    period = 21
+    tulip = 1.5271428571428913
+    [[tables.dpoOracle.rows]]
+    bar = 251
+    pandas = -3.317619047619047
+    period = 21
+    tulip = -3.317619047618976

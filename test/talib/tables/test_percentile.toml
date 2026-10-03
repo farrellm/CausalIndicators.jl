@@ -1,0 +1,453 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_percentile.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_percentile.c"
+
+[arrays.pctlBigN]
+type = "int"
+values = [1000]
+
+[arrays.pctlBookIn]
+type = "double"
+values = [15.0, 20.0, 35.0, 40.0, 50.0]
+
+[arrays.pctlBookOut]
+type = "double"
+values = [15.0, 20.0, 20.0, 20.0, 35.0, 40.0, 50.0, 50.0]
+
+[arrays.pctlBookP]
+type = "double"
+values = [5.0, 25.0, 30.0, 40.0, 50.0, 75.0, 95.0, 100.0]
+
+[arrays.pctlGridN]
+type = "int"
+values = [2, 3, 5, 20, 30, 100]
+
+[arrays.pctlGridP]
+type = "double"
+values = [0.0, 1.0, 7.0, 14.0, 17.0, 25.0, 27.0, 28.0, 34.0, 45.0, 50.0, 54.0, 55.0, 56.0, 60.0, 67.0, 68.0, 75.0, 81.0, 99.0, 100.0]
+
+[structs.PercentileExactRank]
+fields = ["period", "pct"]
+types = ["int", "int"]
+
+[structs.PercentileGolden]
+fields = ["period", "pct", "bar", "want"]
+types = ["int", "double", "int", "double"]
+
+[tables.pctlExactRank]
+type = "PercentileExactRank"
+
+    [[tables.pctlExactRank.rows]]
+    pct = 7
+    period = 100
+    [[tables.pctlExactRank.rows]]
+    pct = 14
+    period = 100
+    [[tables.pctlExactRank.rows]]
+    pct = 28
+    period = 100
+    [[tables.pctlExactRank.rows]]
+    pct = 55
+    period = 100
+    [[tables.pctlExactRank.rows]]
+    pct = 56
+    period = 100
+    [[tables.pctlExactRank.rows]]
+    pct = 14
+    period = 50
+    [[tables.pctlExactRank.rows]]
+    pct = 28
+    period = 50
+    [[tables.pctlExactRank.rows]]
+    pct = 28
+    period = 25
+    [[tables.pctlExactRank.rows]]
+    pct = 68
+    period = 75
+    [[tables.pctlExactRank.rows]]
+    pct = 7
+    period = 200
+
+[tables.percentileOracle]
+type = "PercentileGolden"
+
+    [[tables.percentileOracle.rows]]
+    bar = 1
+    pct = 50.0
+    period = 2
+    want = 91.5
+    [[tables.percentileOracle.rows]]
+    bar = 2
+    pct = 50.0
+    period = 2
+    want = 94.375
+    [[tables.percentileOracle.rows]]
+    bar = 25
+    pct = 50.0
+    period = 2
+    want = 81.375
+    [[tables.percentileOracle.rows]]
+    bar = 84
+    pct = 50.0
+    period = 2
+    want = 106
+    [[tables.percentileOracle.rows]]
+    bar = 126
+    pct = 50.0
+    period = 2
+    want = 131
+    [[tables.percentileOracle.rows]]
+    bar = 131
+    pct = 50.0
+    period = 2
+    want = 137.81
+    [[tables.percentileOracle.rows]]
+    bar = 168
+    pct = 50.0
+    period = 2
+    want = 125.87
+    [[tables.percentileOracle.rows]]
+    bar = 251
+    pct = 50.0
+    period = 2
+    want = 107.87
+    [[tables.percentileOracle.rows]]
+    bar = 2
+    pct = 50.0
+    period = 3
+    want = 94.375
+    [[tables.percentileOracle.rows]]
+    bar = 3
+    pct = 50.0
+    period = 3
+    want = 94.815
+    [[tables.percentileOracle.rows]]
+    bar = 25
+    pct = 50.0
+    period = 3
+    want = 83
+    [[tables.percentileOracle.rows]]
+    bar = 85
+    pct = 50.0
+    period = 3
+    want = 106
+    [[tables.percentileOracle.rows]]
+    bar = 127
+    pct = 50.0
+    period = 3
+    want = 132.25
+    [[tables.percentileOracle.rows]]
+    bar = 131
+    pct = 50.0
+    period = 3
+    want = 137.81
+    [[tables.percentileOracle.rows]]
+    bar = 168
+    pct = 50.0
+    period = 3
+    want = 125.87
+    [[tables.percentileOracle.rows]]
+    bar = 251
+    pct = 50.0
+    period = 3
+    want = 108.75
+    [[tables.percentileOracle.rows]]
+    bar = 4
+    pct = 25.0
+    period = 5
+    want = 93.78
+    [[tables.percentileOracle.rows]]
+    bar = 5
+    pct = 25.0
+    period = 5
+    want = 94.375
+    [[tables.percentileOracle.rows]]
+    bar = 25
+    pct = 25.0
+    period = 5
+    want = 83
+    [[tables.percentileOracle.rows]]
+    bar = 86
+    pct = 25.0
+    period = 5
+    want = 106
+    [[tables.percentileOracle.rows]]
+    bar = 128
+    pct = 25.0
+    period = 5
+    want = 131
+    [[tables.percentileOracle.rows]]
+    bar = 132
+    pct = 25.0
+    period = 5
+    want = 137.25
+    [[tables.percentileOracle.rows]]
+    bar = 169
+    pct = 25.0
+    period = 5
+    want = 124.56
+    [[tables.percentileOracle.rows]]
+    bar = 251
+    pct = 25.0
+    period = 5
+    want = 108.75
+    [[tables.percentileOracle.rows]]
+    bar = 19
+    pct = 45.0
+    period = 20
+    want = 92.47
+    [[tables.percentileOracle.rows]]
+    bar = 20
+    pct = 45.0
+    period = 20
+    want = 92.47
+    [[tables.percentileOracle.rows]]
+    bar = 40
+    pct = 45.0
+    period = 20
+    want = 84.875
+    [[tables.percentileOracle.rows]]
+    bar = 96
+    pct = 45.0
+    period = 20
+    want = 106.125
+    [[tables.percentileOracle.rows]]
+    bar = 135
+    pct = 45.0
+    period = 20
+    want = 131
+    [[tables.percentileOracle.rows]]
+    bar = 174
+    pct = 45.0
+    period = 20
+    want = 124.44
+    [[tables.percentileOracle.rows]]
+    bar = 251
+    pct = 45.0
+    period = 20
+    want = 109.2
+    [[tables.percentileOracle.rows]]
+    bar = 19
+    pct = 60.0
+    period = 20
+    want = 92.815
+    [[tables.percentileOracle.rows]]
+    bar = 20
+    pct = 60.0
+    period = 20
+    want = 92.815
+    [[tables.percentileOracle.rows]]
+    bar = 41
+    pct = 60.0
+    period = 20
+    want = 85.815
+    [[tables.percentileOracle.rows]]
+    bar = 96
+    pct = 60.0
+    period = 20
+    want = 110.5
+    [[tables.percentileOracle.rows]]
+    bar = 135
+    pct = 60.0
+    period = 20
+    want = 132.81
+    [[tables.percentileOracle.rows]]
+    bar = 174
+    pct = 60.0
+    period = 20
+    want = 127.25
+    [[tables.percentileOracle.rows]]
+    bar = 251
+    pct = 60.0
+    period = 20
+    want = 109.75
+    [[tables.percentileOracle.rows]]
+    bar = 20
+    pct = 50.0
+    period = 21
+    want = 92.53
+    [[tables.percentileOracle.rows]]
+    bar = 21
+    pct = 50.0
+    period = 21
+    want = 92.53
+    [[tables.percentileOracle.rows]]
+    bar = 41
+    pct = 50.0
+    period = 21
+    want = 85.5
+    [[tables.percentileOracle.rows]]
+    bar = 97
+    pct = 50.0
+    period = 21
+    want = 109.315
+    [[tables.percentileOracle.rows]]
+    bar = 134
+    pct = 50.0
+    period = 21
+    want = 131
+    [[tables.percentileOracle.rows]]
+    bar = 136
+    pct = 50.0
+    period = 21
+    want = 131
+    [[tables.percentileOracle.rows]]
+    bar = 174
+    pct = 50.0
+    period = 21
+    want = 124.56
+    [[tables.percentileOracle.rows]]
+    bar = 251
+    pct = 50.0
+    period = 21
+    want = 109.25
+    [[tables.percentileOracle.rows]]
+    bar = 29
+    pct = 50.0
+    period = 30
+    want = 90.315
+    [[tables.percentileOracle.rows]]
+    bar = 30
+    pct = 50.0
+    period = 30
+    want = 89.875
+    [[tables.percentileOracle.rows]]
+    bar = 57
+    pct = 50.0
+    period = 30
+    want = 86.375
+    [[tables.percentileOracle.rows]]
+    bar = 103
+    pct = 50.0
+    period = 30
+    want = 110.5
+    [[tables.percentileOracle.rows]]
+    bar = 140
+    pct = 50.0
+    period = 30
+    want = 124.81
+    [[tables.percentileOracle.rows]]
+    bar = 142
+    pct = 50.0
+    period = 30
+    want = 128.25
+    [[tables.percentileOracle.rows]]
+    bar = 177
+    pct = 50.0
+    period = 30
+    want = 124
+    [[tables.percentileOracle.rows]]
+    bar = 251
+    pct = 50.0
+    period = 30
+    want = 108.75
+    [[tables.percentileOracle.rows]]
+    bar = 29
+    pct = 0.0
+    period = 30
+    want = 81.375
+    [[tables.percentileOracle.rows]]
+    bar = 30
+    pct = 0.0
+    period = 30
+    want = 81.375
+    [[tables.percentileOracle.rows]]
+    bar = 103
+    pct = 0.0
+    period = 30
+    want = 85.94
+    [[tables.percentileOracle.rows]]
+    bar = 140
+    pct = 0.0
+    period = 30
+    want = 115.5
+    [[tables.percentileOracle.rows]]
+    bar = 145
+    pct = 0.0
+    period = 30
+    want = 122.25
+    [[tables.percentileOracle.rows]]
+    bar = 177
+    pct = 0.0
+    period = 30
+    want = 119.31
+    [[tables.percentileOracle.rows]]
+    bar = 251
+    pct = 0.0
+    period = 30
+    want = 98
+    [[tables.percentileOracle.rows]]
+    bar = 29
+    pct = 100.0
+    period = 30
+    want = 98.5
+    [[tables.percentileOracle.rows]]
+    bar = 30
+    pct = 100.0
+    period = 30
+    want = 98.5
+    [[tables.percentileOracle.rows]]
+    bar = 48
+    pct = 100.0
+    period = 30
+    want = 91.44
+    [[tables.percentileOracle.rows]]
+    bar = 103
+    pct = 100.0
+    period = 30
+    want = 123
+    [[tables.percentileOracle.rows]]
+    bar = 131
+    pct = 100.0
+    period = 30
+    want = 137.88
+    [[tables.percentileOracle.rows]]
+    bar = 140
+    pct = 100.0
+    period = 30
+    want = 137.88
+    [[tables.percentileOracle.rows]]
+    bar = 177
+    pct = 100.0
+    period = 30
+    want = 135
+    [[tables.percentileOracle.rows]]
+    bar = 251
+    pct = 100.0
+    period = 30
+    want = 118.28
+    [[tables.percentileOracle.rows]]
+    bar = 99
+    pct = 75.0
+    period = 100
+    want = 97.25
+    [[tables.percentileOracle.rows]]
+    bar = 100
+    pct = 75.0
+    period = 100
+    want = 98.5
+    [[tables.percentileOracle.rows]]
+    bar = 150
+    pct = 75.0
+    period = 100
+    want = 123.19
+    [[tables.percentileOracle.rows]]
+    bar = 175
+    pct = 75.0
+    period = 100
+    want = 127.25
+    [[tables.percentileOracle.rows]]
+    bar = 179
+    pct = 75.0
+    period = 100
+    want = 128.38
+    [[tables.percentileOracle.rows]]
+    bar = 201
+    pct = 75.0
+    period = 100
+    want = 128.38
+    [[tables.percentileOracle.rows]]
+    bar = 251
+    pct = 75.0
+    period = 100
+    want = 123.19

@@ -1,0 +1,74 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_sar.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_sar.c"
+
+[arrays.wilderHigh]
+type = "TA_Real"
+values = [51.12, 52.35, 52.1, 51.8, 52.1, 52.5, 52.8, 52.5, 53.5, 53.5, 53.8, 54.2, 53.4, 53.5, 54.4, 55.2, 55.7, 57, 57.5, 58, 57.7, 58, 57.5, 57, 56.7, 57.5, 56.7, 56.0, 56.2, 54.8, 55.5, 54.7, 54.0, 52.5, 51.0, 51.5, 51.7, 53.0]
+
+[arrays.wilderLow]
+type = "TA_Real"
+values = [50.0, 51.5, 51, 50.5, 51.25, 51.7, 51.85, 51.5, 52.3, 52.5, 53, 53.5, 52.5, 52.1, 53, 54, 55, 56, 56.5, 57, 56.5, 57.3, 56.7, 56.3, 56.2, 56, 55.5, 55.0, 54.9, 54.0, 54.5, 53.8, 53.0, 51.5, 50.0, 50.5, 50.2, 51.5]
+
+[structs.TA_Test]
+fields = ["useWilderData", "startIdx", "endIdx", "optInAcceleration", "optInMaximum", "expectedRetCode", "oneOfTheExpectedOutRealIndex0", "oneOfTheExpectedOutReal0", "expectedBegIdx", "expectedNbElement"]
+types = ["TA_Integer", "TA_Integer", "TA_Integer", "TA_Real", "TA_Real", "TA_RetCode", "TA_Integer", "TA_Real", "TA_Integer", "TA_Integer"]
+
+[tables.tableTest]
+type = "TA_Test"
+
+    [[tables.tableTest.rows]]
+    endIdx = 37
+    expectedBegIdx = 1
+    expectedNbElement = 37
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 50.0
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInAcceleration = 0.02
+    optInMaximum = 0.2
+    startIdx = 0
+    useWilderData = 1
+    [[tables.tableTest.rows]]
+    endIdx = 37
+    expectedBegIdx = 1
+    expectedNbElement = 37
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 50.047
+    oneOfTheExpectedOutRealIndex0 = 1
+    optInAcceleration = 0.02
+    optInMaximum = 0.2
+    startIdx = 0
+    useWilderData = 1
+    [[tables.tableTest.rows]]
+    endIdx = 37
+    expectedBegIdx = 1
+    expectedNbElement = 37
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 50.182
+    oneOfTheExpectedOutRealIndex0 = 4
+    optInAcceleration = 0.02
+    optInMaximum = 0.2
+    startIdx = 0
+    useWilderData = 1
+    [[tables.tableTest.rows]]
+    endIdx = 37
+    expectedBegIdx = 1
+    expectedNbElement = 37
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 52.93
+    oneOfTheExpectedOutRealIndex0 = 35
+    optInAcceleration = 0.02
+    optInMaximum = 0.2
+    startIdx = 0
+    useWilderData = 1
+    [[tables.tableTest.rows]]
+    endIdx = 37
+    expectedBegIdx = 1
+    expectedNbElement = 37
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 50.0
+    oneOfTheExpectedOutRealIndex0 = 36
+    optInAcceleration = 0.02
+    optInMaximum = 0.2
+    startIdx = 0
+    useWilderData = 1

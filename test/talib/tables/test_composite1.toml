@@ -1,0 +1,103 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_composite1.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_composite1.c"
+
+[arrays.acStartGrid]
+type = "int"
+values = [0, 1, 40, 60, 120, 200, 251]
+
+[arrays.aoStartGrid]
+type = "int"
+values = [0, 1, 34, 40, 200, 251]
+
+[arrays.cmfDiffGrid]
+type = "int"
+values = [2, 14, 20, 21, 50, 100]
+
+[arrays.efiGrid]
+type = "int"
+values = [1, 2, 13, 30]
+
+[arrays.efiInPlaceGrid]
+type = "int"
+values = [1, 2, 13]
+
+[arrays.efiStartGrid]
+type = "int"
+values = [0, 1, 40, 200]
+
+[arrays.efiUnstGrid]
+type = "unsigned int"
+values = [0, 5]
+
+[arrays.hmaGrid]
+type = "int"
+values = [2, 3, 4, 5, 9, 16, 20, 25, 30, 100]
+
+[arrays.qstickBookClose]
+type = "double"
+values = [64.5625, 64.125, 64.3125, 64.875, 65.1875, 62, 62.1875, 63.875]
+
+[arrays.qstickBookExp]
+type = "double"
+values = [0.796875, 0.46875, -0.203125, 0.015625, 0.1875]
+
+[arrays.qstickBookOpen]
+type = "double"
+values = [62.5625, 64.625, 63.5625, 63.9375, 64.5, 65.1875, 60.5625, 62.25]
+
+[arrays.qstickGrid]
+type = "int"
+values = [1, 2, 3, 5, 8, 10, 14, 30, 100]
+
+[arrays.qstickInPlaceGrid]
+type = "int"
+values = [1, 10, 30]
+
+[arrays.qstickStartGrid]
+type = "int"
+values = [0, 1, 40, 200]
+
+[arrays.qstickTulipClose]
+type = "double"
+values = [81.59, 81.06, 82.87, 83.0, 83.61, 83.15, 82.84, 83.99, 84.55, 84.36, 85.53, 86.54, 86.89, 87.77, 87.29]
+
+[arrays.qstickTulipExp]
+type = "double"
+values = [0.3040000000000049, 0.3040000000000049, 0.3580000000000069, 0.35200000000000387, 0.404000000000002, 0.3240000000000009, 0.675999999999999, 0.8679999999999979, 0.7519999999999982, 0.6359999999999986, 0.552000000000001]
+
+[arrays.qstickTulipOpen]
+type = "double"
+values = [81.85, 81.2, 81.55, 82.91, 83.1, 83.41, 82.71, 82.7, 84.2, 84.25, 84.03, 85.45, 86.18, 88.0, 87.6]
+
+[arrays.tulipVwma4Exp]
+type = "double"
+values = [51.9819, 52.8828, 53.7204, 54.6075, 53.1948, 52.434, 51.6345]
+
+[arrays.tulipVwma4In]
+type = "double"
+values = [50.25, 50.55, 52.5, 54.5, 54.1, 54.12, 55.5, 50.2, 50.45, 50.24]
+
+[arrays.tulipVwma4Vol]
+type = "double"
+values = [12412, 12458, 15874, 12354, 12456, 12542, 15421, 19510, 12521, 12041]
+
+[arrays.tulipVwma5Exp]
+type = "double"
+values = [82.332, 82.61, 83.07, 83.354, 83.682, 83.822, 84.409, 85.165, 85.698, 86.418, 86.805]
+
+[arrays.tulipVwma5In]
+type = "double"
+values = [81.59, 81.06, 82.87, 83.0, 83.61, 83.15, 82.84, 83.99, 84.55, 84.36, 85.53, 86.54, 86.89, 87.77, 87.29]
+
+[arrays.tulipVwma5Vol]
+type = "double"
+values = [5653100, 6447400, 7690900, 3831400, 4455100, 3798000, 3936200, 4732000, 4841300, 3915300, 6830800, 6694100, 5293600, 7985800, 4807900]
+
+[arrays.vwmaGrid]
+type = "int"
+values = [2, 3, 4, 5, 14, 30, 100]
+
+[arrays.vwmaInPlaceGrid]
+type = "int"
+values = [1, 30]

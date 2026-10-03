@@ -1,0 +1,211 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_percentrank.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_percentrank.c"
+
+[structs.PercentRankGolden]
+fields = ["period", "bar", "want"]
+types = ["int", "int", "double"]
+
+[tables.percentRankOracle]
+type = "PercentRankGolden"
+
+    [[tables.percentRankOracle.rows]]
+    bar = 2
+    period = 2
+    want = 50
+    [[tables.percentRankOracle.rows]]
+    bar = 3
+    period = 2
+    want = 100
+    [[tables.percentRankOracle.rows]]
+    bar = 4
+    period = 2
+    want = 0
+    [[tables.percentRankOracle.rows]]
+    bar = 20
+    period = 2
+    want = 0
+    [[tables.percentRankOracle.rows]]
+    bar = 64
+    period = 2
+    want = 100
+    [[tables.percentRankOracle.rows]]
+    bar = 70
+    period = 2
+    want = 0
+    [[tables.percentRankOracle.rows]]
+    bar = 100
+    period = 2
+    want = 50
+    [[tables.percentRankOracle.rows]]
+    bar = 127
+    period = 2
+    want = 100
+    [[tables.percentRankOracle.rows]]
+    bar = 150
+    period = 2
+    want = 0
+    [[tables.percentRankOracle.rows]]
+    bar = 189
+    period = 2
+    want = 50
+    [[tables.percentRankOracle.rows]]
+    bar = 251
+    period = 2
+    want = 0
+    [[tables.percentRankOracle.rows]]
+    bar = 3
+    period = 3
+    want = 100
+    [[tables.percentRankOracle.rows]]
+    bar = 4
+    period = 3
+    want = 0
+    [[tables.percentRankOracle.rows]]
+    bar = 5
+    period = 3
+    want = 66.66666666666666
+    [[tables.percentRankOracle.rows]]
+    bar = 20
+    period = 3
+    want = 0
+    [[tables.percentRankOracle.rows]]
+    bar = 65
+    period = 3
+    want = 100
+    [[tables.percentRankOracle.rows]]
+    bar = 70
+    period = 3
+    want = 0
+    [[tables.percentRankOracle.rows]]
+    bar = 79
+    period = 3
+    want = 33.33333333333333
+    [[tables.percentRankOracle.rows]]
+    bar = 100
+    period = 3
+    want = 66.66666666666666
+    [[tables.percentRankOracle.rows]]
+    bar = 127
+    period = 3
+    want = 100
+    [[tables.percentRankOracle.rows]]
+    bar = 144
+    period = 3
+    want = 33.33333333333333
+    [[tables.percentRankOracle.rows]]
+    bar = 150
+    period = 3
+    want = 33.33333333333333
+    [[tables.percentRankOracle.rows]]
+    bar = 189
+    period = 3
+    want = 33.33333333333333
+    [[tables.percentRankOracle.rows]]
+    bar = 197
+    period = 3
+    want = 33.33333333333333
+    [[tables.percentRankOracle.rows]]
+    bar = 251
+    period = 3
+    want = 0
+    [[tables.percentRankOracle.rows]]
+    bar = 20
+    period = 20
+    want = 0
+    [[tables.percentRankOracle.rows]]
+    bar = 21
+    period = 20
+    want = 0
+    [[tables.percentRankOracle.rows]]
+    bar = 43
+    period = 20
+    want = 100
+    [[tables.percentRankOracle.rows]]
+    bar = 58
+    period = 20
+    want = 55.00000000000001
+    [[tables.percentRankOracle.rows]]
+    bar = 70
+    period = 20
+    want = 45
+    [[tables.percentRankOracle.rows]]
+    bar = 78
+    period = 20
+    want = 100
+    [[tables.percentRankOracle.rows]]
+    bar = 98
+    period = 20
+    want = 55.00000000000001
+    [[tables.percentRankOracle.rows]]
+    bar = 100
+    period = 20
+    want = 65
+    [[tables.percentRankOracle.rows]]
+    bar = 105
+    period = 20
+    want = 55.00000000000001
+    [[tables.percentRankOracle.rows]]
+    bar = 136
+    period = 20
+    want = 35
+    [[tables.percentRankOracle.rows]]
+    bar = 150
+    period = 20
+    want = 10
+    [[tables.percentRankOracle.rows]]
+    bar = 157
+    period = 20
+    want = 55.00000000000001
+    [[tables.percentRankOracle.rows]]
+    bar = 194
+    period = 20
+    want = 5
+    [[tables.percentRankOracle.rows]]
+    bar = 251
+    period = 20
+    want = 10
+    [[tables.percentRankOracle.rows]]
+    bar = 100
+    period = 100
+    want = 93
+    [[tables.percentRankOracle.rows]]
+    bar = 101
+    period = 100
+    want = 92
+    [[tables.percentRankOracle.rows]]
+    bar = 116
+    period = 100
+    want = 100
+    [[tables.percentRankOracle.rows]]
+    bar = 138
+    period = 100
+    want = 83
+    [[tables.percentRankOracle.rows]]
+    bar = 150
+    period = 100
+    want = 67
+    [[tables.percentRankOracle.rows]]
+    bar = 176
+    period = 100
+    want = 85
+    [[tables.percentRankOracle.rows]]
+    bar = 186
+    period = 100
+    want = 28.000000000000004
+    [[tables.percentRankOracle.rows]]
+    bar = 195
+    period = 100
+    want = 0
+    [[tables.percentRankOracle.rows]]
+    bar = 214
+    period = 100
+    want = 5
+    [[tables.percentRankOracle.rows]]
+    bar = 231
+    period = 100
+    want = 28.000000000000004
+    [[tables.percentRankOracle.rows]]
+    bar = 251
+    period = 100
+    want = 35

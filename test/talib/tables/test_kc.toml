@@ -1,0 +1,231 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_kc.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_kc.c"
+
+[structs.KcGolden]
+fields = ["emaPeriod", "atrPeriod", "nbDev", "bar", "upper", "middle", "lower"]
+types = ["int", "int", "double", "int", "double", "double", "double"]
+
+[structs.KcShape]
+fields = ["emaPeriod", "atrPeriod", "nbDev", "begIdx", "nbElement"]
+types = ["int", "int", "double", "int", "int"]
+
+[structs.KcShapeSweep]
+fields = ["emaPeriod", "atrPeriod", "nbDev"]
+types = ["int", "int", "double"]
+
+[tables.kcGdOracle]
+type = "KcGolden"
+
+    [[tables.kcGdOracle.rows]]
+    atrPeriod = 10
+    bar = 950
+    emaPeriod = 20
+    lower = 87.78457508700791
+    middle = 90.46443209838381
+    nbDev = 2.0
+    upper = 93.14428910975971
+    [[tables.kcGdOracle.rows]]
+    atrPeriod = 10
+    bar = 975
+    emaPeriod = 20
+    lower = 88.2224857809855
+    middle = 90.84851994483456
+    nbDev = 2.0
+    upper = 93.47455410868363
+    [[tables.kcGdOracle.rows]]
+    atrPeriod = 10
+    bar = 999
+    emaPeriod = 20
+    lower = 85.40113576158177
+    middle = 89.31911847175239
+    nbDev = 2.0
+    upper = 93.23710118192301
+    [[tables.kcGdOracle.rows]]
+    atrPeriod = 10
+    bar = 950
+    emaPeriod = 10
+    lower = 88.73831311322469
+    middle = 90.07824161891264
+    nbDev = 1.0
+    upper = 91.41817012460059
+    [[tables.kcGdOracle.rows]]
+    atrPeriod = 10
+    bar = 975
+    emaPeriod = 10
+    lower = 90.33592238700045
+    middle = 91.64893946892498
+    nbDev = 1.0
+    upper = 92.96195655084951
+    [[tables.kcGdOracle.rows]]
+    atrPeriod = 10
+    bar = 999
+    emaPeriod = 10
+    lower = 86.68985200850166
+    middle = 88.64884336358696
+    nbDev = 1.0
+    upper = 90.60783471867227
+    [[tables.kcGdOracle.rows]]
+    atrPeriod = 20
+    bar = 995
+    emaPeriod = 30
+    lower = 85.76582228178114
+    middle = 90.07335892176341
+    nbDev = 2.5
+    upper = 94.38089556174569
+    [[tables.kcGdOracle.rows]]
+    atrPeriod = 20
+    bar = 997
+    emaPeriod = 30
+    lower = 85.66401061637683
+    middle = 89.96824993396083
+    nbDev = 2.5
+    upper = 94.27248925154484
+    [[tables.kcGdOracle.rows]]
+    atrPeriod = 20
+    bar = 999
+    emaPeriod = 30
+    lower = 85.14741929714411
+    middle = 89.63605778126367
+    nbDev = 2.5
+    upper = 94.12469626538324
+    [[tables.kcGdOracle.rows]]
+    atrPeriod = 10
+    bar = 950
+    emaPeriod = 4
+    lower = 87.63123448103859
+    middle = 90.31109149241449
+    nbDev = 2.0
+    upper = 92.99094850379039
+    [[tables.kcGdOracle.rows]]
+    atrPeriod = 10
+    bar = 975
+    emaPeriod = 4
+    lower = 89.8930783868403
+    middle = 92.51911255068937
+    nbDev = 2.0
+    upper = 95.14514671453844
+    [[tables.kcGdOracle.rows]]
+    atrPeriod = 10
+    bar = 999
+    emaPeriod = 4
+    lower = 83.96764137838777
+    middle = 87.88562408855839
+    nbDev = 2.0
+    upper = 91.803606798729
+
+[tables.kcGdShape]
+type = "KcShape"
+
+    [[tables.kcGdShape.rows]]
+    atrPeriod = 10
+    begIdx = 19
+    emaPeriod = 20
+    nbDev = 2.0
+    nbElement = 981
+    [[tables.kcGdShape.rows]]
+    atrPeriod = 10
+    begIdx = 10
+    emaPeriod = 10
+    nbDev = 1.0
+    nbElement = 990
+    [[tables.kcGdShape.rows]]
+    atrPeriod = 20
+    begIdx = 29
+    emaPeriod = 30
+    nbDev = 2.5
+    nbElement = 971
+    [[tables.kcGdShape.rows]]
+    atrPeriod = 10
+    begIdx = 10
+    emaPeriod = 4
+    nbDev = 2.0
+    nbElement = 990
+
+[tables.kcSrefOracle]
+type = "KcGolden"
+
+    [[tables.kcSrefOracle.rows]]
+    atrPeriod = 4
+    bar = 200
+    emaPeriod = 8
+    lower = 103.53592990964667
+    middle = 109.58860275540715
+    nbDev = 1.5
+    upper = 115.64127560116764
+    [[tables.kcSrefOracle.rows]]
+    atrPeriod = 4
+    bar = 225
+    emaPeriod = 8
+    lower = 94.55789863407092
+    middle = 100.77603770649361
+    nbDev = 1.5
+    upper = 106.9941767789163
+    [[tables.kcSrefOracle.rows]]
+    atrPeriod = 4
+    bar = 251
+    emaPeriod = 8
+    lower = 105.52819844508795
+    middle = 109.06516670756777
+    nbDev = 1.5
+    upper = 112.60213497004759
+    [[tables.kcSrefOracle.rows]]
+    atrPeriod = 4
+    bar = 200
+    emaPeriod = 4
+    lower = 95.35691763015329
+    middle = 107.46226332167424
+    nbDev = 3.0
+    upper = 119.5676090131952
+    [[tables.kcSrefOracle.rows]]
+    atrPeriod = 4
+    bar = 225
+    emaPeriod = 4
+    lower = 91.46808945202991
+    middle = 103.90436759687529
+    nbDev = 3.0
+    upper = 116.34064574172066
+    [[tables.kcSrefOracle.rows]]
+    atrPeriod = 4
+    bar = 251
+    emaPeriod = 4
+    lower = 101.74539126790228
+    middle = 108.81932779286193
+    nbDev = 3.0
+    upper = 115.89326431782158
+
+[tables.kcSrefShape]
+type = "KcShape"
+
+    [[tables.kcSrefShape.rows]]
+    atrPeriod = 4
+    begIdx = 7
+    emaPeriod = 8
+    nbDev = 1.5
+    nbElement = 245
+    [[tables.kcSrefShape.rows]]
+    atrPeriod = 4
+    begIdx = 4
+    emaPeriod = 4
+    nbDev = 3.0
+    nbElement = 248
+
+[tables.kcSweep]
+type = "KcShapeSweep"
+
+    [[tables.kcSweep.rows]]
+    atrPeriod = 10
+    emaPeriod = 20
+    nbDev = 2.0
+    [[tables.kcSweep.rows]]
+    atrPeriod = 4
+    emaPeriod = 8
+    nbDev = 1.5
+    [[tables.kcSweep.rows]]
+    atrPeriod = 10
+    emaPeriod = 4
+    nbDev = 2.0
+    [[tables.kcSweep.rows]]
+    atrPeriod = 4
+    emaPeriod = 4
+    nbDev = 3.0

@@ -1,0 +1,29 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_marketfi.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_marketfi.c"
+
+[structs.MarketfiPin]
+fields = ["idx", "value"]
+types = ["int", "double"]
+
+[tables.marketfiPin]
+type = "MarketfiPin"
+
+    [[tables.marketfiPin.rows]]
+    idx = 0
+    value = 6.131207847946046e-7
+    [[tables.marketfiPin.rows]]
+    idx = 2
+    value = 4.4499822000712e-7
+    [[tables.marketfiPin.rows]]
+    idx = 50
+    value = 2.8885037550548817e-7
+    [[tables.marketfiPin.rows]]
+    idx = 125
+    value = 7.756092057761733e-7
+    [[tables.marketfiPin.rows]]
+    idx = 200
+    value = 3.330684749599994e-7
+    [[tables.marketfiPin.rows]]
+    idx = 251
+    value = 1.0033095279568003e-6

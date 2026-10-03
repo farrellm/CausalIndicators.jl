@@ -1,0 +1,243 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_fractal.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_fractal.c"
+
+[arrays.fractalDegPairs]
+type = "int"
+values = [[1, 1], [2, 2], [3, 3], [5, 5], [2, 5], [5, 2]]
+
+[arrays.fractalSynHigh]
+type = "TA_Real"
+values = [50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 50.0, 51.0, 52.5, 51.0, 53.0, 51.5, 50.0, 51.5, 50.0, 52.0, 50.5, 52.0, 50.5, 56.0, 51.0, 52.5, 51.0, 53.0, 51.5, 50.0, 51.5, 50.0, 52.0, 50.5, 52.0, 48.0, 48.5, 49.0, 49.5, 50.0, 50.5, 51.0, 51.5, 52.0, 52.5, 53.0, 53.5]
+
+[arrays.fractalSynLow]
+type = "TA_Real"
+values = [40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 40.0, 38.5, 40.0, 38.5, 40.0, 39.0, 37.5, 39.0, 38.0, 39.5, 38.0, 39.5, 38.5, 34.0, 38.5, 40.0, 39.0, 37.5, 39.0, 38.0, 39.5, 38.0, 39.5, 38.5, 40.0, 42.0, 41.5, 41.0, 40.5, 40.0, 39.5, 39.0, 38.5, 38.0, 37.5, 37.0, 36.5]
+
+[arrays.fsH_1_1]
+type = "int"
+values = [10, 12, 15, 17, 19, 21, 23, 25, 28, 30, 32]
+
+[arrays.fsH_1_2]
+type = "int"
+values = [13, 22, 26, 33]
+
+[arrays.fsH_2_1]
+type = "int"
+values = [10, 12, 17, 21, 25, 30]
+
+[arrays.fsH_2_2]
+type = "int"
+values = [13, 22, 26]
+
+[arrays.fsL_1_1]
+type = "int"
+values = [9, 11, 14, 16, 18, 21, 25, 27, 29, 31]
+
+[arrays.fsL_1_2]
+type = "int"
+values = [12, 15, 19, 22, 26, 30, 32]
+
+[arrays.fsL_2_1]
+type = "int"
+values = [9, 14, 21, 25]
+
+[arrays.fsL_2_2]
+type = "int"
+values = [15, 22, 26]
+
+[arrays.fxH_10_1]
+type = "int"
+values = [12, 35, 45, 47, 61, 79, 84, 91, 107, 115, 118, 124, 127, 132, 158, 174, 226, 237]
+
+[arrays.fxH_1_1]
+type = "int"
+values = [3, 7, 12, 17, 20, 26, 28, 30, 35, 40, 45, 47, 50, 53, 61, 69, 79, 84, 91, 94, 100, 107, 109, 115, 118, 121, 124, 127, 132, 136, 143, 145, 150, 158, 161, 164, 168, 174, 177, 183, 185, 191, 195, 200, 202, 206, 209, 218, 220, 226, 228, 237, 239, 243, 247, 249]
+
+[arrays.fxH_1_10]
+type = "int"
+values = [21, 26, 29, 56, 59, 100, 103, 141, 145, 152, 167, 183, 186, 192, 194, 200, 204, 211, 218, 246, 248]
+
+[arrays.fxH_2_2]
+type = "int"
+values = [4, 13, 18, 21, 29, 36, 48, 51, 80, 85, 92, 101, 108, 119, 122, 133, 137, 144, 151, 159, 165, 175, 192, 203, 207, 210, 219, 227, 238, 244, 250]
+
+[arrays.fxH_2_5]
+type = "int"
+values = [7, 16, 21, 24, 32, 39, 51, 54, 95, 104, 111, 122, 136, 140, 147, 154, 162, 178, 195, 206, 213, 230, 241, 247]
+
+[arrays.fxH_3_3]
+type = "int"
+values = [14, 19, 30, 37, 49, 81, 93, 102, 109, 120, 134, 138, 145, 152, 160, 176, 193, 204, 211, 220, 228, 239, 245, 251]
+
+[arrays.fxH_5_2]
+type = "int"
+values = [13, 29, 36, 48, 80, 85, 92, 108, 119, 133, 151, 159, 165, 175, 203, 210, 219, 227, 238, 250]
+
+[arrays.fxH_5_5]
+type = "int"
+values = [16, 32, 39, 51, 95, 111, 122, 136, 154, 162, 178, 206, 213, 230, 241]
+
+[arrays.fxL_10_1]
+type = "int"
+values = [15, 26, 39, 41, 55, 74, 104, 137, 140, 149, 179, 184, 189, 194, 199, 203]
+
+[arrays.fxL_1_1]
+type = "int"
+values = [5, 9, 15, 18, 26, 31, 39, 41, 49, 55, 62, 65, 74, 85, 90, 93, 99, 104, 108, 111, 120, 122, 128, 134, 137, 140, 149, 152, 160, 163, 166, 169, 179, 184, 189, 194, 199, 203, 205, 207, 213, 219, 222, 227, 230, 239, 241, 244, 246, 248]
+
+[arrays.fxL_1_10]
+type = "int"
+values = [35, 50, 64, 83, 94, 99, 113, 120, 129, 131, 158, 161, 172, 175, 212, 222, 231, 236, 239, 250]
+
+[arrays.fxL_2_2]
+type = "int"
+values = [10, 16, 19, 27, 32, 42, 50, 56, 63, 75, 91, 94, 100, 105, 112, 121, 141, 150, 153, 164, 180, 185, 190, 200, 204, 214, 223, 228, 231, 242]
+
+[arrays.fxL_2_5]
+type = "int"
+values = [19, 30, 35, 45, 59, 66, 78, 94, 108, 115, 124, 144, 153, 156, 167, 207, 217, 226, 231, 234, 245]
+
+[arrays.fxL_3_3]
+type = "int"
+values = [11, 17, 28, 43, 57, 76, 101, 106, 113, 122, 142, 151, 165, 181, 191, 201, 205, 215, 224, 243]
+
+[arrays.fxL_5_2]
+type = "int"
+values = [10, 16, 27, 42, 56, 75, 100, 105, 141, 150, 164, 180, 185, 190, 200, 204, 214, 223, 242]
+
+[arrays.fxL_5_5]
+type = "int"
+values = [19, 30, 45, 59, 78, 108, 144, 153, 167, 207, 217, 226, 245]
+
+[structs.FractalBothFire]
+fields = ["optInLeftBars", "optInRightBars", "bar"]
+types = ["int", "int", "int"]
+
+[structs.FractalGolden]
+fields = ["optInLeftBars", "optInRightBars", "swingHigh", "nbSwingHigh", "swingLow", "nbSwingLow", "source"]
+types = ["int", "int", "int *", "int", "int *", "int", "char *"]
+
+[tables.fractalBothFire]
+type = "FractalBothFire"
+
+    [[tables.fractalBothFire.rows]]
+    bar = 21
+    optInLeftBars = 1
+    optInRightBars = 1
+    [[tables.fractalBothFire.rows]]
+    bar = 25
+    optInLeftBars = 1
+    optInRightBars = 1
+    [[tables.fractalBothFire.rows]]
+    bar = 22
+    optInLeftBars = 2
+    optInRightBars = 2
+    [[tables.fractalBothFire.rows]]
+    bar = 26
+    optInLeftBars = 2
+    optInRightBars = 2
+
+[tables.fractalCorpus]
+type = "FractalGolden"
+
+    [[tables.fractalCorpus.rows]]
+    nbSwingHigh = 56
+    nbSwingLow = 50
+    optInLeftBars = 1
+    optInRightBars = 1
+    source = "FX_BOTH"
+    swingHigh = "fxH_1_1"
+    swingLow = "fxL_1_1"
+    [[tables.fractalCorpus.rows]]
+    nbSwingHigh = 31
+    nbSwingLow = 30
+    optInLeftBars = 2
+    optInRightBars = 2
+    source = "FX_BOTH"
+    swingHigh = "fxH_2_2"
+    swingLow = "fxL_2_2"
+    [[tables.fractalCorpus.rows]]
+    nbSwingHigh = 24
+    nbSwingLow = 20
+    optInLeftBars = 3
+    optInRightBars = 3
+    source = "FX_BOTH"
+    swingHigh = "fxH_3_3"
+    swingLow = "fxL_3_3"
+    [[tables.fractalCorpus.rows]]
+    nbSwingHigh = 15
+    nbSwingLow = 13
+    optInLeftBars = 5
+    optInRightBars = 5
+    source = "FX_BOTH"
+    swingHigh = "fxH_5_5"
+    swingLow = "fxL_5_5"
+    [[tables.fractalCorpus.rows]]
+    nbSwingHigh = 24
+    nbSwingLow = 21
+    optInLeftBars = 2
+    optInRightBars = 5
+    source = "FX_TA4J"
+    swingHigh = "fxH_2_5"
+    swingLow = "fxL_2_5"
+    [[tables.fractalCorpus.rows]]
+    nbSwingHigh = 20
+    nbSwingLow = 19
+    optInLeftBars = 5
+    optInRightBars = 2
+    source = "FX_TA4J"
+    swingHigh = "fxH_5_2"
+    swingLow = "fxL_5_2"
+    [[tables.fractalCorpus.rows]]
+    nbSwingHigh = 21
+    nbSwingLow = 20
+    optInLeftBars = 1
+    optInRightBars = 10
+    source = "FX_TA4J"
+    swingHigh = "fxH_1_10"
+    swingLow = "fxL_1_10"
+    [[tables.fractalCorpus.rows]]
+    nbSwingHigh = 18
+    nbSwingLow = 16
+    optInLeftBars = 10
+    optInRightBars = 1
+    source = "FX_TA4J"
+    swingHigh = "fxH_10_1"
+    swingLow = "fxL_10_1"
+
+[tables.fractalSynthetic]
+type = "FractalGolden"
+
+    [[tables.fractalSynthetic.rows]]
+    nbSwingHigh = 11
+    nbSwingLow = 10
+    optInLeftBars = 1
+    optInRightBars = 1
+    source = "FX_BOTH"
+    swingHigh = "fsH_1_1"
+    swingLow = "fsL_1_1"
+    [[tables.fractalSynthetic.rows]]
+    nbSwingHigh = 3
+    nbSwingLow = 3
+    optInLeftBars = 2
+    optInRightBars = 2
+    source = "FX_BOTH"
+    swingHigh = "fsH_2_2"
+    swingLow = "fsL_2_2"
+    [[tables.fractalSynthetic.rows]]
+    nbSwingHigh = 6
+    nbSwingLow = 4
+    optInLeftBars = 2
+    optInRightBars = 1
+    source = "FX_TA4J"
+    swingHigh = "fsH_2_1"
+    swingLow = "fsL_2_1"
+    [[tables.fractalSynthetic.rows]]
+    nbSwingHigh = 4
+    nbSwingLow = 7
+    optInLeftBars = 1
+    optInRightBars = 2
+    source = "FX_TA4J"
+    swingHigh = "fsH_1_2"
+    swingLow = "fsL_1_2"

@@ -1,0 +1,677 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_candlestick.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_candlestick.c"
+
+[structs.TA_CDLGlobals]
+fields = ["bodyLong_type", "bodyLong_avg", "bodyLong_factor", "bodyVeryLong_type", "bodyVeryLong_avg", "bodyVeryLong_factor", "bodyShort_type", "bodyShort_avg", "bodyShort_factor", "bodyDoji_type", "bodyDoji_avg", "bodyDoji_factor", "shadowLong_type", "shadowLong_avg", "shadowLong_factor", "shadowVeryLong_type", "shadowVeryLong_avg", "shadowVeryLong_factor", "shadowShort_type", "shadowShort_avg", "shadowShort_factor", "shadowVeryShort_type", "shadowVeryShort_avg", "shadowVeryShort_factor", "near_type", "near_avg", "near_factor", "far_type", "far_avg", "far_factor", "equal_type", "equal_avg", "equal_factor"]
+types = ["TA_RangeType", "int", "double", "TA_RangeType", "int", "double", "TA_RangeType", "int", "double", "TA_RangeType", "int", "double", "TA_RangeType", "int", "double", "TA_RangeType", "int", "double", "TA_RangeType", "int", "double", "TA_RangeType", "int", "double", "TA_RangeType", "int", "double", "TA_RangeType", "int", "double", "TA_RangeType", "int", "double"]
+
+[structs.TA_Test]
+fields = ["name", "doRangeTestFlag", "startIdx", "endIdx", "params", "expectedRetCode", "output"]
+types = ["char *", "int", "TA_Integer", "TA_Integer", "TA_Real[MAX_OPTIN_PARAM]", "TA_RetCode", "TA_ExpectedOutput[MAX_TESTED_OUTPUT]"]
+
+[tables.cdlGlobalsMatrix]
+type = "TA_CDLGlobals"
+
+    [[tables.cdlGlobalsMatrix.rows]]
+    bodyDoji_avg = 10
+    bodyDoji_factor = 0.1
+    bodyDoji_type = "TA_RangeType_HighLow"
+    bodyLong_avg = 10
+    bodyLong_factor = 1.0
+    bodyLong_type = "TA_RangeType_RealBody"
+    bodyShort_avg = 10
+    bodyShort_factor = 1.0
+    bodyShort_type = "TA_RangeType_RealBody"
+    bodyVeryLong_avg = 10
+    bodyVeryLong_factor = 3.0
+    bodyVeryLong_type = "TA_RangeType_RealBody"
+    equal_avg = 5
+    equal_factor = 0.05
+    equal_type = "TA_RangeType_HighLow"
+    far_avg = 5
+    far_factor = 0.6
+    far_type = "TA_RangeType_HighLow"
+    near_avg = 5
+    near_factor = 0.2
+    near_type = "TA_RangeType_HighLow"
+    shadowLong_avg = 0
+    shadowLong_factor = 1.0
+    shadowLong_type = "TA_RangeType_RealBody"
+    shadowShort_avg = 10
+    shadowShort_factor = 1.0
+    shadowShort_type = "TA_RangeType_Shadows"
+    shadowVeryLong_avg = 0
+    shadowVeryLong_factor = 2.0
+    shadowVeryLong_type = "TA_RangeType_RealBody"
+    shadowVeryShort_avg = 10
+    shadowVeryShort_factor = 0.1
+    shadowVeryShort_type = "TA_RangeType_HighLow"
+    [[tables.cdlGlobalsMatrix.rows]]
+    bodyDoji_avg = 10
+    bodyDoji_factor = 0.1
+    bodyDoji_type = "TA_RangeType_Shadows"
+    bodyLong_avg = 10
+    bodyLong_factor = 1.0
+    bodyLong_type = "TA_RangeType_Shadows"
+    bodyShort_avg = 10
+    bodyShort_factor = 1.0
+    bodyShort_type = "TA_RangeType_Shadows"
+    bodyVeryLong_avg = 10
+    bodyVeryLong_factor = 3.0
+    bodyVeryLong_type = "TA_RangeType_Shadows"
+    equal_avg = 5
+    equal_factor = 0.05
+    equal_type = "TA_RangeType_Shadows"
+    far_avg = 5
+    far_factor = 0.6
+    far_type = "TA_RangeType_Shadows"
+    near_avg = 5
+    near_factor = 0.2
+    near_type = "TA_RangeType_Shadows"
+    shadowLong_avg = 0
+    shadowLong_factor = 1.0
+    shadowLong_type = "TA_RangeType_Shadows"
+    shadowShort_avg = 10
+    shadowShort_factor = 1.0
+    shadowShort_type = "TA_RangeType_Shadows"
+    shadowVeryLong_avg = 0
+    shadowVeryLong_factor = 2.0
+    shadowVeryLong_type = "TA_RangeType_Shadows"
+    shadowVeryShort_avg = 10
+    shadowVeryShort_factor = 0.1
+    shadowVeryShort_type = "TA_RangeType_Shadows"
+    [[tables.cdlGlobalsMatrix.rows]]
+    bodyDoji_avg = 0
+    bodyDoji_factor = 0.1
+    bodyDoji_type = "TA_RangeType_HighLow"
+    bodyLong_avg = 0
+    bodyLong_factor = 1.0
+    bodyLong_type = "TA_RangeType_RealBody"
+    bodyShort_avg = 0
+    bodyShort_factor = 1.0
+    bodyShort_type = "TA_RangeType_RealBody"
+    bodyVeryLong_avg = 0
+    bodyVeryLong_factor = 3.0
+    bodyVeryLong_type = "TA_RangeType_RealBody"
+    equal_avg = 0
+    equal_factor = 0.05
+    equal_type = "TA_RangeType_HighLow"
+    far_avg = 0
+    far_factor = 0.6
+    far_type = "TA_RangeType_HighLow"
+    near_avg = 0
+    near_factor = 0.2
+    near_type = "TA_RangeType_HighLow"
+    shadowLong_avg = 0
+    shadowLong_factor = 1.0
+    shadowLong_type = "TA_RangeType_RealBody"
+    shadowShort_avg = 0
+    shadowShort_factor = 1.0
+    shadowShort_type = "TA_RangeType_Shadows"
+    shadowVeryLong_avg = 0
+    shadowVeryLong_factor = 2.0
+    shadowVeryLong_type = "TA_RangeType_RealBody"
+    shadowVeryShort_avg = 0
+    shadowVeryShort_factor = 0.1
+    shadowVeryShort_type = "TA_RangeType_HighLow"
+    [[tables.cdlGlobalsMatrix.rows]]
+    bodyDoji_avg = 25
+    bodyDoji_factor = 0.9
+    bodyDoji_type = "TA_RangeType_RealBody"
+    bodyLong_avg = 25
+    bodyLong_factor = 0.25
+    bodyLong_type = "TA_RangeType_HighLow"
+    bodyShort_avg = 25
+    bodyShort_factor = 2.0
+    bodyShort_type = "TA_RangeType_HighLow"
+    bodyVeryLong_avg = 25
+    bodyVeryLong_factor = 0.5
+    bodyVeryLong_type = "TA_RangeType_HighLow"
+    equal_avg = 12
+    equal_factor = 0.9
+    equal_type = "TA_RangeType_RealBody"
+    far_avg = 12
+    far_factor = 0.05
+    far_type = "TA_RangeType_RealBody"
+    near_avg = 12
+    near_factor = 0.9
+    near_type = "TA_RangeType_RealBody"
+    shadowLong_avg = 20
+    shadowLong_factor = 0.2
+    shadowLong_type = "TA_RangeType_HighLow"
+    shadowShort_avg = 25
+    shadowShort_factor = 0.2
+    shadowShort_type = "TA_RangeType_RealBody"
+    shadowVeryLong_avg = 20
+    shadowVeryLong_factor = 0.3
+    shadowVeryLong_type = "TA_RangeType_HighLow"
+    shadowVeryShort_avg = 25
+    shadowVeryShort_factor = 0.9
+    shadowVeryShort_type = "TA_RangeType_RealBody"
+    [[tables.cdlGlobalsMatrix.rows]]
+    bodyDoji_avg = 5
+    bodyDoji_factor = 0.01
+    bodyDoji_type = "TA_RangeType_HighLow"
+    bodyLong_avg = 5
+    bodyLong_factor = 4.0
+    bodyLong_type = "TA_RangeType_RealBody"
+    bodyShort_avg = 5
+    bodyShort_factor = 0.05
+    bodyShort_type = "TA_RangeType_RealBody"
+    bodyVeryLong_avg = 5
+    bodyVeryLong_factor = 9.0
+    bodyVeryLong_type = "TA_RangeType_RealBody"
+    equal_avg = 3
+    equal_factor = 0.005
+    equal_type = "TA_RangeType_HighLow"
+    far_avg = 3
+    far_factor = -1.0
+    far_type = "TA_RangeType_HighLow"
+    near_avg = 3
+    near_factor = 0.02
+    near_type = "TA_RangeType_HighLow"
+    shadowLong_avg = 3
+    shadowLong_factor = 4.0
+    shadowLong_type = "TA_RangeType_RealBody"
+    shadowShort_avg = 5
+    shadowShort_factor = 0.05
+    shadowShort_type = "TA_RangeType_Shadows"
+    shadowVeryLong_avg = 3
+    shadowVeryLong_factor = 8.0
+    shadowVeryLong_type = "TA_RangeType_RealBody"
+    shadowVeryShort_avg = 5
+    shadowVeryShort_factor = 0.01
+    shadowVeryShort_type = "TA_RangeType_HighLow"
+
+[tables.tableTest]
+type = "TA_Test"
+
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDL2CROWS"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDL3BLACKCROWS"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDL3INSIDE"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDL3LINESTRIKE"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDL3OUTSIDE"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDL3STARSINSOUTH"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDL3WHITESOLDIERS"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLABANDONEDBABY"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLADVANCEBLOCK"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLBELTHOLD"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLBREAKAWAY"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLCLOSINGMARUBOZU"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLCONCEALBABYSWALL"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLCOUNTERATTACK"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLDARKCLOUDCOVER"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLDOJI"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLDOJISTAR"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLDRAGONFLYDOJI"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLENGULFING"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLEVENINGDOJISTAR"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLEVENINGSTAR"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLGAPSIDESIDEWHITE"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLGRAVESTONEDOJI"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLHAMMER"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLHANGINGMAN"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLHARAMI"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLHARAMICROSS"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLHIKKAKE"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLHIKKAKEMOD"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLHIGHWAVE"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLHOMINGPIGEON"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLIDENTICAL3CROWS"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLINNECK"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLINVERTEDHAMMER"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLKICKING"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLKICKINGBYLENGTH"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLLADDERBOTTOM"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLLONGLEGGEDDOJI"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLLONGLINE"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLMARUBOZU"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLMATCHINGLOW"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLMATHOLD"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLMORNINGDOJISTAR"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLMORNINGSTAR"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLONNECK"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLPIERCING"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLRICKSHAWMAN"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLRISEFALL3METHODS"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLSEPARATINGLINES"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLSHOOTINGSTAR"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLSHORTLINE"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLSPINNINGTOP"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLSTALLEDPATTERN"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLSTICKSANDWICH"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLTAKURI"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLTASUKIGAP"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLTHRUSTING"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLTRISTAR"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLUNIQUE3RIVER"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLUPSIDEGAP2CROWS"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 0
+    expectedRetCode = "TA_SUCCESS"
+    name = "CDLXSIDEGAP3METHODS"
+    output = [[0, 0], [1, 1]]
+    params = [0.0, 0.0]
+    startIdx = 0

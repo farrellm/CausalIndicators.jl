@@ -1,0 +1,83 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_div_zero.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_div_zero.c"
+
+[structs.DivZeroCase]
+fields = ["num", "den", "isNaN", "value", "what"]
+types = ["double", "double", "int", "double", "char *"]
+
+[tables.DZ_CASES]
+type = "DivZeroCase"
+
+    [[tables.DZ_CASES.rows]]
+    den = 0.0
+    isNaN = 1
+    num = 0.0
+    value = 0.0
+    what = "+0 / +0 -> NaN"
+    [[tables.DZ_CASES.rows]]
+    den = -0.0
+    isNaN = 1
+    num = 0.0
+    value = 0.0
+    what = "+0 / -0 -> NaN"
+    [[tables.DZ_CASES.rows]]
+    den = 0.0
+    isNaN = 1
+    num = -0.0
+    value = 0.0
+    what = "-0 / +0 -> NaN"
+    [[tables.DZ_CASES.rows]]
+    den = -0.0
+    isNaN = 1
+    num = -0.0
+    value = 0.0
+    what = "-0 / -0 -> NaN"
+    [[tables.DZ_CASES.rows]]
+    den = 0.0
+    isNaN = 0
+    num = 1.5
+    value = +inf
+    what = "+x / +0 -> +Inf"
+    [[tables.DZ_CASES.rows]]
+    den = 0.0
+    isNaN = 0
+    num = -1.5
+    value = -inf
+    what = "-x / +0 -> -Inf"
+    [[tables.DZ_CASES.rows]]
+    den = -0.0
+    isNaN = 0
+    num = 1.5
+    value = -inf
+    what = "+x / -0 -> -Inf"
+    [[tables.DZ_CASES.rows]]
+    den = -0.0
+    isNaN = 0
+    num = -1.5
+    value = +inf
+    what = "-x / -0 -> +Inf"
+    [[tables.DZ_CASES.rows]]
+    den = 4.0
+    isNaN = 0
+    num = 0.0
+    value = 0.0
+    what = "+0 / +x -> +0"
+    [[tables.DZ_CASES.rows]]
+    den = 4.0
+    isNaN = 0
+    num = -0.0
+    value = -0.0
+    what = "-0 / +x -> -0"
+    [[tables.DZ_CASES.rows]]
+    den = 3.0
+    isNaN = 0
+    num = 6.0
+    value = 2.0
+    what = "ordinary quotient"
+    [[tables.DZ_CASES.rows]]
+    den = 3.0
+    isNaN = 0
+    num = -6.0
+    value = -2.0
+    what = "ordinary quotient"

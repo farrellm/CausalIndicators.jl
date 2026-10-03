@@ -3,11 +3,35 @@ uuid = "2e4c3c01-7b3a-448c-a723-d6bf3f693fd3"
 authors = ["Matthew Farrell <farrellm@alum.mit.edu> and contributors"]
 version = "1.0.0-DEV"
 
+[deps]
+CausalFrames = "388faf74-d151-4224-8c39-96f47ad15296"
+
+[sources]
+CausalFrames = {url = "https://github.com/farrellm/CausalFrames.jl", rev = "master"}
+
 [compat]
-julia = "1.10.10"
+Aqua = "0.8"
+CSV = "0.10"
+CausalFrames = "1"
+CodecZlib = "0.7"
+DataFrames = "1.8"
+JET = "0.9, 0.10, 0.11, 0.12"
+Random = "1.10"
+TOML = "1.0"
+Tables = "1.13"
+Test = "1.10"
+julia = "1.10"
 
 [extras]
+Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+CodecZlib = "944b1d66-785c-5afd-91f1-9de20f533193"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+JET = "c3a54625-cd67-489e-a8e7-0a5a0ff4e31b"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+TOML = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
+Tables = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test"]
+test = ["Aqua", "CSV", "CodecZlib", "DataFrames", "JET", "Random", "TOML", "Tables", "Test"]

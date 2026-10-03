@@ -1,0 +1,85 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_stddev.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_stddev.c"
+
+[arrays.sd243_bases]
+type = "double"
+values = [0.0, 100.0]
+
+[arrays.sd243_periods]
+type = "int"
+values = [2, 5, 20, 30]
+
+[structs.TA_Test]
+fields = ["doRangeTestFlag", "startIdx", "endIdx", "optInTimePeriod", "optInNbDeviation_1", "expectedRetCode", "oneOfTheExpectedOutRealIndex0", "oneOfTheExpectedOutReal0", "expectedBegIdx", "expectedNbElement"]
+types = ["TA_Integer", "TA_Integer", "TA_Integer", "TA_Integer", "TA_Real", "TA_RetCode", "TA_Integer", "TA_Real", "TA_Integer", "TA_Integer"]
+
+[tables.tableTest]
+type = "TA_Test"
+
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 4
+    expectedNbElement = 248
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 1.2856
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInNbDeviation_1 = 1.0
+    optInTimePeriod = 5
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 4
+    expectedNbElement = 248
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 0.4462
+    oneOfTheExpectedOutRealIndex0 = 1
+    optInNbDeviation_1 = 1.0
+    optInTimePeriod = 5
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 4
+    expectedNbElement = 248
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 0.7144
+    oneOfTheExpectedOutRealIndex0 = 247
+    optInNbDeviation_1 = 1.0
+    optInTimePeriod = 5
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 4
+    expectedNbElement = 248
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 1.9285
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInNbDeviation_1 = 1.5
+    optInTimePeriod = 5
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 4
+    expectedNbElement = 248
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 0.66937
+    oneOfTheExpectedOutRealIndex0 = 1
+    optInNbDeviation_1 = 1.5
+    optInTimePeriod = 5
+    startIdx = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 4
+    expectedNbElement = 248
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 1.071533
+    oneOfTheExpectedOutRealIndex0 = 247
+    optInNbDeviation_1 = 1.5
+    optInTimePeriod = 5
+    startIdx = 0

@@ -1,0 +1,7 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_rolling_extremum.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_rolling_extremum.c"
+
+[arrays.rePeriods]
+type = "int"
+values = [2, 3, 4, 5, 29, 30, 31, 32, 33, 64, 65, 127, 199]

@@ -1,0 +1,91 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_quote_unit.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_quote_unit.c"
+
+[arrays.quScaleExp]
+type = "int"
+values = [-120, -60, -30, 30, 60, 120]
+
+[structs.QuOracleRow]
+fields = ["label", "expected", "tol"]
+types = ["char *", "double", "double"]
+
+[tables.quOracleRow]
+type = "QuOracleRow"
+
+    [[tables.quOracleRow.rows]]
+    expected = 49.63210207086758
+    label = "RSI"
+    tol = 1.0e-12
+    [[tables.quOracleRow.rows]]
+    expected = -0.7357958582648365
+    label = "CMO"
+    tol = 1.0e-12
+    [[tables.quOracleRow.rows]]
+    expected = -8.07719799857037
+    label = "CMOU"
+    tol = 1.0e-12
+    [[tables.quOracleRow.rows]]
+    expected = -98.35950398707438
+    label = "CCI"
+    tol = 1.0e-12
+    [[tables.quOracleRow.rows]]
+    expected = 40.08540297699177
+    label = "ULTOSC"
+    tol = 1.0e-12
+    [[tables.quOracleRow.rows]]
+    expected = 106.0828124676471
+    label = "KAMA"
+    tol = 1.0e-12
+    [[tables.quOracleRow.rows]]
+    expected = 3.02290672213603
+    label = "NATR"
+    tol = 1.0e-12
+    [[tables.quOracleRow.rows]]
+    expected = -0.4583333333333316
+    label = "BOP"
+    tol = 1.0e-12
+    [[tables.quOracleRow.rows]]
+    expected = 15.526057510526849
+    label = "ADX"
+    tol = 1.0e-6
+    [[tables.quOracleRow.rows]]
+    expected = 20.492086296160466
+    label = "ADXR"
+    tol = 1.0e-6
+    [[tables.quOracleRow.rows]]
+    expected = 0.47222726427924594
+    label = "DX"
+    tol = 1.0e-6
+    [[tables.quOracleRow.rows]]
+    expected = 20.99955113874627
+    label = "PLUS_DI"
+    tol = 1.0e-6
+    [[tables.quOracleRow.rows]]
+    expected = 21.198823368250974
+    label = "MINUS_DI"
+    tol = 1.0e-6
+    [[tables.quOracleRow.rows]]
+    expected = 30.19478427095876
+    label = "STOCH_K"
+    tol = 1.0e-12
+    [[tables.quOracleRow.rows]]
+    expected = 30.266343825665892
+    label = "STOCHF_K"
+    tol = 1.0e-12
+    [[tables.quOracleRow.rows]]
+    expected = 119.65651267719166
+    label = "ACCB_U"
+    tol = 1.0e-12
+    [[tables.quOracleRow.rows]]
+    expected = 101.85401267719166
+    label = "ACCB_L"
+    tol = 1.0e-12
+    [[tables.quOracleRow.rows]]
+    expected = 4.34844428191114
+    label = "SMI"
+    tol = 1.0e-12
+    [[tables.quOracleRow.rows]]
+    expected = 4.585915474896606
+    label = "BETA"
+    tol = 1.0e-12

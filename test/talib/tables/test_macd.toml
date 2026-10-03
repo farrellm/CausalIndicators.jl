@@ -1,0 +1,113 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_macd.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_macd.c"
+
+[structs.TA_Test]
+fields = ["doRangeTestFlag", "testId", "startIdx", "endIdx", "optInFastPeriod", "optInSlowPeriod", "optInSignalPeriod_2", "expectedRetCode", "expectedBegIdx", "expectedNbElement", "oneOfTheExpectedOutRealIndex0", "oneOfTheExpectedOutReal0", "oneOfTheExpectedOutRealIndex1", "oneOfTheExpectedOutReal1", "oneOfTheExpectedOutRealIndex2", "oneOfTheExpectedOutReal2"]
+types = ["TA_Integer", "TA_TestId", "TA_Integer", "TA_Integer", "TA_Integer", "TA_Integer", "TA_Integer", "TA_RetCode", "TA_Integer", "TA_Integer", "TA_Integer", "TA_Real", "TA_Integer", "TA_Real", "TA_Integer", "TA_Real"]
+
+[tables.tableTest]
+type = "TA_Test"
+
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 33
+    expectedNbElement = 219
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = -1.9738
+    oneOfTheExpectedOutReal1 = -2.7071
+    oneOfTheExpectedOutReal2 = 0.7333000000000001
+    oneOfTheExpectedOutRealIndex0 = 0
+    oneOfTheExpectedOutRealIndex1 = 0
+    oneOfTheExpectedOutRealIndex2 = 0
+    optInFastPeriod = 12
+    optInSignalPeriod_2 = 9
+    optInSlowPeriod = 26
+    startIdx = 0
+    testId = "TA_MACD_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 33
+    expectedNbElement = 219
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = -1.9738
+    oneOfTheExpectedOutReal1 = -2.7071
+    oneOfTheExpectedOutReal2 = 0.7333000000000001
+    oneOfTheExpectedOutRealIndex0 = 0
+    oneOfTheExpectedOutRealIndex1 = 0
+    oneOfTheExpectedOutRealIndex2 = 0
+    optInFastPeriod = 26
+    optInSignalPeriod_2 = 9
+    optInSlowPeriod = 12
+    startIdx = 0
+    testId = "TA_MACD_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 33
+    expectedNbElement = 219
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = -1.9738
+    oneOfTheExpectedOutReal1 = -2.7071
+    oneOfTheExpectedOutReal2 = 0.7333000000000001
+    oneOfTheExpectedOutRealIndex0 = 0
+    oneOfTheExpectedOutRealIndex1 = 0
+    oneOfTheExpectedOutRealIndex2 = 0
+    optInFastPeriod = 12
+    optInSignalPeriod_2 = 9
+    optInSlowPeriod = 26
+    startIdx = 0
+    testId = "TA_MACDEXT_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 33
+    expectedNbElement = 219
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = -1.9519
+    oneOfTheExpectedOutReal1 = -2.6865
+    oneOfTheExpectedOutReal2 = 0.7346000000000001
+    oneOfTheExpectedOutRealIndex0 = 0
+    oneOfTheExpectedOutRealIndex1 = 0
+    oneOfTheExpectedOutRealIndex2 = 0
+    optInFastPeriod = 12
+    optInSignalPeriod_2 = 9
+    optInSlowPeriod = 26
+    startIdx = 0
+    testId = "TA_MACDFIX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 33
+    expectedNbElement = 219
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 0.8768
+    oneOfTheExpectedOutReal1 = 1.3533
+    oneOfTheExpectedOutReal2 = -0.4764999999999999
+    oneOfTheExpectedOutRealIndex0 = 218
+    oneOfTheExpectedOutRealIndex1 = 218
+    oneOfTheExpectedOutRealIndex2 = 218
+    optInFastPeriod = 12
+    optInSignalPeriod_2 = 9
+    optInSlowPeriod = 26
+    startIdx = 0
+    testId = "TA_MACDFIX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 33
+    expectedNbElement = 219
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 0.8768
+    oneOfTheExpectedOutReal1 = 1.3533
+    oneOfTheExpectedOutReal2 = -0.4764999999999999
+    oneOfTheExpectedOutRealIndex0 = 218
+    oneOfTheExpectedOutRealIndex1 = 218
+    oneOfTheExpectedOutRealIndex2 = 218
+    optInFastPeriod = 26
+    optInSignalPeriod_2 = 9
+    optInSlowPeriod = 12
+    startIdx = 0
+    testId = "TA_MACDFIX_TEST"

@@ -1,0 +1,59 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_per_ema.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_per_ema.c"
+
+[structs.TA_Test]
+fields = ["doRangeTestFlag", "theFunction", "unstablePeriod", "startIdx", "endIdx", "optInTimePeriod", "expectedRetCode", "oneOfTheExpectedOutRealIndex", "oneOfTheExpectedOutReal", "expectedBegIdx", "expectedNbElement"]
+types = ["TA_Integer", "TA_TestId", "TA_Integer", "TA_Integer", "TA_Integer", "TA_Integer", "TA_RetCode", "TA_Integer", "TA_Real", "TA_Integer", "TA_Integer"]
+
+[tables.tableTest]
+type = "TA_Test"
+
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal = 0.2589
+    oneOfTheExpectedOutRealIndex = 0
+    optInTimePeriod = 5
+    startIdx = 0
+    theFunction = "TA_TRIX_TEST"
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal = 0.010495
+    oneOfTheExpectedOutRealIndex = 1
+    optInTimePeriod = 5
+    startIdx = 0
+    theFunction = "TA_TRIX_TEST"
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal = -0.058
+    oneOfTheExpectedOutRealIndex = 237
+    optInTimePeriod = 5
+    startIdx = 0
+    theFunction = "TA_TRIX_TEST"
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal = -0.095
+    oneOfTheExpectedOutRealIndex = 238
+    optInTimePeriod = 5
+    startIdx = 0
+    theFunction = "TA_TRIX_TEST"
+    unstablePeriod = 0

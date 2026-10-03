@@ -1,0 +1,371 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_adx.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_adx.c"
+
+[structs.TA_Test]
+fields = ["id", "doRangeTestFlag", "unstablePeriod", "startIdx", "endIdx", "optInTimePeriod", "expectedRetCode", "oneOfTheExpectedOutRealIndex0", "oneOfTheExpectedOutReal0", "expectedBegIdx", "expectedNbElement"]
+types = ["TestId", "TA_Integer", "TA_Integer", "TA_Integer", "TA_Integer", "TA_Integer", "TA_RetCode", "TA_Integer", "TA_Real", "TA_Integer", "TA_Integer"]
+
+[tables.tableTest]
+type = "TA_Test"
+
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_MINUS_DI"
+    oneOfTheExpectedOutReal0 = 0.0
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 1
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_PLUS_DI"
+    oneOfTheExpectedOutReal0 = 0.478
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 1
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_MINUS_DM"
+    oneOfTheExpectedOutReal0 = 0.0
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 1
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_PLUS_DM"
+    oneOfTheExpectedOutReal0 = 1.69
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 1
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 40
+    expectedNbElement = 212
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_ADXR"
+    oneOfTheExpectedOutReal0 = 19.8666
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 40
+    expectedNbElement = 212
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_ADXR"
+    oneOfTheExpectedOutReal0 = 18.9092
+    oneOfTheExpectedOutRealIndex0 = 1
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 40
+    expectedNbElement = 212
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_ADXR"
+    oneOfTheExpectedOutReal0 = 21.5972
+    oneOfTheExpectedOutRealIndex0 = 210
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 40
+    expectedNbElement = 212
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_ADXR"
+    oneOfTheExpectedOutReal0 = 20.492
+    oneOfTheExpectedOutRealIndex0 = 211
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_PLUS_DM"
+    oneOfTheExpectedOutReal0 = 10.28
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_PLUS_DM"
+    oneOfTheExpectedOutReal0 = 10.3240038
+    oneOfTheExpectedOutRealIndex0 = 237
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_PLUS_DM"
+    oneOfTheExpectedOutReal0 = 9.58
+    oneOfTheExpectedOutRealIndex0 = 238
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 14
+    expectedNbElement = 238
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_PLUS_DI"
+    oneOfTheExpectedOutReal0 = 20.3781
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 14
+    expectedNbElement = 238
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_PLUS_DI"
+    oneOfTheExpectedOutReal0 = 22.1073
+    oneOfTheExpectedOutRealIndex0 = 13
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 14
+    expectedNbElement = 238
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_PLUS_DI"
+    oneOfTheExpectedOutReal0 = 20.3746
+    oneOfTheExpectedOutRealIndex0 = 14
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 14
+    expectedNbElement = 238
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_PLUS_DI"
+    oneOfTheExpectedOutReal0 = 21.0
+    oneOfTheExpectedOutRealIndex0 = 237
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_MINUS_DM"
+    oneOfTheExpectedOutReal0 = 12.995
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_MINUS_DM"
+    oneOfTheExpectedOutReal0 = 8.33
+    oneOfTheExpectedOutRealIndex0 = 237
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_MINUS_DM"
+    oneOfTheExpectedOutReal0 = 9.67754537
+    oneOfTheExpectedOutRealIndex0 = 238
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 14
+    expectedNbElement = 238
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_MINUS_DI"
+    oneOfTheExpectedOutReal0 = 30.1684
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 14
+    expectedNbElement = 238
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_MINUS_DI"
+    oneOfTheExpectedOutReal0 = 24.969182
+    oneOfTheExpectedOutRealIndex0 = 14
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 14
+    expectedNbElement = 238
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_MINUS_DI"
+    oneOfTheExpectedOutReal0 = 21.1988
+    oneOfTheExpectedOutRealIndex0 = 237
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 14
+    expectedNbElement = 238
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_DX"
+    oneOfTheExpectedOutReal0 = 19.3689
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 14
+    expectedNbElement = 238
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_DX"
+    oneOfTheExpectedOutReal0 = 9.7131
+    oneOfTheExpectedOutRealIndex0 = 1
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 14
+    expectedNbElement = 238
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_DX"
+    oneOfTheExpectedOutReal0 = 17.2905
+    oneOfTheExpectedOutRealIndex0 = 2
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 14
+    expectedNbElement = 238
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_DX"
+    oneOfTheExpectedOutReal0 = 10.6731
+    oneOfTheExpectedOutRealIndex0 = 236
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 14
+    expectedNbElement = 238
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_DX"
+    oneOfTheExpectedOutReal0 = 0.4722
+    oneOfTheExpectedOutRealIndex0 = 237
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 27
+    expectedNbElement = 225
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_ADX"
+    oneOfTheExpectedOutReal0 = 23.0
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 27
+    expectedNbElement = 225
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_ADX"
+    oneOfTheExpectedOutReal0 = 22.0802
+    oneOfTheExpectedOutRealIndex0 = 1
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 27
+    expectedNbElement = 225
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_ADX"
+    oneOfTheExpectedOutReal0 = 16.684
+    oneOfTheExpectedOutRealIndex0 = 223
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 27
+    expectedNbElement = 225
+    expectedRetCode = "TA_SUCCESS"
+    id = "TST_ADX"
+    oneOfTheExpectedOutReal0 = 15.526
+    oneOfTheExpectedOutRealIndex0 = 224
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0

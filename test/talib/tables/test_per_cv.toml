@@ -1,0 +1,244 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_per_cv.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_per_cv.c"
+
+[structs.PvtGolden]
+fields = ["bar", "want"]
+types = ["int", "double"]
+
+[structs.TA_Test]
+fields = ["doRangeTestFlag", "theFunction", "startIdx", "endIdx", "expectedRetCode", "oneOfTheExpectedOutRealIndex0", "oneOfTheExpectedOutReal0", "expectedBegIdx", "expectedNbElement"]
+types = ["TA_Integer", "TA_TestId", "TA_Integer", "TA_Integer", "TA_RetCode", "TA_Integer", "TA_Real", "TA_Integer", "TA_Integer"]
+
+[tables.pvtOracle]
+type = "PvtGolden"
+
+    [[tables.pvtOracle.rows]]
+    bar = 1
+    want = 179549.819672131
+    [[tables.pvtOracle.rows]]
+    bar = 2
+    want = 157389.48639153206
+    [[tables.pvtOracle.rows]]
+    bar = 3
+    want = 189090.84798093597
+    [[tables.pvtOracle.rows]]
+    bar = 10
+    want = 224295.5150347702
+    [[tables.pvtOracle.rows]]
+    bar = 25
+    want = -1.7956494181918642e6
+    [[tables.pvtOracle.rows]]
+    bar = 50
+    want = -1.0889319928736195e6
+    [[tables.pvtOracle.rows]]
+    bar = 75
+    want = 1.1042180731603324e6
+    [[tables.pvtOracle.rows]]
+    bar = 100
+    want = 3.174604183812041e6
+    [[tables.pvtOracle.rows]]
+    bar = 125
+    want = 4.0626698867437406e6
+    [[tables.pvtOracle.rows]]
+    bar = 150
+    want = 3.2091855786155956e6
+    [[tables.pvtOracle.rows]]
+    bar = 175
+    want = 3.722558928192241e6
+    [[tables.pvtOracle.rows]]
+    bar = 200
+    want = 1.131316760423244e6
+    [[tables.pvtOracle.rows]]
+    bar = 225
+    want = -6.196402845575416e6
+    [[tables.pvtOracle.rows]]
+    bar = 250
+    want = -6.0225620460982025e6
+    [[tables.pvtOracle.rows]]
+    bar = 251
+    want = -6.045790000121191e6
+
+[tables.tableTest]
+type = "TA_Test"
+
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 0
+    expectedNbElement = 252
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 1000.0
+    oneOfTheExpectedOutRealIndex0 = 0
+    startIdx = 0
+    theFunction = "TA_NVI_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 0
+    expectedNbElement = 252
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 995.359384063703
+    oneOfTheExpectedOutRealIndex0 = 2
+    startIdx = 0
+    theFunction = "TA_NVI_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 0
+    expectedNbElement = 252
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 937.3246329630261
+    oneOfTheExpectedOutRealIndex0 = 50
+    startIdx = 0
+    theFunction = "TA_NVI_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 0
+    expectedNbElement = 252
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 1038.1401959467728
+    oneOfTheExpectedOutRealIndex0 = 125
+    startIdx = 0
+    theFunction = "TA_NVI_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 0
+    expectedNbElement = 252
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 1173.0691300345422
+    oneOfTheExpectedOutRealIndex0 = 200
+    startIdx = 0
+    theFunction = "TA_NVI_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 0
+    expectedNbElement = 252
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 1248.340285103247
+    oneOfTheExpectedOutRealIndex0 = 251
+    startIdx = 0
+    theFunction = "TA_NVI_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 0
+    expectedNbElement = 252
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 1000.0
+    oneOfTheExpectedOutRealIndex0 = 0
+    startIdx = 0
+    theFunction = "TA_PVI_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 0
+    expectedNbElement = 252
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 1036.2295081967213
+    oneOfTheExpectedOutRealIndex0 = 1
+    startIdx = 0
+    theFunction = "TA_PVI_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 0
+    expectedNbElement = 252
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 1038.0666743015763
+    oneOfTheExpectedOutRealIndex0 = 50
+    startIdx = 0
+    theFunction = "TA_PVI_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 0
+    expectedNbElement = 252
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 1392.254337997847
+    oneOfTheExpectedOutRealIndex0 = 125
+    startIdx = 0
+    theFunction = "TA_PVI_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 0
+    expectedNbElement = 252
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 997.9892510505222
+    oneOfTheExpectedOutRealIndex0 = 200
+    startIdx = 0
+    theFunction = "TA_PVI_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 0
+    expectedNbElement = 252
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 944.3796037773723
+    oneOfTheExpectedOutRealIndex0 = 251
+    startIdx = 0
+    theFunction = "TA_PVI_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 0
+    expectedNbElement = 252
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 0.0
+    oneOfTheExpectedOutRealIndex0 = 0
+    startIdx = 0
+    theFunction = "TA_PVT_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 0
+    expectedNbElement = 252
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 179549.819672131
+    oneOfTheExpectedOutRealIndex0 = 1
+    startIdx = 0
+    theFunction = "TA_PVT_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 0
+    expectedNbElement = 252
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = -1.0889319928736195e6
+    oneOfTheExpectedOutRealIndex0 = 50
+    startIdx = 0
+    theFunction = "TA_PVT_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 0
+    expectedNbElement = 252
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 4.0626698867437406e6
+    oneOfTheExpectedOutRealIndex0 = 125
+    startIdx = 0
+    theFunction = "TA_PVT_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 0
+    expectedNbElement = 252
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 1.131316760423244e6
+    oneOfTheExpectedOutRealIndex0 = 200
+    startIdx = 0
+    theFunction = "TA_PVT_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 0
+    expectedNbElement = 252
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = -6.045790000121191e6
+    oneOfTheExpectedOutRealIndex0 = 251
+    startIdx = 0
+    theFunction = "TA_PVT_TEST"
