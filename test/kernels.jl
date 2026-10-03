@@ -1,5 +1,14 @@
 using CausalIndicators: EMAKernel, WilderKernel, SMAKernel, MAKernel, MATYPES, step!,
-    current, nseen, lookback, floattype
+    current, nseen, lookback, floattype, WMAKernel, DEMAKernel, TEMAKernel, T3Kernel,
+    TRIMAKernel, KAMAKernel, HMAKernel, ZLEMAKernel
+
+# One of every S1 kernel, for the generic kernel properties.
+const S1_KERNELS =
+    (() -> WMAKernel(Float64, 5), () -> DEMAKernel(Float64, 5; unstable = 1),
+        () -> TEMAKernel(Float64, 4), () -> T3Kernel(Float64, 3, 0.5),
+        () -> TRIMAKernel(Float64, 6), () -> KAMAKernel(Float64, 5),
+        () -> HMAKernel(Float64, 9),
+        () -> ZLEMAKernel(Float64, 6), () -> MAKernel(Float64, :dema, 5; unstable = 2))
 
 # Run a kernel over a series as an indicator would, with `unstable` extra
 # warm-up bars: `missing` until it has seen lookback + unstable + 1 bars.
@@ -11,9 +20,6 @@ function runkernel(k, xs; unstable = 0)
     end
     return out
 end
-
-# The decimals a table value was written with, which set its tolerance.
-decimals(v) = (s = string(v); occursin('.', s) ? length(s) - findlast('.', s) : 0)
 
 # The extracted TA-Lib table rows for one MA type that check a value.
 function marows(matype)
@@ -109,8 +115,13 @@ const KERNELS =
 
     @testset "missing is skipped" begin
         for mk in (p -> EMAKernel(Float64, p), p -> WilderKernel(Float64, p),
-            p -> SMAKernel(Float64, p), p -> MAKernel(Float64, :ema, p))
-            xs = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+            p -> SMAKernel(Float64, p), p -> MAKernel(Float64, :ema, p),
+            p -> WMAKernel(Float64, p), p -> DEMAKernel(Float64, p),
+            p -> TEMAKernel(Float64, p), p -> T3Kernel(Float64, p),
+            p -> TRIMAKernel(Float64, p), p -> KAMAKernel(Float64, p),
+            p -> HMAKernel(Float64, p), p -> ZLEMAKernel(Float64, p),
+            p -> MAKernel(Float64, :kama, p; unstable = 1))
+            xs = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 7.0, 9.0, 11.0, 10.0, 12.0, 15.0, 13.0]
             a = mk(3)
             b = mk(3)
             wantb = [step!(b, x) for x in xs]
@@ -128,7 +139,7 @@ const KERNELS =
         xs = randn(Random.MersenneTwister(1), 50)
         for mk in (() -> EMAKernel(Float64, 5), () -> WilderKernel(Float64, 5),
             () -> WilderKernel(Float64, 5; form = :sum, seedn = 4),
-            () -> SMAKernel(Float64, 5), () -> MAKernel(Float64, :rma, 5))
+            () -> SMAKernel(Float64, 5), () -> MAKernel(Float64, :rma, 5), S1_KERNELS...)
             k = mk()
             first_ = [step!(k, x) for x in xs]
             @test isequal(current(k), first_[end])
@@ -150,10 +161,24 @@ const KERNELS =
 
     @testset "MAKernel" begin
         @test length(MATYPES) == 12
-        for (m, K) in ((:sma, SMAKernel), (:ema, EMAKernel), (:rma, WilderKernel))
+        for (m, K) in ((:sma, SMAKernel), (:ema, EMAKernel), (:rma, WilderKernel),
+            (:wma, WMAKernel), (:dema, DEMAKernel), (:tema, TEMAKernel), (:t3, T3Kernel),
+            (:trima, TRIMAKernel), (:kama, KAMAKernel), (:hma, HMAKernel),
+            (:zlema, ZLEMAKernel))
             @test MAKernel(Float64, m, 5).inner isa K
         end
-        @test_throws ArgumentError MAKernel(Float64, :kama, 5)
+        # TA-Lib's lookbacks (ta_MA.c dispatch) at period 7, unstable 2.
+        for (m, lb) in ((:sma, 6), (:ema, 8), (:wma, 6), (:dema, 16), (:tema, 24),
+            (:trima, 6), (:kama, 9), (:t3, 38), (:hma, 7), (:zlema, 11), (:rma, 8))
+            @test lookback(MAKernel(Float64, m, 7; unstable = 2)) == lb
+            # TA_MA copies at period 1 with lookback 0, whatever the unstable period.
+            @test lookback(MAKernel(Float64, m, 1; unstable = 2)) == 0
+        end
+        @test lookback(MAKernel(Float64, :dema, 1; unstable = 2, identity = false)) == 4
+        @test lookback(MAKernel(Float64, :kama, 1; unstable = 2, identity = false)) == 2
+        @test_throws ArgumentError MAKernel(Float64, :mama, 5)
+        @test_throws ArgumentError MAKernel(Float64, :ema, 5; unstable = -1)
+        @test_throws ArgumentError T3Kernel(Float64, 5, 1.5)
         @test_throws ArgumentError MAKernel(Float64, :nope, 5)
         @test_throws ArgumentError EMAKernel(Float64, 0)
         @test_throws ArgumentError WilderKernel(Float64, 5; form = :median)
@@ -163,7 +188,7 @@ const KERNELS =
         xs = randn(Random.MersenneTwister(2), 100)
         for k in (EMAKernel(Float64, 5), WilderKernel(Float64, 5),
             WilderKernel(Float64, 5; form = :sum), SMAKernel(Float64, 5),
-            MAKernel(Float64, :sma, 5))
+            MAKernel(Float64, :sma, 5), map(mk -> mk(), S1_KERNELS)...)
             foreach(x -> step!(k, x), xs)
             @test allocs(step!, k, 1.5) == 0
             @test allocs(step!, k, missing) == 0

@@ -11,7 +11,8 @@
 #   `missing` (DESIGN.md, "Missing and non-finite inputs").
 # - `current(k)::Union{Missing,T}` is the value after the last bar folded.
 # - `nseen(k)` counts the non-`missing` bars folded, so an indicator emits from
-#   `nseen(k) > lookback(k) + unstable`.
+#   `nseen(k) > lookback(k) + unstable`. (`MAKernel` folds `unstable` into its
+#   own `lookback` and gates `step!` itself; see kernels/ma.jl.)
 # - `lookback(k)` is TA-Lib's lookback for the kernel's parameters.
 # - `fresh(k)` returns a new zero kernel with the same parameters, and `fresh!(k)`
 #   zeroes `k` in place and returns it; `step!` and `fresh!` do not allocate.
@@ -43,4 +44,10 @@ seedsum(::Type{T}) where {T} = fresh(Sum(:x), (x = T,))
 function checkperiod(kernel, period)
     period >= 1 || throw(ArgumentError("$kernel period must be positive, got $period"))
     return Int(period)
+end
+
+function checkunstable(unstable)
+    unstable >= 0 ||
+        throw(ArgumentError("unstable period must be non-negative, got $unstable"))
+    return Int(unstable)
 end

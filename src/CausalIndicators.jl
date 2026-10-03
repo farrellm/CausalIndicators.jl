@@ -7,12 +7,20 @@ See DESIGN.md for the design and the staging of the implementation.
 module CausalIndicators
 
 using CausalFrames
-using CausalFrames: fresh, fresh!, update!, value
+using CausalFrames: fresh, fresh!, update!, value, ColumnSpec, colname, withterms
+
+export MA, EMA, RMA, DEMA, TEMA, TRIMA, KAMA, T3, HMA, ZLEMA, MAVP, WMA, VWMA,
+    MidPoint, MidPrice, AvgPrice, MedPrice, TypPrice, WclPrice
 
 include("kernels/common.jl")
 include("kernels/ema.jl")
 include("kernels/wilder.jl")
 include("kernels/sma.jl")
+include("kernels/wma.jl")
+include("kernels/kama.jl")
 include("kernels/ma.jl")
+
+include("overlap.jl")
+include("price.jl")
 
 end

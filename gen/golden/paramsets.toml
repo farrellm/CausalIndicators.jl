@@ -16,3 +16,62 @@ RMA = [
     {optInTimePeriod = 14},
     {optInTimePeriod = 14, unstable = 3},
 ]
+
+# S1. MA covers each type through TA_MA's dispatch (optInMAType is TA_MAType's
+# order: 0 SMA, 1 EMA, 2 WMA, 3 DEMA, 4 TEMA, 5 TRIMA, 6 KAMA, 8 T3, 9 HMA,
+# 12 ZLEMA, 13 RMA), plus period 1, which TA_MA copies with lookback 0.
+MA = [
+    {optInMAType = 1},
+    {optInMAType = 2},
+    {optInMAType = 3},
+    {optInMAType = 4},
+    {optInMAType = 5},
+    {optInMAType = 6},
+    {optInMAType = 8},
+    {optInMAType = 9},
+    {optInMAType = 12},
+    {optInMAType = 13},
+    {optInTimePeriod = 1, optInMAType = 3},
+    {optInTimePeriod = 10, optInMAType = 3, unstable = 2},
+]
+
+SMA = [{optInTimePeriod = 2}]
+WMA = [{optInTimePeriod = 2}, {optInTimePeriod = 14}]
+DEMA = [
+    {optInTimePeriod = 2},
+    {optInTimePeriod = 14},
+    {optInTimePeriod = 2, unstable = 1},
+    {optInTimePeriod = 14, unstable = 1},
+    {optInTimePeriod = 1, unstable = 2},
+]
+TEMA = [{optInTimePeriod = 14}, {optInTimePeriod = 14, unstable = 1}]
+TRIMA = [{optInTimePeriod = 9}, {optInTimePeriod = 10}, {optInTimePeriod = 12}]
+KAMA = [
+    {optInTimePeriod = 10},
+    {optInTimePeriod = 14},
+    {optInTimePeriod = 14, unstable = 3},
+    {optInTimePeriod = 1, unstable = 2},
+]
+T3 = [{optInTimePeriod = 3, optInVFactor = 0.3}, {optInTimePeriod = 5, unstable = 4}]
+HMA = [{optInTimePeriod = 2}, {optInTimePeriod = 9}, {optInTimePeriod = 30}]
+ZLEMA = [
+    {optInTimePeriod = 2},
+    {optInTimePeriod = 10},
+    {optInTimePeriod = 14},
+    {optInTimePeriod = 10, unstable = 2},
+]
+MAVP = [
+    {optInMinPeriod = 2, optInMaxPeriod = 10, optInMAType = 1},
+    {optInMinPeriod = 3, optInMaxPeriod = 20, optInMAType = 6},
+    {optInMinPeriod = 2, optInMaxPeriod = 30, optInMAType = 3},
+]
+VWMA = [{optInTimePeriod = 1}, {optInTimePeriod = 14}]
+SUM = [{optInTimePeriod = 2}, {optInTimePeriod = 14}]
+MAX = [{optInTimePeriod = 2}, {optInTimePeriod = 14}]
+MIN = [{optInTimePeriod = 2}, {optInTimePeriod = 14}]
+MINMAX = [{optInTimePeriod = 14}]
+MAXINDEX = [{optInTimePeriod = 14}]
+MININDEX = [{optInTimePeriod = 14}]
+MINMAXINDEX = [{optInTimePeriod = 14}]
+MIDPOINT = [{optInTimePeriod = 2}, {optInTimePeriod = 30}]
+MIDPRICE = [{optInTimePeriod = 19}, {optInTimePeriod = 21}, {optInTimePeriod = 30}]

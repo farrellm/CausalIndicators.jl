@@ -98,6 +98,7 @@ table records which:
    `Mean(:x)`. The name table maps each such function to its CausalFrames
    spelling, and the README gives the same list.
    - `SMA` → `Mean`, `SUM` → `Sum`, `MAX`/`MIN`/`MINMAX` → `Max`/`Min`,
+     `MAXINDEX`/`MININDEX`/`MINMAXINDEX` → `MaxIndex`/`MinIndex`,
      `VAR` → `Variance(corrected = false)`, `CORREL` → `Correlation`,
      `PERCENTILE` → `Quantile(percentile / 100; interpolation = :nearestrank)`,
      all under `Bars(period)`
@@ -207,12 +208,14 @@ d. **`MaxIndex`/`MinIndex`** (#85), with `MaxWithIndex`/`MinWithIndex`, which
      the extreme leaves the window TA-Lib rescans with `>`, so the oldest tie
      wins. With period 3, the window `[5, 1, 5]` reports the newest 5 after
      `[1, 1, 5, 1, 5]` but the oldest after `[9, 5, 1, 5]`.
-   - **Resolution.** The index indicators keep the upstream rule and differ
-     from TA-Lib only on rows whose window holds a tied extreme. Their
-     docstrings say so, and their golden and table tests skip those rows (see
-     "Testing"). The extreme's *value* is unaffected.
-   - **Users.** `RollingMaxIndex`, `RollingMinIndex`, `RollingMinMaxIndex`,
-     `Aroon` and `AroonOsc`.
+   - **Resolution.** The index forms keep the upstream rule and differ from
+     TA-Lib only on rows whose window holds a tied extreme. Their golden and
+     table tests skip those rows (see "Testing"), and `Aroon`'s docstring says
+     so. The extreme's *value* is unaffected.
+   - **Users.** `MAXINDEX`, `MININDEX` and `MINMAXINDEX` are CausalFrames only:
+     `MaxIndex`/`MinIndex` emit exactly their value (as bars since the
+     extreme) under `Bars(n)`, so a TA-Lib-named constructor would be an
+     alias. `Aroon` and `AroonOsc` are dependents over them.
 
 e. **Row terms** (#80). Every summarizer that reads a column also accepts a
    named row function (`Sum(:mfv => r -> clv(r) * r.volume)`). The output is
@@ -293,9 +296,11 @@ g. **`CausalFrames.barwindow(s, n, intypes)`, a count-window state** (#81),
     `:close_macd_macd`, `:close_macd_macdsignal`, `:close_macd_macdhist`.
   - Under `addrollingcolumns`, the window name is prefixed, as for every
     summarizer: `:b14_willr`.
-  - A `name` keyword on a plain indicator replaces the stem, which is how two
-    periods of the same indicator coexist in one call:
-    `RSI(:close; period = 7, name = :rsi7)`. Structured indicators do not need
+  - A `name` keyword on a plain indicator replaces the indicator's suffix and
+    keeps the input prefix, which is how two periods of the same indicator
+    coexist in one call: `RSI(:close; period = 7, name = :rsi7)` gives
+    `:close_rsi7`. A price-bar indicator has no prefix, so
+    `ATR(; name = :atr7)` gives `:atr7`. Structured indicators do not need
     one, because two periods are two windows.
 - **Integer inputs** are widened to `Float64` (or to the column's float type if
   it is wider).
@@ -313,10 +318,15 @@ An indicator emits `missing` until it has folded its **lookback** plus
 `unstable` further bars. The lookback is TA-Lib's `TA_<FN>_Lookback` at the
 given parameters.
 
-- **`unstable`.** The keyword defaults to 0 and exists on every function whose
-  YAML carries `unstable_period`. Setting `unstable = k` reproduces exactly the
-  rows TA-Lib emits under `TA_SetUnstablePeriod(…, k)`, which is how the
-  unstable-period test rows are checked.
+- **`unstable`.** The keyword defaults to 0. It exists on every function whose
+  YAML carries `unstable_period`, and on every function whose lookback
+  inherits one through TA-Lib's calls. `DEMA`, `TEMA` and `ZLEMA` inherit
+  EMA's, and `MA` and `MAVP` inherit the dispatched type's. For `DEMA` and
+  `TEMA` the inherited period changes the values, not only the first bar:
+  each EMA stage passes its unstable bars before it feeds the next.
+  Setting `unstable = k` reproduces exactly the rows TA-Lib emits under
+  `TA_SetUnstablePeriod(…, k)`, which is how the unstable-period test rows are
+  checked.
 - **Output types.** Output columns are therefore `Union{Missing, T}`. This
   matches CausalFrames' empty-summary convention, and `forwardfill` and
   `fillmissing` apply directly.
@@ -466,10 +476,21 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
     - It is used by `MA`, `MACDExt`, `APO`/`PPO`/`PVO`, `Stoch*`, `KDJ` and
       non-SMA `BollingerBands`.
     - Its `:sma` form is `SMAKernel`, `:ema` is `EMAKernel` and `:rma` is
-      `WilderKernel`. Each later stage adds the MA types its indicators
-      introduce (S1: `:wma`, `:dema`, `:tema`, `:trima`, `:kama`, `:t3`,
-      `:hma`, `:zlema`; S6: `:mama`). Until then the constructor rejects
-      them with an `ArgumentError`.
+      `WilderKernel`. S1 adds `WMAKernel` (`barwindow` around the `WMA`
+      dependent), `DEMAKernel`, `TEMAKernel` and `T3Kernel` (chained
+      `EMAKernel`s), `TRIMAKernel` (two `SMAKernel`s), `KAMAKernel`
+      (`barwindow`s around `Sum` and `First`), `HMAKernel` (three
+      `WMAKernel`s) and `ZLEMAKernel` (`barwindow` around `First`, then an
+      `EMAKernel`). `:mama` lands in S6, and until then the constructor
+      rejects it with an `ArgumentError`.
+    - Unlike the other kernels, its `lookback` is TA-Lib's whole lookback for
+      the type, unstable period included, and `step!` gates its own output.
+      Its `identity` keyword selects `TA_MA`'s period-1 rule, a copy with
+      lookback 0 whatever the unstable period is. Without it, a named
+      function keeps its own period-1 lookback (`TA_DEMA` delays by twice the
+      unstable period).
+    - Every kernel copies its input at period 1 (TA-Lib's
+      `period1_identity`).
   - `CandleAverages` (S7): TA-Lib's per-setting body and shadow averages, built
     on count-windowed CausalFrames `Mean` states.
 
@@ -481,7 +502,8 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
     `missing`, which is the skip rule under "Missing and non-finite inputs".
   - `current(k)` is the latest value.
   - `nseen(k)` counts the bars folded, so an indicator emits from
-    `nseen(k) > lookback(k) + unstable`.
+    `nseen(k) > lookback(k) + unstable`. (`MAKernel` already includes
+    `unstable` in its `lookback`.)
   - `fresh(k)` and `fresh!(k)` extend the CausalFrames functions.
   - Kernels compute in `floattype(T)`: `Float64`, or a wider float input type.
 - **State layout.** States compose kernels as concrete fields, with no `Any` and
@@ -493,6 +515,16 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
 - **`MA(:x; period, matype)`** is a constructor function mirroring TA-Lib's
   `MA` dispatch. It always returns a plain summarizer over `MAKernel`. The
   window-agnostic SMA is `Mean`, under a `Bars` window.
+  - The named recursive MAs (`EMA`, `DEMA`, `TEMA`, `TRIMA`, `KAMA`, `T3`,
+    `HMA`, `ZLEMA`, `RMA`) are constructor functions too, over the same
+    `MovingAverage{M,C,N}` summarizer: one implementation, with the type, the
+    column and the output name as type parameters.
+  - TA-Lib's `TA_MAType_DISABLED` and `TA_MAType_DEFAULT` have no `matype`
+    symbol.
+  - **`MAVP`** keeps one `MAKernel` per period in `minperiod:maxperiod` and
+    steps them all, as TA-Lib computes each over the whole series. Each is
+    anchored where ta_MAVP.c anchors it, `lookback(maxperiod) − lookback(p)`
+    bars in, so the recursive types agree with TA-Lib too.
 - **Candlesticks** live in the `CausalIndicators.Candles` submodule.
   - It re-exports nothing into the top level. That keeps 61 pattern names out of
     user namespaces: users write `using CausalIndicators.Candles` or
@@ -515,7 +547,7 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
 | `src/statistics.jl` | statistic functions |
 | `src/volume.jl` | volume indicators |
 | `src/price.jl` | price transforms |
-| `src/rolling.jl` | the rolling index operators (the TA-Lib *Math Operators* group not covered by CausalFrames) |
+| `src/rolling.jl` | reserved: the TA-Lib *Math Operators* group is CausalFrames only (S1), so it has no file yet |
 | `src/cycle.jl` | the Hilbert-transform family and `MAMA` |
 | `src/candles/*.jl` | the `Candles` submodule |
 | `test/foldseries.jl` | the test-only batch driver |
@@ -593,7 +625,8 @@ the goldens check every bar.
     `dataset,params,index,<outputs…>`. Reals are written at `%.17g`, and the
     lookback rows are empty cells.
   - **Staging.** Goldens are generated per stage, for the functions that stage
-    implements. S0′ commits `EMA` and `RMA`, which check the kernels.
+    implements. S0′ commits `EMA` and `RMA`, which check the kernels, and S1
+    commits the other 26 S1 functions plus `SMA`.
 - **Comparison.** Every output is compared bar by bar, with the lookback rows
   required to be `missing`.
   - Float outputs use `rtol = 1e-9` together with an `atol` scaled to the
@@ -651,7 +684,9 @@ README rows together, and updates this document where reality differs.
     with the `EMA`/`RMA` goldens, `test/foldseries.jl` and the test helpers
   - CI with Aqua, JET and a JuliaFormatter check
 - **S1:** moving averages, the rolling operators and price transforms (28
-  functions, of which 6 are CausalFrames-only and need only tests).
+  functions, of which 9 are CausalFrames-only and need only tests: `SMA`,
+  `SUM`, `CUMSUM`, `MAX`, `MIN`, `MINMAX`, `MAXINDEX`, `MININDEX`,
+  `MINMAXINDEX`). **Complete.**
 - **S2:** momentum I (23): the MOM/ROC family, RSI, CMO, the MACD family,
   APO/PPO, TRIX, the stochastics, WillR, CCI, BOP, Aroon, ULTOSC, MFI.
 - **S3:** directional movement and volatility (24): TRange, ATR, NATR, ±DM,
@@ -695,32 +730,32 @@ All 182 in-scope TA-Lib functions. The table is generated from the pinned YAML.
 |---|---|---|---|---|---|---|---|
 | `AVGPRICE` | `AvgPrice` | S1 | dependent: `Last` | Group | open, high, low, close | any window (bar-local) | (one column) |
 | `CUMSUM` | `Sum(:x)` | S1 | CausalFrames only: `Sum` (no window) | Group | real | no window (`addsummarycolumns`) | (one column) |
-| `DEMA` | `DEMA` | S1 | new state | plain | real | period=30 | (one column) |
-| `EMA` | `EMA` | S1 | new state | plain | real | period=30 | (one column) |
+| `DEMA` | `DEMA` | S1 | new state | plain | real | period=30, unstable=0 | (one column) |
+| `EMA` | `EMA` | S1 | new state | plain | real | period=30, unstable=0 | (one column) |
 | `HMA` | `HMA` | S1 | new state | plain | real | period=20 | (one column) |
-| `KAMA` | `KAMA` | S1 | new state | plain | real | period=30 | (one column) |
-| `MA` | `MA` | S1 | constructor (dispatches on `matype`) | per MA type | real | period=30, matype=:sma | (one column) |
-| `MAVP` | `MAVP` | S1 | new state | plain | real, periods | minperiod=2, maxperiod=30, matype=:sma | (one column) |
+| `KAMA` | `KAMA` | S1 | new state | plain | real | period=30, unstable=0 | (one column) |
+| `MA` | `MA` | S1 | constructor (dispatches on `matype`) | plain | real | period=30, matype=:sma, unstable=0 | (one column) |
+| `MAVP` | `MAVP` | S1 | new state | plain | real, periods | minperiod=2, maxperiod=30, matype=:sma, unstable=0 | (one column) |
 | `MAX` | `Max(:x)` | S1 | CausalFrames only: `Max` | Group | real | window: Bars(30) | (one column) |
-| `MAXINDEX` | `RollingMaxIndex` | S1 | dependent (upstream): `MaxIndex` | Group | real | window: Bars(30) | (one column) |
+| `MAXINDEX` | `MaxIndex(:x)` | S1 | CausalFrames only: `MaxIndex` | Group | real | window: Bars(30) | (one column) |
 | `MEDPRICE` | `MedPrice` | S1 | dependent: `Last` | Group | high, low | any window (bar-local) | (one column) |
 | `MIDPOINT` | `MidPoint` | S1 | dependent: `Max`, `Min` | Group | real | window: Bars(14) | (one column) |
 | `MIDPRICE` | `MidPrice` | S1 | dependent: `Max`, `Min` | Group | high, low | window: Bars(14) | (one column) |
 | `MIN` | `Min(:x)` | S1 | CausalFrames only: `Min` | Group | real | window: Bars(30) | (one column) |
-| `MININDEX` | `RollingMinIndex` | S1 | dependent (upstream): `MinIndex` | Group | real | window: Bars(30) | (one column) |
+| `MININDEX` | `MinIndex(:x)` | S1 | CausalFrames only: `MinIndex` | Group | real | window: Bars(30) | (one column) |
 | `MINMAX` | `Min(:x)`, `Max(:x)` | S1 | CausalFrames only: `Min`, `Max` | Group | real | window: Bars(30) | min, max |
-| `MINMAXINDEX` | `RollingMinMaxIndex` | S1 | dependent (upstream): `MinIndex`, `MaxIndex` | Group | real | window: Bars(30) | minidx, maxidx |
-| `RMA` | `RMA` | S1 | new state | plain | real | period=30 | (one column) |
+| `MINMAXINDEX` | `MinIndex(:x)`, `MaxIndex(:x)` | S1 | CausalFrames only: `MinIndex`, `MaxIndex` | Group | real | window: Bars(30) | minidx, maxidx |
+| `RMA` | `RMA` | S1 | new state | plain | real | period=30, unstable=0 | (one column) |
 | `SMA` | `Mean(:x)` | S1 | CausalFrames only: `Mean` | Group | real | window: Bars(30) | (one column) |
 | `SUM` | `Sum(:x)` | S1 | CausalFrames only: `Sum` | Group | real | window: Bars(30) | (one column) |
-| `T3` | `T3` | S1 | new state | plain | real | period=5, vfactor=0.7 | (one column) |
-| `TEMA` | `TEMA` | S1 | new state | plain | real | period=30 | (one column) |
+| `T3` | `T3` | S1 | new state | plain | real | period=5, vfactor=0.7, unstable=0 | (one column) |
+| `TEMA` | `TEMA` | S1 | new state | plain | real | period=30, unstable=0 | (one column) |
 | `TRIMA` | `TRIMA` | S1 | new state (nested `Mean` windows) | plain | real | period=30 | (one column) |
 | `TYPPRICE` | `TypPrice` | S1 | dependent: `Last` | Group | high, low, close | any window (bar-local) | (one column) |
 | `VWMA` | `VWMA` | S1 | dependent: `DotProduct`, `Sum` | Group | real, volume | window: Bars(30) | (one column) |
 | `WCLPRICE` | `WclPrice` | S1 | dependent: `Last` | Group | high, low, close | any window (bar-local) | (one column) |
 | `WMA` | `WMA` | S1 | dependent (upstream): `AgeWeightedSum`, `Sum`, `Count` | Group | real | window: Bars(30) | (one column) |
-| `ZLEMA` | `ZLEMA` | S1 | new state | plain | real | period=30 | (one column) |
+| `ZLEMA` | `ZLEMA` | S1 | new state | plain | real | period=30, unstable=0 | (one column) |
 | `APO` | `APO` | S2 | new state | plain | real | fastperiod=12, slowperiod=26, matype=:ema | (one column) |
 | `AROON` | `Aroon` | S2 | dependent (upstream): `MaxIndex`, `MinIndex` | Group | high, low | window: Bars(14) | aroondown, aroonup |
 | `AROONOSC` | `AroonOsc` | S2 | dependent (upstream): `MaxIndex`, `MinIndex` | Group | high, low | window: Bars(14) | (one column) |

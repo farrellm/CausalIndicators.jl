@@ -141,3 +141,195 @@ function interleavekeys(tables)
     ]
     return Tables.columntable(rows)
 end
+
+"""
+    goldenatol(xs) -> Float64
+
+The absolute tolerance the goldens allow next to `rtol = 1e-9`, scaled to the
+magnitude of the input series `xs` (DESIGN.md, "Testing"): it covers outputs
+near zero and the gap between compensated sums and TA-Lib's running sums.
+"""
+goldenatol(xs) = 1e-9 * maximum(x -> isfinite(x) ? abs(x) : 0.0, xs)
+
+"""
+    checkgoldens(run, fn; outputs, input = :close, skip = nothing)
+
+For every `(dataset, params)` golden of TA-Lib function `fn`, call
+`run(params::Dict, data)`, which returns one vector per golden output column
+named in `outputs` (in that order), and check each against the golden with
+[`goldenmatch`](@ref). `skip(data, params, i)`, if given, excludes bar `i` (1-based)
+from the comparison. It returns the number of series checked.
+"""
+function checkgoldens(run, fn; outputs, input = :close, skip = nothing,
+    convert = (want, data, params) -> want)
+    n = 0
+    for ((ds, ps), golden) in sort(collect(loadgolden(fn)); by = first)
+        data = DATASETS[ds]()
+        p = parseparams(ps)
+        got = run(p, data)
+        atol = goldenatol(data[input])
+        for (g, o) in zip(got, outputs)
+            want = convert(golden[o], data, p)
+            if skip !== nothing
+                keep = [!skip(data, p, i) for i in eachindex(want)]
+                g, want = g[keep], want[keep]
+            end
+            ok = goldenmatch(g, want; rtol = 1e-9, atol)
+            ok || @info "golden series failed" fn ds ps o
+            @test ok
+            n += 1
+        end
+    end
+    return n
+end
+
+"""
+    tiedextreme(xs, i, n) -> Bool
+
+Whether the `n`-bar window ending at bar `i` holds its maximum or its minimum
+more than once. There TA-Lib's path-dependent index tie-break and CausalFrames'
+most-recent rule may differ (DESIGN.md (d)), so index tests skip such bars.
+"""
+function tiedextreme(xs, i, n)
+    i < n && return false
+    w = @view xs[(i-n+1):i]
+    return count(==(maximum(w)), w) > 1 || count(==(minimum(w)), w) > 1
+end
+
+"""
+    sincefromindex(want, data, params) -> Vector
+
+A golden index column (TA-Lib's absolute bar index) as bars since the extreme,
+the form CausalFrames' `MaxIndex`/`MinIndex` emit.
+"""
+sincefromindex(want, data, params) =
+    [ismissing(w) ? missing : (i - 1) - Int(w) for (i, w) in enumerate(want)]
+
+"""
+    checkstreaming(s, table; window = nothing, timewindow = nothing)
+
+The streaming properties of DESIGN.md "Testing" for summarizer(s) `s` over the
+Tables.jl `table`:
+
+- the pipeline output equals [`foldseries`](@ref)
+- random re-chunkings give identical output
+- a keyed run over two interleaved series equals the separate runs
+- with a sufficient `warmup`, two split contexts concatenate to the whole
+- for a structured indicator (`window` given), the re-fold path equals the
+  running path, and on unit-spaced bars `timewindow` equals `window`. A time
+  look-back `w` covers `[t − w, t]`, so `Bars(n)` matches `timewindow = n − 1`.
+"""
+function checkstreaming(s, table; window = nothing, timewindow = nothing,
+    rng = Random.MersenneTwister(7))
+    cols = Tables.columntable(table)
+    n = length(first(cols))
+    t = merge((time = collect(1:n),), cols)
+    apply(p) =
+        window === nothing ? addsummarycolumns(p, s) :
+        addrollingcolumns(p, (w = window,), s)
+    whole = foldseries(s, cols; window)
+    outs = keys(whole)
+    frame(p, ctx = Context(0, n + 1)) = DataFrame(load(ctx, p))
+    @test all(isequal(frame(apply(readtable(t)))[!, o], whole[o]) for o in outs)
+
+    for _ in 1:3
+        got = frame(apply(chunked(t, randomsizes(rng, n))))
+        @test all(isequal(got[!, o], whole[o]) for o in outs)
+    end
+
+    # Keyed: the second series is the first reversed, interleaved bar by bar.
+    rev = map(reverse, cols)
+    k = interleavekeys([cols, rev])
+    kp =
+        window === nothing ? addsummarycolumns(readtable(k), s; key = :key) :
+        addrollingcolumns(readtable(k), (w = window,), s; key = :key)
+    keyed = DataFrame(load(Context(0, 2n + 1), kp))
+    other = foldseries(s, rev; window)
+    for o in outs
+        @test isequal(keyed[keyed.key .== 1, o], whole[o])
+        @test isequal(keyed[keyed.key .== 2, o], other[o])
+    end
+
+    # warmup: [1, b) and [b, n] loaded separately, each warmed up over every
+    # earlier bar, concatenate to the whole.
+    b = n ÷ 2
+    w1 = frame(readtable(t) |> warmup(n, apply), Context(0, b))
+    w2 = frame(readtable(t) |> warmup(n, apply), Context(b, n + 1))
+    @test all(isequal(vcat(w1[!, o], w2[!, o]), whole[o]) for o in outs)
+
+    if window !== nothing
+        # The re-fold path: the same summarizers, wrapped so no tier applies.
+        refold = foldseries(map(Refold, tosummarizers(s)), cols; window)
+        for o in outs
+            @test isapprox(collect(skipmissing(refold[o])), collect(skipmissing(whole[o]));
+                rtol = 1e-9, atol = goldenatol(skipmissing(first(cols))))
+            @test isequal(ismissing.(refold[o]), ismissing.(whole[o]))
+        end
+        if timewindow !== nothing
+            timed = foldseries(s, cols; window = timewindow)
+            # A time window has no partial-window rule, so compare where the
+            # bar window is full.
+            for o in outs
+                full = .!ismissing.(whole[o])
+                @test isequal(timed[o][full], whole[o][full])
+            end
+        end
+    end
+    return nothing
+end
+
+tosummarizers(s::CausalFrames.Summarizer) = [s]
+tosummarizers(ss) = collect(ss)
+
+# A structure-hiding wrapper, as CausalFrames' own tests use: it delegates to the
+# wrapped summarizer and its dependencies but subtypes plain `Summarizer`, so
+# the window transforms re-fold it, the oracle for the running path.
+struct Refold{S<:CausalFrames.Summarizer} <: CausalFrames.Summarizer
+    inner::S
+end
+CausalFrames.emptyvalue(o::Refold) = CausalFrames.emptyvalue(o.inner)
+CausalFrames.fresh(o::Refold, intypes::NamedTuple) = CausalFrames.fresh(o.inner, intypes)
+CausalFrames.dependencies(o::Refold) = map(Refold, CausalFrames.dependencies(o.inner))
+
+# The decimals a table value was written with, which set its tolerance.
+decimals(v) = (s = string(v); occursin('.', s) ? length(s) - findlast('.', s) : 0)
+
+"""
+    tablerun(run, data, startidx, endidx, lookback) -> Vector
+
+A TA-Lib table row's call over `startIdx:endIdx` (0-based), as a vector indexed
+by absolute bar (1-based), `missing` outside the output. TA-Lib seeds a call
+at `startIdx − lookback`, so `run(slice)` runs over the bars from there through
+`endIdx` and must return one vector of outputs for them.
+"""
+function tablerun(run, data, startidx, endidx, lookback)
+    first_ = max(startidx - lookback, 0)
+    slice = map(c -> c[(first_+1):(endidx+1)], data)
+    got = run(slice)
+    out = Vector{Union{Missing,eltype(got)}}(missing, endidx + 1)
+    out[(first_+1):end] = got
+    # TA-Lib emits nothing before startIdx.
+    out[1:min(startidx, endidx+1)] .= missing
+    return out
+end
+
+"""
+    checkrow(got, row; out = "oneOfTheExpectedOutReal", index = "oneOfTheExpectedOutRealIndex")
+
+The assertions of DESIGN.md "Testing" for one TA-Lib table row: the first
+emitted bar is `expectedBegIdx`, `expectedNbElement` bars are emitted, and the
+value at `expectedBegIdx + index` matches to the row's precision.
+"""
+function checkrow(got, row; out = "oneOfTheExpectedOutReal",
+    index = "oneOfTheExpectedOutRealIndex", value = true)
+    nb = row["expectedNbElement"]
+    @test count(!ismissing, got) == nb
+    nb == 0 && return nothing
+    beg = row["expectedBegIdx"]
+    @test findfirst(!ismissing, got) - 1 == beg
+    if value
+        want = row[out]
+        @test got[beg+row[index]+1] ≈ want atol = 10.0^-decimals(want)
+    end
+    return nothing
+end

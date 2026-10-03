@@ -17,12 +17,18 @@ These files have no file-scope tables at all:
 - [ ] `test_cmou.c`
 - [ ] `test_correl.c`
 - [ ] `test_linearreg.c`
-- [ ] `test_mavp.c`
+- [x] `test_mavp.c`: the per-bar oracle (MAVP equals `MA(p)` started at
+      MAVP's first output) for every MA type, with and without an unstable
+      period, and the min/max/NaN clamping (S1). The in-place and truncation
+      legs have no counterpart in a stream.
 - [ ] `test_open_contract.c`
 - [ ] `test_reference.c` (with `ta_test_reference.c` and its golden header)
 - [ ] `test_s_overflow.c`
 - [ ] `test_variants.c`
-- [ ] `test_wma.c`
+- [x] `test_wma.c`: W2 (drift does not grow down an 8000-bar series) and W3
+      (a 1000× print does not contaminate later windows), against an exact
+      per-window WMA (S1). W1 needs `test_reference.c`'s golden header and
+      lands with it.
 
 These files have checks outside their extracted tables:
 
@@ -31,7 +37,14 @@ These files have checks outside their extracted tables:
 - [ ] `test_period_boundary.c`: period-1 and minimum-period boundaries, and
       the abstract sweep over every parameter grid
 - [ ] `test_rolling_extremum.c`: the block-scan oracle for MIN, MAX, MINMAX,
-      MIDPOINT, MIDPRICE and WILLR (S1, S2)
+      MIDPOINT, MIDPRICE and WILLR. The S1 part (all but WILLR) is ported as
+      a naive window scan over periods straddling the block edges; WILLR
+      lands in S2.
+- [x] `test_zlema.c`: the pandas and Tulip oracles at 1e-12, period 1 and the
+      inherited EMA unstable period (S1). Its arrays use anonymous structs,
+      which the extractor does not read, so the values are copied into
+      `test/overlap.jl`.
+- [x] `test_cumsum.c`: the C40 golden and the (3, 7) slice (S1)
 
 Not ported, being out of scope:
 
