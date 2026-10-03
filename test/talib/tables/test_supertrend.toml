@@ -1,0 +1,244 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_supertrend.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_supertrend.c"
+
+[arrays.stFlips_10_1]
+type = "int"
+values = [26, 56, 63, 65, 68, 90, 101, 123, 145, 151, 155, 186, 194, 232, 239, 244, 249, 268, 274, 281, 301, 305, 336, 340, 343, 347, 362, 378, 388, 391, 410, 417, 439, 458, 465, 485, 495, 499, 506, 513, 529, 546, 552, 560, 562, 577, 587, 591, 612, 615, 636, 639, 646, 653, 672, 716, 717, 722, 729, 736, 746, 764, 776, 790, 809, 825, 854, 864, 869, 871, 898, 901, 905, 912, 931, 947, 951, 961, 962, 969, 976, 986, 990, 996, 998]
+
+[arrays.stFlips_7_2]
+type = "int"
+values = [28, 56, 75, 125, 148, 151, 165, 190, 205, 283, 343, 348, 366, 392, 443, 489, 529, 580, 590, 593, 647, 654, 687, 725, 731, 740, 747, 765, 787, 792, 810, 830, 861, 871, 906, 949, 964, 970, 979, 988, 992]
+
+[structs.StFlips]
+fields = ["period", "mult", "bars", "nbBarsFlipped"]
+types = ["int", "double", "int *", "int"]
+
+[structs.StGolden]
+fields = ["period", "mult", "bar", "line", "trend"]
+types = ["int", "double", "int", "double", "int"]
+
+[structs.StShape]
+fields = ["period", "mult", "begIdx", "nbElement"]
+types = ["int", "double", "int", "int"]
+
+[structs.StSweep]
+fields = ["period", "mult"]
+types = ["int", "double"]
+
+[tables.stFlipTable]
+type = "StFlips"
+
+    [[tables.stFlipTable.rows]]
+    bars = "stFlips_7_2"
+    mult = 2.0
+    nbBarsFlipped = 41
+    period = 7
+    [[tables.stFlipTable.rows]]
+    bars = "stFlips_10_1"
+    mult = 1.0
+    nbBarsFlipped = 85
+    period = 10
+
+[tables.stGdOracle]
+type = "StGolden"
+
+    [[tables.stGdOracle.rows]]
+    bar = 900
+    line = 95.32237591850891
+    mult = 3.0
+    period = 10
+    trend = 1
+    [[tables.stGdOracle.rows]]
+    bar = 950
+    line = 92.15683632920022
+    mult = 3.0
+    period = 10
+    trend = -1
+    [[tables.stGdOracle.rows]]
+    bar = 975
+    line = 88.98797143766431
+    mult = 3.0
+    period = 10
+    trend = 1
+    [[tables.stGdOracle.rows]]
+    bar = 999
+    line = 92.86697406525593
+    mult = 3.0
+    period = 10
+    trend = -1
+    [[tables.stGdOracle.rows]]
+    bar = 900
+    line = 96.89865185113638
+    mult = 2.0
+    period = 7
+    trend = 1
+    [[tables.stGdOracle.rows]]
+    bar = 950
+    line = 88.2434271504695
+    mult = 2.0
+    period = 7
+    trend = 1
+    [[tables.stGdOracle.rows]]
+    bar = 975
+    line = 90.30155598413283
+    mult = 2.0
+    period = 7
+    trend = 1
+    [[tables.stGdOracle.rows]]
+    bar = 999
+    line = 91.03077602834395
+    mult = 2.0
+    period = 7
+    trend = -1
+    [[tables.stGdOracle.rows]]
+    bar = 900
+    line = 93.71338700335437
+    mult = 4.0
+    period = 14
+    trend = 1
+    [[tables.stGdOracle.rows]]
+    bar = 950
+    line = 93.59108694177152
+    mult = 4.0
+    period = 14
+    trend = -1
+    [[tables.stGdOracle.rows]]
+    bar = 975
+    line = 93.29265806991087
+    mult = 4.0
+    period = 14
+    trend = -1
+    [[tables.stGdOracle.rows]]
+    bar = 999
+    line = 93.29265806991087
+    mult = 4.0
+    period = 14
+    trend = -1
+    [[tables.stGdOracle.rows]]
+    bar = 900
+    line = 99.18786788662209
+    mult = 1.0
+    period = 10
+    trend = -1
+    [[tables.stGdOracle.rows]]
+    bar = 950
+    line = 89.53674610479116
+    mult = 1.0
+    period = 10
+    trend = 1
+    [[tables.stGdOracle.rows]]
+    bar = 975
+    line = 92.08932381255477
+    mult = 1.0
+    period = 10
+    trend = 1
+    [[tables.stGdOracle.rows]]
+    bar = 999
+    line = 88.94899135508531
+    mult = 1.0
+    period = 10
+    trend = -1
+
+[tables.stGdShape]
+type = "StShape"
+
+    [[tables.stGdShape.rows]]
+    begIdx = 10
+    mult = 3.0
+    nbElement = 990
+    period = 10
+    [[tables.stGdShape.rows]]
+    begIdx = 7
+    mult = 2.0
+    nbElement = 993
+    period = 7
+    [[tables.stGdShape.rows]]
+    begIdx = 14
+    mult = 4.0
+    nbElement = 986
+    period = 14
+    [[tables.stGdShape.rows]]
+    begIdx = 10
+    mult = 1.0
+    nbElement = 990
+    period = 10
+
+[tables.stSrefOracle]
+type = "StGolden"
+
+    [[tables.stSrefOracle.rows]]
+    bar = 200
+    line = 114.35194013755326
+    mult = 2.0
+    period = 7
+    trend = -1
+    [[tables.stSrefOracle.rows]]
+    bar = 225
+    line = 100.16118753507284
+    mult = 2.0
+    period = 7
+    trend = 1
+    [[tables.stSrefOracle.rows]]
+    bar = 251
+    line = 113.53995615951584
+    mult = 2.0
+    period = 7
+    trend = -1
+    [[tables.stSrefOracle.rows]]
+    bar = 200
+    line = 112.2539514483794
+    mult = 1.5
+    period = 5
+    trend = -1
+    [[tables.stSrefOracle.rows]]
+    bar = 225
+    line = 101.90280269605175
+    mult = 1.5
+    period = 5
+    trend = 1
+    [[tables.stSrefOracle.rows]]
+    bar = 251
+    line = 111.78141670443482
+    mult = 1.5
+    period = 5
+    trend = -1
+
+[tables.stSrefShape]
+type = "StShape"
+
+    [[tables.stSrefShape.rows]]
+    begIdx = 7
+    mult = 2.0
+    nbElement = 245
+    period = 7
+    [[tables.stSrefShape.rows]]
+    begIdx = 5
+    mult = 1.5
+    nbElement = 247
+    period = 5
+
+[tables.stSweep]
+type = "StSweep"
+
+    [[tables.stSweep.rows]]
+    mult = 3.0
+    period = 10
+    [[tables.stSweep.rows]]
+    mult = 3.0
+    period = 2
+    [[tables.stSweep.rows]]
+    mult = 0.5
+    period = 3
+    [[tables.stSweep.rows]]
+    mult = 2.0
+    period = 7
+    [[tables.stSweep.rows]]
+    mult = 4.0
+    period = 14
+    [[tables.stSweep.rows]]
+    mult = 1.0
+    period = 20
+    [[tables.stSweep.rows]]
+    mult = 0.0
+    period = 5

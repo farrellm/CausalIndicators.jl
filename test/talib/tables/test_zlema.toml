@@ -1,0 +1,7 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_zlema.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_zlema.c"
+
+[arrays.zlemaDiffGrid]
+type = "int"
+values = [1, 2, 3, 4, 5, 7, 10, 14, 20, 30, 50, 100]

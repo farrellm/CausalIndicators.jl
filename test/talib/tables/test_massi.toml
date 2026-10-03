@@ -1,0 +1,239 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_massi.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_massi.c"
+
+[arrays.massiFast]
+type = "int"
+values = [2, 3, 4, 5, 7, 9, 12, 16, 25]
+
+[arrays.massiSlow]
+type = "int"
+values = [2, 3, 5, 9, 14, 20, 25, 30, 40]
+
+[arrays.massiUnst]
+type = "int"
+values = [0, 1, 4]
+
+[structs.MassiGolden]
+fields = ["fast", "slow", "bar", "want", "src"]
+types = ["int", "int", "int", "double", "char *"]
+
+[tables.massiOracle]
+type = "MassiGolden"
+
+    [[tables.massiOracle.rows]]
+    bar = 40
+    fast = 9
+    slow = 25
+    src = "pandas"
+    want = 24.624023433455974
+    [[tables.massiOracle.rows]]
+    bar = 41
+    fast = 9
+    slow = 25
+    src = "pandas"
+    want = 24.45998272102605
+    [[tables.massiOracle.rows]]
+    bar = 93
+    fast = 9
+    slow = 25
+    src = "pandas"
+    want = 26.565153522353782
+    [[tables.massiOracle.rows]]
+    bar = 146
+    fast = 9
+    slow = 25
+    src = "pandas"
+    want = 25.186880067585125
+    [[tables.massiOracle.rows]]
+    bar = 199
+    fast = 9
+    slow = 25
+    src = "pandas"
+    want = 25.918563721685704
+    [[tables.massiOracle.rows]]
+    bar = 251
+    fast = 9
+    slow = 25
+    src = "pandas"
+    want = 24.17050146632966
+    [[tables.massiOracle.rows]]
+    bar = 175
+    fast = 9
+    slow = 25
+    src = "tulip"
+    want = 24.30843550586522
+    [[tables.massiOracle.rows]]
+    bar = 175
+    fast = 9
+    slow = 25
+    src = "trading-signals"
+    want = 24.308435505865226
+    [[tables.massiOracle.rows]]
+    bar = 200
+    fast = 9
+    slow = 25
+    src = "tulip"
+    want = 25.942788420389675
+    [[tables.massiOracle.rows]]
+    bar = 200
+    fast = 9
+    slow = 25
+    src = "trading-signals"
+    want = 25.942788420389686
+    [[tables.massiOracle.rows]]
+    bar = 251
+    fast = 9
+    slow = 25
+    src = "tulip"
+    want = 24.170501466329654
+    [[tables.massiOracle.rows]]
+    bar = 251
+    fast = 9
+    slow = 25
+    src = "trading-signals"
+    want = 24.17050146632966
+    [[tables.massiOracle.rows]]
+    bar = 25
+    fast = 9
+    slow = 10
+    src = "pandas"
+    want = 10.058214763147717
+    [[tables.massiOracle.rows]]
+    bar = 26
+    fast = 9
+    slow = 10
+    src = "pandas"
+    want = 9.962518975609584
+    [[tables.massiOracle.rows]]
+    bar = 81
+    fast = 9
+    slow = 10
+    src = "pandas"
+    want = 11.314064551303744
+    [[tables.massiOracle.rows]]
+    bar = 138
+    fast = 9
+    slow = 10
+    src = "pandas"
+    want = 10.277273333764514
+    [[tables.massiOracle.rows]]
+    bar = 195
+    fast = 9
+    slow = 10
+    src = "pandas"
+    want = 9.910706209817144
+    [[tables.massiOracle.rows]]
+    bar = 251
+    fast = 9
+    slow = 10
+    src = "pandas"
+    want = 8.272802159556495
+    [[tables.massiOracle.rows]]
+    bar = 175
+    fast = 9
+    slow = 10
+    src = "tulip"
+    want = 9.826802941354101
+    [[tables.massiOracle.rows]]
+    bar = 175
+    fast = 9
+    slow = 10
+    src = "trading-signals"
+    want = 9.826802941354103
+    [[tables.massiOracle.rows]]
+    bar = 200
+    fast = 9
+    slow = 10
+    src = "tulip"
+    want = 10.133421105256309
+    [[tables.massiOracle.rows]]
+    bar = 200
+    fast = 9
+    slow = 10
+    src = "trading-signals"
+    want = 10.133421105256307
+    [[tables.massiOracle.rows]]
+    bar = 251
+    fast = 9
+    slow = 10
+    src = "tulip"
+    want = 8.272802159556493
+    [[tables.massiOracle.rows]]
+    bar = 251
+    fast = 9
+    slow = 10
+    src = "trading-signals"
+    want = 8.272802159556495
+    [[tables.massiOracle.rows]]
+    bar = 21
+    fast = 5
+    slow = 14
+    src = "pandas"
+    want = 14.1688739429547
+    [[tables.massiOracle.rows]]
+    bar = 22
+    fast = 5
+    slow = 14
+    src = "pandas"
+    want = 14.077787564125472
+    [[tables.massiOracle.rows]]
+    bar = 78
+    fast = 5
+    slow = 14
+    src = "pandas"
+    want = 14.87490859308568
+    [[tables.massiOracle.rows]]
+    bar = 136
+    fast = 5
+    slow = 14
+    src = "pandas"
+    want = 14.455482691175655
+    [[tables.massiOracle.rows]]
+    bar = 194
+    fast = 5
+    slow = 14
+    src = "pandas"
+    want = 13.930580422802295
+    [[tables.massiOracle.rows]]
+    bar = 251
+    fast = 5
+    slow = 14
+    src = "pandas"
+    want = 12.414269220196172
+    [[tables.massiOracle.rows]]
+    bar = 33
+    fast = 3
+    slow = 30
+    src = "pandas"
+    want = 29.934966341440543
+    [[tables.massiOracle.rows]]
+    bar = 34
+    fast = 3
+    slow = 30
+    src = "pandas"
+    want = 29.836340160478606
+    [[tables.massiOracle.rows]]
+    bar = 87
+    fast = 3
+    slow = 30
+    src = "pandas"
+    want = 30.120644547127185
+    [[tables.massiOracle.rows]]
+    bar = 142
+    fast = 3
+    slow = 30
+    src = "pandas"
+    want = 29.770592759372533
+    [[tables.massiOracle.rows]]
+    bar = 197
+    fast = 3
+    slow = 30
+    src = "pandas"
+    want = 30.182844262063217
+    [[tables.massiOracle.rows]]
+    bar = 251
+    fast = 3
+    slow = 30
+    src = "pandas"
+    want = 29.59864498027602

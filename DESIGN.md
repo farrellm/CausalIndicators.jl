@@ -457,16 +457,33 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
 
 - **Kernels** (`src/kernels/`) cover only what CausalFrames does not:
   - `EMAKernel` and `WilderKernel`, seeded through an embedded CausalFrames
-    `Sum` state
+    `Sum` state. `WilderKernel` has TA-Lib's two forms: `:mean` (RMA, RSI, ATR)
+    seeds with the average and steps `fma(β, prev, α·x)`, and `:sum` (±DM and
+    the TR sum) seeds with the sum of `seedn` bars and steps
+    `prev − prev/period + x`.
+  - `SMAKernel`: `barwindow` around `Mean`.
   - `MAKernel{M}`: the moving-average family behind a type parameter.
     - It is used by `MA`, `MACDExt`, `APO`/`PPO`/`PVO`, `Stoch*`, `KDJ` and
       non-SMA `BollingerBands`.
-    - Its `:sma` form is `barwindow` around `Mean`.
-  - `CandleAverages`: TA-Lib's per-setting body and shadow averages, built on
-    count-windowed CausalFrames `Mean` states.
+    - Its `:sma` form is `SMAKernel`, `:ema` is `EMAKernel` and `:rma` is
+      `WilderKernel`. Each later stage adds the MA types its indicators
+      introduce (S1: `:wma`, `:dema`, `:tema`, `:trima`, `:kama`, `:t3`,
+      `:hma`, `:zlema`; S6: `:mama`). Until then the constructor rejects
+      them with an `ArgumentError`.
+  - `CandleAverages` (S7): TA-Lib's per-setting body and shadow averages, built
+    on count-windowed CausalFrames `Mean` states.
 
   Window sums, extrema and the ring buffer are never kernels. They are
   CausalFrames states and `CausalFrames.barwindow`.
+- **Kernel interface.** A kernel is a mutable struct, not a summarizer:
+  - `step!(k, x)` folds one bar and returns the value after it, `missing`
+    until seeded. A `missing` bar leaves the kernel unchanged and returns
+    `missing`, which is the skip rule under "Missing and non-finite inputs".
+  - `current(k)` is the latest value.
+  - `nseen(k)` counts the bars folded, so an indicator emits from
+    `nseen(k) > lookback(k) + unstable`.
+  - `fresh(k)` and `fresh!(k)` extend the CausalFrames functions.
+  - Kernels compute in `floattype(T)`: `Float64`, or a wider float input type.
 - **State layout.** States compose kernels as concrete fields, with no `Any` and
   no abstract field types.
   - `update!` allocates nothing, and `fresh!` zeroes everything in place.
@@ -491,7 +508,7 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
 | File | Content |
 |---|---|
 | `src/CausalIndicators.jl` | module, includes, exports |
-| `src/kernels/*.jl` | `EMAKernel`, `WilderKernel`, `MAKernel`, `CandleAverages` |
+| `src/kernels/*.jl` | `EMAKernel`, `WilderKernel`, `SMAKernel`, `MAKernel`, `CandleAverages` |
 | `src/overlap.jl` | moving averages and bands |
 | `src/momentum.jl` | momentum indicators |
 | `src/volatility.jl` | volatility indicators |
@@ -502,6 +519,7 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
 | `src/cycle.jl` | the Hilbert-transform family and `MAMA` |
 | `src/candles/*.jl` | the `Candles` submodule |
 | `test/foldseries.jl` | the test-only batch driver |
+| `test/helpers.jl` | loaders for the data, tables and goldens; allocation and streaming-property helpers |
 | `gen/` | the TA-Lib test extractor and golden generator (not part of the package) |
 
 The file groups follow TA-Lib's own `group` field, so the YAML says where a
@@ -526,14 +544,18 @@ test-only helper in `test/foldseries.jl`, not part of the package.
 
 - `gen/extract_talib_tests.jl` parses each
   `src/tools/ta_regtest/ta_test_func/test_*.c`. From each file it reads:
-  - the file's own `typedef struct … TA_Test` field list, which differs from
-    file to file
-  - the `tableTest[]` initializer rows
-  - the `TA_*_TEST` and `TA_MAType_*` identifiers
+  - every file-scope struct typedef's field list, which differs from file to
+    file (`TA_Test`, and oracle structs such as `RmaGolden`)
+  - every file-scope initialized array: struct arrays (`tableTest[]`,
+    `rmaPandasClose[]`, …) become `[tables.<name>]` with one row per
+    initializer, and scalar arrays become `[arrays.<name>]`
+  - the `TA_*_TEST` and `TA_MAType_*` identifiers, kept as strings
 
-  It evaluates the rows' constant expressions (`252-14`) and writes
-  `test/talib/tables/<file>.toml`, which is committed with the source path and
-  commit.
+  It evaluates the rows' constant expressions (`252-14`, `#define`d sizes,
+  `sizeof` ratios, casts), tags each row inside a preprocessor conditional with
+  `cond` (and the `TA_FUNC_NO_RANGE_CHECK` rows with `rangecheck = true`), and
+  writes `test/talib/tables/<file>.toml`. That file is committed with the
+  source path and commit.
 - A small hand-written adapter per file maps each test identifier to a Julia
   summarizer and, for structured indicators, a `Bars` window. Each row asserts:
   - the value at `expectedBegIdx + index` matches to the precision the C test
@@ -547,17 +569,31 @@ test-only helper in `test/foldseries.jl`, not part of the package.
 - C tests that are not tables are ported by hand and listed in
   `test/talib/README.md`. These include the candlestick settings matrix, the
   division-by-zero cases and the stream/finite-value checks.
-- The reference data is extracted once to `test/data/*.csv`. It is
-  `TA_SREF_*_daily_ref_0_PRIV` (252 OHLCV bars) and the 10,000-bar `gData*`
-  set.
+- The reference data is extracted once to `test/data/*.csv` by
+  `gen/extract_talib_data.jl`, which copies the C literals verbatim. It is
+  `TA_SREF_*_daily_ref_0_PRIV` (`ref252.csv`, 252 OHLCV bars) and the 10,000-bar
+  `gData*` set (`gdata10000.csv`, OHLC only: TA-Lib has no volume for it).
 
 **Full-series goldens.** The tables check a handful of points per function, so
 the goldens check every bar.
 
 - **Generator.** `gen/golden/dump_golden.c` links a pinned TA-Lib build and
-  uses its abstract interface (`TA_GetFuncHandle`, `TA_CallFunc`). It runs every
-  in-scope function over both datasets, at its defaults and at every parameter
-  set the tables use, and writes `test/golden/<FN>.csv`.
+  uses its abstract interface (`TA_GetFuncHandle`, `TA_CallFunc`).
+  `gen/golden/generate.jl FN…` drives it and writes `test/golden/<FN>.csv.gz`.
+  - **Parameter sets.** Each function runs at its defaults over both datasets.
+    It also runs at every parameter set `gen/golden/paramsets.toml` lists for
+    it, over the 252-bar set only. The list holds the sets the tables use, and
+    `unstable = k` among them is `TA_SetUnstablePeriod`.
+  - **Missing volume.** A function that needs volume runs on the 252-bar set
+    only.
+  - **Input binding.** A price input takes the columns its flags name. The
+    k-th real input takes close, high, low, open in that order. `MAVP`'s
+    `inPeriods` takes `2 + (i mod 29)`. The file header records the binding.
+  - **File format.** One gzipped long-format CSV per function, with columns
+    `dataset,params,index,<outputs…>`. Reals are written at `%.17g`, and the
+    lookback rows are empty cells.
+  - **Staging.** Goldens are generated per stage, for the functions that stage
+    implements. S0′ commits `EMA` and `RMA`, which check the kernels.
 - **Comparison.** Every output is compared bar by bar, with the lookback rows
   required to be `missing`.
   - Float outputs use `rtol = 1e-9` together with an `atol` scaled to the
@@ -608,10 +644,12 @@ README rows together, and updates this document where reality differs.
 - **S0′, scaffolding:**
   - the CausalFrames dependency. It is unregistered, so this uses `[sources]`
     on Julia ≥ 1.11 plus a CI `Pkg.develop(url = …)` step on 1.10.
-  - the kernels
-  - the extractor, the golden generator, the extracted data and
-    `test/foldseries.jl`
-  - CI with Aqua and JET
+  - the core kernels: `EMAKernel`, `WilderKernel`, `SMAKernel`, and
+    `MAKernel` with `:sma`, `:ema` and `:rma`. The other MA types land with
+    their stages, and `CandleAverages` lands in S7.
+  - the data and table extractors, all extracted tables, the golden generator
+    with the `EMA`/`RMA` goldens, `test/foldseries.jl` and the test helpers
+  - CI with Aqua, JET and a JuliaFormatter check
 - **S1:** moving averages, the rolling operators and price transforms (28
   functions, of which 6 are CausalFrames-only and need only tests).
 - **S2:** momentum I (23): the MOM/ROC family, RSI, CMO, the MACD family,

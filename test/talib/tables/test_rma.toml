@@ -1,0 +1,413 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_rma.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_rma.c"
+
+[arrays.rmaAtozVecIn]
+type = "double"
+values = [62.125, 61.125, 62.3438, 65.3125, 63.9688, 63.4375, 63, 63.7812, 63.4062, 63.4062, 62.4375, 61.8438]
+
+[arrays.rmaAtozVecOut]
+type = "double"
+values = [62.975, 63.0675, 63.054, 63.1995, 63.2408, 63.2739, 63.1066, 62.854]
+
+[arrays.rmaTulipVecIn]
+type = "double"
+values = [81.59, 81.06, 82.87, 83.0, 83.61, 83.15, 82.84, 83.99, 84.55, 84.36, 85.53, 86.54, 86.89, 87.77, 87.29]
+
+[arrays.rmaTulipVecOut]
+type = "double"
+values = [82.426, 82.571, 82.625, 82.898, 83.228, 83.455, 83.87, 84.404, 84.901, 85.475, 85.838]
+
+[structs.RmaBookVector]
+fields = ["source", "nbIn", "in", "nbOut", "out", "decimals"]
+types = ["char *", "int", "double *", "int", "double *", "int"]
+
+[structs.RmaGolden]
+fields = ["period", "bar", "want"]
+types = ["int", "int", "double"]
+
+[tables.rmaBookVectors]
+type = "RmaBookVector"
+
+    [[tables.rmaBookVectors.rows]]
+    decimals = 3
+    in = "rmaTulipVecIn"
+    nbIn = 15
+    nbOut = 11
+    out = "rmaTulipVecOut"
+    source = "Tulip Indicators 0.9.2 tests/untest.txt:483"
+    [[tables.rmaBookVectors.rows]]
+    decimals = 4
+    in = "rmaAtozVecIn"
+    nbIn = 12
+    nbOut = 8
+    out = "rmaAtozVecOut"
+    source = "Achelis, TA from A to Z p.366 (atoz.txt:296)"
+
+[tables.rmaPandasClose]
+type = "RmaGolden"
+
+    [[tables.rmaPandasClose.rows]]
+    bar = 1
+    period = 2
+    want = 93.1575
+    [[tables.rmaPandasClose.rows]]
+    bar = 2
+    period = 2
+    want = 93.76625
+    [[tables.rmaPandasClose.rows]]
+    bar = 50
+    period = 2
+    want = 89.75368189118433
+    [[tables.rmaPandasClose.rows]]
+    bar = 150
+    period = 2
+    want = 122.382756893379
+    [[tables.rmaPandasClose.rows]]
+    bar = 251
+    period = 2
+    want = 108.43841071045082
+    [[tables.rmaPandasClose.rows]]
+    bar = 4
+    period = 5
+    want = 93.91300000000001
+    [[tables.rmaPandasClose.rows]]
+    bar = 5
+    period = 5
+    want = 94.0554
+    [[tables.rmaPandasClose.rows]]
+    bar = 50
+    period = 5
+    want = 89.44940436048824
+    [[tables.rmaPandasClose.rows]]
+    bar = 150
+    period = 5
+    want = 123.21853561837347
+    [[tables.rmaPandasClose.rows]]
+    bar = 251
+    period = 5
+    want = 108.94720710690687
+    [[tables.rmaPandasClose.rows]]
+    bar = 13
+    period = 14
+    want = 93.8575
+    [[tables.rmaPandasClose.rows]]
+    bar = 14
+    period = 14
+    want = 93.65339285714286
+    [[tables.rmaPandasClose.rows]]
+    bar = 50
+    period = 14
+    want = 88.54194780931827
+    [[tables.rmaPandasClose.rows]]
+    bar = 150
+    period = 14
+    want = 125.26530097547894
+    [[tables.rmaPandasClose.rows]]
+    bar = 251
+    period = 14
+    want = 108.01489148034045
+    [[tables.rmaPandasClose.rows]]
+    bar = 29
+    period = 30
+    want = 90.42633333333335
+    [[tables.rmaPandasClose.rows]]
+    bar = 30
+    period = 30
+    want = 90.2537888888889
+    [[tables.rmaPandasClose.rows]]
+    bar = 50
+    period = 30
+    want = 89.22000422772238
+    [[tables.rmaPandasClose.rows]]
+    bar = 150
+    period = 30
+    want = 121.33794198613596
+    [[tables.rmaPandasClose.rows]]
+    bar = 251
+    period = 30
+    want = 108.26343017251227
+
+[tables.rmaPandasCross]
+type = "RmaGolden"
+
+    [[tables.rmaPandasCross.rows]]
+    bar = 1
+    period = 2
+    want = -22.6875
+    [[tables.rmaPandasCross.rows]]
+    bar = 2
+    period = 2
+    want = -19.21875
+    [[tables.rmaPandasCross.rows]]
+    bar = 28
+    period = 2
+    want = 0.016792791429907084
+    [[tables.rmaPandasCross.rows]]
+    bar = 50
+    period = 2
+    want = 1.51679286761112
+    [[tables.rmaPandasCross.rows]]
+    bar = 150
+    period = 2
+    want = 12.548998021590284
+    [[tables.rmaPandasCross.rows]]
+    bar = 251
+    period = 2
+    want = -9.087628236443575
+    [[tables.rmaPandasCross.rows]]
+    bar = 4
+    period = 5
+    want = -15.75
+    [[tables.rmaPandasCross.rows]]
+    bar = 5
+    period = 5
+    want = -12.975000000000001
+    [[tables.rmaPandasCross.rows]]
+    bar = 50
+    period = 5
+    want = -1.2505041233389222
+    [[tables.rmaPandasCross.rows]]
+    bar = 150
+    period = 5
+    want = 4.639339128999701
+    [[tables.rmaPandasCross.rows]]
+    bar = 202
+    period = 5
+    want = -0.00019917518156553626
+    [[tables.rmaPandasCross.rows]]
+    bar = 251
+    period = 5
+    want = -0.405355482669544
+    [[tables.rmaPandasCross.rows]]
+    bar = 13
+    period = 14
+    want = -5.678571428571429
+    [[tables.rmaPandasCross.rows]]
+    bar = 14
+    period = 14
+    want = -6.014030612244898
+    [[tables.rmaPandasCross.rows]]
+    bar = 50
+    period = 14
+    want = -1.013723537254915
+    [[tables.rmaPandasCross.rows]]
+    bar = 150
+    period = 14
+    want = 1.326119112497842
+    [[tables.rmaPandasCross.rows]]
+    bar = 175
+    period = 14
+    want = 0.013146456743032386
+    [[tables.rmaPandasCross.rows]]
+    bar = 251
+    period = 14
+    want = 0.5096058107917132
+    [[tables.rmaPandasCross.rows]]
+    bar = 29
+    period = 30
+    want = -3.05
+    [[tables.rmaPandasCross.rows]]
+    bar = 30
+    period = 30
+    want = -2.498333333333333
+    [[tables.rmaPandasCross.rows]]
+    bar = 50
+    period = 30
+    want = -1.6469231405840379
+    [[tables.rmaPandasCross.rows]]
+    bar = 72
+    period = 30
+    want = 0.0021537358922822103
+    [[tables.rmaPandasCross.rows]]
+    bar = 150
+    period = 30
+    want = 0.7451474590902893
+    [[tables.rmaPandasCross.rows]]
+    bar = 251
+    period = 30
+    want = 0.25077744797727564
+
+[tables.rmaTulipClose]
+type = "RmaGolden"
+
+    [[tables.rmaTulipClose.rows]]
+    bar = 1
+    period = 2
+    want = 93.1575
+    [[tables.rmaTulipClose.rows]]
+    bar = 2
+    period = 2
+    want = 93.76625
+    [[tables.rmaTulipClose.rows]]
+    bar = 50
+    period = 2
+    want = 89.75368189118433
+    [[tables.rmaTulipClose.rows]]
+    bar = 150
+    period = 2
+    want = 122.382756893379
+    [[tables.rmaTulipClose.rows]]
+    bar = 251
+    period = 2
+    want = 108.43841071045082
+    [[tables.rmaTulipClose.rows]]
+    bar = 4
+    period = 5
+    want = 93.91299999999998
+    [[tables.rmaTulipClose.rows]]
+    bar = 5
+    period = 5
+    want = 94.05539999999999
+    [[tables.rmaTulipClose.rows]]
+    bar = 50
+    period = 5
+    want = 89.44940436048822
+    [[tables.rmaTulipClose.rows]]
+    bar = 150
+    period = 5
+    want = 123.21853561837344
+    [[tables.rmaTulipClose.rows]]
+    bar = 251
+    period = 5
+    want = 108.94720710690683
+    [[tables.rmaTulipClose.rows]]
+    bar = 13
+    period = 14
+    want = 93.85749999999999
+    [[tables.rmaTulipClose.rows]]
+    bar = 14
+    period = 14
+    want = 93.65339285714285
+    [[tables.rmaTulipClose.rows]]
+    bar = 50
+    period = 14
+    want = 88.54194780931823
+    [[tables.rmaTulipClose.rows]]
+    bar = 150
+    period = 14
+    want = 125.26530097547888
+    [[tables.rmaTulipClose.rows]]
+    bar = 251
+    period = 14
+    want = 108.01489148034038
+    [[tables.rmaTulipClose.rows]]
+    bar = 29
+    period = 30
+    want = 90.42633333333333
+    [[tables.rmaTulipClose.rows]]
+    bar = 30
+    period = 30
+    want = 90.25378888888889
+    [[tables.rmaTulipClose.rows]]
+    bar = 50
+    period = 30
+    want = 89.22000422772234
+    [[tables.rmaTulipClose.rows]]
+    bar = 150
+    period = 30
+    want = 121.33794198613595
+    [[tables.rmaTulipClose.rows]]
+    bar = 251
+    period = 30
+    want = 108.26343017251223
+
+[tables.rmaTulipCross]
+type = "RmaGolden"
+
+    [[tables.rmaTulipCross.rows]]
+    bar = 1
+    period = 2
+    want = -22.6875
+    [[tables.rmaTulipCross.rows]]
+    bar = 2
+    period = 2
+    want = -19.21875
+    [[tables.rmaTulipCross.rows]]
+    bar = 28
+    period = 2
+    want = 0.016792791429907035
+    [[tables.rmaTulipCross.rows]]
+    bar = 50
+    period = 2
+    want = 1.5167928676111204
+    [[tables.rmaTulipCross.rows]]
+    bar = 150
+    period = 2
+    want = 12.548998021590286
+    [[tables.rmaTulipCross.rows]]
+    bar = 251
+    period = 2
+    want = -9.087628236443576
+    [[tables.rmaTulipCross.rows]]
+    bar = 4
+    period = 5
+    want = -15.75
+    [[tables.rmaTulipCross.rows]]
+    bar = 5
+    period = 5
+    want = -12.975
+    [[tables.rmaTulipCross.rows]]
+    bar = 50
+    period = 5
+    want = -1.2505041233389211
+    [[tables.rmaTulipCross.rows]]
+    bar = 150
+    period = 5
+    want = 4.639339128999701
+    [[tables.rmaTulipCross.rows]]
+    bar = 202
+    period = 5
+    want = -0.00019917518156531422
+    [[tables.rmaTulipCross.rows]]
+    bar = 251
+    period = 5
+    want = -0.40535548266954446
+    [[tables.rmaTulipCross.rows]]
+    bar = 13
+    period = 14
+    want = -5.678571428571429
+    [[tables.rmaTulipCross.rows]]
+    bar = 14
+    period = 14
+    want = -6.014030612244898
+    [[tables.rmaTulipCross.rows]]
+    bar = 50
+    period = 14
+    want = -1.0137235372549145
+    [[tables.rmaTulipCross.rows]]
+    bar = 150
+    period = 14
+    want = 1.326119112497842
+    [[tables.rmaTulipCross.rows]]
+    bar = 175
+    period = 14
+    want = 0.013146456743032449
+    [[tables.rmaTulipCross.rows]]
+    bar = 251
+    period = 14
+    want = 0.5096058107917139
+    [[tables.rmaTulipCross.rows]]
+    bar = 29
+    period = 30
+    want = -3.05
+    [[tables.rmaTulipCross.rows]]
+    bar = 30
+    period = 30
+    want = -2.498333333333333
+    [[tables.rmaTulipCross.rows]]
+    bar = 50
+    period = 30
+    want = -1.6469231405840383
+    [[tables.rmaTulipCross.rows]]
+    bar = 72
+    period = 30
+    want = 0.002153735892282237
+    [[tables.rmaTulipCross.rows]]
+    bar = 150
+    period = 30
+    want = 0.745147459090289
+    [[tables.rmaTulipCross.rows]]
+    bar = 251
+    period = 30
+    want = 0.25077744797727597

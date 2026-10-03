@@ -1,0 +1,106 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_cvi.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_cvi.c"
+
+[structs.CviGolden]
+fields = ["period", "bar", "want", "src"]
+types = ["int", "int", "double", "char *"]
+
+[tables.cviOracle]
+type = "CviGolden"
+
+    [[tables.cviOracle.rows]]
+    bar = 10
+    period = 5
+    src = "pandas"
+    want = 30.701973068571505
+    [[tables.cviOracle.rows]]
+    bar = 69
+    period = 5
+    src = "pandas"
+    want = -16.3413456052495
+    [[tables.cviOracle.rows]]
+    bar = 134
+    period = 5
+    src = "pandas"
+    want = -15.25173217783061
+    [[tables.cviOracle.rows]]
+    bar = 192
+    period = 5
+    src = "pandas"
+    want = 16.163394342965436
+    [[tables.cviOracle.rows]]
+    bar = 251
+    period = 5
+    src = "tulip"
+    want = -10.949893057533124
+    [[tables.cviOracle.rows]]
+    bar = 24
+    period = 10
+    src = "pandas"
+    want = -13.173401413075892
+    [[tables.cviOracle.rows]]
+    bar = 77
+    period = 10
+    src = "pandas"
+    want = 65.81463536090983
+    [[tables.cviOracle.rows]]
+    bar = 136
+    period = 10
+    src = "pandas"
+    want = 14.784662183201126
+    [[tables.cviOracle.rows]]
+    bar = 194
+    period = 10
+    src = "pandas"
+    want = -13.457467647868086
+    [[tables.cviOracle.rows]]
+    bar = 251
+    period = 10
+    src = "tulip"
+    want = -43.71657024393183
+    [[tables.cviOracle.rows]]
+    bar = 27
+    period = 14
+    src = "pandas"
+    want = 14.959797363727267
+    [[tables.cviOracle.rows]]
+    bar = 83
+    period = 14
+    src = "pandas"
+    want = 35.260809029845646
+    [[tables.cviOracle.rows]]
+    bar = 148
+    period = 14
+    src = "pandas"
+    want = 24.307487614216186
+    [[tables.cviOracle.rows]]
+    bar = 201
+    period = 14
+    src = "pandas"
+    want = 14.290070182393253
+    [[tables.cviOracle.rows]]
+    bar = 251
+    period = 14
+    src = "tulip"
+    want = -39.78875493395858
+    [[tables.cviOracle.rows]]
+    bar = 40
+    period = 20
+    src = "pandas"
+    want = -10.612717758682335
+    [[tables.cviOracle.rows]]
+    bar = 92
+    period = 20
+    src = "pandas"
+    want = 32.21926811851804
+    [[tables.cviOracle.rows]]
+    bar = 148
+    period = 20
+    src = "pandas"
+    want = 11.893893605355673
+    [[tables.cviOracle.rows]]
+    bar = 198
+    period = 20
+    src = "pandas"
+    want = 14.07452895802758

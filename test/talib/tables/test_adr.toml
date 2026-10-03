@@ -1,0 +1,251 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_adr.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_adr.c"
+
+[arrays.adrGrid]
+type = "int"
+values = [1, 2, 3, 5, 14, 20, 50, 100]
+
+[arrays.adrKandExp]
+type = "double"
+values = [48.866666666666184, 52.26666666666764, 48.06666666666812, 57.26666666667006, 57.33333333333576, 73.8666666666686, 73.10000000000097, 67.66666666666667, 46.5, 44.80000000000049, 48.46666666666715, 68.36666666666618, 87.23333333333237, 104.83333333333333, 112.63333333333382, 86.30000000000048, 72.53333333333285, 60.9333333333343, 77.26666666666763, 79.56666666666813, 78.06666666666813, 66.96666666666715, 59.96666666666715, 66.33333333333333, 66.23333333333478, 57.4333333333343, 42.333333333333336, 54.73333333333236, 97.69999999999952, 113.0666666666657, 97.03333333333285, 60.599999999998545, 55.599999999998545, 51.5666666666657, 64.33333333333333, 69.33333333333333, 71.36666666666618, 65.26666666666522, 52.366666666666184, 47.833333333333336, 58.10000000000097, 59.5666666666657, 58.23333333333236, 40.53333333333285, 37.53333333333527, 39.53333333333527, 39.0, 37.166666666666664, 48.76666666666764, 57.46666666666715, 63.166666666666664, 58.03333333333285, 54.9333333333343, 52.0, 48.0666666666657, 65.76666666666522, 70.39999999999903, 69.60000000000097, 52.400000000001455, 66.60000000000097, 60.866666666666184, 61.400000000001455, 44.23333333333479, 48.46666666666715, 43.93333333333188, 47.53333333333285, 46.30000000000049, 47.30000000000049, 39.30000000000049, 35.96666666666715, 33.30000000000049, 44.46666666666715, 61.30000000000049, 73.30000000000048, 86.19999999999952, 75.73333333333237, 60.0, 34.53333333333527, 38.83333333333576, 56.80000000000049, 58.5666666666657, 43.533333333330425, 28.599999999998545, 29.599999999998545, 32.96666666666715, 29.566666666665697, 27.099999999998545, 22.966666666664725, 33.333333333333336, 42.166666666669094, 57.4333333333343, 42.03333333333285, 41.19999999999709, 33.03333333333285, 46.5, 50.0, 51.79999999999806, 39.69999999999709]
+
+[arrays.adrKandHigh]
+type = "double"
+values = [35266.0, 35247.5, 35235.7, 35190.8, 35182.0, 35258.0, 35262.9, 35281.5, 35256.0, 35210.0, 35185.4, 35230.0, 35241.0, 35218.1, 35212.6, 35128.9, 35047.7, 35019.5, 35078.8, 35085.0, 35034.1, 34984.4, 35010.8, 35047.1, 35091.4, 35150.4, 35123.9, 35110.0, 35092.1, 35179.2, 35244.9, 35150.2, 35136.0, 35133.6, 35188.0, 35215.3, 35221.9, 35219.2, 35234.0, 35216.7, 35197.9, 35178.4, 35183.4, 35129.7, 35149.1, 35129.3, 35125.5, 35114.5, 35120.1, 35129.4, 35105.4, 35054.1, 35034.6, 35032.9, 35070.8, 35086.0, 35086.9, 35048.9, 34988.6, 35004.3, 34985.0, 35004.2, 35010.0, 35041.8, 35024.7, 34982.0, 35018.0, 34978.2, 34959.5, 34965.0, 34985.3, 35002.4, 35018.0, 34989.0, 34943.0, 34900.0, 34932.1, 34930.0, 34920.3, 34929.9, 34940.0, 35019.7, 35009.1, 34980.2, 34977.3, 34976.1, 34969.4, 35000.0, 35010.0, 35015.9, 35062.9, 35084.8, 35085.1, 35077.9, 35118.0, 35104.0, 35086.2, 35041.7, 35009.2, 34994.2]
+
+[arrays.adrKandLow]
+type = "double"
+values = [35216.1, 35206.5, 35180.0, 35130.7, 35153.6, 35174.7, 35202.6, 35203.5, 35175.0, 35166.0, 35170.9, 35154.1, 35186.0, 35143.9, 35080.1, 35021.1, 34950.1, 34966.0, 35012.3, 35022.2, 34931.6, 34911.0, 34952.5, 34977.9, 35039.0, 35073.0, 35055.0, 35084.0, 35060.0, 35073.1, 35090.0, 35072.0, 35078.0, 35088.0, 35124.8, 35169.4, 35138.0, 35141.0, 35182.0, 35151.1, 35158.4, 35140.0, 35087.0, 35085.8, 35114.7, 35086.0, 35090.6, 35074.1, 35078.4, 35100.0, 35030.2, 34986.3, 34988.1, 34973.1, 35012.3, 35048.3, 35038.9, 34937.3, 34937.0, 34958.7, 34925.0, 34910.0, 34981.6, 34980.2, 34982.0, 34940.9, 34970.0, 34924.7, 34922.1, 34914.0, 34955.8, 34975.0, 34975.0, 34926.0, 34865.1, 34821.0, 34830.4, 34883.5, 34888.5, 34904.6, 34880.6, 34934.0, 34978.5, 34965.9, 34936.4, 34942.5, 34945.0, 34969.3, 34983.8, 35003.9, 35001.1, 35032.1, 35027.3, 35062.3, 35067.8, 35070.7, 35030.2, 34981.0, 34970.5, 34974.5]
+
+[arrays.adrStartGrid]
+type = "int"
+values = [0, 1, 40, 200]
+
+[structs.AdrGolden]
+fields = ["period", "bar", "want"]
+types = ["int", "int", "double"]
+
+[tables.adrSrefOracle]
+type = "AdrGolden"
+
+    [[tables.adrSrefOracle.rows]]
+    bar = 1
+    period = 2
+    want = 3.0174999999999983
+    [[tables.adrSrefOracle.rows]]
+    bar = 2
+    period = 2
+    want = 2.8299999999999983
+    [[tables.adrSrefOracle.rows]]
+    bar = 50
+    period = 2
+    want = 1.3275000000000006
+    [[tables.adrSrefOracle.rows]]
+    bar = 63
+    period = 2
+    want = 2.4849999999999994
+    [[tables.adrSrefOracle.rows]]
+    bar = 126
+    period = 2
+    want = 2.9099999999999966
+    [[tables.adrSrefOracle.rows]]
+    bar = 189
+    period = 2
+    want = 4.405000000000001
+    [[tables.adrSrefOracle.rows]]
+    bar = 236
+    period = 2
+    want = 7.685000000000002
+    [[tables.adrSrefOracle.rows]]
+    bar = 251
+    period = 2
+    want = 2.4099999999999966
+    [[tables.adrSrefOracle.rows]]
+    bar = 2
+    period = 3
+    want = 2.719999999999999
+    [[tables.adrSrefOracle.rows]]
+    bar = 3
+    period = 3
+    want = 2.7833333333333314
+    [[tables.adrSrefOracle.rows]]
+    bar = 51
+    period = 3
+    want = 1.6866666666666674
+    [[tables.adrSrefOracle.rows]]
+    bar = 64
+    period = 3
+    want = 3.0849999999999986
+    [[tables.adrSrefOracle.rows]]
+    bar = 127
+    period = 3
+    want = 2.896666666666666
+    [[tables.adrSrefOracle.rows]]
+    bar = 189
+    period = 3
+    want = 3.8133333333333326
+    [[tables.adrSrefOracle.rows]]
+    bar = 238
+    period = 3
+    want = 6.813333333333333
+    [[tables.adrSrefOracle.rows]]
+    bar = 251
+    period = 3
+    want = 2.1899999999999977
+    [[tables.adrSrefOracle.rows]]
+    bar = 4
+    period = 5
+    want = 2.8069999999999995
+    [[tables.adrSrefOracle.rows]]
+    bar = 5
+    period = 5
+    want = 2.5509999999999993
+    [[tables.adrSrefOracle.rows]]
+    bar = 66
+    period = 5
+    want = 2.8319999999999994
+    [[tables.adrSrefOracle.rows]]
+    bar = 128
+    period = 5
+    want = 3.0740000000000007
+    [[tables.adrSrefOracle.rows]]
+    bar = 190
+    period = 5
+    want = 3.6879999999999997
+    [[tables.adrSrefOracle.rows]]
+    bar = 238
+    period = 5
+    want = 5.938
+    [[tables.adrSrefOracle.rows]]
+    bar = 250
+    period = 5
+    want = 1.9019999999999981
+    [[tables.adrSrefOracle.rows]]
+    bar = 251
+    period = 5
+    want = 2.0279999999999974
+    [[tables.adrSrefOracle.rows]]
+    bar = 13
+    period = 14
+    want = 2.9442857142857144
+    [[tables.adrSrefOracle.rows]]
+    bar = 14
+    period = 14
+    want = 3.091785714285714
+    [[tables.adrSrefOracle.rows]]
+    bar = 51
+    period = 14
+    want = 2.1942857142857144
+    [[tables.adrSrefOracle.rows]]
+    bar = 72
+    period = 14
+    want = 2.6853571428571428
+    [[tables.adrSrefOracle.rows]]
+    bar = 132
+    period = 14
+    want = 3.299285714285714
+    [[tables.adrSrefOracle.rows]]
+    bar = 191
+    period = 14
+    want = 4.313571428571428
+    [[tables.adrSrefOracle.rows]]
+    bar = 192
+    period = 14
+    want = 4.059285714285713
+    [[tables.adrSrefOracle.rows]]
+    bar = 251
+    period = 14
+    want = 2.7699999999999982
+    [[tables.adrSrefOracle.rows]]
+    bar = 19
+    period = 20
+    want = 2.9844999999999997
+    [[tables.adrSrefOracle.rows]]
+    bar = 20
+    period = 20
+    want = 3.00175
+    [[tables.adrSrefOracle.rows]]
+    bar = 61
+    period = 20
+    want = 2.2392499999999997
+    [[tables.adrSrefOracle.rows]]
+    bar = 77
+    period = 20
+    want = 3.0295
+    [[tables.adrSrefOracle.rows]]
+    bar = 135
+    period = 20
+    want = 3.3724999999999996
+    [[tables.adrSrefOracle.rows]]
+    bar = 193
+    period = 20
+    want = 3.978999999999999
+    [[tables.adrSrefOracle.rows]]
+    bar = 196
+    period = 20
+    want = 4.282499999999999
+    [[tables.adrSrefOracle.rows]]
+    bar = 251
+    period = 20
+    want = 3.560499999999999
+    [[tables.adrSrefOracle.rows]]
+    bar = 49
+    period = 50
+    want = 2.8051999999999997
+    [[tables.adrSrefOracle.rows]]
+    bar = 50
+    period = 50
+    want = 2.7752
+    [[tables.adrSrefOracle.rows]]
+    bar = 68
+    period = 50
+    want = 2.5521
+    [[tables.adrSrefOracle.rows]]
+    bar = 99
+    period = 50
+    want = 3.0928999999999998
+    [[tables.adrSrefOracle.rows]]
+    bar = 150
+    period = 50
+    want = 3.5143999999999993
+    [[tables.adrSrefOracle.rows]]
+    bar = 196
+    period = 50
+    want = 3.7674000000000003
+    [[tables.adrSrefOracle.rows]]
+    bar = 201
+    period = 50
+    want = 3.7246000000000006
+    [[tables.adrSrefOracle.rows]]
+    bar = 251
+    period = 50
+    want = 3.186199999999999
+    [[tables.adrSrefOracle.rows]]
+    bar = 99
+    period = 100
+    want = 2.9490499999999997
+    [[tables.adrSrefOracle.rows]]
+    bar = 100
+    period = 100
+    want = 2.96655
+    [[tables.adrSrefOracle.rows]]
+    bar = 137
+    period = 100
+    want = 3.1290999999999993
+    [[tables.adrSrefOracle.rows]]
+    bar = 175
+    period = 100
+    want = 3.4645500000000005
+    [[tables.adrSrefOracle.rows]]
+    bar = 202
+    period = 100
+    want = 3.642700000000001
+    [[tables.adrSrefOracle.rows]]
+    bar = 213
+    period = 100
+    want = 3.521500000000001
+    [[tables.adrSrefOracle.rows]]
+    bar = 251
+    period = 100
+    want = 3.455400000000001

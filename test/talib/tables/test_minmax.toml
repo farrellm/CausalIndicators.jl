@@ -1,0 +1,760 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_minmax.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_minmax.c"
+
+[arrays.testSerie1]
+type = "TA_Real"
+values = [9, 8, 7, 6, 5]
+
+[arrays.testSerie10]
+type = "TA_Real"
+values = [3, 3, -3, 2, -1, 0, 2]
+
+[arrays.testSerie2]
+type = "TA_Real"
+values = [3, 7, 9, 10, 15, 33, 50]
+
+[arrays.testSerie3]
+type = "TA_Real"
+values = [0, 0, 0, 1, 2, 0, 0, 0]
+
+[arrays.testSerie4]
+type = "TA_Real"
+values = [0, 0, 0, 2, 1, 0, 0, 0]
+
+[arrays.testSerie5]
+type = "TA_Real"
+values = [2, 0, 0, 0, 0, 0, 0, 0]
+
+[arrays.testSerie6]
+type = "TA_Real"
+values = [0, 0, 0, 0, 0, 0, 0, 1]
+
+[arrays.testSerie7]
+type = "TA_Real"
+values = [-3, 2]
+
+[arrays.testSerie8]
+type = "TA_Real"
+values = [2, -2]
+
+[arrays.testSerie9]
+type = "TA_Real"
+values = [4, 2, 3]
+
+[structs.TA_RefTest]
+fields = ["input", "nbElement"]
+types = ["TA_Real *", "unsigned int"]
+
+[structs.TA_Test]
+fields = ["doRangeTestFlag", "theFunction", "startIdx", "endIdx", "optInTimePeriod", "expectedRetCode", "oneOfTheExpectedOutRealIndex0", "oneOfTheExpectedOutReal0", "expectedBegIdx", "expectedNbElement"]
+types = ["TA_Integer", "TA_TestId", "TA_Integer", "TA_Integer", "TA_Integer", "TA_RetCode", "TA_Integer", "TA_Real", "TA_Integer", "TA_Integer"]
+
+[tables.tableRefTest]
+type = "TA_RefTest"
+
+    [[tables.tableRefTest.rows]]
+    input = "testSerie1"
+    nbElement = 5
+    [[tables.tableRefTest.rows]]
+    input = "testSerie2"
+    nbElement = 7
+    [[tables.tableRefTest.rows]]
+    input = "testSerie3"
+    nbElement = 8
+    [[tables.tableRefTest.rows]]
+    input = "testSerie4"
+    nbElement = 8
+    [[tables.tableRefTest.rows]]
+    input = "testSerie5"
+    nbElement = 8
+    [[tables.tableRefTest.rows]]
+    input = "testSerie6"
+    nbElement = 8
+    [[tables.tableRefTest.rows]]
+    input = "testSerie7"
+    nbElement = 2
+    [[tables.tableRefTest.rows]]
+    input = "testSerie8"
+    nbElement = 2
+    [[tables.tableRefTest.rows]]
+    input = "testSerie9"
+    nbElement = 3
+    [[tables.tableRefTest.rows]]
+    input = "testSerie10"
+    nbElement = 7
+
+[tables.tableTest]
+type = "TA_Test"
+
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 1
+    expectedBegIdx = 0
+    expectedNbElement = 0
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 0
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 1
+    theFunction = "TA_MIN_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 14
+    expectedBegIdx = 14
+    expectedNbElement = 1
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 91.125
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 14
+    theFunction = "TA_MIN_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 15
+    expectedBegIdx = 13
+    expectedNbElement = 3
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 91.125
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 0
+    theFunction = "TA_MIN_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 15
+    expectedBegIdx = 13
+    expectedNbElement = 3
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 91.125
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 1
+    theFunction = "TA_MIN_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 16
+    expectedBegIdx = 13
+    expectedNbElement = 4
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 91.125
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 2
+    theFunction = "TA_MIN_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 16
+    expectedBegIdx = 13
+    expectedNbElement = 4
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 91.125
+    oneOfTheExpectedOutRealIndex0 = 1
+    optInTimePeriod = 14
+    startIdx = 2
+    theFunction = "TA_MIN_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 16
+    expectedBegIdx = 13
+    expectedNbElement = 4
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 91.125
+    oneOfTheExpectedOutRealIndex0 = 2
+    optInTimePeriod = 14
+    startIdx = 2
+    theFunction = "TA_MIN_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 14
+    expectedBegIdx = 13
+    expectedNbElement = 2
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 91.125
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 0
+    theFunction = "TA_MIN_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 13
+    expectedBegIdx = 13
+    expectedNbElement = 1
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 91.125
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 0
+    theFunction = "TA_MIN_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 21
+    expectedBegIdx = 20
+    expectedNbElement = 2
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 89.345
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 20
+    theFunction = "TA_MIN_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 21
+    expectedBegIdx = 20
+    expectedNbElement = 2
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 87.94
+    oneOfTheExpectedOutRealIndex0 = 1
+    optInTimePeriod = 14
+    startIdx = 20
+    theFunction = "TA_MIN_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 91.125
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 0
+    theFunction = "TA_MIN_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 91.125
+    oneOfTheExpectedOutRealIndex0 = 1
+    optInTimePeriod = 14
+    startIdx = 0
+    theFunction = "TA_MIN_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 91.125
+    oneOfTheExpectedOutRealIndex0 = 2
+    optInTimePeriod = 14
+    startIdx = 0
+    theFunction = "TA_MIN_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 91.125
+    oneOfTheExpectedOutRealIndex0 = 3
+    optInTimePeriod = 14
+    startIdx = 0
+    theFunction = "TA_MIN_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 89.75
+    oneOfTheExpectedOutRealIndex0 = 4
+    optInTimePeriod = 14
+    startIdx = 0
+    theFunction = "TA_MIN_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 107.75
+    oneOfTheExpectedOutRealIndex0 = 238
+    optInTimePeriod = 14
+    startIdx = 0
+    theFunction = "TA_MIN_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 91.5
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 2
+    startIdx = 0
+    theFunction = "TA_MIN_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 91.5
+    oneOfTheExpectedOutRealIndex0 = 1
+    optInTimePeriod = 2
+    startIdx = 0
+    theFunction = "TA_MIN_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 93.97
+    oneOfTheExpectedOutRealIndex0 = 2
+    optInTimePeriod = 2
+    startIdx = 0
+    theFunction = "TA_MIN_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 93.97
+    oneOfTheExpectedOutRealIndex0 = 3
+    optInTimePeriod = 2
+    startIdx = 0
+    theFunction = "TA_MIN_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 94.5
+    oneOfTheExpectedOutRealIndex0 = 4
+    optInTimePeriod = 2
+    startIdx = 0
+    theFunction = "TA_MIN_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 109.19
+    oneOfTheExpectedOutRealIndex0 = 250
+    optInTimePeriod = 2
+    startIdx = 0
+    theFunction = "TA_MIN_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 14
+    expectedBegIdx = 14
+    expectedNbElement = 1
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 98.815
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 14
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 15
+    expectedBegIdx = 13
+    expectedNbElement = 3
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 98.815
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 0
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 15
+    expectedBegIdx = 13
+    expectedNbElement = 3
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 98.815
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 1
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 16
+    expectedBegIdx = 13
+    expectedNbElement = 4
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 98.815
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 2
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 16
+    expectedBegIdx = 13
+    expectedNbElement = 4
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 98.815
+    oneOfTheExpectedOutRealIndex0 = 1
+    optInTimePeriod = 14
+    startIdx = 2
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 16
+    expectedBegIdx = 13
+    expectedNbElement = 4
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 98.815
+    oneOfTheExpectedOutRealIndex0 = 2
+    optInTimePeriod = 14
+    startIdx = 2
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 14
+    expectedBegIdx = 13
+    expectedNbElement = 2
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 98.815
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 0
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 13
+    expectedBegIdx = 13
+    expectedNbElement = 1
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 98.815
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 0
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 21
+    expectedBegIdx = 20
+    expectedNbElement = 2
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 98.815
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 20
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 21
+    expectedBegIdx = 20
+    expectedNbElement = 2
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 98.815
+    oneOfTheExpectedOutRealIndex0 = 1
+    optInTimePeriod = 14
+    startIdx = 20
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 99
+    expectedBegIdx = 20
+    expectedNbElement = 80
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 93.405
+    oneOfTheExpectedOutRealIndex0 = 6
+    optInTimePeriod = 14
+    startIdx = 20
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 99
+    expectedBegIdx = 20
+    expectedNbElement = 80
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 93.405
+    oneOfTheExpectedOutRealIndex0 = 6
+    optInTimePeriod = 14
+    startIdx = 20
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 99
+    expectedBegIdx = 20
+    expectedNbElement = 80
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 89.78
+    oneOfTheExpectedOutRealIndex0 = 13
+    optInTimePeriod = 14
+    startIdx = 20
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 98.815
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 0
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 98.815
+    oneOfTheExpectedOutRealIndex0 = 1
+    optInTimePeriod = 14
+    startIdx = 0
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 98.815
+    oneOfTheExpectedOutRealIndex0 = 2
+    optInTimePeriod = 14
+    startIdx = 0
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 98.815
+    oneOfTheExpectedOutRealIndex0 = 3
+    optInTimePeriod = 14
+    startIdx = 0
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 98.815
+    oneOfTheExpectedOutRealIndex0 = 4
+    optInTimePeriod = 14
+    startIdx = 0
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 110.69
+    oneOfTheExpectedOutRealIndex0 = 238
+    optInTimePeriod = 14
+    startIdx = 0
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 92.5
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 2
+    startIdx = 0
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 95.155
+    oneOfTheExpectedOutRealIndex0 = 1
+    optInTimePeriod = 2
+    startIdx = 0
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 95.155
+    oneOfTheExpectedOutRealIndex0 = 2
+    optInTimePeriod = 2
+    startIdx = 0
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 95.5
+    oneOfTheExpectedOutRealIndex0 = 3
+    optInTimePeriod = 2
+    startIdx = 0
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 95.5
+    oneOfTheExpectedOutRealIndex0 = 4
+    optInTimePeriod = 2
+    startIdx = 0
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 95.0
+    oneOfTheExpectedOutRealIndex0 = 5
+    optInTimePeriod = 2
+    startIdx = 0
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 109.69
+    oneOfTheExpectedOutRealIndex0 = 250
+    optInTimePeriod = 2
+    startIdx = 0
+    theFunction = "TA_MAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 91.125
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 0
+    theFunction = "TA_MINMAX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 91.125
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 0
+    theFunction = "TA_MINMAXINDEX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 91.125
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 0
+    theFunction = "TA_MININDEX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 91.125
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 0
+    theFunction = "TA_MAXINDEX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 94.97
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 0
+    theFunction = "TA_MIDPOINT_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 94.97
+    oneOfTheExpectedOutRealIndex0 = 1
+    optInTimePeriod = 14
+    startIdx = 0
+    theFunction = "TA_MIDPOINT_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 13
+    expectedNbElement = 239
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 109.22
+    oneOfTheExpectedOutRealIndex0 = 238
+    optInTimePeriod = 14
+    startIdx = 0
+    theFunction = "TA_MIDPOINT_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 92.0
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 2
+    startIdx = 0
+    theFunction = "TA_MIDPOINT_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 93.3275
+    oneOfTheExpectedOutRealIndex0 = 1
+    optInTimePeriod = 2
+    startIdx = 0
+    theFunction = "TA_MIDPOINT_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 109.44
+    oneOfTheExpectedOutRealIndex0 = 250
+    optInTimePeriod = 2
+    startIdx = 0
+    theFunction = "TA_MIDPOINT_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 29
+    expectedNbElement = 223
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 90.0325
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 30
+    startIdx = 0
+    theFunction = "TA_MIDPOINT_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 29
+    expectedNbElement = 223
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 107.25
+    oneOfTheExpectedOutRealIndex0 = 222
+    optInTimePeriod = 30
+    startIdx = 0
+    theFunction = "TA_MIDPOINT_TEST"

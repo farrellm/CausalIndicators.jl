@@ -1,0 +1,151 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_vwap.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_vwap.c"
+
+[structs.VwapGolden]
+fields = ["shape", "idx", "value"]
+types = ["int", "int", "double"]
+
+[structs.VwapShape]
+fields = ["startIdx", "begIdx", "nbElement"]
+types = ["int", "int", "int"]
+
+[tables.vwapBitwise]
+type = "VwapGolden"
+
+    [[tables.vwapBitwise.rows]]
+    idx = 0
+    shape = 0
+    value = 91.83333333333333
+    [[tables.vwapBitwise.rows]]
+    idx = 1
+    shape = 0
+    value = 92.86839558379641
+    [[tables.vwapBitwise.rows]]
+    idx = 2
+    shape = 0
+    value = 93.60554322033693
+    [[tables.vwapBitwise.rows]]
+    idx = 41
+    shape = 0
+    value = 89.21709976920314
+    [[tables.vwapBitwise.rows]]
+    idx = 100
+    shape = 0
+    value = 94.8793032488805
+    [[tables.vwapBitwise.rows]]
+    idx = 130
+    shape = 0
+    value = 101.23717590751647
+    [[tables.vwapBitwise.rows]]
+    idx = 176
+    shape = 0
+    value = 108.24576785745043
+    [[tables.vwapBitwise.rows]]
+    idx = 210
+    shape = 0
+    value = 107.89661267744586
+    [[tables.vwapBitwise.rows]]
+    idx = 251
+    shape = 0
+    value = 107.07755043572831
+    [[tables.vwapBitwise.rows]]
+    idx = 0
+    shape = 1
+    value = 115.16333333333334
+    [[tables.vwapBitwise.rows]]
+    idx = 1
+    shape = 1
+    value = 115.34551890050594
+    [[tables.vwapBitwise.rows]]
+    idx = 25
+    shape = 1
+    value = 119.76555694639723
+    [[tables.vwapBitwise.rows]]
+    idx = 75
+    shape = 1
+    value = 124.89162643202307
+    [[tables.vwapBitwise.rows]]
+    idx = 120
+    shape = 1
+    value = 114.25365308116315
+    [[tables.vwapBitwise.rows]]
+    idx = 151
+    shape = 1
+    value = 112.89053997317322
+
+[tables.vwapOracle]
+type = "VwapGolden"
+
+    [[tables.vwapOracle.rows]]
+    idx = 0
+    shape = 0
+    value = 91.83333333333333
+    [[tables.vwapOracle.rows]]
+    idx = 1
+    shape = 0
+    value = 92.86839558379641
+    [[tables.vwapOracle.rows]]
+    idx = 2
+    shape = 0
+    value = 93.60554322033693
+    [[tables.vwapOracle.rows]]
+    idx = 41
+    shape = 0
+    value = 89.21709976920313
+    [[tables.vwapOracle.rows]]
+    idx = 100
+    shape = 0
+    value = 94.87930324888053
+    [[tables.vwapOracle.rows]]
+    idx = 130
+    shape = 0
+    value = 101.2371759075165
+    [[tables.vwapOracle.rows]]
+    idx = 176
+    shape = 0
+    value = 108.24576785745043
+    [[tables.vwapOracle.rows]]
+    idx = 210
+    shape = 0
+    value = 107.89661267744582
+    [[tables.vwapOracle.rows]]
+    idx = 251
+    shape = 0
+    value = 107.0775504357283
+    [[tables.vwapOracle.rows]]
+    idx = 0
+    shape = 1
+    value = 115.16333333333334
+    [[tables.vwapOracle.rows]]
+    idx = 1
+    shape = 1
+    value = 115.34551890050594
+    [[tables.vwapOracle.rows]]
+    idx = 25
+    shape = 1
+    value = 119.76555694639723
+    [[tables.vwapOracle.rows]]
+    idx = 75
+    shape = 1
+    value = 124.89162643202312
+    [[tables.vwapOracle.rows]]
+    idx = 120
+    shape = 1
+    value = 114.25365308116316
+    [[tables.vwapOracle.rows]]
+    idx = 151
+    shape = 1
+    value = 112.89053997317323
+
+[tables.vwapShape]
+type = "VwapShape"
+
+    [[tables.vwapShape.rows]]
+    begIdx = 0
+    nbElement = 252
+    startIdx = 0
+    [[tables.vwapShape.rows]]
+    begIdx = 100
+    nbElement = 152
+    startIdx = 100

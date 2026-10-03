@@ -1,0 +1,151 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_cmf.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_cmf.c"
+
+[structs.CmfGolden]
+fields = ["period", "idx", "value"]
+types = ["int", "int", "double"]
+
+[structs.CmfShape]
+fields = ["period", "begIdx", "nbElement"]
+types = ["int", "int", "int"]
+
+[tables.cmfOracle]
+type = "CmfGolden"
+
+    [[tables.cmfOracle.rows]]
+    idx = 86
+    period = 20
+    value = 0.2748837073939467
+    [[tables.cmfOracle.rows]]
+    idx = 177
+    period = 20
+    value = -0.27466797094768686
+    [[tables.cmfOracle.rows]]
+    idx = 214
+    period = 20
+    value = 0.36645256949023364
+    [[tables.cmfOracle.rows]]
+    idx = 215
+    period = 20
+    value = 0.29510957870722815
+    [[tables.cmfOracle.rows]]
+    idx = 216
+    period = 20
+    value = 0.3033557404335154
+    [[tables.cmfOracle.rows]]
+    idx = 86
+    period = 21
+    value = 0.28310612850294853
+    [[tables.cmfOracle.rows]]
+    idx = 176
+    period = 21
+    value = -0.29635727216658597
+    [[tables.cmfOracle.rows]]
+    idx = 213
+    period = 21
+    value = 0.2772069250163705
+    [[tables.cmfOracle.rows]]
+    idx = 214
+    period = 21
+    value = 0.32496064144415715
+    [[tables.cmfOracle.rows]]
+    idx = 215
+    period = 21
+    value = 0.28358661822021536
+    [[tables.cmfOracle.rows]]
+    idx = 214
+    period = 14
+    value = 0.3667885815354505
+    [[tables.cmfOracle.rows]]
+    idx = 218
+    period = 14
+    value = 0.33555476247639643
+    [[tables.cmfOracle.rows]]
+    idx = 220
+    period = 14
+    value = 0.41524830694319675
+    [[tables.cmfOracle.rows]]
+    idx = 221
+    period = 14
+    value = 0.3406926431469364
+    [[tables.cmfOracle.rows]]
+    idx = 222
+    period = 14
+    value = 0.3415630009844272
+    [[tables.cmfOracle.rows]]
+    idx = 26
+    period = 2
+    value = 0.9688594378118667
+    [[tables.cmfOracle.rows]]
+    idx = 52
+    period = 2
+    value = -0.8579757583612682
+    [[tables.cmfOracle.rows]]
+    idx = 124
+    period = 2
+    value = 0.8829069959727924
+    [[tables.cmfOracle.rows]]
+    idx = 195
+    period = 2
+    value = -0.9868211527352246
+    [[tables.cmfOracle.rows]]
+    idx = 97
+    period = 100
+    value = -0.0909139554605235
+    [[tables.cmfOracle.rows]]
+    idx = 102
+    period = 100
+    value = -0.08785963534860912
+    [[tables.cmfOracle.rows]]
+    idx = 114
+    period = 100
+    value = -0.09533735515282327
+    [[tables.cmfOracle.rows]]
+    idx = 116
+    period = 100
+    value = -0.08685459376386248
+
+[tables.cmfSelf]
+type = "CmfGolden"
+
+    [[tables.cmfSelf.rows]]
+    idx = 0
+    period = 20
+    value = 0.050071067777419445
+    [[tables.cmfSelf.rows]]
+    idx = 1
+    period = 20
+    value = 0.044514975886278806
+    [[tables.cmfSelf.rows]]
+    idx = 116
+    period = 20
+    value = 0.0024762946305121832
+    [[tables.cmfSelf.rows]]
+    idx = 232
+    period = 20
+    value = 0.02983659566810397
+
+[tables.cmfShape]
+type = "CmfShape"
+
+    [[tables.cmfShape.rows]]
+    begIdx = 19
+    nbElement = 233
+    period = 20
+    [[tables.cmfShape.rows]]
+    begIdx = 20
+    nbElement = 232
+    period = 21
+    [[tables.cmfShape.rows]]
+    begIdx = 13
+    nbElement = 239
+    period = 14
+    [[tables.cmfShape.rows]]
+    begIdx = 1
+    nbElement = 251
+    period = 2
+    [[tables.cmfShape.rows]]
+    begIdx = 99
+    nbElement = 153
+    period = 100

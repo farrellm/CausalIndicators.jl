@@ -37,5 +37,27 @@ jobs:
           version: ${{ matrix.version }}
           arch: ${{ matrix.arch }}
       - uses: julia-actions/cache@v3
+      # CausalFrames is unregistered. Julia >= 1.11 reads its URL from
+      # [sources] in Project.toml; 1.10 ignores [sources], so develop it first.
+      - name: Develop CausalFrames (Julia 1.10)
+        if: matrix.version == '1.10'
+        run: julia --project -e 'using Pkg; Pkg.develop(url = "https://github.com/farrellm/CausalFrames.jl")'
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-runtest@v1
+        with:
+          # JET 0.10+ drops Julia 1.10, so the floor job lets the resolver pick
+          # the newest 1.10-compatible JET rather than forcing the latest.
+          force_latest_compatible_version: ${{ matrix.version == '1.10' && 'false' || 'auto' }}
+  format:
+    name: Format check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: write   # let the action post reviewdog suggestions on PRs
+    steps:
+      - uses: actions/checkout@v7
+      - uses: julia-actions/julia-format@v4
+        with:
+          # Track JuliaFormatter v2, as CausalFrames does.
+          version: '2'

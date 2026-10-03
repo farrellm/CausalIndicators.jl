@@ -1,0 +1,215 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_trange.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_trange.c"
+
+[structs.TA_Test]
+fields = ["doRangeTestFlag", "unstablePeriod", "startIdx", "endIdx", "doAverage", "optInTimePeriod", "expectedRetCode", "oneOfTheExpectedOutRealIndex", "oneOfTheExpectedOutReal", "expectedBegIdx", "expectedNbElement"]
+types = ["TA_Integer", "TA_Integer", "TA_Integer", "TA_Integer", "TA_Integer", "TA_Integer", "TA_RetCode", "TA_Integer", "TA_Real", "TA_Integer", "TA_Integer"]
+
+[tables.tableTest]
+type = "TA_Test"
+
+    [[tables.tableTest.rows]]
+    doAverage = 0
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal = 3.535
+    oneOfTheExpectedOutRealIndex = 0
+    optInTimePeriod = 0
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doAverage = 0
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal = 9.685
+    oneOfTheExpectedOutRealIndex = 12
+    optInTimePeriod = 0
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doAverage = 0
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal = 5.125
+    oneOfTheExpectedOutRealIndex = 40
+    optInTimePeriod = 0
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doAverage = 0
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal = 2.88
+    oneOfTheExpectedOutRealIndex = 250
+    optInTimePeriod = 0
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doAverage = 1
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal = 3.535
+    oneOfTheExpectedOutRealIndex = 0
+    optInTimePeriod = 1
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doAverage = 1
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal = 9.685
+    oneOfTheExpectedOutRealIndex = 12
+    optInTimePeriod = 1
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doAverage = 1
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal = 5.125
+    oneOfTheExpectedOutRealIndex = 40
+    optInTimePeriod = 1
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doAverage = 1
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal = 2.88
+    oneOfTheExpectedOutRealIndex = 250
+    optInTimePeriod = 1
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doAverage = 1
+    doRangeTestFlag = 0
+    endIdx = 15
+    expectedBegIdx = 15
+    expectedNbElement = 1
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal = 3.4876
+    oneOfTheExpectedOutRealIndex = 0
+    optInTimePeriod = 14
+    startIdx = 14
+    unstablePeriod = 1
+    [[tables.tableTest.rows]]
+    doAverage = 1
+    doRangeTestFlag = 0
+    endIdx = 16
+    expectedBegIdx = 15
+    expectedNbElement = 2
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal = 3.4876
+    oneOfTheExpectedOutRealIndex = 0
+    optInTimePeriod = 14
+    startIdx = 15
+    unstablePeriod = 1
+    [[tables.tableTest.rows]]
+    doAverage = 1
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 14
+    expectedNbElement = 238
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal = 3.578
+    oneOfTheExpectedOutRealIndex = 0
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doAverage = 1
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 14
+    expectedNbElement = 238
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal = 3.4876
+    oneOfTheExpectedOutRealIndex = 1
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doAverage = 1
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 14
+    expectedNbElement = 238
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal = 3.55
+    oneOfTheExpectedOutRealIndex = 2
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doAverage = 1
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 14
+    expectedNbElement = 238
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal = 3.245
+    oneOfTheExpectedOutRealIndex = 12
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doAverage = 1
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 14
+    expectedNbElement = 238
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal = 3.394
+    oneOfTheExpectedOutRealIndex = 13
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doAverage = 1
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 14
+    expectedNbElement = 238
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal = 3.413
+    oneOfTheExpectedOutRealIndex = 14
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doAverage = 1
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 14
+    expectedNbElement = 238
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal = 3.26
+    oneOfTheExpectedOutRealIndex = 237
+    optInTimePeriod = 14
+    startIdx = 0
+    unstablePeriod = 0

@@ -1,0 +1,165 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_1in_1out.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_1in_1out.c"
+
+[structs.TA_Test]
+fields = ["doRangeTestFlag", "theFunction", "unstablePeriod", "startIdx", "endIdx", "expectedRetCode", "oneOfTheExpectedOutRealIndex0", "oneOfTheExpectedOutReal0", "expectedBegIdx", "expectedNbElement"]
+types = ["TA_Integer", "TA_TestId", "TA_Integer", "TA_Integer", "TA_Integer", "TA_RetCode", "TA_Integer", "TA_Real", "TA_Integer", "TA_Integer"]
+
+[tables.tableTest]
+type = "TA_Test"
+
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 63
+    expectedNbElement = 189
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 1.0
+    oneOfTheExpectedOutRealIndex0 = 0
+    startIdx = 0
+    theFunction = "TA_HT_TRENDMODE_TEST"
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 63
+    expectedNbElement = 189
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 88.257
+    oneOfTheExpectedOutRealIndex0 = 0
+    startIdx = 0
+    theFunction = "TA_HT_TRENDLINE_TEST"
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 63
+    expectedNbElement = 189
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 88.257
+    oneOfTheExpectedOutRealIndex0 = 0
+    startIdx = 0
+    theFunction = "TA_HT_TRENDLINE_TEST"
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 63
+    expectedNbElement = 189
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 109.69
+    oneOfTheExpectedOutRealIndex0 = 186
+    startIdx = 0
+    theFunction = "TA_HT_TRENDLINE_TEST"
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 63
+    expectedNbElement = 189
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 110.18
+    oneOfTheExpectedOutRealIndex0 = 187
+    startIdx = 0
+    theFunction = "TA_HT_TRENDLINE_TEST"
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 63
+    expectedNbElement = 189
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 110.46
+    oneOfTheExpectedOutRealIndex0 = 188
+    startIdx = 0
+    theFunction = "TA_HT_TRENDLINE_TEST"
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 63
+    expectedNbElement = 189
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 22.1495
+    oneOfTheExpectedOutRealIndex0 = 0
+    startIdx = 0
+    theFunction = "TA_HT_DCPHASE_TEST"
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 63
+    expectedNbElement = 189
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = -31.182
+    oneOfTheExpectedOutRealIndex0 = 186
+    startIdx = 0
+    theFunction = "TA_HT_DCPHASE_TEST"
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 63
+    expectedNbElement = 189
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 23.2691
+    oneOfTheExpectedOutRealIndex0 = 187
+    startIdx = 0
+    theFunction = "TA_HT_DCPHASE_TEST"
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 63
+    expectedNbElement = 189
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 47.2765
+    oneOfTheExpectedOutRealIndex0 = 188
+    startIdx = 0
+    theFunction = "TA_HT_DCPHASE_TEST"
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 32
+    expectedNbElement = 220
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 15.5527
+    oneOfTheExpectedOutRealIndex0 = 0
+    startIdx = 0
+    theFunction = "TA_HT_DCPERIOD_TEST"
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 32
+    expectedNbElement = 220
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 18.614
+    oneOfTheExpectedOutRealIndex0 = 219
+    startIdx = 0
+    theFunction = "TA_HT_DCPERIOD_TEST"
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 0
+    expectedNbElement = 252
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = -0.38371
+    oneOfTheExpectedOutRealIndex0 = 0
+    startIdx = 0
+    theFunction = "TA_SIN_TEST"
+    unstablePeriod = 0
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 0
+    expectedNbElement = 252
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 0.870319
+    oneOfTheExpectedOutRealIndex0 = 251
+    startIdx = 0
+    theFunction = "TA_SIN_TEST"
+    unstablePeriod = 0

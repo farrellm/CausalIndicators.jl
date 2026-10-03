@@ -1,0 +1,133 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_vhf.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_vhf.c"
+
+[arrays.vhfAtozVecIn]
+type = "double"
+values = [44.3125, 44.125, 45.0625, 44.8125, 44.8125, 45.25, 46.125, 47.375, 49]
+
+[arrays.vhfAtozVecOut]
+type = "double"
+values = [0.6207, 0.525, 0.9111, 1]
+
+[arrays.vhfTulipVecIn]
+type = "double"
+values = [81.59, 81.06, 82.87, 83.0, 83.61, 83.15, 82.84, 83.99, 84.55, 84.36, 85.53, 86.54, 86.89, 87.77, 87.29]
+
+[arrays.vhfTulipVecOut]
+type = "double"
+values = [0.72, 0.232, 0.432, 0.553, 0.64, 0.796, 0.625, 0.771, 0.947, 0.576]
+
+[structs.VhfBookVector]
+fields = ["source", "nbIn", "in", "nbOut", "out", "decimals"]
+types = ["char *", "int", "double *", "int", "double *", "int"]
+
+[structs.VhfGolden]
+fields = ["period", "bar", "want"]
+types = ["int", "int", "double"]
+
+[tables.vhfBookVectors]
+type = "VhfBookVector"
+
+    [[tables.vhfBookVectors.rows]]
+    decimals = 3
+    in = "vhfTulipVecIn"
+    nbIn = 15
+    nbOut = 10
+    out = "vhfTulipVecOut"
+    source = "Tulip Indicators 0.9.2 tests/untest.txt:450"
+    [[tables.vhfBookVectors.rows]]
+    decimals = 4
+    in = "vhfAtozVecIn"
+    nbIn = 9
+    nbOut = 4
+    out = "vhfAtozVecOut"
+    source = "Achelis, TA from A to Z p.354 (atoz.txt:260)"
+
+[tables.vhfOracle]
+type = "VhfGolden"
+
+    [[tables.vhfOracle.rows]]
+    bar = 5
+    period = 5
+    want = 0.19819140919366987
+    [[tables.vhfOracle.rows]]
+    bar = 6
+    period = 5
+    want = 0.47368421052631604
+    [[tables.vhfOracle.rows]]
+    bar = 66
+    period = 5
+    want = 0.3182179793158315
+    [[tables.vhfOracle.rows]]
+    bar = 128
+    period = 5
+    want = 0.41379310344827586
+    [[tables.vhfOracle.rows]]
+    bar = 190
+    period = 5
+    want = 0.35774410774410786
+    [[tables.vhfOracle.rows]]
+    bar = 206
+    period = 5
+    want = 0.1944684528954193
+    [[tables.vhfOracle.rows]]
+    bar = 251
+    period = 5
+    want = 0.6198083067092653
+    [[tables.vhfOracle.rows]]
+    bar = 14
+    period = 14
+    want = 0.2941678035470669
+    [[tables.vhfOracle.rows]]
+    bar = 15
+    period = 14
+    want = 0.31002875629043863
+    [[tables.vhfOracle.rows]]
+    bar = 73
+    period = 14
+    want = 0.5519215044971382
+    [[tables.vhfOracle.rows]]
+    bar = 133
+    period = 14
+    want = 0.7469527059970746
+    [[tables.vhfOracle.rows]]
+    bar = 192
+    period = 14
+    want = 0.3832869080779944
+    [[tables.vhfOracle.rows]]
+    bar = 250
+    period = 14
+    want = 0.17848970251716254
+    [[tables.vhfOracle.rows]]
+    bar = 251
+    period = 14
+    want = 0.22301644031451054
+    [[tables.vhfOracle.rows]]
+    bar = 28
+    period = 28
+    want = 0.28895638235045984
+    [[tables.vhfOracle.rows]]
+    bar = 29
+    period = 28
+    want = 0.3053945608559965
+    [[tables.vhfOracle.rows]]
+    bar = 84
+    period = 28
+    want = 0.449604743083004
+    [[tables.vhfOracle.rows]]
+    bar = 140
+    period = 28
+    want = 0.3590420133955755
+    [[tables.vhfOracle.rows]]
+    bar = 163
+    period = 28
+    want = 0.15791848398255387
+    [[tables.vhfOracle.rows]]
+    bar = 196
+    period = 28
+    want = 0.41681748573019634
+    [[tables.vhfOracle.rows]]
+    bar = 251
+    period = 28
+    want = 0.3155712212315984

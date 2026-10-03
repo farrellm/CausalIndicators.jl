@@ -1,0 +1,18 @@
+# Parameter sets for the full-series goldens, per TA-Lib function. TA-Lib's
+# defaults are always generated as well; list here the sets the extracted tables
+# use, so every table point also has a golden series around it. `unstable` is
+# TA_SetUnstablePeriod(TA_FUNC_UNST_ALL, k).
+
+EMA = [
+    {optInTimePeriod = 2},
+    {optInTimePeriod = 10},
+    {optInTimePeriod = 14},
+    {optInTimePeriod = 10, unstable = 2},
+]
+
+RMA = [
+    {optInTimePeriod = 2},
+    {optInTimePeriod = 5},
+    {optInTimePeriod = 14},
+    {optInTimePeriod = 14, unstable = 3},
+]

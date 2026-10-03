@@ -1,0 +1,115 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_rvol.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_rvol.c"
+
+[structs.RvolGolden]
+fields = ["period", "bar", "want"]
+types = ["int", "int", "double"]
+
+[tables.rvolOracle]
+type = "RvolGolden"
+
+    [[tables.rvolOracle.rows]]
+    bar = 5
+    period = 5
+    want = 0.8049128655722588
+    [[tables.rvolOracle.rows]]
+    bar = 6
+    period = 5
+    want = 0.7649620775273733
+    [[tables.rvolOracle.rows]]
+    bar = 40
+    period = 5
+    want = 0.7407867954270673
+    [[tables.rvolOracle.rows]]
+    bar = 90
+    period = 5
+    want = 2.5170958734098665
+    [[tables.rvolOracle.rows]]
+    bar = 140
+    period = 5
+    want = 0.5931677552054483
+    [[tables.rvolOracle.rows]]
+    bar = 190
+    period = 5
+    want = 0.8021552261118724
+    [[tables.rvolOracle.rows]]
+    bar = 202
+    period = 5
+    want = 5.950395166154858
+    [[tables.rvolOracle.rows]]
+    bar = 227
+    period = 5
+    want = 0.21479995197688267
+    [[tables.rvolOracle.rows]]
+    bar = 251
+    period = 5
+    want = 0.7765369778225043
+    [[tables.rvolOracle.rows]]
+    bar = 20
+    period = 20
+    want = 0.9229846885186312
+    [[tables.rvolOracle.rows]]
+    bar = 21
+    period = 20
+    want = 0.8694316340907822
+    [[tables.rvolOracle.rows]]
+    bar = 40
+    period = 20
+    want = 0.7233455126911897
+    [[tables.rvolOracle.rows]]
+    bar = 90
+    period = 20
+    want = 1.7911746133612803
+    [[tables.rvolOracle.rows]]
+    bar = 140
+    period = 20
+    want = 0.8519058995119522
+    [[tables.rvolOracle.rows]]
+    bar = 190
+    period = 20
+    want = 0.8653836461589016
+    [[tables.rvolOracle.rows]]
+    bar = 202
+    period = 20
+    want = 7.002677153444755
+    [[tables.rvolOracle.rows]]
+    bar = 227
+    period = 20
+    want = 0.28144426081893764
+    [[tables.rvolOracle.rows]]
+    bar = 251
+    period = 20
+    want = 0.3815091974883258
+    [[tables.rvolOracle.rows]]
+    bar = 50
+    period = 50
+    want = 0.6110104722464995
+    [[tables.rvolOracle.rows]]
+    bar = 51
+    period = 50
+    want = 1.283032710887038
+    [[tables.rvolOracle.rows]]
+    bar = 90
+    period = 50
+    want = 2.1848488134677853
+    [[tables.rvolOracle.rows]]
+    bar = 140
+    period = 50
+    want = 0.8834456153725133
+    [[tables.rvolOracle.rows]]
+    bar = 190
+    period = 50
+    want = 1.0009532443887297
+    [[tables.rvolOracle.rows]]
+    bar = 202
+    period = 50
+    want = 8.909014451509217
+    [[tables.rvolOracle.rows]]
+    bar = 249
+    period = 50
+    want = 0.24550898313090333
+    [[tables.rvolOracle.rows]]
+    bar = 251
+    period = 50
+    want = 0.2687146332038236

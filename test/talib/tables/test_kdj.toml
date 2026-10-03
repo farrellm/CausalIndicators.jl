@@ -1,0 +1,367 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_kdj.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_kdj.c"
+
+[structs.KdjGolden]
+fields = ["arm", "n", "m1", "m2", "bar", "k", "d", "j"]
+types = ["KdjArm", "int", "int", "int", "int", "double", "double", "double"]
+
+[structs.KdjTuple]
+fields = ["n", "m1", "m2"]
+types = ["int", "int", "int"]
+
+[tables.kdjGrid]
+type = "KdjTuple"
+
+    [[tables.kdjGrid.rows]]
+    m1 = 3
+    m2 = 3
+    n = 9
+    [[tables.kdjGrid.rows]]
+    m1 = 3
+    m2 = 3
+    n = 5
+    [[tables.kdjGrid.rows]]
+    m1 = 3
+    m2 = 3
+    n = 14
+    [[tables.kdjGrid.rows]]
+    m1 = 5
+    m2 = 5
+    n = 9
+    [[tables.kdjGrid.rows]]
+    m1 = 1
+    m2 = 1
+    n = 2
+    [[tables.kdjGrid.rows]]
+    m1 = 1
+    m2 = 3
+    n = 9
+
+[tables.kdjOracle]
+type = "KdjGolden"
+
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TULIP"
+    bar = 12
+    d = 59.90345528075604
+    j = 88.13666442358989
+    k = 69.31452499503399
+    m1 = 3
+    m2 = 3
+    n = 9
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TULIP"
+    bar = 13
+    d = 56.428390789417946
+    j = 35.578003841389375
+    k = 49.478261806741756
+    m1 = 3
+    m2 = 3
+    n = 9
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TULIP"
+    bar = 44
+    d = 55.722583679490306
+    j = 102.7210280499592
+    k = 71.38873180297993
+    m1 = 3
+    m2 = 3
+    n = 9
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TULIP"
+    bar = 72
+    d = 43.07175785225509
+    j = -11.114115659384396
+    k = 25.009800015041925
+    m1 = 3
+    m2 = 3
+    n = 9
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TULIP"
+    bar = 78
+    d = 63.49275035489137
+    j = 112.9832939135934
+    k = 79.98959820779204
+    m1 = 3
+    m2 = 3
+    n = 9
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TULIP"
+    bar = 132
+    d = 88.41596292479353
+    j = 88.95977073261562
+    k = 88.59723219406757
+    m1 = 3
+    m2 = 3
+    n = 9
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TULIP"
+    bar = 140
+    d = 32.25607187879737
+    j = -15.985220727543748
+    k = 16.175641010017
+    m1 = 3
+    m2 = 3
+    n = 9
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TULIP"
+    bar = 192
+    d = 26.039007675266785
+    j = 23.618597375791673
+    k = 25.232204242108416
+    m1 = 3
+    m2 = 3
+    n = 9
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TULIP"
+    bar = 251
+    d = 49.88486010136848
+    j = 33.339701245358256
+    k = 44.36980714936507
+    m1 = 3
+    m2 = 3
+    n = 9
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TULIP"
+    bar = 17
+    d = 26.791540721181562
+    j = 18.990772923575165
+    k = 24.191284788646097
+    m1 = 3
+    m2 = 3
+    n = 14
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TULIP"
+    bar = 18
+    d = 27.443987952698276
+    j = 31.358671341798548
+    k = 28.7488824157317
+    m1 = 3
+    m2 = 3
+    n = 14
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TULIP"
+    bar = 75
+    d = 43.342213599513194
+    j = 64.46104301635741
+    k = 50.38182340512793
+    m1 = 3
+    m2 = 3
+    n = 14
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TULIP"
+    bar = 134
+    d = 89.20634065213817
+    j = 81.95040728482016
+    k = 86.7876961963655
+    m1 = 3
+    m2 = 3
+    n = 14
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TULIP"
+    bar = 157
+    d = 54.67864446310357
+    j = 83.311375146132
+    k = 64.22288802411305
+    m1 = 3
+    m2 = 3
+    n = 14
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TULIP"
+    bar = 193
+    d = 18.290836818157654
+    j = 12.783817831994618
+    k = 16.455163822769975
+    m1 = 3
+    m2 = 3
+    n = 14
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TULIP"
+    bar = 251
+    d = 34.117756127947054
+    j = 44.48462975184087
+    k = 37.57338066924499
+    m1 = 3
+    m2 = 3
+    n = 14
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TULIP"
+    bar = 16
+    d = 51.32367380929552
+    j = 25.094826422061587
+    k = 42.58072468021754
+    m1 = 5
+    m2 = 5
+    n = 9
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TULIP"
+    bar = 17
+    d = 48.67806858850423
+    j = 16.930805939008792
+    k = 38.09564770533908
+    m1 = 5
+    m2 = 5
+    n = 9
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TULIP"
+    bar = 44
+    d = 49.060276645119124
+    j = 86.1458558962771
+    k = 61.42213639550511
+    m1 = 5
+    m2 = 5
+    n = 9
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TULIP"
+    bar = 75
+    d = 49.0251092686697
+    j = 41.376611078776065
+    k = 46.47560987203849
+    m1 = 5
+    m2 = 5
+    n = 9
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TULIP"
+    bar = 134
+    d = 81.57981418752668
+    j = 76.62433647678225
+    k = 79.9279882839452
+    m1 = 5
+    m2 = 5
+    n = 9
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TULIP"
+    bar = 193
+    d = 27.168517467024422
+    j = 18.16273523837738
+    k = 24.16659005747541
+    m1 = 5
+    m2 = 5
+    n = 9
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TULIP"
+    bar = 251
+    d = 48.9969189290848
+    j = 42.19198181674315
+    k = 46.72860655830425
+    m1 = 5
+    m2 = 5
+    n = 9
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TS"
+    bar = 12
+    d = 70.16693611509986
+    j = 121.69696393378743
+    k = 87.34361205466239
+    m1 = 3
+    m2 = 3
+    n = 9
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TS"
+    bar = 13
+    d = 72.69335803299445
+    j = 30.054758195783506
+    k = 58.4804914205908
+    m1 = 3
+    m2 = 3
+    n = 9
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TS"
+    bar = 72
+    d = 23.49316519288494
+    j = -5.194125402613992
+    k = 13.930734994385297
+    m1 = 3
+    m2 = 3
+    n = 9
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TS"
+    bar = 132
+    d = 92.92950716297197
+    j = 82.4439688778181
+    k = 89.43432773458734
+    m1 = 3
+    m2 = 3
+    n = 9
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TS"
+    bar = 192
+    d = 35.747942069911495
+    j = 25.081646237941342
+    k = 32.192510125921444
+    m1 = 3
+    m2 = 3
+    n = 9
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TS"
+    bar = 251
+    d = 57.358428385233104
+    j = 6.9662404874172665
+    k = 40.56103241929449
+    m1 = 3
+    m2 = 3
+    n = 9
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TS"
+    bar = 17
+    d = 30.51778937357734
+    j = 24.906168825660835
+    k = 28.647249190938506
+    m1 = 3
+    m2 = 3
+    n = 14
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TS"
+    bar = 18
+    d = 29.048543689320383
+    j = 18.601941747572823
+    k = 25.566343042071196
+    m1 = 3
+    m2 = 3
+    n = 14
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TS"
+    bar = 75
+    d = 29.28876040471646
+    j = 91.90467855544799
+    k = 50.16073312162697
+    m1 = 3
+    m2 = 3
+    n = 14
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TS"
+    bar = 127
+    d = 92.13083567595105
+    j = 89.36025990539596
+    k = 91.20731041909936
+    m1 = 3
+    m2 = 3
+    n = 14
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TS"
+    bar = 134
+    d = 88.42371103811631
+    j = 77.91331330129904
+    k = 84.92024512584389
+    m1 = 3
+    m2 = 3
+    n = 14
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TS"
+    bar = 193
+    d = 22.063687912749756
+    j = 0.4420637494702362
+    k = 14.85647985832325
+    m1 = 3
+    m2 = 3
+    n = 14
+    [[tables.kdjOracle.rows]]
+    arm = "KDJ_ARM_TS"
+    bar = 251
+    d = 34.50715249353161
+    j = 48.88849142197613
+    k = 39.300932136346454
+    m1 = 3
+    m2 = 3
+    n = 14

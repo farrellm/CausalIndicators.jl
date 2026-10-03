@@ -1,0 +1,15 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_period_boundary.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_period_boundary.c"
+
+[arrays.pbMacdHi]
+type = "TA_Real"
+values = [6515.901813836415, 913.71]
+
+[arrays.pbMacdLo]
+type = "TA_Real"
+values = [470.3574516572389, 0.87]
+
+[arrays.pbMacdRuns]
+type = "int"
+values = [24, 30, 36, 39, 45]

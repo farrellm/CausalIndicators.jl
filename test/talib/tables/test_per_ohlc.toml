@@ -1,0 +1,55 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_per_ohlc.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_per_ohlc.c"
+
+[structs.TA_Test]
+fields = ["doRangeTestFlag", "theFunction", "startIdx", "endIdx", "optInTimePeriod", "expectedRetCode", "oneOfTheExpectedOutRealIndex0", "oneOfTheExpectedOutReal0", "expectedBegIdx", "expectedNbElement"]
+types = ["TA_Integer", "TA_TestId", "TA_Integer", "TA_Integer", "TA_Integer", "TA_RetCode", "TA_Integer", "TA_Real", "TA_Integer", "TA_Integer"]
+
+[tables.tableTest]
+type = "TA_Test"
+
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 0
+    expectedNbElement = 252
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 92.0
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 0
+    startIdx = 0
+    theFunction = "TA_AVGPRICE_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 0
+    expectedNbElement = 252
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 93.17
+    oneOfTheExpectedOutRealIndex0 = 1
+    optInTimePeriod = 0
+    startIdx = 0
+    theFunction = "TA_AVGPRICE_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 251
+    expectedBegIdx = 0
+    expectedNbElement = 252
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = -0.4
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 0
+    startIdx = 0
+    theFunction = "TA_BOP_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 0
+    expectedNbElement = 252
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 0.94
+    oneOfTheExpectedOutRealIndex0 = 1
+    optInTimePeriod = 0
+    startIdx = 0
+    theFunction = "TA_BOP_TEST"

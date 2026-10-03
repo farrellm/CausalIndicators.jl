@@ -1,0 +1,19 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_cumsum.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_cumsum.c"
+
+[arrays.c40_A]
+type = "TA_Real"
+values = [1800, 1500, 900, 2100, 1700, 1200, 600, 2400, 1900, 1100, 800, 2200, 1600, 1000, 1400, 2000, 700, 1300, 2300, 1500, 950, 1750, 2050, 1150, 850, 1950, 1450, 1250, 2150, 1650, 750, 1850, 1050, 2250, 1350, 1550, 650, 2350, 1750, 1450]
+
+[arrays.c40_D]
+type = "TA_Real"
+values = [1100, 1400, 2000, 800, 1200, 1700, 2300, 500, 1000, 1800, 2100, 700, 1300, 1900, 1500, 900, 2200, 1600, 600, 1400, 1950, 1150, 850, 1750, 2050, 950, 1450, 1650, 750, 1250, 2150, 1050, 1850, 650, 1550, 1350, 2250, 550, 1150, 1450]
+
+[arrays.c40_first8]
+type = "TA_Real"
+values = [700, 800, -300, 1000, 1500, 1000, -700, 1200]
+
+[arrays.c40_slice37]
+type = "TA_Real"
+values = [1300, 1800, 1300, -400, 1500]

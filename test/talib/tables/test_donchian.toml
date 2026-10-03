@@ -1,0 +1,153 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_donchian.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_donchian.c"
+
+[structs.DonchianGolden]
+fields = ["period", "bar", "upper", "middle", "lower"]
+types = ["int", "int", "double", "double", "double"]
+
+[tables.donchianGold]
+type = "DonchianGolden"
+
+    [[tables.donchianGold.rows]]
+    bar = 19
+    lower = 86.75
+    middle = 93.1875
+    period = 20
+    upper = 99.625
+    [[tables.donchianGold.rows]]
+    bar = 100
+    lower = 101.72
+    middle = 112.36
+    period = 20
+    upper = 123.0
+    [[tables.donchianGold.rows]]
+    bar = 251
+    lower = 104.5
+    middle = 113.31
+    period = 20
+    upper = 122.12
+    [[tables.donchianGold.rows]]
+    bar = 4
+    lower = 90.75
+    middle = 93.5625
+    period = 5
+    upper = 96.375
+    [[tables.donchianGold.rows]]
+    bar = 100
+    lower = 110.5
+    middle = 114.4075
+    period = 5
+    upper = 118.315
+    [[tables.donchianGold.rows]]
+    bar = 251
+    lower = 106.62
+    middle = 108.685
+    period = 5
+    upper = 110.75
+
+[tables.donchianTa4jGold]
+type = "DonchianGolden"
+
+    [[tables.donchianTa4jGold.rows]]
+    bar = 1
+    lower = 90.75
+    middle = 92.845
+    period = 2
+    upper = 94.94
+    [[tables.donchianTa4jGold.rows]]
+    bar = 2
+    lower = 91.405
+    middle = 93.89
+    period = 2
+    upper = 96.375
+    [[tables.donchianTa4jGold.rows]]
+    bar = 3
+    lower = 93.5
+    middle = 94.9375
+    period = 2
+    upper = 96.375
+    [[tables.donchianTa4jGold.rows]]
+    bar = 2
+    lower = 90.75
+    middle = 93.5625
+    period = 3
+    upper = 96.375
+    [[tables.donchianTa4jGold.rows]]
+    bar = 3
+    lower = 91.405
+    middle = 93.89
+    period = 3
+    upper = 96.375
+    [[tables.donchianTa4jGold.rows]]
+    bar = 4
+    lower = 92.815
+    middle = 94.595
+    period = 3
+    upper = 96.375
+    [[tables.donchianTa4jGold.rows]]
+    bar = 4
+    lower = 90.75
+    middle = 93.5625
+    period = 5
+    upper = 96.375
+    [[tables.donchianTa4jGold.rows]]
+    bar = 5
+    lower = 91.405
+    middle = 93.89
+    period = 5
+    upper = 96.375
+    [[tables.donchianTa4jGold.rows]]
+    bar = 6
+    lower = 92
+    middle = 94.1875
+    period = 5
+    upper = 96.375
+    [[tables.donchianTa4jGold.rows]]
+    bar = 6
+    lower = 90.75
+    middle = 93.5625
+    period = 7
+    upper = 96.375
+    [[tables.donchianTa4jGold.rows]]
+    bar = 7
+    lower = 89.75
+    middle = 93.0625
+    period = 7
+    upper = 96.375
+    [[tables.donchianTa4jGold.rows]]
+    bar = 8
+    lower = 89.44
+    middle = 92.9075
+    period = 7
+    upper = 96.375
+    [[tables.donchianTa4jGold.rows]]
+    bar = 100
+    lower = 110.5
+    middle = 116.125
+    period = 10
+    upper = 121.75
+    [[tables.donchianTa4jGold.rows]]
+    bar = 175
+    lower = 122.87
+    middle = 130.28
+    period = 10
+    upper = 137.69
+    [[tables.donchianTa4jGold.rows]]
+    bar = 200
+    lower = 103.87
+    middle = 113.31
+    period = 10
+    upper = 122.75
+    [[tables.donchianTa4jGold.rows]]
+    bar = 21
+    lower = 86.53
+    middle = 93.0775
+    period = 20
+    upper = 99.625
+    [[tables.donchianTa4jGold.rows]]
+    bar = 251
+    lower = 104.5
+    middle = 113.31
+    period = 20
+    upper = 122.12

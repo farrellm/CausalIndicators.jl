@@ -1,0 +1,139 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_mfi.c. Do not edit.
+commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+source = "src/tools/ta_regtest/ta_test_func/test_mfi.c"
+
+[arrays.mfiPeriod]
+type = "int"
+values = [2, 14, 30]
+
+[arrays.mfiScaleExp]
+type = "int"
+values = [10, 20, 30, 40, 50, 60, 70, 80]
+
+[structs.MfiGolden]
+fields = ["period", "idx", "tulip", "pandas"]
+types = ["int", "int", "double", "double"]
+
+[tables.mfiOracle]
+type = "MfiGolden"
+
+    [[tables.mfiOracle.rows]]
+    idx = 0
+    pandas = 100
+    period = 2
+    tulip = 100
+    [[tables.mfiOracle.rows]]
+    idx = 1
+    pandas = 53.489986681886066
+    period = 2
+    tulip = 53.48998668188607
+    [[tables.mfiOracle.rows]]
+    idx = 2
+    pandas = 0
+    period = 2
+    tulip = 7.206304281986694e-15
+    [[tables.mfiOracle.rows]]
+    idx = 62
+    pandas = 100
+    period = 2
+    tulip = 100
+    [[tables.mfiOracle.rows]]
+    idx = 125
+    pandas = 100
+    period = 2
+    tulip = 100
+    [[tables.mfiOracle.rows]]
+    idx = 187
+    pandas = 40.15777220858367
+    period = 2
+    tulip = 40.15777220858366
+    [[tables.mfiOracle.rows]]
+    idx = 248
+    pandas = 0
+    period = 2
+    tulip = 0
+    [[tables.mfiOracle.rows]]
+    idx = 249
+    pandas = 0
+    period = 2
+    tulip = 0
+    [[tables.mfiOracle.rows]]
+    idx = 0
+    pandas = 42.89233919198443
+    period = 14
+    tulip = 42.89233919198445
+    [[tables.mfiOracle.rows]]
+    idx = 1
+    pandas = 45.60715685109148
+    period = 14
+    tulip = 45.60715685109149
+    [[tables.mfiOracle.rows]]
+    idx = 2
+    pandas = 38.87879395159337
+    period = 14
+    tulip = 38.87879395159338
+    [[tables.mfiOracle.rows]]
+    idx = 59
+    pandas = 35.63209448866813
+    period = 14
+    tulip = 35.63209448866814
+    [[tables.mfiOracle.rows]]
+    idx = 119
+    pandas = 78.7800452842688
+    period = 14
+    tulip = 78.7800452842688
+    [[tables.mfiOracle.rows]]
+    idx = 178
+    pandas = 26.56509084461874
+    period = 14
+    tulip = 26.565090844618716
+    [[tables.mfiOracle.rows]]
+    idx = 236
+    pandas = 46.950189199635574
+    period = 14
+    tulip = 46.95018919963556
+    [[tables.mfiOracle.rows]]
+    idx = 237
+    pandas = 53.19967885062866
+    period = 14
+    tulip = 53.19967885062863
+    [[tables.mfiOracle.rows]]
+    idx = 0
+    pandas = 37.58090766368932
+    period = 30
+    tulip = 37.58090766368931
+    [[tables.mfiOracle.rows]]
+    idx = 1
+    pandas = 37.25083560428305
+    period = 30
+    tulip = 37.25083560428305
+    [[tables.mfiOracle.rows]]
+    idx = 2
+    pandas = 34.82219959105231
+    period = 30
+    tulip = 34.82219959105231
+    [[tables.mfiOracle.rows]]
+    idx = 55
+    pandas = 64.94967329662806
+    period = 30
+    tulip = 64.94967329662803
+    [[tables.mfiOracle.rows]]
+    idx = 111
+    pandas = 58.8139450308303
+    period = 30
+    tulip = 58.8139450308303
+    [[tables.mfiOracle.rows]]
+    idx = 166
+    pandas = 35.61467698713909
+    period = 30
+    tulip = 35.6146769871391
+    [[tables.mfiOracle.rows]]
+    idx = 220
+    pandas = 63.9882999165731
+    period = 30
+    tulip = 63.9882999165731
+    [[tables.mfiOracle.rows]]
+    idx = 221
+    pandas = 65.12915644047477
+    period = 30
+    tulip = 65.12915644047477
