@@ -20,6 +20,9 @@ include("helpers.jl")
 
     include("harness.jl")
     include("kernels.jl")
+    include("overlap.jl")
+    include("price.jl")
+    include("rolling.jl")
 
     # JET can lag pre-release Julia; the checks are the same on every released
     # version, so skipping them there loses nothing.
