@@ -60,7 +60,7 @@ These files have checks outside their extracted tables:
       0 (DESIGN.md, "Testing"). The legs run on the C test's own LCG data
       (`lcgsym`) (S3). Scale invariance under `Bars(2)` is
       `@test_broken`: the windowed `Variance` keeps ~1e-7 error on a two-bar
-      window (CausalFrames.jl#90). The `ta_test_reference.c` legs
+      window (CausalFrames.jl#91). The `ta_test_reference.c` legs
       (two-pass oracle, NIST StRD, small-scale ladder) wait for that file's
       port.
 - [x] `test_kc.c`: the gData and TA_SREF shapes and ta4j oracles, the

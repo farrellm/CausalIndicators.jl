@@ -776,7 +776,8 @@ prerequisites" in the same PR.
   the level and it is never negative. Under `Bars(2)` the shift can still sit
   a bar away from a window of two close values, which leaves ~1e-7 relative
   error. test_stddev.c's scale-invariance leg under `Bars(2)` is
-  `@test_broken` for that reason.
+  `@test_broken` for that reason, tracked upstream as
+  [CausalFrames.jl#91](https://github.com/farrellm/CausalFrames.jl/issues/91).
 
 ## Name table
 
