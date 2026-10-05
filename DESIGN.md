@@ -770,14 +770,13 @@ prerequisites" in the same PR.
 
 - **Registering CausalFrames**, which would replace the `[sources]` and CI
   workaround with a plain `[compat]` entry.
-- **CausalFrames' windowed `Variance` under a large offset.** It forms
-  `(Σx² − (Σx)²/n)/n`, which cancels when the mean is large against the
-  spread. Values ±1000 around 1e6 lose 1.6% at `Bars(2)`, and a 1e8 level with
-  0.01 steps gives a negative variance (`Std` clamps it to 0). It affects VAR,
-  StdDev, BollingerBands and RVI on high-priced series. Tracked upstream as
-  [CausalFrames.jl#89](https://github.com/farrellm/CausalFrames.jl/issues/89).
-  Until it is fixed, three test_stddev.c legs are `@test_broken`: shift
-  invariance, VAR non-negativity, and scale invariance under `Bars(2)`.
+- **CausalFrames' windowed `Variance` on a two-bar window.** Since
+  [CausalFrames.jl#90](https://github.com/farrellm/CausalFrames.jl/pull/90) it
+  folds sums about a shift near the data, so its error no longer grows with
+  the level and it is never negative. Under `Bars(2)` the shift can still sit
+  a bar away from a window of two close values, which leaves ~1e-7 relative
+  error. test_stddev.c's scale-invariance leg under `Bars(2)` is
+  `@test_broken` for that reason.
 
 ## Name table
 

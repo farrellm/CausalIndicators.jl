@@ -51,9 +51,7 @@ tavar(x, p) = only(foldseries(Variance(:x; corrected = false), (; x); window = B
 
     @testset "test_stddev.c invariants" begin
         # Shift invariance, to the C test's tolerance: x + c carries ~c·eps of
-        # representation error per value. CausalFrames' windowed Variance forms
-        # `(Σx² − (Σx)²/n)/n`, which cancels under a large offset, so this leg
-        # is broken until it is fixed upstream (CausalFrames.jl#89).
+        # representation error per value.
         base = 1000 .* lcgsym(0x1BADCAFE, 400)
         shiftok = map(Iterators.product((2, 5, 20, 30), (1e6, 1e8, 1e10))) do (p, c)
             v0, v1 = tavar(base, p), tavar(base .+ c, p)
@@ -62,10 +60,11 @@ tavar(x, p) = only(foldseries(Variance(:x; corrected = false), (; x); window = B
                 abs(v1[i] - v0[i]) / abs(v0[i]) <= tol
             end
         end
-        @test_broken all(shiftok)
+        @test all(shiftok)
         # Scale invariance: var(c·x) = c²·var(x). Under Bars(2) a window of two
-        # close values has a tiny variance, which the same cancellation
-        # spoils (to ~1e-7), so that period is broken until #89 is fixed.
+        # close values has a tiny variance, and CausalFrames' shifted co-moment
+        # still cancels there (to ~1e-7, CausalFrames.jl#90), so that period
+        # is broken.
         base = 100 .+ 20 .* lcgsym(0x5EED1234, 300)
         scaleok(p) = all((1e3, 1e-3, 7.5)) do c
             v0, v1 = tavar(base, p), tavar(c .* base, p)
@@ -73,14 +72,12 @@ tavar(x, p) = only(foldseries(Variance(:x; corrected = false), (; x); window = B
         end
         @test scaleok(10) && scaleok(25)
         @test_broken scaleok(2)
-        # Non-negativity under a spike and a level shift, and an exactly
-        # constant series gives exactly 0.
+        # Non-negativity under a spike, a level shift and a 1e8 level, and an
+        # exactly constant series gives exactly 0.
         x = [1e8 + ((i * 13) % 7 - 3) * 0.01 for i in 0:499]
         x[101] = 1e12
         x[251:end] .= [3.0 + ((i * 7) % 5 - 2) * 0.1 for i in 250:499]
-        # The same cancellation drives VAR negative at the 1e8 level (Std
-        # clamps it to 0), so that leg is broken until #89 is fixed.
-        @test_broken all(p -> all(>=(0), skipmissing(tavar(x, p))), (2, 5, 20, 50))
+        @test all(p -> all(>=(0), skipmissing(tavar(x, p))), (2, 5, 20, 50))
         for p in (2, 5, 20, 50)
             @test all(
                 >=(0),
