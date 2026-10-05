@@ -210,6 +210,18 @@ function movingaverage(fn, matype, column, period, unstable, name;
     return withterms(s, column)
 end
 
+# The docstring paragraphs shared by the plain indicators of every file.
+const PLAIN_DOC = """
+It is a plain summarizer (no `combine!`), so it belongs under
+`addsummarycolumns`. Under `addrollingcolumns` each window re-folds from a
+fresh state, a cold start per window. The output is `missing` for TA-Lib's
+lookback (plus `unstable`) bars.
+"""
+
+const SKIP_DOC = """
+A `missing` input bar leaves the state unchanged and emits `missing`.
+"""
+
 const MA_DOC_COMMON = """
 It is a plain summarizer (no `combine!`), so it belongs under
 `addsummarycolumns`. Under `addrollingcolumns` each window re-folds from a
@@ -468,3 +480,637 @@ end
 
 @inline CausalFrames.value(st::MAVPState{C,P,N,K,T}) where {C,P,N,K,T} =
     NamedTuple{(N,),Tuple{Union{Missing,T}}}((st.out,))
+
+# ---------------------------------------------------------------------------
+# Bands (S3)
+
+const BAND_SUFFIXES = (:upperband, :middleband, :lowerband)
+
+"""
+    Donchian(; high = :high, low = :low) -> Summarizer
+
+TA-Lib's `DONCHIAN`, the Donchian channel, in `:donchian_upperband` (the
+window's highest high), `:donchian_middleband` (their midpoint) and
+`:donchian_lowerband` (the lowest low). It is a dependent over `Max` and `Min`
+(Group tier), so it shares them with [`MidPrice`](@ref). TA-Lib's
+`DONCHIAN(period = p)` is `Donchian()` under `Bars(p)`.
+
+TA-Lib: `ta_codegen/input/donchian/donchian.yaml`, `donchian.md`.
+"""
+struct Donchian{H,L} <: GroupSummarizer end
+Donchian(; high::ColumnSpec = :high, low::ColumnSpec = :low) =
+    withterms(Donchian{colname(high),colname(low)}(), high, low)
+
+CausalFrames.dependencies(::Donchian{H,L}) where {H,L} = (Max(H), Min(L))
+CausalFrames.emptyvalue(::Donchian) =
+    NamedTuple{outnames(nothing, :donchian, BAND_SUFFIXES)}((missing, missing, missing))
+CausalFrames.fresh(::Donchian{H,L}, ::NamedTuple) where {H,L} =
+    derivedvalues(outnames(nothing, :donchian, BAND_SUFFIXES),
+        (Symbol(H, :_max), Symbol(L, :_min)), donchianvalues)
+
+donchianvalues(u, l) = (u, (u + l) / 2, l)
+
+# AccBands' hidden row terms: the bar's high and low widened by
+# `f = 4(high − low)/(high + low)`, or the bare high and low where TA-Lib finds
+# `high + low` zero relative to the prices (ta_ACCBANDS.c).
+struct AccBandTerm{K,H,L} <: Function end
+@inline function (::AccBandTerm{K,H,L})(r) where {K,H,L}
+    h, l = getproperty(r, H), getproperty(r, L)
+    s = h + l
+    iszeroscaled(s, abs(h) + abs(l)) && return K === :up ? float(h) : float(l)
+    f = 4 * (h - l) / s
+    return K === :up ? h * (1 + f) : l * (1 - f)
+end
+
+"""
+    AccBands(; high = :high, low = :low, close = :close) -> Summarizer
+
+TA-Lib's `ACCBANDS`, Headley's acceleration bands, in `:accbands_upperband`,
+`:accbands_middleband` and `:accbands_lowerband`. With
+`f = 4(high − low)/(high + low)` per bar, they are the means over the window of
+`high·(1 + f)`, of the close and of `low·(1 − f)`. A bar whose `high + low`
+TA-Lib finds zero contributes its bare high and low. It is a dependent over
+CausalFrames' `Mean` of the row terms `:accbands_up` and `:accbands_dn` and of
+the close (Group tier). TA-Lib's `ACCBANDS(period = p)` is `AccBands()` under
+`Bars(p)`. Two `AccBands` over different columns cannot share a call, since
+their terms share the names.
+
+TA-Lib: `ta_codegen/input/accbands/accbands.yaml`, `accbands.md`.
+"""
+struct AccBands{H,L,C} <: GroupSummarizer end
+AccBands(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close) =
+    accbands(colname(high), colname(low), colname(close), high, low, close)
+accbands(H, L, C, specs...) =
+    withterms(AccBands{H,L,C}(), specs..., :accbands_up => AccBandTerm{:up,H,L}(),
+        :accbands_dn => AccBandTerm{:dn,H,L}())
+
+CausalFrames.dependencies(::AccBands{H,L,C}) where {H,L,C} =
+    (Mean(:accbands_up), Mean(C), Mean(:accbands_dn))
+CausalFrames.emptyvalue(::AccBands) =
+    NamedTuple{outnames(nothing, :accbands, BAND_SUFFIXES)}((missing, missing, missing))
+CausalFrames.fresh(::AccBands{H,L,C}, ::NamedTuple) where {H,L,C} =
+    derivedvalues(outnames(nothing, :accbands, BAND_SUFFIXES),
+        (:accbands_up_mean, Symbol(C, :_mean), :accbands_dn_mean), tuple)
+
+# Bollinger's bands around `mid` at `up` and `dn` deviations `sd`, in
+# ta_BBANDS.c's arithmetic: one offset when the multipliers are equal, else a
+# fused upper band. `missing` propagates element-wise.
+struct BandsFormula{U,D} end
+@inline (::BandsFormula{U,D})(mid, sd) where {U,D} = bbandsvalues(mid, sd, U, D)
+@inline function bbandsvalues(mid, sd, up, dn)
+    if up == dn
+        off = sd * up
+        return (mid + off, mid, mid - off)
+    end
+    return (bandfma(sd, up, mid), mid, mid - sd * dn)
+end
+bandfma(sd, k, m) = ismissing(sd) || ismissing(m) ? missing : fma(sd, k, m)
+
+"""
+    BollingerBands(column::ColumnSpec; nbdevup = 2, nbdevdn = 2) -> Summarizer
+    BollingerBands(column::ColumnSpec; matype, period = 20, nbdevup = 2, nbdevdn = 2,
+                   unstable = 0, name = :bbands) -> Summarizer
+
+TA-Lib's `BBANDS`, Bollinger's bands, in `:{column}_bbands_upperband`,
+`:{column}_bbands_middleband` and `:{column}_bbands_lowerband`: the middle band
+is a moving average of `column`, and the outer ones lie `nbdevup` and `nbdevdn`
+population standard deviations of `column` above and below it.
+
+- **Without `matype`** the middle band is the simple average, and the indicator
+  is a dependent over CausalFrames' `Mean` and `Std(corrected = false)` (Group
+  tier). It is window-agnostic: TA-Lib's `BBANDS(period = p)` with the SMA is
+  `BollingerBands(:x)` under `Bars(p)`. It takes no `period`.
+- **With `matype`** (any `matype` symbol of [`MA`](@ref); `:mama` lands with S6)
+  it is a plain summarizer over a `period`-bar moving average and a CausalFrames
+  `Std(corrected = false)` under `CausalFrames.barwindow`. The lookback is the
+  larger of the average's and `period − 1`, and `unstable` is the unstable
+  period of `matype`, if it has one. `name` replaces the `bbands` in the output
+  names.
+
+CausalFrames bakes `corrected` into the state type, not the output name, so the
+structured form cannot share a call with a corrected `Std` or `Variance` over
+the same column; put them in separate calls.
+
+TA-Lib: `ta_codegen/input/bbands/bbands.yaml`, `bbands.md`.
+"""
+function BollingerBands(column::ColumnSpec; nbdevup::Real = 2, nbdevdn::Real = 2,
+    matype::Union{Nothing,Symbol} = nothing, period::Union{Nothing,Integer} = nothing,
+    unstable::Integer = 0, name::Symbol = :bbands)
+    C = colname(column)
+    up, dn = Float64(nbdevup), Float64(nbdevdn)
+    if matype === nothing
+        period === nothing && unstable == 0 && name === :bbands || throw(
+            ArgumentError(
+                "BollingerBands without matype takes its window from the transform; " *
+                "period, unstable and name need a matype"))
+        return withterms(BollingerSMA{C,up,dn}(), column)
+    end
+    p = something(period, 20)
+    checkrange("BollingerBands", "period", p, 2, 100_000)
+    checkmatype("BollingerBands", "matype", matype)
+    checkunstable(unstable)
+    s = BollingerSummarizer{matype,C,outnames(C, name, BAND_SUFFIXES)}(Int(p), up, dn,
+        Int(unstable))
+    return withterms(s, column)
+end
+
+struct BollingerSMA{C,U,D} <: GroupSummarizer end
+
+CausalFrames.dependencies(::BollingerSMA{C}) where {C} =
+    (Mean(C), Std(C; corrected = false))
+CausalFrames.emptyvalue(::BollingerSMA{C}) where {C} =
+    NamedTuple{outnames(C, :bbands, BAND_SUFFIXES)}((missing, missing, missing))
+CausalFrames.fresh(::BollingerSMA{C,U,D}, ::NamedTuple) where {C,U,D} =
+    derivedvalues(outnames(C, :bbands, BAND_SUFFIXES),
+        (Symbol(C, :_mean), Symbol(C, :_std)),
+        BandsFormula{U,D}())
+
+struct BollingerSummarizer{M,C,Ns} <: Summarizer
+    period::Int
+    nbdevup::Float64
+    nbdevdn::Float64
+    unstable::Int
+end
+
+mutable struct BollingerState{C,Ns,K,W,T} <: SummarizerState
+    const ma::K
+    const std::W
+    const nbdevup::T
+    const nbdevdn::T
+    bands::Union{Missing,NTuple{3,T}}
+end
+
+CausalFrames.emptyvalue(::BollingerSummarizer{M,C,Ns}) where {M,C,Ns} =
+    NamedTuple{Ns}((missing, missing, missing))
+
+function CausalFrames.fresh(
+    s::BollingerSummarizer{M,C,Ns},
+    intypes::NamedTuple,
+) where {M,C,Ns}
+    T = floattype(intypes[C])
+    k = MAKernel(T, M, s.period; s.unstable)
+    w = CausalFrames.barwindow(Std(:x; corrected = false), s.period, (x = T,))
+    return BollingerState{C,Ns,typeof(k),typeof(w),T}(k, w, T(s.nbdevup), T(s.nbdevdn),
+        missing)
+end
+CausalFrames.fresh(st::BollingerState{C,Ns,K,W,T}) where {C,Ns,K,W,T} =
+    BollingerState{C,Ns,K,W,T}(fresh(st.ma), fresh(st.std), st.nbdevup, st.nbdevdn, missing)
+function CausalFrames.fresh!(st::BollingerState)
+    fresh!(st.ma)
+    fresh!(st.std)
+    st.bands = missing
+    return st
+end
+
+@inline function CausalFrames.update!(
+    st::BollingerState{C,Ns,K,W,T},
+    row,
+) where {C,Ns,K,W,T}
+    x = row[C]
+    st.bands = missing
+    ismissing(x) && return nothing
+    v = convert(T, x)
+    m = step!(st.ma, v)
+    update!(st.std, (x = v,))
+    sd = value(st.std).x_std
+    (ismissing(m) || ismissing(sd)) && return nothing
+    st.bands = bbandsvalues(m::T, sd::T, st.nbdevup, st.nbdevdn)
+    return nothing
+end
+@inline function CausalFrames.value(st::BollingerState{C,Ns,K,W,T}) where {C,Ns,K,W,T}
+    b = st.bands
+    vals = ismissing(b) ? (missing, missing, missing) : b
+    return NamedTuple{Ns,NTuple{3,Union{Missing,T}}}(vals)
+end
+
+# ---------------------------------------------------------------------------
+# Keltner channels
+
+struct KeltnerSummarizer{H,L,C,Ns} <: Summarizer
+    period::Int
+    atrperiod::Int
+    nbdev::Float64
+    unstable::Int
+end
+
+mutable struct KeltnerState{H,L,C,Ns,E,A,T} <: SummarizerState
+    const ema::E
+    const atr::A
+    const nbdev::T
+    const unstable::Int
+    const emaoffset::Int
+    const atroffset::Int
+    n::Int
+    bands::Union{Missing,NTuple{3,T}}
+end
+
+CausalFrames.emptyvalue(::KeltnerSummarizer{H,L,C,Ns}) where {H,L,C,Ns} =
+    NamedTuple{Ns}((missing, missing, missing))
+
+function CausalFrames.fresh(
+    s::KeltnerSummarizer{H,L,C,Ns},
+    intypes::NamedTuple,
+) where {H,L,C,Ns}
+    T = pricetype(intypes, (H, L, C))
+    e = EMAKernel(T, s.period)
+    a = ATRKernel(T, s.atrperiod)
+    # Both legs first emit on the same bar, as ta_KC.c anchors them: the one
+    # with the shorter lookback starts that much later.
+    le, la = lookback(e) + s.unstable, lookback(a) + s.unstable
+    L0 = max(le, la)
+    return KeltnerState{H,L,C,Ns,typeof(e),typeof(a),T}(e, a, T(s.nbdev), s.unstable,
+        L0 - le, L0 - la, 0, missing)
+end
+CausalFrames.fresh(st::KeltnerState{H,L,C,Ns,E,A,T}) where {H,L,C,Ns,E,A,T} =
+    KeltnerState{H,L,C,Ns,E,A,T}(fresh(st.ema), fresh(st.atr), st.nbdev, st.unstable,
+        st.emaoffset, st.atroffset, 0, missing)
+function CausalFrames.fresh!(st::KeltnerState)
+    fresh!(st.ema)
+    fresh!(st.atr)
+    st.n = 0
+    st.bands = missing
+    return st
+end
+
+@inline function CausalFrames.update!(st::KeltnerState{H,L,C,Ns,E,A,T},
+    row) where {H,L,C,Ns,E,A,T}
+    h, l, c = row[H], row[L], row[C]
+    st.bands = missing
+    anymissing(h, l, c) && return nothing
+    h, l, c = convert(T, h), convert(T, l), convert(T, c)
+    n = st.n += 1
+    n > st.emaoffset && step!(st.ema, (h + l + c) / 3)
+    n > st.atroffset && step!(st.atr, h, l, c)
+    a = st.atr
+    (emitted(st.ema, st.unstable) && nseen(a) > lookback(a) + st.unstable) ||
+        return nothing
+    mid = st.ema.prev
+    w = a.wilder.prev * st.nbdev
+    st.bands = (mid + w, mid, mid - w)
+    return nothing
+end
+@inline function CausalFrames.value(st::KeltnerState{H,L,C,Ns,E,A,T}) where {H,L,C,Ns,E,A,T}
+    b = st.bands
+    vals = ismissing(b) ? (missing, missing, missing) : b
+    return NamedTuple{Ns,NTuple{3,Union{Missing,T}}}(vals)
+end
+
+"""
+    KeltnerChannels(; high = :high, low = :low, close = :close, period = 20,
+                    atrperiod = 10, nbdev = 2, unstable = 0, name = :kc)
+
+TA-Lib's `KC`, Keltner's channels, in `:kc_upperband`, `:kc_middleband` and
+`:kc_lowerband`: the middle band is the `period`-bar EMA of the typical price
+`(high + low + close)/3`, and the outer ones lie `nbdev` times the
+`atrperiod`-bar [`ATR`](@ref) above and below it. The two averages are aligned
+to emit first on the same bar, as TA-Lib aligns them, so the lookback is the
+larger of `period − 1` and `atrperiod`, plus `unstable`, the EMA and ATR
+unstable period TA-Lib's KC inherits.
+
+$PLAIN_DOC
+A bar with any input `missing` leaves the state unchanged and emits `missing`.
+
+TA-Lib: `ta_codegen/input/kc/kc.yaml`, `kc.md`.
+"""
+function KeltnerChannels(; high::ColumnSpec = :high, low::ColumnSpec = :low,
+    close::ColumnSpec = :close, period::Integer = 20, atrperiod::Integer = 10,
+    nbdev::Real = 2, unstable::Integer = 0, name::Symbol = :kc)
+    checkrange("KeltnerChannels", "period", period, 2, 100_000)
+    checkrange("KeltnerChannels", "atrperiod", atrperiod, 1, 100_000)
+    checkunstable(unstable)
+    s = KeltnerSummarizer{colname(high),colname(low),colname(close),
+        outnames(nothing, name, BAND_SUFFIXES)}(Int(period), Int(atrperiod),
+        Float64(nbdev), Int(unstable))
+    return withterms(s, high, low, close)
+end
+
+# ---------------------------------------------------------------------------
+# Parabolic SAR
+
+# `K` is `:sar` (the SAR itself) or `:sarext` (signed: negative while short).
+struct SARSummarizer{K,H,L,N} <: Summarizer
+    startvalue::Float64
+    offset::Float64
+    initlong::Float64
+    accellong::Float64
+    maxlong::Float64
+    initshort::Float64
+    accelshort::Float64
+    maxshort::Float64
+end
+
+mutable struct SARState{K,H,L,N,T} <: SummarizerState
+    const startvalue::T
+    const offset::T
+    const initlong::T
+    const accellong::T
+    const maxlong::T
+    const initshort::T
+    const accelshort::T
+    const maxshort::T
+    n::Int
+    islong::Bool
+    sar::T
+    ep::T
+    aflong::T
+    afshort::T
+    newhigh::T
+    newlow::T
+    out::Union{Missing,T}
+end
+
+CausalFrames.emptyvalue(::SARSummarizer{K,H,L,N}) where {K,H,L,N} =
+    NamedTuple{(N,)}((missing,))
+
+function CausalFrames.fresh(s::SARSummarizer{K,H,L,N}, intypes::NamedTuple) where {K,H,L,N}
+    T = pricetype(intypes, (H, L))
+    z = zero(T)
+    return SARState{K,H,L,N,T}(s.startvalue, s.offset, s.initlong, s.accellong,
+        s.maxlong, s.initshort, s.accelshort, s.maxshort, 0, true, z, z, z, z, z, z,
+        missing)
+end
+CausalFrames.fresh(st::SARState{K,H,L,N,T}) where {K,H,L,N,T} = fresh!(
+    SARState{K,H,L,N,T}(st.startvalue, st.offset, st.initlong, st.accellong, st.maxlong,
+        st.initshort, st.accelshort, st.maxshort, 0, true, zero(T), zero(T), zero(T),
+        zero(T), zero(T), zero(T), missing))
+function CausalFrames.fresh!(st::SARState{K,H,L,N,T}) where {K,H,L,N,T}
+    st.n = 0
+    st.islong = true
+    st.sar = st.ep = st.newhigh = st.newlow = zero(T)
+    st.aflong = st.initlong
+    st.afshort = st.initshort
+    st.out = missing
+    return st
+end
+
+@inline function CausalFrames.update!(st::SARState{K,H,L,N,T}, row) where {K,H,L,N,T}
+    h, l = row[H], row[L]
+    st.out = missing
+    anymissing(h, l) && return nothing
+    h, l = convert(T, h), convert(T, l)
+    n = st.n += 1
+    if n == 1
+        st.newhigh, st.newlow = h, l
+        return nothing
+    end
+    n == 2 && sarstart!(st, h, l)
+    st.out = sarstep!(st, h, l)
+    return nothing
+end
+@inline CausalFrames.value(st::SARState{K,H,L,N,T}) where {K,H,L,N,T} =
+    NamedTuple{(N,),Tuple{Union{Missing,T}}}((st.out,))
+
+# ta_SAREXT.c's start on the second bar: the direction from the first two bars'
+# −DM (long unless the down move wins), or from the sign of `startvalue`; the
+# SAR at the previous bar's extreme or `|startvalue|`; the extreme point at
+# this bar's. Then the "cheat": this bar also stands in for the previous one.
+function sarstart!(st::SARState, h, l)
+    sv = st.startvalue
+    if sv == 0
+        diffp = h - st.newhigh
+        diffm = st.newlow - l
+        mdm = diffm > 0 && diffp < diffm ? diffm : zero(diffm)
+        st.islong = !(mdm > 0)
+        st.sar = st.islong ? st.newlow : st.newhigh
+    else
+        st.islong = sv > 0
+        st.sar = abs(sv)
+    end
+    st.ep = st.islong ? h : l
+    st.newhigh, st.newlow = h, l
+    return nothing
+end
+
+# One bar of ta_SAREXT.c's loop: the value emitted is the SAR going into the
+# bar, or on a reversal the old extreme point clamped to the two bars' range and
+# offset; then the SAR moves `af` of the way to the extreme point, clamped.
+function sarstep!(st::SARState{K,H,L,N,T}, h, l) where {K,H,L,N,T}
+    prevlow, prevhigh = st.newlow, st.newhigh
+    st.newlow, st.newhigh = l, h
+    sar = st.sar
+    if st.islong
+        if l <= sar
+            st.islong = false
+            sar = max(st.ep, prevhigh, h)
+            st.offset != 0 && (sar += sar * st.offset)
+            out = -sar
+            st.afshort = st.initshort
+            st.ep = l
+            sar = max(fma(st.afshort, st.ep - sar, sar), prevhigh, h)
+        else
+            out = sar
+            if h > st.ep
+                st.ep = h
+                st.aflong = min(st.aflong + st.accellong, st.maxlong)
+            end
+            sar = min(fma(st.aflong, st.ep - sar, sar), prevlow, l)
+        end
+    else
+        if h >= sar
+            st.islong = true
+            sar = min(st.ep, prevlow, l)
+            st.offset != 0 && (sar -= sar * st.offset)
+            out = sar
+            st.aflong = st.initlong
+            st.ep = h
+            sar = min(fma(st.aflong, st.ep - sar, sar), prevlow, l)
+        else
+            out = -sar
+            if l < st.ep
+                st.ep = l
+                st.afshort = min(st.afshort + st.accelshort, st.maxshort)
+            end
+            sar = max(fma(st.afshort, st.ep - sar, sar), prevhigh, h)
+        end
+    end
+    st.sar = sar
+    return K === :sarext ? out : abs(out)
+end
+
+function sarsummarizer(K, high, low, name, sv, off, il, al, ml, is, as, ms)
+    # ta_SAREXT.c caps the initial and step factors at the maximum.
+    il, al = min(il, ml), min(al, ml)
+    is, as = min(is, ms), min(as, ms)
+    s = SARSummarizer{K,colname(high),colname(low),name}(sv, off, il, al, ml, is, as, ms)
+    return withterms(s, high, low)
+end
+
+const SAR_DOC = """
+It is path-dependent: its value depends on the bar the state starts at, so no
+finite `warmup` makes it split-invariant. The lookback is 1.
+
+$PLAIN_DOC
+A bar with any input `missing` leaves the state unchanged and emits `missing`.
+"""
+
+"""
+    SAR(; high = :high, low = :low, acceleration = 0.02, maximum = 0.2, name = :sar)
+
+TA-Lib's `SAR`, Wilder's parabolic stop and reverse, in `:sar`. The trend
+starts long unless the first two bars' down move wins. Each bar the SAR moves
+`af` of the way to the trend's extreme point, clamped to the last two bars'
+range. `af` starts at `acceleration` and grows by it with each new extreme, up
+to `maximum`. When a bar's range reaches the SAR it reverses, emitting the old
+extreme point as the SAR.
+
+$SAR_DOC
+TA-Lib: `ta_codegen/input/sar/sar.yaml`, `sar.md`.
+"""
+function SAR(; high::ColumnSpec = :high, low::ColumnSpec = :low,
+    acceleration::Real = 0.02, maximum::Real = 0.2, name::Symbol = :sar)
+    checkrange("SAR", "acceleration", acceleration, 0, Inf)
+    checkrange("SAR", "maximum", maximum, 0, Inf)
+    a, m = Float64(acceleration), Float64(maximum)
+    return sarsummarizer(:sar, high, low, name, 0.0, 0.0, a, a, m, a, a, m)
+end
+
+"""
+    SARExt(; high = :high, low = :low, startvalue = 0, offsetonreverse = 0,
+           accelerationinitlong = 0.02, accelerationlong = 0.02,
+           accelerationmaxlong = 0.2, accelerationinitshort = 0.02,
+           accelerationshort = 0.02, accelerationmaxshort = 0.2, name = :sarext)
+
+TA-Lib's `SAREXT`, the parabolic SAR with separate long and short acceleration
+factors, in `:sarext`, as [`SAR`](@ref) but signed: positive while long and
+negative while short. A positive `startvalue` starts long at that SAR and a
+negative one starts short at its magnitude; 0 decides as `SAR` does. On a
+reversal the emitted SAR moves `offsetonreverse` times itself away from the
+price.
+
+$SAR_DOC
+TA-Lib: `ta_codegen/input/sarext/sarext.yaml`, `sarext.md`.
+"""
+function SARExt(; high::ColumnSpec = :high, low::ColumnSpec = :low,
+    startvalue::Real = 0, offsetonreverse::Real = 0, accelerationinitlong::Real = 0.02,
+    accelerationlong::Real = 0.02, accelerationmaxlong::Real = 0.2,
+    accelerationinitshort::Real = 0.02, accelerationshort::Real = 0.02,
+    accelerationmaxshort::Real = 0.2, name::Symbol = :sarext)
+    for (kw, v) in (("offsetonreverse", offsetonreverse),
+        ("accelerationinitlong", accelerationinitlong),
+        ("accelerationlong", accelerationlong),
+        ("accelerationmaxlong", accelerationmaxlong),
+        ("accelerationinitshort", accelerationinitshort),
+        ("accelerationshort", accelerationshort),
+        ("accelerationmaxshort", accelerationmaxshort))
+        checkrange("SARExt", kw, v, 0, Inf)
+    end
+    return sarsummarizer(:sarext, high, low, name, Float64(startvalue),
+        Float64(offsetonreverse), Float64(accelerationinitlong), Float64(accelerationlong),
+        Float64(accelerationmaxlong), Float64(accelerationinitshort),
+        Float64(accelerationshort), Float64(accelerationmaxshort))
+end
+
+# ---------------------------------------------------------------------------
+# SuperTrend
+
+struct SuperTrendSummarizer{H,L,C,Ns} <: Summarizer
+    period::Int
+    multiplier::Float64
+    unstable::Int
+end
+
+mutable struct SuperTrendState{H,L,C,Ns,A,T} <: SummarizerState
+    const atr::A
+    const multiplier::T
+    const unstable::Int
+    started::Bool
+    isup::Bool
+    upper::T
+    lower::T
+    prevclose::T
+    out::Union{Missing,T}
+    trend::Union{Missing,Int}
+end
+
+CausalFrames.emptyvalue(::SuperTrendSummarizer{H,L,C,Ns}) where {H,L,C,Ns} =
+    NamedTuple{Ns}((missing, missing))
+
+function CausalFrames.fresh(s::SuperTrendSummarizer{H,L,C,Ns},
+    intypes::NamedTuple) where {H,L,C,Ns}
+    T = pricetype(intypes, (H, L, C))
+    a = ATRKernel(T, s.period)
+    z = zero(T)
+    return SuperTrendState{H,L,C,Ns,typeof(a),T}(a, T(s.multiplier), s.unstable, false,
+        true, z, z, z, missing, missing)
+end
+CausalFrames.fresh(st::SuperTrendState{H,L,C,Ns,A,T}) where {H,L,C,Ns,A,T} =
+    SuperTrendState{H,L,C,Ns,A,T}(fresh(st.atr), st.multiplier, st.unstable, false, true,
+        zero(T), zero(T), zero(T), missing, missing)
+function CausalFrames.fresh!(st::SuperTrendState{H,L,C,Ns,A,T}) where {H,L,C,Ns,A,T}
+    fresh!(st.atr)
+    st.started = false
+    st.isup = true
+    st.upper = st.lower = st.prevclose = zero(T)
+    st.out = st.trend = missing
+    return st
+end
+
+# ta_SUPERTREND.c: bands `(h + l)/2 ± multiplier·ATR`. The first bar takes
+# both and starts up. After it, each band only tightens unless the previous
+# close crossed it; the trend turns down when the close falls below the lower
+# band and up when it rises above the upper one; the line is the lower band in
+# an uptrend and the upper one in a downtrend.
+@inline function CausalFrames.update!(st::SuperTrendState{H,L,C,Ns,A,T},
+    row) where {H,L,C,Ns,A,T}
+    h, l, c = row[H], row[L], row[C]
+    st.out = st.trend = missing
+    anymissing(h, l, c) && return nothing
+    h, l, c = convert(T, h), convert(T, l), convert(T, c)
+    a = st.atr
+    step!(a, h, l, c)
+    nseen(a) > lookback(a) + st.unstable || return nothing
+    med = (h + l) / 2
+    band = st.multiplier * a.wilder.prev
+    bu, bl = med + band, med - band
+    if st.started
+        (bu < st.upper || st.prevclose > st.upper) && (st.upper = bu)
+        (bl > st.lower || st.prevclose < st.lower) && (st.lower = bl)
+        if st.isup
+            c < st.lower && (st.isup = false)
+        else
+            c > st.upper && (st.isup = true)
+        end
+    else
+        st.started = true
+        st.isup = true
+        st.upper, st.lower = bu, bl
+    end
+    st.prevclose = c
+    st.out = st.isup ? st.lower : st.upper
+    st.trend = st.isup ? 1 : -1
+    return nothing
+end
+@inline CausalFrames.value(st::SuperTrendState{H,L,C,Ns,A,T}) where {H,L,C,Ns,A,T} =
+    NamedTuple{Ns,Tuple{Union{Missing,T},Union{Missing,Int}}}((st.out, st.trend))
+
+"""
+    SuperTrend(; high = :high, low = :low, close = :close, period = 10,
+               multiplier = 3.0, unstable = 0, name = :supertrend)
+
+TA-Lib's `SUPERTREND` in `:supertrend_supertrend` and `:supertrend_trend`. The
+bands lie `multiplier` times the `period`-bar [`ATR`](@ref) above and below the
+bar's median price `(high + low)/2`. Each band only tightens unless the
+previous close crossed it. The trend (an `Int`, 1 up or −1 down) starts up and
+turns when the close crosses the band on its side, and the line is the lower
+band in an uptrend and the upper one in a downtrend. The lookback is `period`,
+plus `unstable`, the ATR unstable period TA-Lib's SUPERTREND inherits.
+
+It is path-dependent: its value depends on the bar the state starts at, so no
+finite `warmup` makes it split-invariant.
+
+$PLAIN_DOC
+A bar with any input `missing` leaves the state unchanged and emits `missing`.
+
+TA-Lib: `ta_codegen/input/supertrend/supertrend.yaml`, `supertrend.md`.
+"""
+function SuperTrend(; high::ColumnSpec = :high, low::ColumnSpec = :low,
+    close::ColumnSpec = :close, period::Integer = 10, multiplier::Real = 3.0,
+    unstable::Integer = 0, name::Symbol = :supertrend)
+    checkrange("SuperTrend", "period", period, 2, 100_000)
+    checkrange("SuperTrend", "multiplier", multiplier, 0, Inf)
+    checkunstable(unstable)
+    s = SuperTrendSummarizer{colname(high),colname(low),colname(close),
+        outnames(nothing, name, (:supertrend, :trend))}(Int(period), Float64(multiplier),
+        Int(unstable))
+    return withterms(s, high, low, close)
+end

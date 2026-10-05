@@ -6,8 +6,6 @@ using CausalIndicators: GainLossKernel, FastKKernel, malookback
 
 # The MA type of a golden's `optIn…MAType` parameter, or `default`.
 matypeof(p, k, default) = MATYPE_CODES[get(p, k, default)]
-# A table row's TA_MAType identifier as a matype symbol.
-tablematype(s) = Symbol(lowercase(replace(s, "TA_MAType_" => "")))
 
 # One of each plain S2 state, for the allocation and JET checks.
 const PLAIN_S2 = [
@@ -569,5 +567,111 @@ end
             @test allocs(CausalFrames.value, st) == 0
             @test allocs(fresh!, st) == 0
         end
+    end
+end
+
+# S3 directional movement: ±DM, ±DI, DX, ADX and ADXR.
+
+const DIRECTIONAL = Dict("PLUS_DM" => (PlusDM, :plusdm), "MINUS_DM" => (MinusDM, :minusdm),
+    "PLUS_DI" => (PlusDI, :plusdi), "MINUS_DI" => (MinusDI, :minusdi),
+    "DX" => (DX, :dx),
+    "ADX" => (ADX, :adx), "ADXR" => (ADXR, :adxr))
+
+# TA-Lib's lookback of each, at period p and unstable period u.
+function dirlookback(fn, p, u)
+    fn in ("PLUS_DM", "MINUS_DM") && return p == 1 ? 1 : p - 1 + u
+    fn in ("PLUS_DI", "MINUS_DI") && return p == 1 ? 1 : p + u
+    fn == "DX" && return p + u
+    fn == "ADX" && return 2p - 1 + u
+    return 3p - 2 + u
+end
+
+@testset "directional movement" begin
+    @testset "$fn goldens" for fn in sort(collect(keys(DIRECTIONAL)))
+        ctor, out = DIRECTIONAL[fn]
+        checkgoldens(fn; outputs = (:outReal,)) do p, data
+            s = ctor(;
+                period = get(p, :optInTimePeriod, 14),
+                unstable = get(p, :unstable, 0),
+            )
+            (foldseries(s, data)[out],)
+        end
+    end
+
+    @testset "test_adx.c table rows" begin
+        ref = loadref()
+        n = 0
+        for r in loadtable("test_adx")["tables"]["tableTest"]["rows"]
+            fn = replace(r["id"], "TST_" => "")
+            ctor, out = DIRECTIONAL[fn]
+            p, u = r["optInTimePeriod"], r["unstablePeriod"]
+            got = tablerun(ref, r["startIdx"], r["endIdx"], dirlookback(fn, p, u)) do d
+                foldseries(ctor(; period = p, unstable = u), d)[out]
+            end
+            checkrow(got, r; out = "oneOfTheExpectedOutReal0",
+                index = "oneOfTheExpectedOutRealIndex0")
+            n += 1
+        end
+        @test n >= 30
+    end
+
+    @testset "period 1 (test_period_boundary.c)" begin
+        ref = loadref()
+        tr = foldseries(TRange(), ref; window = Bars(2)).w_trange
+        for (ctor, dm) in ((PlusDI, PlusDM), (MinusDI, MinusDM))
+            di = only(foldseries(ctor(; period = 1, unstable = 3), ref))
+            raw = only(foldseries(dm(; period = 1, unstable = 3), ref))
+            @test findfirst(!ismissing, di) == 2 && findfirst(!ismissing, raw) == 2
+            # No factor 100 at period 1: TA-Lib's historical quirk.
+            @test all(i -> di[i] ≈ (tr[i] == 0 ? 0.0 : raw[i] / tr[i]), 2:length(di))
+        end
+    end
+
+    @testset "test_quote_unit.c 2^-60 oracles and range" begin
+        ref = loadref()
+        scaled = map(c -> c .* ldexp(1.0, -60), ref)
+        for (ctor, out, want) in ((ADX, :adx, 15.526057510526849),
+            (ADXR, :adxr, 20.492086296160466), (DX, :dx, 0.47222726427924594),
+            (PlusDI, :plusdi, 20.99955113874627), (MinusDI, :minusdi, 21.198823368250974))
+            # pandas-ta's oracles, to the C test's relative 1e-6 (its Wilder
+            # seeding differs).
+            @test foldseries(ctor(), scaled)[out][252] ≈ want rtol = 1e-6
+            for p in (2, 5, 14, 30)
+                v = skipmissing(foldseries(ctor(; period = p), ref)[out])
+                @test all(x -> 0 <= x <= 100, v)
+            end
+        end
+    end
+
+    @testset "DX repeats the previous value where it is undefined" begin
+        # A flat stretch has no directional movement, so the DIs sum to zero.
+        h = vcat(collect(10.0:2.0:40.0), fill(40.0, 10))
+        d = (high = h, low = h .- 1, close = h .- 0.5)
+        dx = foldseries(DX(; period = 3), d).dx
+        adx = foldseries(ADX(; period = 3), d).adx
+        last_ = findlast(i -> h[i] != h[i-1], 2:length(h)) + 1
+        @test all(==(dx[last_]), dx[(last_+1):end])
+        @test !ismissing(adx[end])
+    end
+
+    @testset "constructors" begin
+        @test keys(CausalFrames.emptyvalue(PlusDM())) == (:plusdm,)
+        @test keys(CausalFrames.emptyvalue(ADX(; name = :adx7))) == (:adx7,)
+        for ctor in (PlusDM, MinusDM, PlusDI, MinusDI)
+            @test_throws ArgumentError ctor(; period = 0)
+            @test_throws ArgumentError ctor(; unstable = -1)
+        end
+        for ctor in (DX, ADX, ADXR)
+            @test_throws ArgumentError ctor(; period = 1)
+            @test_throws ArgumentError ctor(; period = 100_001)
+        end
+        # DM reads no close.
+        @test keys(
+            foldseries(
+                PlusDM(; period = 3),
+                (high = [1.0, 2.0, 3.0, 5.0],
+                    low = [0.0, 1.0, 2.0, 3.0]),
+            ),
+        ) == (:plusdm,)
     end
 end

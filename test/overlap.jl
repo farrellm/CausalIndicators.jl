@@ -7,6 +7,9 @@ using CausalIndicators: MovingAverageState, MAVPState, UNSTABLE_MATYPES
 const MATYPE_CODES = Dict(0 => :sma, 1 => :ema, 2 => :wma, 3 => :dema, 4 => :tema,
     5 => :trima, 6 => :kama, 7 => :mama, 8 => :t3, 9 => :hma, 12 => :zlema, 13 => :rma)
 
+# A table row's TA_MAType identifier as a matype symbol.
+tablematype(s) = Symbol(lowercase(replace(s, "TA_MAType_" => "")))
+
 # The named constructor and TA-Lib default period of each recursive MA.
 const NAMED_MA = Dict("EMA" => (EMA, 30), "RMA" => (RMA, 30), "DEMA" => (DEMA, 30),
     "TEMA" => (TEMA, 30), "TRIMA" => (TRIMA, 30), "KAMA" => (KAMA, 30),
@@ -299,5 +302,309 @@ mavpperiods(n) = [2.0 + (i % 29) for i in 0:(n-1)]
             @test allocs(CausalFrames.value, st) == 0
             @test allocs(fresh!, st) == 0
         end
+    end
+end
+
+# S3 overlap studies: the structured Donchian, AccBands and BollingerBands, and
+# the plain BollingerBands(; matype), KeltnerChannels, SAR, SARExt and
+# SuperTrend.
+
+const BANDS = (:outRealUpperBand, :outRealMiddleBand, :outRealLowerBand)
+
+# The first `n` bars of the 10,000-bar set, the corpus TA-Lib's KC and
+# SUPERTREND oracles use.
+gdprefix(n) = map(c -> c[1:n], loadgdata())
+
+sarext(p) = SARExt(; startvalue = get(p, :optInStartValue, 0),
+    offsetonreverse = get(p, :optInOffsetOnReverse, 0),
+    accelerationinitlong = get(p, :optInAccelerationInitLong, 0.02),
+    accelerationlong = get(p, :optInAccelerationLong, 0.02),
+    accelerationmaxlong = get(p, :optInAccelerationMaxLong, 0.2),
+    accelerationinitshort = get(p, :optInAccelerationInitShort, 0.02),
+    accelerationshort = get(p, :optInAccelerationShort, 0.02),
+    accelerationmaxshort = get(p, :optInAccelerationMaxShort, 0.2))
+
+@testset "bands, SAR and SuperTrend" begin
+    @testset "goldens" begin
+        checkgoldens("DONCHIAN"; outputs = BANDS) do p, data
+            Tuple(foldseries(Donchian(), data; window = Bars(get(p, :optInTimePeriod, 20))))
+        end
+        checkgoldens("ACCBANDS"; outputs = BANDS) do p, data
+            Tuple(foldseries(AccBands(), data; window = Bars(get(p, :optInTimePeriod, 20))))
+        end
+        checkgoldens("BBANDS"; outputs = BANDS) do p, data
+            m = MATYPE_CODES[get(p, :optInMAType, 0)]
+            per = get(p, :optInTimePeriod, 20)
+            up, dn = get(p, :optInNbDevUp, 2.0), get(p, :optInNbDevDn, 2.0)
+            # The SMA runs both forms: the structured one has no unstable period.
+            s =
+                m === :sma && get(p, :unstable, 0) == 0 ?
+                foldseries(BollingerBands(:close; nbdevup = up, nbdevdn = dn), data;
+                    window = Bars(per)) :
+                foldseries(
+                    BollingerBands(:close; matype = m, period = per, nbdevup = up,
+                        nbdevdn = dn, unstable = get(p, :unstable, 0)), data)
+            Tuple(s)
+        end
+        checkgoldens("KC"; outputs = BANDS) do p, data
+            s = KeltnerChannels(; period = get(p, :optInTimePeriod, 20),
+                atrperiod = get(p, :optInATRPeriod, 10),
+                nbdev = get(p, :optInNbDev, 2.0),
+                unstable = get(p, :unstable, 0))
+            Tuple(foldseries(s, data))
+        end
+        checkgoldens("SAR"; outputs = (:outReal,)) do p, data
+            s = SAR(; acceleration = get(p, :optInAcceleration, 0.02),
+                maximum = get(p, :optInMaximum, 0.2))
+            (foldseries(s, data).sar,)
+        end
+        checkgoldens("SAREXT"; outputs = (:outReal,)) do p, data
+            (foldseries(sarext(p), data).sarext,)
+        end
+        checkgoldens("SUPERTREND"; outputs = (:outSupertrend, :outTrend)) do p, data
+            s = SuperTrend(; period = get(p, :optInTimePeriod, 10),
+                multiplier = get(p, :optInMultiplier, 3.0),
+                unstable = get(p, :unstable, 0))
+            Tuple(foldseries(s, data))
+        end
+    end
+
+    @testset "BollingerBands without matype is the SMA form" begin
+        ref = loadref()
+        a = foldseries(BollingerBands(:close; nbdevup = 1.5, nbdevdn = 2.5), ref;
+            window = Bars(14))
+        b = foldseries(
+            BollingerBands(:close; matype = :sma, period = 14, nbdevup = 1.5,
+                nbdevdn = 2.5), ref)
+        for (x, y) in zip(a, b)
+            @test isequal(ismissing.(x), ismissing.(y))
+            @test all(i -> ismissing(x[i]) || x[i] ≈ y[i], eachindex(x))
+        end
+        # test_bbands.c's ordering, at every bar and either form.
+        for o in (a, b)
+            u, m, l = o
+            @test all(i -> ismissing(m[i]) || u[i] >= m[i] >= l[i], eachindex(m))
+        end
+    end
+
+    @testset "test_bbands.c table rows" begin
+        close = loadref().close
+        n = 0
+        for r in loadtable("test_bbands")["tables"]["tableTest"]["rows"]
+            p, up, dn = r["optInTimePeriod"], r["optInNbDevUp"], r["optInNbDevDn"]
+            m = tablematype(r["optInMethod_3"])
+            for k in 0:2
+                got = tablerun((; close), r["startIdx"], r["endIdx"], p - 1) do d
+                    foldseries(
+                        BollingerBands(:close; matype = m, period = p, nbdevup = up,
+                            nbdevdn = dn), d)[k+1]
+                end
+                checkrow(got, r; out = "oneOfTheExpectedOutReal$k",
+                    index = "oneOfTheExpectedOutRealIndex$k")
+            end
+            n += 1
+        end
+        @test n >= 17
+    end
+
+    @testset "test_per_hlc.c ACCBANDS row and test_quote_unit.c" begin
+        ref = loadref()
+        r = only(
+            x for x in loadtable("test_per_hlc")["tables"]["tableTest"]["rows"]
+            if x["theFunction"] == "TA_ACCBANDS_TEST"
+        )
+        p = r["optInTimePeriod1"]
+        # The row checks the middle band.
+        got =
+            tablerun(d -> foldseries(AccBands(), d; window = Bars(p)).w_accbands_middleband,
+                ref, r["startIdx"], r["endIdx"], p - 1)
+        checkrow(got, r; out = "oneOfTheExpectedOutReal0",
+            index = "oneOfTheExpectedOutRealIndex0")
+        # At 2^-60 the zero guard is relative to the prices, so nothing changes
+        # but the scale.
+        scaled = map(c -> c .* ldexp(1.0, -60), ref)
+        o = foldseries(AccBands(), scaled; window = Bars(20))
+        @test ldexp(o.w_accbands_upperband[252], 60) ≈ 119.65651267719166 rtol = 1e-12
+        @test ldexp(o.w_accbands_lowerband[252], 60) ≈ 101.85401267719166 rtol = 1e-12
+    end
+
+    @testset "test_donchian.c" begin
+        ref = loadref()
+        t = loadtable("test_donchian")["tables"]
+        for r in vcat(t["donchianGold"]["rows"], t["donchianTa4jGold"]["rows"])
+            o = foldseries(Donchian(), ref; window = Bars(r["period"]))
+            i = r["bar"] + 1
+            @test o.w_donchian_upperband[i] == r["upper"]
+            @test o.w_donchian_middleband[i] == r["middle"]
+            @test o.w_donchian_lowerband[i] == r["lower"]
+        end
+        # Bit-identical to Max, Min and MidPrice, which it shares.
+        for p in (2, 5, 20, 32)
+            o = foldseries([Donchian(), Max(:high), Min(:low), MidPrice()], ref;
+                window = Bars(p))
+            @test isequal(o.w_donchian_upperband, o.w_high_max)
+            @test isequal(o.w_donchian_lowerband, o.w_low_min)
+            @test isequal(o.w_donchian_middleband, o.w_midprice)
+        end
+        flat = (high = fill(100.0, 40), low = fill(100.0, 40))
+        o = foldseries(Donchian(), flat; window = Bars(5))
+        @test all(v -> all(==(100.0), skipmissing(v)), o)
+        @test count(
+            !ismissing,
+            foldseries(Donchian(), map(c -> c[1:32], ref);
+                window = Bars(32)).w_donchian_middleband,
+        ) == 1
+    end
+
+    @testset "test_sar.c table rows" begin
+        a = loadtable("test_sar")["arrays"]
+        wilder = (high = Float64.(a["wilderHigh"]["values"]),
+            low = Float64.(a["wilderLow"]["values"]))
+        n = 0
+        for r in loadtable("test_sar")["tables"]["tableTest"]["rows"]
+            s = SAR(; acceleration = r["optInAcceleration"], maximum = r["optInMaximum"])
+            got = tablerun(d -> foldseries(s, d).sar, wilder, r["startIdx"], r["endIdx"], 1)
+            checkrow(got, r; out = "oneOfTheExpectedOutReal0",
+                index = "oneOfTheExpectedOutRealIndex0")
+            n += 1
+        end
+        @test n >= 5
+    end
+
+    @testset "SAR is SARExt's magnitude" begin
+        ref = loadref()
+        for (a, m) in ((0.02, 0.2), (0.05, 0.1), (0.3, 0.2))
+            s = foldseries(SAR(; acceleration = a, maximum = m), ref).sar
+            e = foldseries(
+                SARExt(; accelerationinitlong = a, accelerationlong = a,
+                    accelerationmaxlong = m, accelerationinitshort = a,
+                    accelerationshort = a,
+                    accelerationmaxshort = m), ref).sarext
+            @test isequal(s, map(x -> ismissing(x) ? x : abs(x), e))
+        end
+    end
+
+    @testset "test_kc.c oracles and composition" begin
+        t = loadtable("test_kc")["tables"]
+        for (shape, oracle_, data) in (("kcGdShape", "kcGdOracle", gdprefix(1000)),
+            ("kcSrefShape", "kcSrefOracle", loadref()))
+            for r in t[shape]["rows"]
+                o = foldseries(
+                    KeltnerChannels(; period = r["emaPeriod"],
+                        atrperiod = r["atrPeriod"], nbdev = r["nbDev"]), data)
+                @test findfirst(!ismissing, o.kc_middleband) - 1 == r["begIdx"]
+                @test count(!ismissing, o.kc_middleband) == r["nbElement"]
+            end
+            for r in t[oracle_]["rows"]
+                o = foldseries(
+                    KeltnerChannels(; period = r["emaPeriod"],
+                        atrperiod = r["atrPeriod"], nbdev = r["nbDev"]), data)
+                i = r["bar"] + 1
+                @test o.kc_upperband[i] ≈ r["upper"] rtol = 1e-12 atol = 1e-12
+                @test o.kc_middleband[i] ≈ r["middle"] rtol = 1e-12 atol = 1e-12
+                @test o.kc_lowerband[i] ≈ r["lower"] rtol = 1e-12 atol = 1e-12
+            end
+        end
+        # The middle band is the EMA of the typical price from the first output,
+        # and the bands lie nbdev ATRs from it; nbdev 0 collapses them.
+        ref = loadref()
+        tp = (ref.high .+ ref.low .+ ref.close) ./ 3
+        for (p, m, k) in ((20, 10, 2.0), (8, 4, 1.5), (4, 10, 2.0), (4, 4, 3.0))
+            o = foldseries(KeltnerChannels(; period = p, atrperiod = m, nbdev = k), ref)
+            b = findfirst(!ismissing, o.kc_middleband)
+            @test b - 1 == max(p - 1, m)
+            ema = foldseries(EMA(:x; period = p), (; x = tp[(b-p+1):end])).x_ema
+            @test isequal(o.kc_middleband[b:end], ema[p:end])
+            # The ATR is anchored, like the EMA, to first emit at the same bar.
+            off = (b - 1) - m
+            atr = foldseries(ATR(; period = m), map(c -> c[(off+1):end], ref)).atr
+            @test all(i -> o.kc_upperband[i] == o.kc_middleband[i] + atr[i-off] * k, b:252)
+            @test all(i -> o.kc_lowerband[i] == o.kc_middleband[i] - atr[i-off] * k, b:252)
+            z = foldseries(KeltnerChannels(; period = p, atrperiod = m, nbdev = 0), ref)
+            @test isequal(z.kc_upperband, z.kc_middleband) &&
+                  isequal(z.kc_lowerband, z.kc_middleband)
+        end
+    end
+
+    @testset "test_supertrend.c oracles, flips and edges" begin
+        t = loadtable("test_supertrend")
+        gd, ref = gdprefix(1000), loadref()
+        st(d, p, m) = foldseries(SuperTrend(; period = p, multiplier = m), d)
+        for (shape, oracle_, data) in (("stGdShape", "stGdOracle", gd),
+            ("stSrefShape", "stSrefOracle", ref))
+            for r in t["tables"][shape]["rows"]
+                o = st(data, r["period"], r["mult"])
+                @test findfirst(!ismissing, o.supertrend_trend) - 1 == r["begIdx"]
+                @test count(!ismissing, o.supertrend_trend) == r["nbElement"]
+            end
+            for r in t["tables"][oracle_]["rows"]
+                o = st(data, r["period"], r["mult"])
+                i = r["bar"] + 1
+                @test o.supertrend_supertrend[i] ≈ r["line"] rtol = 1e-12 atol = 1e-12
+                @test o.supertrend_trend[i] === r["trend"]
+            end
+        end
+        # Every trend change lands exactly on the listed bars.
+        for r in t["tables"]["stFlipTable"]["rows"]
+            tr = st(gd, r["period"], r["mult"]).supertrend_trend
+            flips = [i - 1 for i in 2:1000 if !ismissing(tr[i-1]) && tr[i] != tr[i-1]]
+            @test flips == t["arrays"][r["bars"]]["values"]
+            @test length(flips) == r["nbBarsFlipped"]
+        end
+        # The seed bar takes the lower band and an uptrend.
+        for r in t["tables"]["stSweep"]["rows"], data in (gd, ref)
+            p, m = r["period"], r["mult"]
+            o = st(data, p, m)
+            atr = foldseries(ATR(; period = p), data).atr
+            b = p + 1
+            @test o.supertrend_trend[b] == 1
+            @test o.supertrend_supertrend[b] ==
+                  (data.high[b] + data.low[b]) / 2 - m * atr[b]
+        end
+        # A shock on the second output bar turns the trend down onto the seed's
+        # upper band.
+        h, l, c = fill(150.5, 12), fill(149.5, 12), fill(150.0, 12)
+        h[7], l[7], c[7] = 200.0, 100.0, 101.0
+        o = st((high = h, low = l, close = c), 5, 2.0)
+        @test o.supertrend_trend[6:7] == [1, -1]
+        @test o.supertrend_supertrend[7] == 150.0 + 2.0
+        # Multiplier 0: the line is always some bar's median price, and a flat
+        # series is the price in an uptrend throughout.
+        o = st(ref, 5, 0.0)
+        med = (ref.high .+ ref.low) ./ 2
+        @test all(v -> v in med, skipmissing(o.supertrend_supertrend))
+        @test length(unique(skipmissing(o.supertrend_trend))) == 2
+        flat = (high = fill(50.0, 30), low = fill(50.0, 30), close = fill(50.0, 30))
+        o = st(flat, 5, 3.0)
+        @test all(==(50.0), skipmissing(o.supertrend_supertrend))
+        @test all(==(1), skipmissing(o.supertrend_trend))
+    end
+
+    @testset "constructors" begin
+        @test keys(CausalFrames.emptyvalue(Donchian())) ==
+              (:donchian_upperband, :donchian_middleband, :donchian_lowerband)
+        @test keys(CausalFrames.emptyvalue(BollingerBands(:close))) ==
+              (:close_bbands_upperband, :close_bbands_middleband, :close_bbands_lowerband)
+        @test keys(
+            CausalFrames.emptyvalue(BollingerBands(:close; matype = :ema,
+                name = :bb)),
+        ) == (:close_bb_upperband, :close_bb_middleband, :close_bb_lowerband)
+        @test keys(CausalFrames.emptyvalue(KeltnerChannels())) ==
+              (:kc_upperband, :kc_middleband, :kc_lowerband)
+        @test keys(CausalFrames.emptyvalue(SuperTrend())) ==
+              (:supertrend_supertrend, :supertrend_trend)
+        @test keys(CausalFrames.emptyvalue(SARExt())) == (:sarext,)
+        # The structured form takes its window from the transform.
+        @test BollingerBands(:x) isa CausalFrames.GroupSummarizer ||
+              BollingerBands(:x) isa CausalFrames.Termed
+        @test_throws ArgumentError BollingerBands(:x; period = 10)
+        @test_throws ArgumentError BollingerBands(:x; matype = :ema, period = 1)
+        @test_throws ArgumentError BollingerBands(:x; matype = :mama)
+        @test_throws ArgumentError KeltnerChannels(; period = 1)
+        @test_throws ArgumentError KeltnerChannels(; atrperiod = 0)
+        @test_throws ArgumentError SAR(; acceleration = -0.1)
+        @test_throws ArgumentError SARExt(; offsetonreverse = -1)
+        @test_throws ArgumentError SuperTrend(; period = 1)
+        @test_throws ArgumentError SuperTrend(; multiplier = -1)
     end
 end

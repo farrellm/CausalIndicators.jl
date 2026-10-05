@@ -124,6 +124,10 @@ table records which:
    - `AvgPrice` reads `Last` of four columns.
    - `PercentRank100` is `100 · PercentRank` over `Bars(period + 1)`.
    - `CCI` reads `Mean`, `MeanAbsDev` and `Last` of the typical price.
+   - `Donchian` reads `Max(:high)` and `Min(:low)`, which `MidPrice` shares.
+   - `ADR` and `AccBands` read `Mean`s of namespaced row terms
+     (`:adr_range`, `:accbands_up`, `:accbands_dn`).
+   - `BollingerBands()` reads `Mean` and `Std(corrected = false)`.
 3. **Move it into CausalFrames.** If an indicator needs a *generic* accumulator
    or operator that CausalFrames lacks, it is first added to CausalFrames as a
    prerequisite PR, with its own tests, docs and DESIGN.md entry. The indicator
@@ -261,8 +265,9 @@ g. **`CausalFrames.barwindow(s, n, intypes)`, a count-window state** (#81),
 
    Recursive states cannot get a window through a transform, so they use this.
    Its users are KAMA, MFI, ULTOSC, AO, TRIMA, the Stoch family's %K,
-   `MAKernel`'s `:sma` and `:wma`, non-SMA `BollingerBands` and
-   `CandleAverages`.
+   `MAKernel`'s `:sma` and `:wma`, `BollingerBands(; matype)` and RVI (a
+   `Std`), CVI and ADXR (a `First` of their own earlier values), MassIndex (a
+   `Sum`) and `CandleAverages`.
 
 h. **`MeanAbsDev(column)`**, the mean absolute deviation about the mean,
    `Σ|x − mean| / n`. It is a fieldless dependent over `Mean` and
@@ -325,6 +330,7 @@ h. **`MeanAbsDev(column)`**, the mean absolute deviation about the mean,
   - The index forms emit `Int` *bars since* the extreme (0 = this bar), not
     TA-Lib's absolute array index, which is meaningless in a stream. The tests
     convert between the two.
+  - `SuperTrend`'s trend emits `Int` 1 (up) or −1 (down).
 
 ## Semantics
 
@@ -338,8 +344,14 @@ given parameters.
   YAML carries `unstable_period`, and on every function whose lookback
   inherits one through TA-Lib's calls.
   - `DEMA`, `TEMA`, `ZLEMA`, `MACD`, `MACDFix` and `TRIX` inherit EMA's.
-  - `MA`, `MAVP`, `MACDExt`, `APO`, `PPO`, `Stoch`, `StochF` and `StochRSI`
-    inherit the dispatched types'. `StochRSI` also inherits RSI's.
+  - `MA`, `MAVP`, `MACDExt`, `APO`, `PPO`, `Stoch`, `StochF`, `StochRSI` and
+    `BollingerBands(; matype)` inherit the dispatched types'. `StochRSI` also
+    inherits RSI's.
+  - `ADXR` inherits ADX's, `KeltnerChannels` EMA's and ATR's, `SuperTrend`
+    ATR's, and `CVI` and `MassIndex` EMA's (`MassIndex` once per EMA stage).
+  - `ATR`, `NATR`, `PlusDM`, `MinusDM`, `PlusDI`, `MinusDI`, `DX`, `ADX` and
+    `RVI` have their own. At period 1 the DMs and DIs ignore it, as TA-Lib's
+    period-1 arms do.
   - One keyword sets them all, as `TA_FUNC_UNST_ALL` does.
   - For the chained EMAs (`DEMA`, `TEMA`, `MACD`, `TRIX`) the inherited period
     changes the values, not only the first bar: each EMA stage passes its
@@ -421,7 +433,7 @@ The name table's "Tier" column records it.
   - `SMA`, `SUM`, `VAR`, `StdDev`, `Correl`, `VWMA`
   - `WMA`, the `LINEARREG` family
   - `CMF`, `ADR`, `QStick`, `IMI`, `AccBands`, `AD`, `VWAP`
-  - `BollingerBands()` (SMA middle band)
+  - `BollingerBands(:x)`, without `matype` (SMA middle band)
   - `PERCENTILE` (`Quantile`), `PercentRank100`
   - `CCI` and `AVGDEV` (`MeanAbsDev`)
   - `RVOL` (`Sum` and `Last`)
@@ -445,10 +457,13 @@ The name table's "Tier" column records it.
   - recursive filters: the EMA family, Wilder smoothing, `MACD`, `KAMA`, `T3`,
     `MAMA`, the Hilbert family
   - everything with an `matype` keyword: `MA`, `MACDExt`, `APO`/`PPO`/`PVO`,
-    `Stoch*`, `KDJ`, and `BollingerBands(; matype)` with a non-SMA `matype`
-  - path-dependent states: `SAR`, `SuperTrend`, `OBV`
+    `Stoch*`, `KDJ`, and `BollingerBands(:x; matype)`. Passing `matype` at all
+    selects the plain form; without it, `BollingerBands(:x)` is the Group-tier
+    SMA form under a `Bars` window.
+  - path-dependent states: `SAR`, `SARExt`, `SuperTrend`, `OBV`
   - indicators that feed a per-row term needing the previous bar into a window
-    or a recursion: `RSI`/`CMO`, `ATR`, `MFI`, `ULTOSC`, `Beta` returns,
+    or a recursion: `RSI`/`CMO`, `ATR`/`NATR`, the ±DM/±DI/DX/ADX family, `CVI`,
+    `MassIndex`, `RVI`, `KeltnerChannels`, `MFI`, `ULTOSC`, `Beta` returns,
     `Vortex`
   - candlesticks
 
@@ -495,7 +510,7 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
     `Sum` state. `WilderKernel` has TA-Lib's two forms: `:mean` (RMA, RSI, ATR)
     seeds with the average and steps `fma(β, prev, α·x)`, and `:sum` (±DM and
     the TR sum) seeds with the sum of `seedn` bars and steps
-    `prev − prev/period + x`.
+    `prev − prev·(1/period) + x`, multiplying as ta_PLUS_DM.c does.
   - `SMAKernel`: `barwindow` around `Mean`.
   - `GainLossKernel` (S2): the Wilder-smoothed gains and losses behind RSI, CMO
     and StochRSI, two `:mean` `WilderKernel`s over the bar-to-bar moves.
@@ -503,6 +518,14 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
     dependent over `Max`, `Min` and `Last`. It is not `WillR`'s value: %K is
     `(c − l)/(h − l)·100` with no clamp, where WillR is `(h − c)/(h − l)·−100`
     clamped to [−100, 0]. It shares their accumulators, though.
+  - `ATRKernel` (S3): the true range against the previous close, smoothed by a
+    `:mean` `WilderKernel`. ATR, NATR, KeltnerChannels and SuperTrend read it,
+    and sharing `WilderKernel` with RMA keeps TA-Lib's identity
+    `RMA(TRANGE) == ATR`.
+  - `DMKernel` (S3): +DM, −DM and the true range, each smoothed by a `:sum`
+    `WilderKernel` seeded with `period − 1` bars, or kept raw at period 1. The
+    ±DM, ±DI, DX, ADX and ADXR states read it. DX repeats its previous value
+    where it is undefined, and ADX holds, as TA-Lib does.
   - `MAKernel{M}`: the moving-average family behind a type parameter.
     - It is used by `MA`, `MACDExt`, `APO`/`PPO`/`PVO`, `Stoch*`, `KDJ` and
       non-SMA `BollingerBands`.
@@ -571,7 +594,7 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
 | File | Content |
 |---|---|
 | `src/CausalIndicators.jl` | module, includes, exports |
-| `src/kernels/*.jl` | `EMAKernel`, `WilderKernel`, `SMAKernel`, `MAKernel`, `GainLossKernel`, `FastKKernel`, `CandleAverages` |
+| `src/kernels/*.jl` | `EMAKernel`, `WilderKernel`, `SMAKernel`, `MAKernel`, `GainLossKernel`, `FastKKernel`, `ATRKernel`, `DMKernel`, `CandleAverages` |
 | `src/overlap.jl` | moving averages and bands |
 | `src/momentum.jl` | momentum indicators |
 | `src/volatility.jl` | volatility indicators |
@@ -667,6 +690,13 @@ the goldens check every bar.
     also fail on the gap between compensated sums and TA-Lib's drifting running
     sums.
   - Integer outputs must match exactly.
+  - **Variance near zero.** TA-Lib's var.c floors a variance below 1e-12 of
+    the window's mean square to exactly 0. CausalFrames' `Variance` does not, so
+    a flat window can leave a residue (σ ≈ 1.3e-14 at a 1e-6 price level).
+    TA-Lib's exact-zero flat-window checks are therefore held to that floor's
+    bound, σ ≤ 1e-6·level, rather than to 0. RVI's and MassIndex's flat edges
+    stay exact, because a flat series routes nothing to RVI's legs and gives
+    MassIndex an exact ratio of 1.
   - The index forms (`MAXINDEX`, `MININDEX`, `MINMAXINDEX`) skip rows whose
     window holds a tied extreme, where TA-Lib's path-dependent tie-break and
     the upstream most-recent rule may differ (see (d)). Their extracted table
@@ -724,7 +754,8 @@ README rows together, and updates this document where reality differs.
   needed the upstream `MeanAbsDev` (h). **Complete.**
 - **S3:** directional movement and volatility (24): TRange, ATR, NATR, ±DM,
   ±DI, DX, ADX, ADXR, SAR, SARExt, BollingerBands, StdDev, Var, AvgDev,
-  AccBands, Keltner, Donchian, SuperTrend, ADR, CVI, MassIndex, RVI.
+  AccBands, Keltner, Donchian, SuperTrend, ADR, CVI, MassIndex, RVI. VAR and
+  AVGDEV are CausalFrames only. **Complete.**
 - **S4:** statistics and volume (21).
 - **S5:** the TA-Lib 0.8 additions (18): AC, AO, CMOU, Coppock, DPO, ERI, ER,
   FOSC, Fractal, IMI, KDJ, QStick, SMI, TSI, VHF, Vortex, WAD, HeikinAshi.
@@ -739,6 +770,13 @@ prerequisites" in the same PR.
 
 - **Registering CausalFrames**, which would replace the `[sources]` and CI
   workaround with a plain `[compat]` entry.
+- **CausalFrames' windowed `Variance` under a large offset.** It forms
+  `(Σx² − (Σx)²/n)/n`, which cancels when the mean is large against the
+  spread. Values ±1000 around 1e6 lose 1.6% at `Bars(2)`, and a 1e8 level with
+  0.01 steps gives a negative variance (`Std` clamps it to 0). It affects VAR,
+  StdDev, BollingerBands and RVI on high-priced series. test_stddev.c's
+  shift-invariance and VAR non-negativity legs are `@test_broken` until it is
+  fixed upstream.
 
 ## Name table
 
@@ -812,28 +850,28 @@ All 182 in-scope TA-Lib functions. The table is generated from the pinned YAML.
 | `TRIX` | `TRIX` | S2 | new state | plain | real | period=30, unstable=0 | (one column) |
 | `ULTOSC` | `ULTOSC` | S2 | new state | plain | high, low, close | timeperiod1=7, timeperiod2=14, timeperiod3=28 | (one column) |
 | `WILLR` | `WillR` | S2 | dependent: `Max`, `Min`, `Last` | Group | high, low, close | window: Bars(14) | (one column) |
-| `ACCBANDS` | `AccBands` | S3 | dependent (upstream): row-term `Sum`, `Count` | Group | high, low, close | window: Bars(20) | upperband, middleband, lowerband |
-| `ADR` | `ADR` | S3 | dependent (upstream): row-term `Sum`, `Count` | Group | high, low | window: Bars(14) | (one column) |
-| `ADX` | `ADX` | S3 | new state | plain | high, low, close | period=14 | (one column) |
-| `ADXR` | `ADXR` | S3 | new state | plain | high, low, close | period=14 | (one column) |
-| `ATR` | `ATR` | S3 | new state | plain | high, low, close | period=14 | (one column) |
+| `ACCBANDS` | `AccBands` | S3 | dependent (upstream): `Mean` of row terms and of the close | Group | high, low, close | window: Bars(20) | upperband, middleband, lowerband |
+| `ADR` | `ADR` | S3 | dependent (upstream): `Mean` of a row term | Group | high, low | window: Bars(14) | (one column) |
+| `ADX` | `ADX` | S3 | new state (`DMKernel`) | plain | high, low, close | period=14, unstable=0 | (one column) |
+| `ADXR` | `ADXR` | S3 | new state (`DMKernel`, `First` of its ADX) | plain | high, low, close | period=14, unstable=0 | (one column) |
+| `ATR` | `ATR` | S3 | new state (`ATRKernel`) | plain | high, low, close | period=14, unstable=0 | (one column) |
 | `AVGDEV` | `MeanAbsDev(:x)` | S3 | CausalFrames only: `MeanAbsDev` | Group | real | window: Bars(14) | (one column) |
-| `BBANDS` | `BollingerBands` | S3 | dependent: `Mean`, `Std` (no `matype`); new state with `matype` | Group / plain | real | window: Bars(20), nbdevup=2, nbdevdn=2; with `matype`: period=20, matype=:sma | upperband, middleband, lowerband |
-| `CVI` | `CVI` | S3 | new state | plain | high, low | period=10, rocperiod=10 | (one column) |
+| `BBANDS` | `BollingerBands` | S3 | dependent: `Mean`, `Std` (no `matype`); new state with `matype` | Group / plain | real | window: Bars(20), nbdevup=2, nbdevdn=2; with `matype`: period=20, unstable=0 | upperband, middleband, lowerband |
+| `CVI` | `CVI` | S3 | new state | plain | high, low | period=10, rocperiod=10, unstable=0 | (one column) |
 | `DONCHIAN` | `Donchian` | S3 | dependent: `Max`, `Min` | Group | high, low | window: Bars(20) | upperband, middleband, lowerband |
-| `DX` | `DX` | S3 | new state | plain | high, low, close | period=14 | (one column) |
-| `KC` | `KeltnerChannels` | S3 | new state | plain | high, low, close | period=20, atrperiod=10, nbdev=2 | upperband, middleband, lowerband |
-| `MASSI` | `MassIndex` | S3 | new state | plain | high, low | fastperiod=9, slowperiod=25 | (one column) |
-| `MINUS_DI` | `MinusDI` | S3 | new state | plain | high, low, close | period=14 | (one column) |
-| `MINUS_DM` | `MinusDM` | S3 | new state | plain | high, low | period=14 | (one column) |
-| `NATR` | `NATR` | S3 | new state | plain | high, low, close | period=14 | (one column) |
-| `PLUS_DI` | `PlusDI` | S3 | new state | plain | high, low, close | period=14 | (one column) |
-| `PLUS_DM` | `PlusDM` | S3 | new state | plain | high, low | period=14 | (one column) |
-| `RVI` | `RVI` | S3 | new state | plain | real | period=14, stddevperiod=10 | (one column) |
+| `DX` | `DX` | S3 | new state (`DMKernel`) | plain | high, low, close | period=14, unstable=0 | (one column) |
+| `KC` | `KeltnerChannels` | S3 | new state | plain | high, low, close | period=20, atrperiod=10, nbdev=2, unstable=0 | upperband, middleband, lowerband |
+| `MASSI` | `MassIndex` | S3 | new state | plain | high, low | fastperiod=9, slowperiod=25, unstable=0 | (one column) |
+| `MINUS_DI` | `MinusDI` | S3 | new state (`DMKernel`) | plain | high, low, close | period=14, unstable=0 | (one column) |
+| `MINUS_DM` | `MinusDM` | S3 | new state (`DMKernel`) | plain | high, low | period=14, unstable=0 | (one column) |
+| `NATR` | `NATR` | S3 | new state (`ATRKernel`) | plain | high, low, close | period=14, unstable=0 | (one column) |
+| `PLUS_DI` | `PlusDI` | S3 | new state (`DMKernel`) | plain | high, low, close | period=14, unstable=0 | (one column) |
+| `PLUS_DM` | `PlusDM` | S3 | new state (`DMKernel`) | plain | high, low | period=14, unstable=0 | (one column) |
+| `RVI` | `RVI` | S3 | new state (`Std` window, two `WilderKernel`s) | plain | real | period=14, stddevperiod=10, unstable=0 | (one column) |
 | `SAR` | `SAR` | S3 | new state | plain | high, low | acceleration=0.02, maximum=0.2 | (one column) |
-| `SAREXT` | `SARExt` | S3 | new state | plain | high, low | startvalue=0, offsetonreverse=0, accelerationinitlong=0.02, accelerationlong=0.02, accelerationmaxlong=0.2, accelerationinitshort=0.02, accelerationshort=0.02, accelerationmaxshort=0.2 | (one column) |
+| `SAREXT` | `SARExt` | S3 | new state (shared with `SAR`) | plain | high, low | startvalue=0, offsetonreverse=0, accelerationinitlong=0.02, accelerationlong=0.02, accelerationmaxlong=0.2, accelerationinitshort=0.02, accelerationshort=0.02, accelerationmaxshort=0.2 | (one column) |
 | `STDDEV` | `StdDev` | S3 | dependent: `Std(corrected=false)` | Group | real | window: Bars(5), nbdev=1 | (one column) |
-| `SUPERTREND` | `SuperTrend` | S3 | new state | plain | high, low, close | period=10, multiplier=3.0 | supertrend, trend |
+| `SUPERTREND` | `SuperTrend` | S3 | new state (`ATRKernel`) | plain | high, low, close | period=10, multiplier=3.0, unstable=0 | supertrend, trend (`Int`) |
 | `TRANGE` | `TRange` | S3 | dependent: `Last`, `First` | Group | high, low, close | window: Bars(2) (fixed) | (one column) |
 | `VAR` | `Variance(:x; corrected=false)` | S3 | CausalFrames only: `Variance(corrected=false)` | Group | real | window: Bars(5) (TA-Lib ignores nbdev) | (one column) |
 | `AD` | `AD` | S4 | dependent (upstream): row-term `Sum` (no window) | Group | high, low, close, volume | no window (`addsummarycolumns`) | (one column) |

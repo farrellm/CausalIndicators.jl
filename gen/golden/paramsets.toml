@@ -157,3 +157,70 @@ ROC = [{optInTimePeriod = 1}, {optInTimePeriod = 14}]
 ROCP = [{optInTimePeriod = 1}, {optInTimePeriod = 14}]
 ROCR = [{optInTimePeriod = 1}, {optInTimePeriod = 14}]
 ROCR100 = [{optInTimePeriod = 1}, {optInTimePeriod = 14}]
+
+# S3. MA types use TA_MAType's order (see MA above).
+ATR = [{optInTimePeriod = 1}, {optInTimePeriod = 2}, {optInTimePeriod = 14, unstable = 1}]
+NATR = [{optInTimePeriod = 1}, {optInTimePeriod = 5}, {optInTimePeriod = 14, unstable = 2}]
+PLUS_DM = [{optInTimePeriod = 1}, {optInTimePeriod = 2}, {optInTimePeriod = 14, unstable = 2}]
+MINUS_DM = [{optInTimePeriod = 1}, {optInTimePeriod = 2}, {optInTimePeriod = 14, unstable = 2}]
+PLUS_DI = [{optInTimePeriod = 1}, {optInTimePeriod = 2}, {optInTimePeriod = 14, unstable = 2}]
+MINUS_DI = [{optInTimePeriod = 1}, {optInTimePeriod = 2}, {optInTimePeriod = 14, unstable = 2}]
+DX = [{optInTimePeriod = 2}, {optInTimePeriod = 5}, {optInTimePeriod = 14, unstable = 2}]
+ADX = [{optInTimePeriod = 2}, {optInTimePeriod = 5}, {optInTimePeriod = 14, unstable = 2}]
+ADXR = [{optInTimePeriod = 2}, {optInTimePeriod = 5}, {optInTimePeriod = 14, unstable = 2}]
+SAR = [
+    {optInAcceleration = 0.01, optInMaximum = 0.1},
+    {optInAcceleration = 0.3, optInMaximum = 0.2},
+]
+SAREXT = [
+    {optInStartValue = 90.0},
+    {optInStartValue = -110.0},
+    {optInOffsetOnReverse = 0.01},
+    {optInAccelerationInitLong = 0.01, optInAccelerationLong = 0.03, optInAccelerationMaxLong = 0.3, optInAccelerationInitShort = 0.04, optInAccelerationShort = 0.01, optInAccelerationMaxShort = 0.1},
+    {optInAccelerationInitLong = 0.5, optInAccelerationMaxLong = 0.2},
+]
+BBANDS = [
+    {optInNbDevUp = 1.0, optInNbDevDn = 1.0, optInMAType = 1},
+    {optInNbDevUp = 1.5, optInNbDevDn = 1.0, optInMAType = 1},
+    {optInNbDevUp = 1.0, optInNbDevDn = 1.5, optInMAType = 1},
+    {optInMAType = 1},
+    {optInTimePeriod = 5, optInNbDevUp = 1.5, optInNbDevDn = 2.5},
+    {optInMAType = 1, unstable = 3},
+    {optInTimePeriod = 10, optInMAType = 6},
+    {optInTimePeriod = 2, optInMAType = 2},
+]
+STDDEV = [{optInTimePeriod = 2}, {optInNbDev = 1.5}, {optInTimePeriod = 20, optInNbDev = 2.0}]
+VAR = [{optInTimePeriod = 1}, {optInTimePeriod = 2}, {optInTimePeriod = 20}]
+AVGDEV = [{optInTimePeriod = 2}, {optInTimePeriod = 5}, {optInTimePeriod = 30}]
+ACCBANDS = [{optInTimePeriod = 2}, {optInTimePeriod = 14}]
+KC = [
+    {optInTimePeriod = 8, optInATRPeriod = 4, optInNbDev = 1.5},
+    {optInTimePeriod = 4, optInATRPeriod = 10},
+    {optInTimePeriod = 4, optInATRPeriod = 4, optInNbDev = 3.0},
+    {optInTimePeriod = 10, optInATRPeriod = 10, optInNbDev = 0.0},
+    {optInTimePeriod = 8, optInATRPeriod = 12, unstable = 2},
+]
+DONCHIAN = [{optInTimePeriod = 2}, {optInTimePeriod = 14}]
+SUPERTREND = [
+    {optInTimePeriod = 7, optInMultiplier = 2.0},
+    {optInTimePeriod = 10, optInMultiplier = 1.0},
+    {optInTimePeriod = 2, optInMultiplier = 0.0},
+    {optInTimePeriod = 5, optInMultiplier = 1.5, unstable = 2},
+]
+ADR = [{optInTimePeriod = 1}, {optInTimePeriod = 2}, {optInTimePeriod = 20}]
+CVI = [
+    {optInTimePeriod = 5, optInROCPeriod = 5},
+    {optInTimePeriod = 2, optInROCPeriod = 1},
+    {optInTimePeriod = 10, optInROCPeriod = 14, unstable = 3},
+]
+MASSI = [
+    {optInFastPeriod = 2, optInSlowPeriod = 2},
+    {optInFastPeriod = 25, optInSlowPeriod = 3},
+    {optInFastPeriod = 9, optInSlowPeriod = 25, unstable = 2},
+]
+RVI = [
+    {optInTimePeriod = 1, optInStdDevPeriod = 10},
+    {optInTimePeriod = 3, optInStdDevPeriod = 2},
+    {optInTimePeriod = 14, optInStdDevPeriod = 30},
+    {optInTimePeriod = 14, optInStdDevPeriod = 10, unstable = 4},
+]
