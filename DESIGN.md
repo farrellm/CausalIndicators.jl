@@ -101,7 +101,7 @@ table records which:
      `MAXINDEX`/`MININDEX`/`MINMAXINDEX` → `MaxIndex`/`MinIndex`,
      `VAR` → `Variance(corrected = false)`, `CORREL` → `Correlation`,
      `PERCENTILE` → `Quantile(percentile / 100; interpolation = :nearestrank)`,
-     all under `Bars(period)`
+     `AVGDEV` → `MeanAbsDev`, all under `Bars(period)`
    - `CUMSUM` → `Sum` under `addsummarycolumns`, with no window
 
    CausalFrames bakes `corrected` into the state type, not the output name. So
@@ -123,6 +123,7 @@ table records which:
      `Bars(2)`.
    - `AvgPrice` reads `Last` of four columns.
    - `PercentRank100` is `100 · PercentRank` over `Bars(period + 1)`.
+   - `CCI` reads `Mean`, `MeanAbsDev` and `Last` of the typical price.
 3. **Move it into CausalFrames.** If an indicator needs a *generic* accumulator
    or operator that CausalFrames lacks, it is first added to CausalFrames as a
    prerequisite PR, with its own tests, docs and DESIGN.md entry. The indicator
@@ -134,8 +135,8 @@ table records which:
 The rule also binds internal code:
 
 - **Windows inside recursive indicators.** Some recursive indicators need a
-  window sum, mean or extremum, such as KAMA's volatility sum, CCI's mean, AO's
-  two means and Stoch's %K range. They embed CausalFrames states through
+  window sum, mean or extremum, such as KAMA's volatility sum, MFI's flow sums,
+  AO's two means and Stoch's %K range. They embed CausalFrames states through
   `CausalFrames.barwindow` (g). They never hand-roll a compensated sum, a ring
   buffer or a monotone deque.
 - **Linear regression.** CausalFrames already has `LinearRegression`, but it
@@ -146,8 +147,9 @@ The rule also binds internal code:
 
 ### Upstream prerequisites
 
-These were added to CausalFrames as stage S0, which is complete as of
-CausalFrames `1e1442d`. Each entry gives the public name it landed under.
+Items (a)–(g) were added to CausalFrames as stage S0, which is complete as of
+CausalFrames `1e1442d`. Item (h) was added ahead of S2. Each entry gives the
+public name it landed under.
 
 a. **`warmup(lookback, f)`** (#84). This is a transform of transforms: it runs
    `f(p)` over `[start − lookback, stop)` and drops the output rows with
@@ -216,6 +218,9 @@ d. **`MaxIndex`/`MinIndex`** (#85), with `MaxWithIndex`/`MinWithIndex`, which
      `MaxIndex`/`MinIndex` emit exactly their value (as bars since the
      extreme) under `Bars(n)`, so a TA-Lib-named constructor would be an
      alias. `Aroon` and `AroonOsc` are dependents over them.
+   - **Aroon matches exactly.** aroon.c and aroonosc.c take a tie with `<=`
+     and `>=` both when they rescan and when they step, so the newest tie
+     always wins. That is the upstream rule, so no Aroon row is skipped.
 
 e. **Row terms** (#80). Every summarizer that reads a column also accepts a
    named row function (`Sum(:mfv => r -> clv(r) * r.volume)`). The output is
@@ -255,8 +260,17 @@ g. **`CausalFrames.barwindow(s, n, intypes)`, a count-window state** (#81),
      state holding one takes its type as a type parameter.
 
    Recursive states cannot get a window through a transform, so they use this.
-   Its users are KAMA, CCI, AvgDev, AO, TRIMA, the Stoch family's %K,
-   `MAKernel`'s `:sma`, non-SMA `BollingerBands` and `CandleAverages`.
+   Its users are KAMA, MFI, ULTOSC, AO, TRIMA, the Stoch family's %K,
+   `MAKernel`'s `:sma` and `:wma`, non-SMA `BollingerBands` and
+   `CandleAverages`.
+
+h. **`MeanAbsDev(column)`**, the mean absolute deviation about the mean,
+   `Σ|x − mean| / n`. It is a fieldless dependent over `SortedValues` (f) and
+   `Mean`, so it stays a group, and each emission scans the window once, which
+   is TA-Lib's cost too. It is exactly TA-Lib's `AVGDEV`, which is therefore
+   CausalFrames only (case 1), and it is the deviation `CCI` reads (case 2).
+   Without it, both would have needed a hand-rolled ring of the window's
+   values.
 
 ## Model
 
@@ -320,10 +334,15 @@ given parameters.
 
 - **`unstable`.** The keyword defaults to 0. It exists on every function whose
   YAML carries `unstable_period`, and on every function whose lookback
-  inherits one through TA-Lib's calls. `DEMA`, `TEMA` and `ZLEMA` inherit
-  EMA's, and `MA` and `MAVP` inherit the dispatched type's. For `DEMA` and
-  `TEMA` the inherited period changes the values, not only the first bar:
-  each EMA stage passes its unstable bars before it feeds the next.
+  inherits one through TA-Lib's calls.
+  - `DEMA`, `TEMA`, `ZLEMA`, `MACD`, `MACDFix` and `TRIX` inherit EMA's.
+  - `MA`, `MAVP`, `MACDExt`, `APO`, `PPO`, `Stoch`, `StochF` and `StochRSI`
+    inherit the dispatched types'. `StochRSI` also inherits RSI's.
+  - One keyword sets them all, as `TA_FUNC_UNST_ALL` does.
+  - For the chained EMAs (`DEMA`, `TEMA`, `MACD`, `TRIX`) the inherited period
+    changes the values, not only the first bar: each EMA stage passes its
+    unstable bars before it feeds the next.
+
   Setting `unstable = k` reproduces exactly the rows TA-Lib emits under
   `TA_SetUnstablePeriod(…, k)`, which is how the unstable-period test rows are
   checked.
@@ -402,11 +421,13 @@ The name table's "Tier" column records it.
   - `CMF`, `ADR`, `QStick`, `IMI`, `AccBands`, `AD`, `VWAP`
   - `BollingerBands()` (SMA middle band)
   - `PERCENTILE` (`Quantile`), `PercentRank100`
+  - `CCI` and `AVGDEV` (`MeanAbsDev`)
   - `RVOL` (`Sum` and `Last`)
   - the bar-local price transforms (`AvgPrice`, `MedPrice`, `TypPrice`,
     `WclPrice`, `BOP`, `MarketFI`), which are `Last`-dependents
   - `MAX`/`MIN`/`MINMAX` and the index forms
-  - `MidPoint`, `MidPrice`, `Donchian`, `WillR`, `Aroon`/`AroonOsc`
+  - `MidPoint`, `MidPrice`, `Donchian`, `WillR`
+  - `Aroon`/`AroonOsc` (`MaxIndex`/`MinIndex` and `Count`)
   - `MOM`/`ROC*` (`First`/`Last`)
   - `TRange` (`First`/`Last` under `Bars(2)`)
 
@@ -424,9 +445,9 @@ The name table's "Tier" column records it.
   - everything with an `matype` keyword: `MA`, `MACDExt`, `APO`/`PPO`/`PVO`,
     `Stoch*`, `KDJ`, and `BollingerBands(; matype)` with a non-SMA `matype`
   - path-dependent states: `SAR`, `SuperTrend`, `OBV`
-  - mean-deviation indicators: `CCI`, `AvgDev`
   - indicators that feed a per-row term needing the previous bar into a window
-    or a recursion: `ATR`, `MFI`, `Beta` returns, `Vortex`
+    or a recursion: `RSI`/`CMO`, `ATR`, `MFI`, `ULTOSC`, `Beta` returns,
+    `Vortex`
   - candlesticks
 
   A plain indicator that needs a window takes TA-Lib's `period` keyword and
@@ -454,8 +475,10 @@ TA-Lib's default window is listed as `window: Bars(n)` in the name table.
   `RVOL`, which compares the current bar with the mean of the `period` bars
   before it, reads `Sum` and `Last` and computes that mean as
   `(Sum − Last) / period`. `PercentRank100` ranks the current bar against the
-  `period` bars before it. In every case the window includes the current bar, so
-  TA-Lib's `period = p` is `Bars(p + 1)`, and their docstrings say so.
+  `period` bars before it. `Aroon` and `AroonOsc` find the extremes over the
+  current bar and the `period` before it, and read `period` back as the
+  window's `Count` minus one. In every case the window includes the current
+  bar, so TA-Lib's `period = p` is `Bars(p + 1)`, and their docstrings say so.
 - **`TRange`** is fixed at `Bars(2)`. Its TA-Lib lookback of 1 comes from the
   partial-window rule.
 
@@ -472,6 +495,12 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
     the TR sum) seeds with the sum of `seedn` bars and steps
     `prev − prev/period + x`.
   - `SMAKernel`: `barwindow` around `Mean`.
+  - `GainLossKernel` (S2): the Wilder-smoothed gains and losses behind RSI, CMO
+    and StochRSI, two `:mean` `WilderKernel`s over the bar-to-bar moves.
+  - `FastKKernel` (S2): the stochastic %K, a `barwindow` around an internal
+    dependent over `Max`, `Min` and `Last`. It is not `WillR`'s value: %K is
+    `(c − l)/(h − l)·100` with no clamp, where WillR is `(h − c)/(h − l)·−100`
+    clamped to [−100, 0]. It shares their accumulators, though.
   - `MAKernel{M}`: the moving-average family behind a type parameter.
     - It is used by `MA`, `MACDExt`, `APO`/`PPO`/`PVO`, `Stoch*`, `KDJ` and
       non-SMA `BollingerBands`.
@@ -540,7 +569,7 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
 | File | Content |
 |---|---|
 | `src/CausalIndicators.jl` | module, includes, exports |
-| `src/kernels/*.jl` | `EMAKernel`, `WilderKernel`, `SMAKernel`, `MAKernel`, `CandleAverages` |
+| `src/kernels/*.jl` | `EMAKernel`, `WilderKernel`, `SMAKernel`, `MAKernel`, `GainLossKernel`, `FastKKernel`, `CandleAverages` |
 | `src/overlap.jl` | moving averages and bands |
 | `src/momentum.jl` | momentum indicators |
 | `src/volatility.jl` | volatility indicators |
@@ -636,10 +665,11 @@ the goldens check every bar.
     also fail on the gap between compensated sums and TA-Lib's drifting running
     sums.
   - Integer outputs must match exactly.
-  - The index forms (`MAXINDEX`, `MININDEX`, `MINMAXINDEX`, `AROON`,
-    `AROONOSC`) skip rows whose window holds a tied extreme, where TA-Lib's
-    path-dependent tie-break and the upstream most-recent rule may differ (see
-    (d)). The extracted table rows skip them too.
+  - The index forms (`MAXINDEX`, `MININDEX`, `MINMAXINDEX`) skip rows whose
+    window holds a tied extreme, where TA-Lib's path-dependent tie-break and
+    the upstream most-recent rule may differ (see (d)). Their extracted table
+    rows check only shape. `AROON` and `AROONOSC` share the upstream rule and
+    skip nothing.
 - **Running it.** The generator runs by hand when the pin moves. It is not
   built in CI, so CI needs no C toolchain.
 
@@ -688,7 +718,8 @@ README rows together, and updates this document where reality differs.
   `SUM`, `CUMSUM`, `MAX`, `MIN`, `MINMAX`, `MAXINDEX`, `MININDEX`,
   `MINMAXINDEX`). **Complete.**
 - **S2:** momentum I (23): the MOM/ROC family, RSI, CMO, the MACD family,
-  APO/PPO, TRIX, the stochastics, WillR, CCI, BOP, Aroon, ULTOSC, MFI.
+  APO/PPO, TRIX, the stochastics, WillR, CCI, BOP, Aroon, ULTOSC, MFI. It
+  needed the upstream `MeanAbsDev` (h). **Complete.**
 - **S3:** directional movement and volatility (24): TRange, ATR, NATR, ±DM,
   ±DI, DX, ADX, ADXR, SAR, SARExt, BollingerBands, StdDev, Var, AvgDev,
   AccBands, Keltner, Donchian, SuperTrend, ADR, CVI, MassIndex, RVI.
@@ -756,27 +787,27 @@ All 182 in-scope TA-Lib functions. The table is generated from the pinned YAML.
 | `WCLPRICE` | `WclPrice` | S1 | dependent: `Last` | Group | high, low, close | any window (bar-local) | (one column) |
 | `WMA` | `WMA` | S1 | dependent (upstream): `AgeWeightedSum`, `Sum`, `Count` | Group | real | window: Bars(30) | (one column) |
 | `ZLEMA` | `ZLEMA` | S1 | new state | plain | real | period=30, unstable=0 | (one column) |
-| `APO` | `APO` | S2 | new state | plain | real | fastperiod=12, slowperiod=26, matype=:ema | (one column) |
-| `AROON` | `Aroon` | S2 | dependent (upstream): `MaxIndex`, `MinIndex` | Group | high, low | window: Bars(14) | aroondown, aroonup |
-| `AROONOSC` | `AroonOsc` | S2 | dependent (upstream): `MaxIndex`, `MinIndex` | Group | high, low | window: Bars(14) | (one column) |
+| `APO` | `APO` | S2 | new state | plain | real | fastperiod=12, slowperiod=26, matype=:ema, unstable=0 | (one column) |
+| `AROON` | `Aroon` | S2 | dependent (upstream): `MaxIndex`, `MinIndex`, `Count` | Group | high, low | window: Bars(15) (period + 1) | aroondown, aroonup |
+| `AROONOSC` | `AroonOsc` | S2 | dependent (upstream): `MaxIndex`, `MinIndex`, `Count` | Group | high, low | window: Bars(15) (period + 1) | (one column) |
 | `BOP` | `BOP` | S2 | dependent: `Last` | Group | open, high, low, close | any window (bar-local) | (one column) |
-| `CCI` | `CCI` | S2 | new state (mean deviation needs the window) | plain | high, low, close | period=14 | (one column) |
-| `CMO` | `CMO` | S2 | new state | plain | real | period=14 | (one column) |
-| `MACD` | `MACD` | S2 | new state | plain | real | fastperiod=12, slowperiod=26, signalperiod=9 | macd, macdsignal, macdhist |
-| `MACDEXT` | `MACDExt` | S2 | new state | plain | real | fastperiod=12, fastmatype=:sma, slowperiod=26, slowmatype=:sma, signalperiod=9, signalmatype=:sma | macd, macdsignal, macdhist |
-| `MACDFIX` | `MACDFix` | S2 | new state | plain | real | signalperiod=9 | macd, macdsignal, macdhist |
+| `CCI` | `CCI` | S2 | dependent (upstream): `Mean`, `MeanAbsDev`, `Last` of the typical price | Group | high, low, close | window: Bars(14) | (one column) |
+| `CMO` | `CMO` | S2 | new state | plain | real | period=14, unstable=0 | (one column) |
+| `MACD` | `MACD` | S2 | new state | plain | real | fastperiod=12, slowperiod=26, signalperiod=9, unstable=0 | macd, macdsignal, macdhist |
+| `MACDEXT` | `MACDExt` | S2 | new state | plain | real | fastperiod=12, fastmatype=:sma, slowperiod=26, slowmatype=:sma, signalperiod=9, signalmatype=:sma, unstable=0 | macd, macdsignal, macdhist |
+| `MACDFIX` | `MACDFix` | S2 | new state (fixed k = 0.15, 0.075) | plain | real | signalperiod=9, unstable=0 | macd, macdsignal, macdhist |
 | `MFI` | `MFI` | S2 | new state | plain | high, low, close, volume | period=14 | (one column) |
-| `MOM` | `MOM` | S2 | dependent: `First`, `Last` | Group | real | window: Bars(11) | (one column) |
-| `PPO` | `PPO` | S2 | new state | plain | real | fastperiod=12, slowperiod=26, matype=:ema | (one column) |
-| `ROC` | `ROC` | S2 | dependent: `First`, `Last` | Group | real | window: Bars(11) | (one column) |
-| `ROCP` | `ROCP` | S2 | dependent: `First`, `Last` | Group | real | window: Bars(11) | (one column) |
-| `ROCR` | `ROCR` | S2 | dependent: `First`, `Last` | Group | real | window: Bars(11) | (one column) |
-| `ROCR100` | `ROCR100` | S2 | dependent: `First`, `Last` | Group | real | window: Bars(11) | (one column) |
-| `RSI` | `RSI` | S2 | new state | plain | real | period=14 | (one column) |
-| `STOCH` | `Stoch` | S2 | new state | plain | high, low, close | fastkperiod=5, slowkperiod=3, slowkmatype=:sma, slowdperiod=3, slowdmatype=:sma | slowk, slowd |
-| `STOCHF` | `StochF` | S2 | new state (%K is `WillR`'s dependent) | plain | high, low, close | fastkperiod=5, fastdperiod=3, fastdmatype=:sma | fastk, fastd |
-| `STOCHRSI` | `StochRSI` | S2 | new state | plain | real | period=14, fastkperiod=5, fastdperiod=3, fastdmatype=:sma | fastk, fastd |
-| `TRIX` | `TRIX` | S2 | new state | plain | real | period=30 | (one column) |
+| `MOM` | `MOM` | S2 | dependent: `First`, `Last` | Group | real | window: Bars(11) (period + 1) | (one column) |
+| `PPO` | `PPO` | S2 | new state | plain | real | fastperiod=12, slowperiod=26, matype=:ema, unstable=0 | (one column) |
+| `ROC` | `ROC` | S2 | dependent: `First`, `Last` | Group | real | window: Bars(11) (period + 1) | (one column) |
+| `ROCP` | `ROCP` | S2 | dependent: `First`, `Last` | Group | real | window: Bars(11) (period + 1) | (one column) |
+| `ROCR` | `ROCR` | S2 | dependent: `First`, `Last` | Group | real | window: Bars(11) (period + 1) | (one column) |
+| `ROCR100` | `ROCR100` | S2 | dependent: `First`, `Last` | Group | real | window: Bars(11) (period + 1) | (one column) |
+| `RSI` | `RSI` | S2 | new state | plain | real | period=14, unstable=0 | (one column) |
+| `STOCH` | `Stoch` | S2 | new state (%K over `Max`, `Min`, `Last`) | plain | high, low, close | fastkperiod=5, slowkperiod=3, slowkmatype=:sma, slowdperiod=3, slowdmatype=:sma, unstable=0 | slowk, slowd |
+| `STOCHF` | `StochF` | S2 | new state (%K over `Max`, `Min`, `Last`) | plain | high, low, close | fastkperiod=5, fastdperiod=3, fastdmatype=:sma, unstable=0 | fastk, fastd |
+| `STOCHRSI` | `StochRSI` | S2 | new state | plain | real | period=14, fastkperiod=5, fastdperiod=3, fastdmatype=:sma, unstable=0 | fastk, fastd |
+| `TRIX` | `TRIX` | S2 | new state | plain | real | period=30, unstable=0 | (one column) |
 | `ULTOSC` | `ULTOSC` | S2 | new state | plain | high, low, close | timeperiod1=7, timeperiod2=14, timeperiod3=28 | (one column) |
 | `WILLR` | `WillR` | S2 | dependent: `Max`, `Min`, `Last` | Group | high, low, close | window: Bars(14) | (one column) |
 | `ACCBANDS` | `AccBands` | S3 | dependent (upstream): row-term `Sum`, `Count` | Group | high, low, close | window: Bars(20) | upperband, middleband, lowerband |
@@ -784,7 +815,7 @@ All 182 in-scope TA-Lib functions. The table is generated from the pinned YAML.
 | `ADX` | `ADX` | S3 | new state | plain | high, low, close | period=14 | (one column) |
 | `ADXR` | `ADXR` | S3 | new state | plain | high, low, close | period=14 | (one column) |
 | `ATR` | `ATR` | S3 | new state | plain | high, low, close | period=14 | (one column) |
-| `AVGDEV` | `AvgDev` | S3 | new state (mean deviation needs the window) | plain | real | period=14 | (one column) |
+| `AVGDEV` | `MeanAbsDev(:x)` | S3 | CausalFrames only: `MeanAbsDev` | Group | real | window: Bars(14) | (one column) |
 | `BBANDS` | `BollingerBands` | S3 | dependent: `Mean`, `Std` (no `matype`); new state with `matype` | Group / plain | real | window: Bars(20), nbdevup=2, nbdevdn=2; with `matype`: period=20, matype=:sma | upperband, middleband, lowerband |
 | `CVI` | `CVI` | S3 | new state | plain | high, low | period=10, rocperiod=10 | (one column) |
 | `DONCHIAN` | `Donchian` | S3 | dependent: `Max`, `Min` | Group | high, low | window: Bars(20) | upperband, middleband, lowerband |

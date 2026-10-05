@@ -259,7 +259,7 @@ function checkstreaming(s, table; window = nothing, timewindow = nothing,
 
     if window !== nothing
         # The re-fold path: the same summarizers, wrapped so no tier applies.
-        refold = foldseries(map(Refold, tosummarizers(s)), cols; window)
+        refold = foldseries(map(refolded, tosummarizers(s)), cols; window)
         for o in outs
             @test isapprox(collect(skipmissing(refold[o])), collect(skipmissing(whole[o]));
                 rtol = 1e-9, atol = goldenatol(skipmissing(first(cols))))
@@ -291,8 +291,18 @@ CausalFrames.emptyvalue(o::Refold) = CausalFrames.emptyvalue(o.inner)
 CausalFrames.fresh(o::Refold, intypes::NamedTuple) = CausalFrames.fresh(o.inner, intypes)
 CausalFrames.dependencies(o::Refold) = map(Refold, CausalFrames.dependencies(o.inner))
 
-# The decimals a table value was written with, which set its tolerance.
-decimals(v) = (s = string(v); occursin('.', s) ? length(s) - findlast('.', s) : 0)
+# Wrap a summarizer that carries row terms inside its terms, which must stay
+# outermost.
+refolded(s) = Refold(s)
+refolded(t::CausalFrames.Termed) = CausalFrames.Termed(Refold(t.summarizer), t.terms)
+
+# The decimals a table value was written with, which set its tolerance. The
+# extractor evaluates the C literals, so a value can carry a representation
+# error (0.7333000000000001); 15 significant digits recover the literal.
+decimals(v) = (
+    s = string(round(v; sigdigits = 15));
+    occursin('.', s) ? length(s) - findlast('.', s) : 0
+)
 
 """
     tablerun(run, data, startidx, endidx, lookback) -> Vector

@@ -75,3 +75,85 @@ MININDEX = [{optInTimePeriod = 14}]
 MINMAXINDEX = [{optInTimePeriod = 14}]
 MIDPOINT = [{optInTimePeriod = 2}, {optInTimePeriod = 30}]
 MIDPRICE = [{optInTimePeriod = 19}, {optInTimePeriod = 21}, {optInTimePeriod = 30}]
+
+# S2. MA types use TA_MAType's order (see MA above).
+RSI = [
+    {optInTimePeriod = 2},
+    {optInTimePeriod = 5},
+    {optInTimePeriod = 14, unstable = 1},
+    {optInTimePeriod = 14, unstable = 2},
+]
+CMO = [{optInTimePeriod = 5}, {optInTimePeriod = 14, unstable = 2}]
+MACD = [
+    {optInFastPeriod = 26, optInSlowPeriod = 12},
+    {optInFastPeriod = 5, optInSlowPeriod = 13, optInSignalPeriod = 4},
+    {optInSignalPeriod = 1},
+    {unstable = 2},
+    {optInSignalPeriod = 1, unstable = 2},
+]
+MACDFIX = [{optInSignalPeriod = 1}, {optInSignalPeriod = 4}, {unstable = 2}]
+MACDEXT = [
+    {optInFastMAType = 1, optInSlowMAType = 1, optInSignalMAType = 1},
+    {optInFastMAType = 1, optInSlowMAType = 1, optInSignalMAType = 1, unstable = 2},
+    {optInFastMAType = 1, optInSlowMAType = 1, optInSignalMAType = 1, optInSignalPeriod = 1},
+    {optInFastPeriod = 26, optInFastMAType = 2, optInSlowPeriod = 12, optInSlowMAType = 0},
+    {optInFastMAType = 6, optInSlowMAType = 1, optInSignalMAType = 0},
+    {optInFastMAType = 3, optInSlowMAType = 4, optInSignalMAType = 8, unstable = 1},
+]
+APO = [
+    {optInMAType = 0},
+    {optInFastPeriod = 26, optInSlowPeriod = 12, optInMAType = 0},
+    {optInMAType = 6},
+    {unstable = 3},
+]
+PPO = [
+    {optInFastPeriod = 2, optInSlowPeriod = 3, optInMAType = 0},
+    {optInFastPeriod = 3, optInSlowPeriod = 2, optInMAType = 0},
+    {optInMAType = 0},
+    {optInFastPeriod = 26, optInSlowPeriod = 12},
+    {optInMAType = 3, unstable = 2},
+]
+TRIX = [
+    {optInTimePeriod = 1},
+    {optInTimePeriod = 5},
+    {optInTimePeriod = 14, unstable = 2},
+]
+STOCH = [
+    {optInSlowD_Period = 4},
+    {optInSlowK_MAType = 1, optInSlowD_MAType = 1},
+    {optInSlowK_MAType = 1, optInSlowD_MAType = 2, unstable = 2},
+    {optInFastK_Period = 1, optInSlowK_Period = 1, optInSlowD_Period = 1},
+    {optInFastK_Period = 14, optInSlowK_MAType = 6, optInSlowD_MAType = 8},
+]
+STOCHF = [
+    {optInFastD_Period = 1},
+    {optInFastD_MAType = 1, unstable = 2},
+    {optInFastK_Period = 14, optInFastD_MAType = 4},
+]
+STOCHRSI = [
+    {optInTimePeriod = 14, optInFastK_Period = 14, optInFastD_Period = 1},
+    {optInTimePeriod = 14, optInFastK_Period = 45, optInFastD_Period = 1},
+    {optInTimePeriod = 11, optInFastK_Period = 13, optInFastD_Period = 16},
+    {optInFastD_MAType = 1, unstable = 2},
+]
+WILLR = [{optInTimePeriod = 2}, {optInTimePeriod = 30}]
+CCI = [{optInTimePeriod = 2}, {optInTimePeriod = 5}, {optInTimePeriod = 11}]
+ULTOSC = [
+    {optInTimePeriod1 = 14, optInTimePeriod2 = 7, optInTimePeriod3 = 28},
+    {optInTimePeriod1 = 1, optInTimePeriod2 = 1, optInTimePeriod3 = 1},
+    {optInTimePeriod1 = 2, optInTimePeriod2 = 3, optInTimePeriod3 = 4},
+]
+MFI = [
+    {optInTimePeriod = 2},
+    {optInTimePeriod = 49},
+    {optInTimePeriod = 50},
+    {optInTimePeriod = 51},
+    {optInTimePeriod = 100},
+]
+AROON = [{optInTimePeriod = 2}, {optInTimePeriod = 25}]
+AROONOSC = [{optInTimePeriod = 2}, {optInTimePeriod = 25}]
+MOM = [{optInTimePeriod = 1}, {optInTimePeriod = 14}]
+ROC = [{optInTimePeriod = 1}, {optInTimePeriod = 14}]
+ROCP = [{optInTimePeriod = 1}, {optInTimePeriod = 14}]
+ROCR = [{optInTimePeriod = 1}, {optInTimePeriod = 14}]
+ROCR100 = [{optInTimePeriod = 1}, {optInTimePeriod = 14}]

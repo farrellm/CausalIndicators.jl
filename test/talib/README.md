@@ -36,10 +36,14 @@ These files have checks outside their extracted tables:
       `CandleSettings` (S7)
 - [ ] `test_period_boundary.c`: period-1 and minimum-period boundaries, and
       the abstract sweep over every parameter grid
-- [ ] `test_rolling_extremum.c`: the block-scan oracle for MIN, MAX, MINMAX,
-      MIDPOINT, MIDPRICE and WILLR. The S1 part (all but WILLR) is ported as
-      a naive window scan over periods straddling the block edges; WILLR
-      lands in S2.
+- [x] `test_rolling_extremum.c`: the block-scan oracle for MIN, MAX, MINMAX,
+      MIDPOINT, MIDPRICE and WILLR, ported as a naive window scan over periods
+      straddling the block edges (S1; WILLR in S2).
+- [x] `test_mfi.c`: the Tulip/pandas-ta oracle at 2e-12 with natural and
+      2^-60 volume, the bit-exact power-of-two volume-scale invariance, the
+      [0, 100] range over periods 2–60, and the exact-zero empty window
+      (flat and halted shapes, 24 phases) (S2).
+- [x] `test_po.c`: APO and PPO default to EMA (S2).
 - [x] `test_zlema.c`: the pandas and Tulip oracles at 1e-12, period 1 and the
       inherited EMA unstable period (S1). Its arrays use anonymous structs,
       which the extractor does not read, so the values are copied into

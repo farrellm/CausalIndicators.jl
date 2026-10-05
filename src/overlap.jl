@@ -23,6 +23,31 @@ CausalFrames.fresh!(st::DerivedValue) = st
 @inline CausalFrames.downdate!(::DerivedValue, row) = nothing
 CausalFrames.combine!(::DerivedValue, ::DerivedValue, ::DerivedValue) = nothing
 
+# The same for a formula `F` returning one value per output name in `Ns`, as a
+# tuple.
+struct DerivedValues{Ns,Ds,F} <: SummarizerState end
+
+derivedvalues(ns::Tuple, ds::Tuple, f) = DerivedValues{ns,ds,typeof(f)}()
+
+@inline function CausalFrames.value(::DerivedValues{Ns,Ds,F},
+    vals::NamedTuple) where {Ns,Ds,F}
+    V = Base.promote_op(F.instance, map(d -> fieldtype(typeof(vals), d), Ds)...)
+    return NamedTuple{Ns,V}(F.instance(map(d -> vals[d], Ds)...))
+end
+
+CausalFrames.fresh(st::DerivedValues) = st
+CausalFrames.fresh!(st::DerivedValues) = st
+@inline CausalFrames.update!(::DerivedValues, row) = nothing
+@inline CausalFrames.downdate!(::DerivedValues, row) = nothing
+CausalFrames.combine!(::DerivedValues, ::DerivedValues, ::DerivedValues) = nothing
+
+# A formula `F` lifted over `missing`: `missing` if any argument is, else
+# `F(args...)`. A fieldless singleton, so it can be a dependent's formula.
+struct Lifted{F} end
+lifted(f) = Lifted{typeof(f)}()
+@inline (::Lifted{F})(args...) where {F} =
+    any(ismissing, args) ? missing : F.instance(args...)
+
 midvalue(a, b) = (a + b) / 2
 
 # ---------------------------------------------------------------------------
