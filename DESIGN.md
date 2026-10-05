@@ -265,12 +265,14 @@ g. **`CausalFrames.barwindow(s, n, intypes)`, a count-window state** (#81),
    `CandleAverages`.
 
 h. **`MeanAbsDev(column)`**, the mean absolute deviation about the mean,
-   `Σ|x − mean| / n`. It is a fieldless dependent over `SortedValues` (f) and
-   `Mean`, so it stays a group, and each emission scans the window once, which
-   is TA-Lib's cost too. It is exactly TA-Lib's `AVGDEV`, which is therefore
-   CausalFrames only (case 1), and it is the deviation `CCI` reads (case 2).
-   Without it, both would have needed a hand-rolled ring of the window's
-   values.
+   `Σ|x − mean| / n`. It is a fieldless dependent over `Mean` and
+   `CausalFrames.WindowValues`, the window's values in arrival order, so it
+   stays a group. Each emission scans the window once, which is TA-Lib's cost
+   too. It does not read `SortedValues` (f): the scan needs no order, and
+   keeping one more than doubled the cost at indicator windows. It is exactly
+   TA-Lib's `AVGDEV`, which is therefore CausalFrames only (case 1), and it is
+   the deviation `CCI` reads (case 2). Without it, both would have needed a
+   hand-rolled ring of the window's values.
 
 ## Model
 
