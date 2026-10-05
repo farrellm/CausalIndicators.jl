@@ -51,3 +51,15 @@ function checkunstable(unstable)
         throw(ArgumentError("unstable period must be non-negative, got $unstable"))
     return Int(unstable)
 end
+
+# TA-Lib's zero tests (ta_utility.h): `TA_IS_ZERO`, a fixed band, and
+# `TA_IS_ZERO_SCALED`, a band relative to the operands' magnitude `scale`
+# (|a| + |b| for a difference a − b). The indicators that guard a division with
+# one use the same test, so a flat window gives TA-Lib's 0 rather than a
+# quotient of round-off.
+const TA_EPSILON = 1e-14
+@inline iszerota(v) = -TA_EPSILON < v < TA_EPSILON
+@inline iszeroscaled(v, scale) = abs(v) <= TA_EPSILON * scale
+
+# TA-Lib's true range: the bar's range widened to the previous close.
+@inline truerange(h, l, cprev) = max(h - l, abs(cprev - h), abs(cprev - l))

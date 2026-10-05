@@ -5,8 +5,8 @@
 TA-Lib's technical indicators as causal, streaming building blocks for
 [CausalFrames.jl](https://github.com/farrellm/CausalFrames.jl) pipelines. See
 [DESIGN.md](DESIGN.md) for the design and the implementation stages. This is
-under construction: stage S1 (moving averages, rolling operators and price
-transforms) has landed.
+under construction: stages S1 (moving averages, rolling operators and price
+transforms) and S2 (momentum I) have landed.
 
 ```julia
 using CausalFrames, CausalIndicators, Dates
@@ -22,7 +22,8 @@ p = readcsv("bars.csv"; types = Dict(:time => DateTime, :symbol => String,
 Structured indicators (sums, extrema and their dependents) take their window
 from `addrollingcolumns`, so TA-Lib's `period = p` is `Bars(p)`. Recursive ones
 take a `period` keyword and run under `addsummarycolumns`. Output columns are
-`missing` for TA-Lib's lookback.
+`missing` for TA-Lib's lookback. Functions that compare with the bar `period`
+back (the MOM/ROC family, Aroon) take `Bars(period + 1)`.
 
 ## Indicators
 
@@ -36,6 +37,18 @@ take a `period` keyword and run under `addsummarycolumns`. Output columns are
 | `MIDPOINT` | `MidPoint(:x)` | `Bars(14)` |
 | `MIDPRICE` | `MidPrice(; high, low)` | `Bars(14)` |
 | `AVGPRICE`, `MEDPRICE`, `TYPPRICE`, `WCLPRICE` | `AvgPrice()`, `MedPrice()`, `TypPrice()`, `WclPrice()` | either (bar-local) |
+| `RSI`, `CMO` | `RSI(:x; period = 14)`, `CMO(:x; period = 14)` | `addsummarycolumns` |
+| `MACD`, `MACDFIX`, `MACDEXT` | `MACD(:x; fastperiod = 12, slowperiod = 26, signalperiod = 9)`, `MACDFix(:x)`, `MACDExt(:x; fastmatype, …)` | `addsummarycolumns` |
+| `APO`, `PPO` | `APO(:x; fastperiod = 12, slowperiod = 26, matype = :ema)`, `PPO(:x; …)` | `addsummarycolumns` |
+| `TRIX` | `TRIX(:x; period = 30)` | `addsummarycolumns` |
+| `STOCH`, `STOCHF`, `STOCHRSI` | `Stoch(; fastkperiod = 5, …)`, `StochF(; …)`, `StochRSI(:x; period = 14, …)` | `addsummarycolumns` |
+| `ULTOSC` | `ULTOSC(; timeperiod1 = 7, timeperiod2 = 14, timeperiod3 = 28)` | `addsummarycolumns` |
+| `MFI` | `MFI(; period = 14)` | `addsummarycolumns` |
+| `MOM`, `ROC`, `ROCP`, `ROCR`, `ROCR100` | `MOM(:x)`, `ROC(:x)`, … | `Bars(11)` (period + 1) |
+| `WILLR` | `WillR(; high, low, close)` | `Bars(14)` |
+| `CCI` | `CCI(; high, low, close)` | `Bars(14)` |
+| `AROON`, `AROONOSC` | `Aroon(; high, low)`, `AroonOsc(; high, low)` | `Bars(15)` (period + 1) |
+| `BOP` | `BOP()` | either (bar-local) |
 
 These TA-Lib functions are CausalFrames summarizers already, so this package
 only tests them and adds no constructor:

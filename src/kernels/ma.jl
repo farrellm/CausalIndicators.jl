@@ -100,3 +100,21 @@ current(m::MAKernel) = m.n > m.lookback ? current(m.inner) : missing
     v = step!(m.inner, x)
     return m.n > m.lookback ? v : missing
 end
+
+"""
+    fixedemakernel(T, period, k; unstable = 0) -> MAKernel{:ema}
+
+An `:ema` `MAKernel` with smoothing factor `k` in place of `2 / (period + 1)`:
+MACDFix's fixed 12- and 26-bar EMAs (`k = 0.15` and `0.075`, ta_MACDFIX.c).
+"""
+function fixedemakernel(
+    ::Type{T},
+    period::Integer,
+    k::Real;
+    unstable::Integer = 0,
+) where {T}
+    e = EMAKernel(T, period, k)
+    return MAKernel{:ema,typeof(e)}(e,
+        malookback(Val(:ema), e.period,
+            checkunstable(unstable)), 0)
+end
