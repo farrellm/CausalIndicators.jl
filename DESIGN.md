@@ -774,9 +774,10 @@ prerequisites" in the same PR.
   `(Σx² − (Σx)²/n)/n`, which cancels when the mean is large against the
   spread. Values ±1000 around 1e6 lose 1.6% at `Bars(2)`, and a 1e8 level with
   0.01 steps gives a negative variance (`Std` clamps it to 0). It affects VAR,
-  StdDev, BollingerBands and RVI on high-priced series. test_stddev.c's
-  shift-invariance and VAR non-negativity legs are `@test_broken` until it is
-  fixed upstream.
+  StdDev, BollingerBands and RVI on high-priced series. Tracked upstream as
+  [CausalFrames.jl#89](https://github.com/farrellm/CausalFrames.jl/issues/89).
+  Until it is fixed, three test_stddev.c legs are `@test_broken`: shift
+  invariance, VAR non-negativity, and scale invariance under `Bars(2)`.
 
 ## Name table
 

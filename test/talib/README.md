@@ -54,13 +54,15 @@ These files have checks outside their extracted tables:
       `checkDataSame` and the `doRangeTest` sub-range sweeps, which a stream
       has no counterpart for; test_bbands.c's MAMA alignment (S6) and its legs
       built on `ta_test_reference.c` data (NumAcc, pandas, tick ladder).
-- [x] `test_stddev.c`: its table, scale invariance, STDDEV non-negativity,
-      the exactly constant window, and the flat tail, held to var.c's
-      relative floor rather than exact 0 (DESIGN.md, "Testing") (S3).
-      Shift invariance and VAR non-negativity are `@test_broken`: CausalFrames'
-      windowed `Variance` cancels under a large offset (DESIGN.md, "Open
-      questions"). The `ta_test_reference.c` legs (two-pass oracle, NIST
-      StRD, small-scale ladder) wait for that file's port.
+- [x] `test_stddev.c`: its table, STDDEV non-negativity, the exactly
+      constant window, scale invariance at periods 10 and 25, and the flat
+      tail. The flat tail is held to var.c's relative floor rather than exact
+      0 (DESIGN.md, "Testing"). The legs run on the C test's own LCG data
+      (`lcgsym`) (S3). Shift invariance, VAR non-negativity and scale
+      invariance under `Bars(2)` are `@test_broken` until CausalFrames.jl#89
+      (the windowed `Variance` cancels). The `ta_test_reference.c` legs
+      (two-pass oracle, NIST StRD, small-scale ladder) wait for that file's
+      port.
 - [x] `test_kc.c`: the gData and TA_SREF shapes and ta4j oracles, the
       composition (middle = EMA of the typical price from the first output,
       bands = middle ± nbdev·ATR) and nbdev 0 (S3)
