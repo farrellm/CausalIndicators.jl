@@ -278,17 +278,6 @@ outname(C::Symbol, name) = Symbol(C, :_, name)
 outname(::Nothing, name) = name
 outnames(C, name, suffixes) = map(s -> Symbol(outname(C, name), :_, s), suffixes)
 
-const PLAIN_DOC = """
-It is a plain summarizer (no `combine!`), so it belongs under
-`addsummarycolumns`. Under `addrollingcolumns` each window re-folds from a
-fresh state, a cold start per window. The output is `missing` for TA-Lib's
-lookback (plus `unstable`) bars.
-"""
-
-const SKIP_DOC = """
-A `missing` input bar leaves the state unchanged and emits `missing`.
-"""
-
 # Missing-checked reads of a row's inputs.
 @inline anymissing(xs...) = any(ismissing, xs)
 
@@ -1119,3 +1108,308 @@ function MFI(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSp
         Int(period))
     return withterms(s, high, low, close, volume)
 end
+
+# ---------------------------------------------------------------------------
+# Directional movement: ±DM, ±DI, DX, ADX and ADXR
+
+# `K` is `:plusdm`, `:minusdm`, `:plusdi`, `:minusdi`, `:dx`, `:adx` or
+# `:adxr`; `C` is `nothing` for the DMs, which read no close.
+struct DirectionalSummarizer{K,H,L,C,N} <: Summarizer
+    period::Int
+    unstable::Int
+end
+
+mutable struct DirectionalState{K,H,L,C,N,D,S,A,T} <: SummarizerState
+    const kernel::D
+    const unstable::Int
+    const invperiod::T
+    const adxseed::S
+    const lag::A
+    ndx::Int
+    lastdx::T
+    adx::T
+    out::Union{Missing,T}
+end
+
+CausalFrames.emptyvalue(::DirectionalSummarizer{K,H,L,C,N}) where {K,H,L,C,N} =
+    NamedTuple{(N,)}((missing,))
+
+dicolumns(H, L, ::Nothing) = (H, L)
+dicolumns(H, L, C) = (H, L, C)
+
+function CausalFrames.fresh(s::DirectionalSummarizer{K,H,L,C,N},
+    intypes::NamedTuple) where {K,H,L,C,N}
+    T = floattype(promote_type(map(c -> nonmissingtype(intypes[c]), dicolumns(H, L, C))...))
+    k = DMKernel(T, s.period)
+    lag = K === :adxr ? CausalFrames.barwindow(First(:x), s.period, (x = T,)) : nothing
+    seed = seedsum(T)
+    return DirectionalState{K,H,L,C,N,typeof(k),typeof(seed),typeof(lag),T}(k, s.unstable,
+        one(T) / T(s.period), seed, lag, 0, zero(T), zero(T), missing)
+end
+CausalFrames.fresh(st::DirectionalState{K,H,L,C,N,D,S,A,T}) where {K,H,L,C,N,D,S,A,T} =
+    DirectionalState{K,H,L,C,N,D,S,A,T}(fresh(st.kernel), st.unstable, st.invperiod,
+        fresh(st.adxseed), freshornothing(st.lag), 0, zero(T), zero(T), missing)
+function CausalFrames.fresh!(
+    st::DirectionalState{K,H,L,C,N,D,S,A,T},
+) where {K,H,L,C,N,D,S,A,T}
+    fresh!(st.kernel)
+    fresh!(st.adxseed)
+    st.lag === nothing || fresh!(st.lag)
+    st.ndx = 0
+    st.lastdx = st.adx = zero(T)
+    st.out = missing
+    return st
+end
+
+dirclose(row, L, ::Nothing) = row[L]
+dirclose(row, L, C) = row[C]
+
+@inline function CausalFrames.update!(st::DirectionalState{K,H,L,C}, row) where {K,H,L,C}
+    h, l, c = row[H], row[L], dirclose(row, L, C)
+    st.out = missing
+    anymissing(h, l, c) && return nothing
+    step!(st.kernel, h, l, c)
+    directional!(Val(K), st)
+    return nothing
+end
+@inline CausalFrames.value(
+    st::DirectionalState{K,H,L,C,N,D,S,A,T},
+) where {K,H,L,C,N,D,S,A,T} =
+    NamedTuple{(N,),Tuple{Union{Missing,T}}}((st.out,))
+
+# ta_PLUS_DM.c: the smoothed sum, or the raw DM at period 1, whose lookback
+# ignores the unstable period.
+function directional!(::Union{Val{:plusdm},Val{:minusdm}},
+    st::DirectionalState{K}) where {K}
+    k = st.kernel
+    p = k.period
+    lb = p == 1 ? 1 : p - 1 + st.unstable
+    nseen(k) > lb || return nothing
+    pdm, mdm, _ = dmsums(k)
+    st.out = K === :plusdm ? pdm : mdm
+    return nothing
+end
+
+# ta_PLUS_DI.c: `100·DM/TR`, or at period 1 the bar's `DM/TR` without the 100,
+# TA-Lib's historical quirk; 0 where there is no range.
+function directional!(::Union{Val{:plusdi},Val{:minusdi}},
+    st::DirectionalState{K,H,L,C,N,D,S,A,T}) where {K,H,L,C,N,D,S,A,T}
+    k = st.kernel
+    p = k.period
+    lb = p == 1 ? 1 : p + st.unstable
+    nseen(k) > lb || return nothing
+    pdm, mdm, tr = dmsums(k)
+    dm = K === :plusdi ? pdm : mdm
+    st.out = if p == 1
+        dm > 0 ? (tr <= 0 ? zero(T) : dm / tr) : zero(T)
+    else
+        tr > 0 ? 100 * (dm / tr) : zero(T)
+    end
+    return nothing
+end
+
+# ta_DX.c: the bar's DX and whether TA-Lib's guards (some range, and DIs that
+# do not sum to zero) let it count.
+@inline function dxvalue((pdm, mdm, tr)::NTuple{3,T}) where {T}
+    tr > 0 || return (false, zero(T))
+    m = 100 * (mdm / tr)
+    pl = 100 * (pdm / tr)
+    s = m + pl
+    iszerota(s) && return (false, zero(T))
+    return (true, 100 * (abs(m - pl) / s))
+end
+
+# A guarded DX repeats the previous one (0 before the first), as ta_DX.c does.
+function directional!(::Val{:dx}, st::DirectionalState)
+    k = st.kernel
+    nseen(k) > k.period + st.unstable || return nothing
+    ok, dx = dxvalue(dmsums(k))
+    ok && (st.lastdx = dx)
+    st.out = st.lastdx
+    return nothing
+end
+
+# ta_ADX.c: the mean of the first `period` DX values (a guarded one adds
+# nothing), then `adx − (adx − dx)/period`, held on a guarded bar. Returns
+# whether the ADX is past its lookback and unstable period.
+function adxstep!(st::DirectionalState{K,H,L,C,N,D,S,A,T}) where {K,H,L,C,N,D,S,A,T}
+    k = st.kernel
+    p = k.period
+    nseen(k) > p || return false
+    n = st.ndx += 1
+    ok, dx = dxvalue(dmsums(k))
+    if n <= p
+        ok && seedadd!(st.adxseed, dx)
+        n == p && (st.adx = seedtotal(st.adxseed) / p)
+    elseif ok
+        st.adx = st.adx - (st.adx - dx) * st.invperiod
+    end
+    return n >= p + st.unstable
+end
+
+function directional!(::Val{:adx}, st::DirectionalState)
+    adxstep!(st) && (st.out = st.adx)
+    return nothing
+end
+
+# ta_ADXR.c: the mean of today's ADX and the one `period − 1` bars back, read
+# from a CausalFrames `First` over the last `period` ADX values.
+function directional!(
+    ::Val{:adxr},
+    st::DirectionalState{K,H,L,C,N,D,S,A,T},
+) where {K,H,L,C,N,D,S,A,T}
+    adxstep!(st) || return nothing
+    update!(st.lag, (x = st.adx,))
+    old = value(st.lag).x_first
+    st.out = ismissing(old) ? missing : (st.adx + old) / 2
+    return nothing
+end
+
+function directional(fn, K, high, low, close, period, unstable, name; minperiod)
+    checkrange(fn, "period", period, minperiod, 100_000)
+    checkunstable(unstable)
+    H, L = colname(high), colname(low)
+    C = close === nothing ? nothing : colname(close)
+    s = DirectionalSummarizer{K,H,L,C,name}(Int(period), Int(unstable))
+    specs = close === nothing ? (high, low) : (high, low, close)
+    return withterms(s, specs...)
+end
+
+const DM_DOC = """
+The directional movement of a bar is its up move `high − previous high` (+DM)
+or its down move `previous low − low` (−DM), whichever is larger and positive;
+the other is 0, and a tie gives 0 to both. Over more than one bar they are
+smoothed as Wilder's running sums, seeded with the sum of the first
+`period − 1` moves and stepped `prev − prev/period + dm`.
+"""
+
+const DI_DOC = """
+The directional indicators are `100·DM/TR` over the Wilder-smoothed sums of the
+directional movement and the true range, each seeded with its first
+`period − 1` values (0 where the summed range is not positive).
+"""
+
+const DIR_DOC = """
+$PLAIN_DOC
+A bar with any input `missing` leaves the state unchanged and emits `missing`.
+"""
+
+"""
+    PlusDM(; high = :high, low = :low, period = 14, unstable = 0, name = :plusdm)
+
+TA-Lib's `PLUS_DM`, the smoothed +DM, in `:plusdm`. The lookback is
+`period − 1`, plus `unstable`, TA-Lib's unstable period. At period 1 it is the
+bar's raw +DM with lookback 1, whatever `unstable` is.
+
+$DM_DOC
+$DIR_DOC
+TA-Lib: `ta_codegen/input/plus_dm/plus_dm.yaml`, `plus_dm.md`.
+"""
+PlusDM(; high::ColumnSpec = :high, low::ColumnSpec = :low, period::Integer = 14,
+    unstable::Integer = 0, name::Symbol = :plusdm) =
+    directional("PlusDM", :plusdm, high, low, nothing, period, unstable, name;
+        minperiod = 1)
+
+"""
+    MinusDM(; high = :high, low = :low, period = 14, unstable = 0, name = :minusdm)
+
+TA-Lib's `MINUS_DM`, the smoothed −DM, in `:minusdm`, as [`PlusDM`](@ref).
+
+$DM_DOC
+$DIR_DOC
+TA-Lib: `ta_codegen/input/minus_dm/minus_dm.yaml`, `minus_dm.md`.
+"""
+MinusDM(; high::ColumnSpec = :high, low::ColumnSpec = :low, period::Integer = 14,
+    unstable::Integer = 0, name::Symbol = :minusdm) =
+    directional("MinusDM", :minusdm, high, low, nothing, period, unstable, name;
+        minperiod = 1)
+
+"""
+    PlusDI(; high = :high, low = :low, close = :close, period = 14, unstable = 0,
+           name = :plusdi)
+
+TA-Lib's `PLUS_DI`, the positive directional indicator, in `:plusdi`. The
+lookback is `period`, plus `unstable`, TA-Lib's unstable period. At period 1 it
+is the bar's `+DM/TR` *without* the factor 100, TA-Lib's historical quirk, with
+lookback 1 whatever `unstable` is.
+
+$DI_DOC
+$DM_DOC
+$DIR_DOC
+TA-Lib: `ta_codegen/input/plus_di/plus_di.yaml`, `plus_di.md`.
+"""
+PlusDI(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
+    period::Integer = 14, unstable::Integer = 0, name::Symbol = :plusdi) =
+    directional("PlusDI", :plusdi, high, low, close, period, unstable, name;
+        minperiod = 1)
+
+"""
+    MinusDI(; high = :high, low = :low, close = :close, period = 14, unstable = 0,
+            name = :minusdi)
+
+TA-Lib's `MINUS_DI`, the negative directional indicator, in `:minusdi`, as
+[`PlusDI`](@ref).
+
+$DI_DOC
+$DM_DOC
+$DIR_DOC
+TA-Lib: `ta_codegen/input/minus_di/minus_di.yaml`, `minus_di.md`.
+"""
+MinusDI(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
+    period::Integer = 14, unstable::Integer = 0, name::Symbol = :minusdi) =
+    directional("MinusDI", :minusdi, high, low, close, period, unstable, name;
+        minperiod = 1)
+
+"""
+    DX(; high = :high, low = :low, close = :close, period = 14, unstable = 0, name = :dx)
+
+TA-Lib's `DX`, the directional movement index `100·|−DI − +DI|/(−DI + +DI)`,
+in `:dx`. Where there is no range, or the DIs sum to what TA-Lib finds zero,
+it repeats the previous DX (0 before the first), as TA-Lib does. The lookback
+is `period`, plus `unstable`, TA-Lib's unstable period.
+
+$DI_DOC
+$DIR_DOC
+TA-Lib: `ta_codegen/input/dx/dx.yaml`, `dx.md`.
+"""
+DX(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
+    period::Integer = 14, unstable::Integer = 0, name::Symbol = :dx) =
+    directional("DX", :dx, high, low, close, period, unstable, name; minperiod = 2)
+
+const ADX_DOC = """
+The ADX is seeded with the mean of the first `period` DX values (a bar where
+DX is undefined adds nothing), then steps `adx − (adx − dx)/period`, holding
+its value on a bar where DX is undefined.
+"""
+
+"""
+    ADX(; high = :high, low = :low, close = :close, period = 14, unstable = 0,
+        name = :adx)
+
+TA-Lib's `ADX`, Wilder's average directional movement index, in `:adx`. The
+lookback is `2·period − 1`, plus `unstable`, TA-Lib's unstable period.
+
+$ADX_DOC
+$DIR_DOC
+TA-Lib: `ta_codegen/input/adx/adx.yaml`, `adx.md`.
+"""
+ADX(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
+    period::Integer = 14, unstable::Integer = 0, name::Symbol = :adx) =
+    directional("ADX", :adx, high, low, close, period, unstable, name; minperiod = 2)
+
+"""
+    ADXR(; high = :high, low = :low, close = :close, period = 14, unstable = 0,
+         name = :adxr)
+
+TA-Lib's `ADXR`, the average of today's [`ADX`](@ref) and the one
+`period − 1` bars back, in `:adxr`. The lookback is `3·period − 2`, plus
+`unstable`, the ADX unstable period TA-Lib's ADXR inherits. The earlier ADX is
+read from a CausalFrames `First` under `CausalFrames.barwindow`.
+
+$ADX_DOC
+$DIR_DOC
+TA-Lib: `ta_codegen/input/adxr/adxr.yaml`, `adxr.md`.
+"""
+ADXR(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
+    period::Integer = 14, unstable::Integer = 0, name::Symbol = :adxr) =
+    directional("ADXR", :adxr, high, low, close, period, unstable, name; minperiod = 2)

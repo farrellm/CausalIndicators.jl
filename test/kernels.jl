@@ -107,7 +107,7 @@ const KERNELS =
         s = sum(xs[1:(p-1)])
         push!(ref, s)
         for x in xs[p:end]
-            s = s - s / p + x
+            s = s - s * (1 / p) + x
             push!(ref, s)
         end
         @test isequal(got, ref)

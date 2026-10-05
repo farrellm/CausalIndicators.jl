@@ -5,13 +5,14 @@
 #   `fma(β, prev, α * x)` with `β = (period - 1) / period` and `α = 1 - β`, the
 #   order of ta_RMA.c.
 # - `:sum` (±DM, the TR sum of ±DI and DX): the sum of the first `seedn` bars,
-#   then `prev - prev / period + x` (ta_PLUS_DM.c, whose seed is `period - 1`
-#   bars).
+#   then `prev - prev * invperiod + x` with `invperiod = 1 / period`
+#   (ta_PLUS_DM.c, whose seed is `period - 1` bars).
 mutable struct WilderKernel{T,S,F}
     const period::Int
     const seedn::Int
     const alpha::T
     const beta::T
+    const invperiod::T
     n::Int
     prev::T
     const seed::S
@@ -32,8 +33,8 @@ function WilderKernel(::Type{T}, period::Integer; form::Symbol = :mean,
     seedn >= 1 || throw(ArgumentError("WilderKernel seedn must be positive, got $seedn"))
     beta = T(p - 1) / T(p)
     S = typeof(seedsum(T))
-    return WilderKernel{T,S,form}(p, Int(seedn), one(T) - beta, beta, 0, zero(T),
-        seedsum(T))
+    return WilderKernel{T,S,form}(p, Int(seedn), one(T) - beta, beta, one(T) / T(p), 0,
+        zero(T), seedsum(T))
 end
 
 CausalFrames.fresh(w::WilderKernel{T,S,F}) where {T,S,F} =
@@ -51,7 +52,7 @@ current(w::WilderKernel{T}) where {T} =
     (w.n >= w.seedn ? w.prev : missing)::Union{Missing,T}
 
 @inline smooth(w::WilderKernel{T,S,:mean}, x) where {T,S} = fma(w.beta, w.prev, w.alpha * x)
-@inline smooth(w::WilderKernel{T,S,:sum}, x) where {T,S} = w.prev - w.prev / w.period + x
+@inline smooth(w::WilderKernel{T,S,:sum}, x) where {T,S} = w.prev - w.prev * w.invperiod + x
 
 @inline seeded(w::WilderKernel{T,S,:mean}) where {T,S} = seedtotal(w.seed) / w.seedn
 @inline seeded(w::WilderKernel{T,S,:sum}) where {T,S} = seedtotal(w.seed)

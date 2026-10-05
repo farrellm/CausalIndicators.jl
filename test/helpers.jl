@@ -343,3 +343,18 @@ function checkrow(got, row; out = "oneOfTheExpectedOutReal",
     end
     return nothing
 end
+
+"""
+    lcgsym(seed, n) -> Vector{Float64}
+
+`n` draws in `[-1, 1)` from ta_test_reference.c's LCG (`ta_test_ref_lcg_sym`)
+seeded with `seed`, so a hand port runs on the C test's own data, identical on
+every Julia version (`rand` streams are not).
+"""
+function lcgsym(seed, n)
+    state = UInt32(seed)
+    return map(1:n) do _
+        state = state * 0x41c64e6d + 0x00003039
+        Float64((state >> 8) & 0x00ffffff) / 8388608.0 - 1.0
+    end
+end

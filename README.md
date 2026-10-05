@@ -6,7 +6,8 @@ TA-Lib's technical indicators as causal, streaming building blocks for
 [CausalFrames.jl](https://github.com/farrellm/CausalFrames.jl) pipelines. See
 [DESIGN.md](DESIGN.md) for the design and the implementation stages. This is
 under construction: stages S1 (moving averages, rolling operators and price
-transforms) and S2 (momentum I) have landed.
+transforms), S2 (momentum I) and S3 (directional movement and volatility) have
+landed.
 
 ```julia
 using CausalFrames, CausalIndicators, Dates
@@ -23,7 +24,8 @@ Structured indicators (sums, extrema and their dependents) take their window
 from `addrollingcolumns`, so TA-Lib's `period = p` is `Bars(p)`. Recursive ones
 take a `period` keyword and run under `addsummarycolumns`. Output columns are
 `missing` for TA-Lib's lookback. Functions that compare with the bar `period`
-back (the MOM/ROC family, Aroon) take `Bars(period + 1)`.
+back (the MOM/ROC family, Aroon) take `Bars(period + 1)`. Indicators with a
+TA-Lib unstable period, their own or inherited, take an `unstable` keyword.
 
 ## Indicators
 
@@ -49,6 +51,21 @@ back (the MOM/ROC family, Aroon) take `Bars(period + 1)`.
 | `CCI` | `CCI(; high, low, close)` | `Bars(14)` |
 | `AROON`, `AROONOSC` | `Aroon(; high, low)`, `AroonOsc(; high, low)` | `Bars(15)` (period + 1) |
 | `BOP` | `BOP()` | either (bar-local) |
+| `PLUS_DM`, `MINUS_DM` | `PlusDM(; period = 14)`, `MinusDM(; …)` | `addsummarycolumns` |
+| `PLUS_DI`, `MINUS_DI`, `DX`, `ADX`, `ADXR` | `PlusDI(; period = 14)`, `MinusDI`, `DX`, `ADX`, `ADXR` (same keywords) | `addsummarycolumns` |
+| `TRANGE` | `TRange(; high, low, close)` | `Bars(2)` |
+| `ATR`, `NATR` | `ATR(; period = 14)`, `NATR(; period = 14)` | `addsummarycolumns` |
+| `ADR` | `ADR(; high, low)` | `Bars(14)` |
+| `CVI` | `CVI(; period = 10, rocperiod = 10)` | `addsummarycolumns` |
+| `MASSI` | `MassIndex(; fastperiod = 9, slowperiod = 25)` | `addsummarycolumns` |
+| `RVI` | `RVI(:x; period = 14, stddevperiod = 10)` | `addsummarycolumns` |
+| `STDDEV` | `StdDev(:x; nbdev = 1)` | `Bars(5)` |
+| `BBANDS` | `BollingerBands(:x; nbdevup = 2, nbdevdn = 2)` (SMA), or with `matype` and `period = 20` | `Bars(20)`, or `addsummarycolumns` with `matype` |
+| `ACCBANDS` | `AccBands(; high, low, close)` | `Bars(20)` |
+| `DONCHIAN` | `Donchian(; high, low)` | `Bars(20)` |
+| `KC` | `KeltnerChannels(; period = 20, atrperiod = 10, nbdev = 2)` | `addsummarycolumns` |
+| `SAR`, `SAREXT` | `SAR(; acceleration = 0.02, maximum = 0.2)`, `SARExt(; startvalue = 0, …)` | `addsummarycolumns` |
+| `SUPERTREND` | `SuperTrend(; period = 10, multiplier = 3.0)` | `addsummarycolumns` |
 
 These TA-Lib functions are CausalFrames summarizers already, so this package
 only tests them and adds no constructor:
@@ -60,6 +77,8 @@ only tests them and adds no constructor:
 | `CUMSUM` | `Sum(:x)` | `addsummarycolumns` |
 | `MAX`, `MIN`, `MINMAX` | `Max(:x)`, `Min(:x)` | `Bars(30)` |
 | `MAXINDEX`, `MININDEX`, `MINMAXINDEX` | `MaxIndex(:x)`, `MinIndex(:x)` (bars since the extreme, newest tie wins) | `Bars(30)` |
+| `VAR` | `Variance(:x; corrected = false)` | `Bars(5)` |
+| `AVGDEV` | `MeanAbsDev(:x)` | `Bars(14)` |
 
 ## Development
 
