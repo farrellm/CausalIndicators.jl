@@ -242,8 +242,7 @@ tavar(x, p) = only(foldseries(Variance(:x; corrected = false), (; x); window = B
     end
 
     @testset "LINEARREG family (test_linearreg.c)" begin
-        rng = Random.MersenneTwister(11)
-        y = 100 .+ cumsum(randn(rng, 300))
+        y = 100 .+ cumsum(lcgsym(0x11EA4E61, 300))
         fit(s, x, p) = only(foldseries(s, (; x); window = Bars(p)))
         for p in (2, 3, 14, 30)
             lr, sl, ic, an, tf = (
@@ -303,9 +302,9 @@ tavar(x, p) = only(foldseries(Variance(:x; corrected = false), (; x); window = B
     end
 
     @testset "test_correl.c" begin
-        rng = Random.MersenneTwister(5)
-        x = cumsum(randn(rng, 200))
-        y = 0.6 .* x .+ randn(rng, 200)
+        # The C test's LCG, so the data is the same on every Julia version.
+        x = cumsum(lcgsym(0xC0FFEE05, 200))
+        y = 0.6 .* x .+ lcgsym(0xC0FFEE06, 200)
         cor(a, b, p) = only(foldseries(Correlation(:a, :b), (; a, b); window = Bars(p)))
         for p in (2, 5, 30)
             r = cor(x, y, p)
