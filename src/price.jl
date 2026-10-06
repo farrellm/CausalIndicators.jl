@@ -80,3 +80,62 @@ CausalFrames.dependencies(::WclPrice{H,L,C}) where {H,L,C} = (Last(H), Last(L), 
 CausalFrames.emptyvalue(::WclPrice) = (; wclprice = missing)
 CausalFrames.fresh(::WclPrice{H,L,C}, ::NamedTuple) where {H,L,C} =
     derivedvalue(:wclprice, map(lastname, (H, L, C)), wclprice)
+
+# ---------------------------------------------------------------------------
+# Heikin-Ashi (S5)
+
+struct HASpec
+    unstable::Int
+end
+
+mutable struct HAKernel{T}
+    const unstable::Int
+    n::Int
+    open::T
+    close::T
+end
+
+barkernel(s::HASpec, ::Type{T}) where {T} = HAKernel{T}(s.unstable, 0, zero(T), zero(T))
+CausalFrames.fresh(k::HAKernel{T}) where {T} = HAKernel{T}(k.unstable, 0, zero(T), zero(T))
+CausalFrames.fresh!(k::HAKernel{T}) where {T} =
+    (k.n = 0; k.open = zero(T); k.close = zero(T); k)
+
+@inline function barstep!(k::HAKernel{T}, o::T, h::T, l::T, c::T) where {T}
+    # The open moves from the previous candle before the close is replaced
+    # (ta_HA.c); the first candle opens at the midpoint of its own open and close.
+    k.open = (k.n += 1) == 1 ? (o + c) / 2 : (k.open + k.close) / 2
+    k.close = (((o + h) + l) + c) / 4
+    k.n > k.unstable || return nothing
+    a, b = k.open, k.close
+    # Plain comparisons, as ta_HA.c spells the extremes.
+    hi = h
+    a > hi && (hi = a)
+    b > hi && (hi = b)
+    lo = l
+    a < lo && (lo = a)
+    b < lo && (lo = b)
+    return (a, hi, lo, b)
+end
+
+"""
+    HeikinAshi(; open = :open, high = :high, low = :low, close = :close, unstable = 0,
+               name = :ha)
+
+TA-Lib's `HA`, Heikin-Ashi candles, in `:ha_haopen`, `:ha_hahigh`, `:ha_halow`
+and `:ha_haclose`. The close is the bar's mean price `(((o + h) + l) + c)/4`,
+the open the midpoint of the previous candle's open and close (of the bar's own
+open and close for the first candle), and the high and low widen the bar's to
+contain them. `unstable` is TA-Lib's unstable period for HA: it delays the
+first output without changing the values. The candles are recursive, so they
+are anchored at the first bar seen, and the seed's weight halves each bar.
+
+$PLAIN_DOC
+A bar with any input `missing` leaves the state unchanged and emits `missing`.
+
+TA-Lib: `ta_codegen/input/ha/ha.yaml`, `ha.md`.
+"""
+HeikinAshi(; open::ColumnSpec = :open, high::ColumnSpec = :high, low::ColumnSpec = :low,
+    close::ColumnSpec = :close, unstable::Integer = 0, name::Symbol = :ha) =
+    barindicator(HASpec(checkunstable(unstable)),
+        outnames(nothing, name, (:haopen, :hahigh, :halow, :haclose)), open, high, low,
+        close)

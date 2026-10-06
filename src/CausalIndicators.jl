@@ -18,7 +18,9 @@ export MA, EMA, RMA, DEMA, TEMA, TRIMA, KAMA, T3, HMA, ZLEMA, MAVP, WMA, VWMA,
     SAR, SARExt, BollingerBands, AccBands, KeltnerChannels, Donchian, SuperTrend,
     StdDev, LinearReg, LinearRegSlope, LinearRegIntercept, LinearRegAngle, TSF,
     PercentRank100, Beta,
-    AD, ADOSC, CMF, EFI, MarketFI, NVI, OBV, PVI, PVO, PVT, RVOL, VWAP
+    AD, ADOSC, CMF, EFI, MarketFI, NVI, OBV, PVI, PVO, PVT, RVOL, VWAP,
+    AC, AO, CMOU, Coppock, DPO, ER, ERI, FOSC, Fractal, IMI, KDJ, QStick, SMI, TSI, VHF,
+    Vortex, WAD, HeikinAshi
 
 include("kernels/common.jl")
 include("kernels/ema.jl")
@@ -31,6 +33,8 @@ include("kernels/gainloss.jl")
 include("kernels/stoch.jl")
 include("kernels/atr.jl")
 include("kernels/dm.jl")
+
+include("barindicator.jl")
 
 include("overlap.jl")
 include("price.jl")

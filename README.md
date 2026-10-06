@@ -6,8 +6,8 @@ TA-Lib's technical indicators as causal, streaming building blocks for
 [CausalFrames.jl](https://github.com/farrellm/CausalFrames.jl) pipelines. See
 [DESIGN.md](DESIGN.md) for the design and the implementation stages. This is
 under construction: stages S1 (moving averages, rolling operators and price
-transforms), S2 (momentum I), S3 (directional movement and volatility) and S4
-(statistics and volume) have landed.
+transforms), S2 (momentum I), S3 (directional movement and volatility), S4
+(statistics and volume) and S5 (the TA-Lib 0.8 additions) have landed.
 
 ```julia
 using CausalFrames, CausalIndicators, Dates
@@ -24,7 +24,7 @@ Structured indicators (sums, extrema and their dependents) take their window
 from `addrollingcolumns`, so TA-Lib's `period = p` is `Bars(p)`. Recursive ones
 take a `period` keyword and run under `addsummarycolumns`. Output columns are
 `missing` for TA-Lib's lookback. Functions that compare with the bar `period`
-back (the MOM/ROC family, Aroon, PercentRank100, RVOL) take `Bars(period + 1)`. Indicators with a
+back (the MOM/ROC family, Aroon, PercentRank100, RVOL, FOSC) take `Bars(period + 1)`. Indicators with a
 TA-Lib unstable period, their own or inherited, take an `unstable` keyword.
 
 ## Indicators
@@ -79,6 +79,23 @@ TA-Lib unstable period, their own or inherited, take an `unstable` keyword.
 | `PVO` | `PVO(; fastperiod = 12, slowperiod = 26, matype = :ema)` | `addsummarycolumns` |
 | `RVOL` | `RVOL(; volume)` | `Bars(21)` (period + 1) |
 | `VWAP` | `VWAP(; high, low, close, volume)` | `addsummarycolumns` (a key per session) |
+| `AO`, `AC` | `AO(; fastperiod = 5, slowperiod = 34)`, `AC(; …, signalperiod = 5)` | `addsummarycolumns` |
+| `CMOU` | `CMOU(:x; period = 14)` | `addsummarycolumns` |
+| `COPPOCK` | `Coppock(:x; wmaperiod = 10, roc1period = 11, roc2period = 14)` | `addsummarycolumns` |
+| `DPO` | `DPO(:x; period = 20)` | `addsummarycolumns` |
+| `ER` | `ER(:x; period = 10)` | `addsummarycolumns` |
+| `ERI` | `ERI(; period = 13)` | `addsummarycolumns` |
+| `FOSC` | `FOSC(:x)` | `Bars(6)` (period + 1) |
+| `FRACTAL` | `Fractal(; leftbars = 2, rightbars = 2)` (`Int`, on the confirmation bar) | `addsummarycolumns` |
+| `IMI` | `IMI(; open, close)` | `Bars(14)` |
+| `KDJ` | `KDJ(; fastkperiod = 9, slowkperiod = 3, slowkmatype = :rma, …)` | `addsummarycolumns` |
+| `QSTICK` | `QStick(; open, close)` | `Bars(10)` |
+| `SMI` | `SMI(; period = 13, fastperiod = 2, slowperiod = 25, signalperiod = 9)` | `addsummarycolumns` |
+| `TSI` | `TSI(:x; firstperiod = 25, secondperiod = 13)` | `addsummarycolumns` |
+| `VHF` | `VHF(:x; period = 28)` | `addsummarycolumns` |
+| `VORTEX` | `Vortex(; period = 14)` | `addsummarycolumns` |
+| `WAD` | `WAD(; high, low, close)` | `addsummarycolumns` |
+| `HA` | `HeikinAshi(; open, high, low, close)` | `addsummarycolumns` |
 
 These TA-Lib functions are CausalFrames summarizers already, so this package
 only tests them and adds no constructor:
