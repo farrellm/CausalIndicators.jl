@@ -273,22 +273,16 @@ tavar(x, p) = only(foldseries(Variance(:x; corrected = false), (; x); window = B
                 fit(LinearReg(:x), a .* y .+ c, p), fit(LinearRegSlope(:x), y .+ c, p)
             @test all(i -> isapprox(alr[i], a * lr[i] + c; rtol = 1e-12), full)
             @test all(i -> isapprox(csl[i], sl[i]; atol = 1e-9), full)
-            # A constant window has slope 0 and every value at the level. It
-            # holds to round-off only: CausalFrames' windowed AgeWeightedSum
-            # drops the rounding of `(n − 1)·x` when a row leaves, so on a
-            # constant series it drifts by the same error every bar (an upstream
-            # fix: an error-free product in its downdate! and combine!).
-            k = fill(1234.5678, 200)
+            # A constant window has slope 0 and every value at the level, to the
+            # one rounding of the fit itself. Every full window gives the same
+            # value, so nothing drifts however far it slides (CausalFrames.jl#94).
+            k = fill(1234.5678, 2000)
             sk, lk, tk = (fit(s(:x), k, p) for s in (LinearRegSlope, LinearReg, TSF))
-            @test all(v -> abs(v) <= 1e-10, skipmissing(sk))
-            @test all(v -> isapprox(v, 1234.5678; rtol = 1e-13), skipmissing(lk))
-            @test all(v -> isapprox(v, 1234.5678; rtol = 1e-13), skipmissing(tk))
-            # Bars(2) slides without residue.
-            if p == 2
-                @test all(==(0), skipmissing(sk))
-            else
-                @test_broken all(==(0), skipmissing(sk))
-            end
+            @test allequal(skipmissing(sk)) && allequal(skipmissing(lk)) &&
+                  allequal(skipmissing(tk))
+            @test all(v -> abs(v) <= 1e-13, skipmissing(sk))
+            @test all(v -> isapprox(v, 1234.5678; rtol = 1e-15), skipmissing(lk))
+            @test all(v -> isapprox(v, 1234.5678; rtol = 1e-15), skipmissing(tk))
         end
         # A straight line is fitted exactly.
         line = 7.0 .+ 0.25 .* (0:99)
