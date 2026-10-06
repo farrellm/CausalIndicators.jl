@@ -128,6 +128,11 @@ table records which:
    - `ADR` and `AccBands` read `Mean`s of namespaced row terms
      (`:adr_range`, `:accbands_up`, `:accbands_dn`).
    - `BollingerBands()` reads `Mean` and `Std(corrected = false)`.
+   - The `LINEARREG` family and `TSF` read `Count`, `Sum` and
+     `AgeWeightedSum`.
+   - `AD`, `CMF` and `VWAP` read `Sum`s of namespaced row terms (`:ad_mfv`,
+     shared by `AD` and `CMF`, and `:vwap_pv`, `:vwap_v`), `RVOL` reads
+     `Count`, `Sum` and `Last`, and `MarketFI` reads `Last`.
 3. **Move it into CausalFrames.** If an indicator needs a *generic* accumulator
    or operator that CausalFrames lacks, it is first added to CausalFrames as a
    prerequisite PR, with its own tests, docs and DESIGN.md entry. The indicator
@@ -267,7 +272,8 @@ g. **`CausalFrames.barwindow(s, n, intypes)`, a count-window state** (#81),
    Its users are KAMA, MFI, ULTOSC, AO, TRIMA, the Stoch family's %K,
    `MAKernel`'s `:sma` and `:wma`, `BollingerBands(; matype)` and RVI (a
    `Std`), CVI and ADXR (a `First` of their own earlier values), MassIndex (a
-   `Sum`) and `CandleAverages`.
+   `Sum`), Beta (`Covariance`, `Variance` and `Mean` of the returns) and
+   `CandleAverages`.
 
 h. **`MeanAbsDev(column)`**, the mean absolute deviation about the mean,
    `Σ|x − mean| / n`. It is a fieldless dependent over `Mean` and
@@ -349,6 +355,8 @@ given parameters.
     inherits RSI's.
   - `ADXR` inherits ADX's, `KeltnerChannels` EMA's and ATR's, `SuperTrend`
     ATR's, and `CVI` and `MassIndex` EMA's (`MassIndex` once per EMA stage).
+  - `ADOSC` and `EFI` inherit EMA's, and `PVO` its dispatched type's. TA-Lib's
+    YAML flags none of the three, but each lookback calls one that has it.
   - `ATR`, `NATR`, `PlusDM`, `MinusDM`, `PlusDI`, `MinusDI`, `DX`, `ADX` and
     `RVI` have their own. At period 1 the DMs and DIs ignore it, as TA-Lib's
     period-1 arms do.
@@ -418,6 +426,8 @@ A bar count cannot be turned into a time span in general, so the caller chooses
   `missing` rules unchanged, since their state *is* the CausalFrames state.
 - **`NaN` and `±Inf`** propagate as IEEE arithmetic and TA-Lib do.
   - The `RVOL` and `VWMA` zero-volume cases follow their YAML notes.
+  - `VWAP` leaves out a bar whose typical price or volume is not finite, as
+    ta_VWAP.c does: its row terms are 0 there, so the sums stay finite.
   - Structured indicators recover once a nonfinite bar leaves the window,
     because CausalFrames' sums are compensated and count nonfinite terms.
   - Recursive ones do not recover, as in TA-Lib.
@@ -430,13 +440,13 @@ The name table's "Tier" column records it.
 - **Group** (`GroupSummarizer`, running O(1) amortized with `downdate!`). The
   value is a function of invertible sums, the sorted multiset, the windowed
   extrema or `First`/`Last` (c):
-  - `SMA`, `SUM`, `VAR`, `StdDev`, `Correl`, `VWMA`
+  - `SMA`, `SUM`, `VAR`, `StdDev`, `CORREL` (`Correlation`), `VWMA`
   - `WMA`, the `LINEARREG` family
   - `CMF`, `ADR`, `QStick`, `IMI`, `AccBands`, `AD`, `VWAP`
   - `BollingerBands(:x)`, without `matype` (SMA middle band)
   - `PERCENTILE` (`Quantile`), `PercentRank100`
   - `CCI` and `AVGDEV` (`MeanAbsDev`)
-  - `RVOL` (`Sum` and `Last`)
+  - `RVOL` (`Count`, `Sum` and `Last`)
   - the bar-local price transforms (`AvgPrice`, `MedPrice`, `TypPrice`,
     `WclPrice`, `BOP`, `MarketFI`), which are `Last`-dependents
   - `MAX`/`MIN`/`MINMAX` and the index forms
@@ -460,11 +470,12 @@ The name table's "Tier" column records it.
     `Stoch*`, `KDJ`, and `BollingerBands(:x; matype)`. Passing `matype` at all
     selects the plain form; without it, `BollingerBands(:x)` is the Group-tier
     SMA form under a `Bars` window.
-  - path-dependent states: `SAR`, `SARExt`, `SuperTrend`, `OBV`
+  - path-dependent states: `SAR`, `SARExt`, `SuperTrend`, `OBV`, `PVT`, `NVI`,
+    `PVI`, `ADOSC`
   - indicators that feed a per-row term needing the previous bar into a window
     or a recursion: `RSI`/`CMO`, `ATR`/`NATR`, the ±DM/±DI/DX/ADX family, `CVI`,
     `MassIndex`, `RVI`, `KeltnerChannels`, `MFI`, `ULTOSC`, `Beta` returns,
-    `Vortex`
+    `EFI`, `Vortex`
   - candlesticks
 
   A plain indicator that needs a window takes TA-Lib's `period` keyword and
@@ -490,8 +501,8 @@ TA-Lib's default window is listed as `window: Bars(n)` in the name table.
 - **Previous-bar functions.** The functions that compare with the bar `period`
   back (`MOM`, the `ROC` family) read `First`/`Last` over the whole window.
   `RVOL`, which compares the current bar with the mean of the `period` bars
-  before it, reads `Sum` and `Last` and computes that mean as
-  `(Sum − Last) / period`. `PercentRank100` ranks the current bar against the
+  before it, reads `Count`, `Sum` and `Last` and computes that mean as
+  `(Sum − Last) / period`, with `period` the window's `Count` minus one. `PercentRank100` ranks the current bar against the
   `period` bars before it. `Aroon` and `AroonOsc` find the extremes over the
   current bar and the `period` before it, and read `period` back as the
   window's `Count` minus one. In every case the window includes the current
@@ -507,7 +518,8 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
 
 - **Kernels** (`src/kernels/`) cover only what CausalFrames does not:
   - `EMAKernel` and `WilderKernel`, seeded through an embedded CausalFrames
-    `Sum` state. `WilderKernel` has TA-Lib's two forms: `:mean` (RMA, RSI, ATR)
+    `Sum` state. `EMAKernel` at period 1 with a smoothing factor below 1 is an
+    EMA seeded with its first bar, ADOSC's two averages. `WilderKernel` has TA-Lib's two forms: `:mean` (RMA, RSI, ATR)
     seeds with the average and steps `fma(β, prev, α·x)`, and `:sum` (±DM and
     the TR sum) seeds with the sum of `seedn` bars and steps
     `prev − prev·(1/period) + x`, multiplying as ta_PLUS_DM.c does.
@@ -686,10 +698,24 @@ the goldens check every bar.
   - Float outputs use `rtol = 1e-9` together with an `atol` scaled to the
     magnitude of the function's inputs. A relative tolerance alone would fail on
     near-zero outputs: the variance of a flat window, a flat `LINEARREG` slope,
-    `CORREL` at ±1 (which CausalFrames clamps and TA-Lib does not). It would
+    `CORREL` at ±1. It would
     also fail on the gap between compensated sums and TA-Lib's drifting running
     sums.
   - Integer outputs must match exactly.
+  - **`AgeWeightedSum` on a constant series.** Its windowed `downdate!` (and
+    `combine!`) round the product `(n − 1)·x` and drop that error, so a
+    constant series loses the same rounding every bar and drifts linearly
+    (about 6e-12 relative after 100,000 bars at `Bars(3)`; ordinary data shows
+    no drift). A flat `LINEARREG` slope is therefore round-off, not exactly 0.
+    The fix is upstream, an error-free product as #92 gave the co-moments, and
+    the `test_linearreg.c` port holds the exact-zero leg `@test_broken` until
+    then.
+  - **Correlation of a flat window.** TA-Lib's `CORREL` gives 0 where either
+    series has no spread in the window. CausalFrames' `Correlation` gives `NaN`
+    there (0/0). `CORREL` stays CausalFrames only, as `VAR` does with its flat
+    windows, so the goldens skip those bars, and the `test_correl.c` port checks
+    the `NaN`. Wanting TA-Lib's 0 is a `fillmissing`-style step on the output,
+    or a `Correl` dependent if it is ever needed.
   - **Variance near zero.** TA-Lib's var.c floors a variance below 1e-12 of
     the window's mean square to exactly 0. CausalFrames' `Variance` does not, so
     a flat window can leave a residue (σ ≈ 1.3e-14 at a 1e-6 price level).
@@ -756,7 +782,11 @@ README rows together, and updates this document where reality differs.
   ±DI, DX, ADX, ADXR, SAR, SARExt, BollingerBands, StdDev, Var, AvgDev,
   AccBands, Keltner, Donchian, SuperTrend, ADR, CVI, MassIndex, RVI. VAR and
   AVGDEV are CausalFrames only. **Complete.**
-- **S4:** statistics and volume (21).
+- **S4:** statistics and volume (21): AD, ADOSC, Beta, CMF, CORREL, EFI, the
+  LINEARREG family and TSF, MarketFI, NVI, OBV, PERCENTILE, PercentRank100,
+  PVI, PVO, PVT, RVOL, VWAP. CORREL and PERCENTILE are CausalFrames only, and
+  it needed no upstream addition. PVO is PPO's state over the volume.
+  **Complete.**
 - **S5:** the TA-Lib 0.8 additions (18): AC, AO, CMOU, Coppock, DPO, ERI, ER,
   FOSC, Fractal, IMI, KDJ, QStick, SMI, TSI, VHF, Vortex, WAD, HeikinAshi.
 - **S6:** the Hilbert-transform cycle family and `MAMA` (7).
@@ -868,24 +898,24 @@ All 182 in-scope TA-Lib functions. The table is generated from the pinned YAML.
 | `TRANGE` | `TRange` | S3 | dependent: `Last`, `First` | Group | high, low, close | window: Bars(2) (fixed) | (one column) |
 | `VAR` | `Variance(:x; corrected=false)` | S3 | CausalFrames only: `Variance(corrected=false)` | Group | real | window: Bars(5) (TA-Lib ignores nbdev) | (one column) |
 | `AD` | `AD` | S4 | dependent (upstream): row-term `Sum` (no window) | Group | high, low, close, volume | no window (`addsummarycolumns`) | (one column) |
-| `ADOSC` | `ADOSC` | S4 | new state | plain | high, low, close, volume | fastperiod=3, slowperiod=10 | (one column) |
-| `BETA` | `Beta` | S4 | new state (returns need the previous bar) | plain | real0, real1 | period=5 | (one column) |
-| `CMF` | `CMF` | S4 | dependent (upstream): row-term `Sum`, `Sum` | Group | high, low, close, volume | window: Bars(20) | (one column) |
+| `ADOSC` | `ADOSC` | S4 | new state (A/D `Sum`, two first-value-seeded `EMAKernel`s) | plain | high, low, close, volume | fastperiod=3, slowperiod=10, unstable=0 | (one column) |
+| `BETA` | `Beta` | S4 | new state (returns need the previous bar; `Covariance`, `Variance`, `Mean` under `barwindow`) | plain | real0, real1 | period=5 | (one column) |
+| `CMF` | `CMF` | S4 | dependent (upstream): row-term `Sum` (shared with `AD`), `Sum` | Group | high, low, close, volume | window: Bars(20) | (one column) |
 | `CORREL` | `Correlation(:a, :b)` | S4 | CausalFrames only: `Correlation` | Group | real0, real1 | window: Bars(30) | (one column) |
-| `EFI` | `EFI` | S4 | new state | plain | close, volume | period=13 | (one column) |
+| `EFI` | `EFI` | S4 | new state (`EMAKernel` of the force) | plain | close, volume | period=13, unstable=0 | (one column) |
 | `LINEARREG` | `LinearReg` | S4 | dependent (upstream): `AgeWeightedSum`, `Sum`, `Count` | Group | real | window: Bars(14) | (one column) |
 | `LINEARREG_ANGLE` | `LinearRegAngle` | S4 | dependent (upstream): `AgeWeightedSum`, `Sum`, `Count` | Group | real | window: Bars(14) | (one column) |
 | `LINEARREG_INTERCEPT` | `LinearRegIntercept` | S4 | dependent (upstream): `AgeWeightedSum`, `Sum`, `Count` | Group | real | window: Bars(14) | (one column) |
 | `LINEARREG_SLOPE` | `LinearRegSlope` | S4 | dependent (upstream): `AgeWeightedSum`, `Sum`, `Count` | Group | real | window: Bars(14) | (one column) |
 | `MARKETFI` | `MarketFI` | S4 | dependent: `Last` | Group | high, low, volume | any window (bar-local) | (one column) |
 | `NVI` | `NVI` | S4 | new state | plain | close, volume | — | (one column) |
-| `OBV` | `OBV` | S4 | new state (previous close) | plain | real, volume | — | (one column) |
+| `OBV` | `OBV` | S4 | new state (previous close, a `Sum`) | plain | real, volume | — | (one column) |
 | `PERCENTILE` | `Quantile(:x, 0.5; interpolation=:nearestrank)` | S4 | CausalFrames only: `Quantile(percentile / 100; interpolation=:nearestrank)` | Group | real | window: Bars(30), percentile=50 | (one column) |
 | `PERCENTRANK` | `PercentRank100` | S4 | dependent (upstream): `PercentRank` | Group | real | window: Bars(101) (period + 1) | (one column) |
 | `PVI` | `PVI` | S4 | new state | plain | close, volume | — | (one column) |
-| `PVO` | `PVO` | S4 | new state | plain | volume | fastperiod=12, slowperiod=26, matype=:ema | (one column) |
-| `PVT` | `PVT` | S4 | new state | plain | close, volume | — | (one column) |
-| `RVOL` | `RVOL` | S4 | dependent: `Sum`, `Last` over n+1 bars | Group | volume | window: Bars(21) | (one column) |
+| `PVO` | `PVO` | S4 | new state (`PPO`'s, over the volume) | plain | volume | fastperiod=12, slowperiod=26, matype=:ema, unstable=0 | (one column) |
+| `PVT` | `PVT` | S4 | new state (previous close, a `Sum`) | plain | close, volume | — | (one column) |
+| `RVOL` | `RVOL` | S4 | dependent: `Count`, `Sum`, `Last` over n+1 bars | Group | volume | window: Bars(21) (period + 1) | (one column) |
 | `TSF` | `TSF` | S4 | dependent (upstream): `AgeWeightedSum`, `Sum`, `Count` | Group | real | window: Bars(14) | (one column) |
 | `VWAP` | `VWAP` | S4 | dependent (upstream): row-term `Sum`, `Sum` (no window) | Group | high, low, close, volume | no window (`addsummarycolumns`) | (one column) |
 | `AC` | `AC` | S5 | new state | plain | high, low | fastperiod=5, slowperiod=34, signalperiod=5 | (one column) |

@@ -601,14 +601,17 @@ end
 oscillatorvalue(::Val{:apo}, f, s) = f - s
 oscillatorvalue(::Val{:ppo}, f, s) = iszerota(s) ? zero(s) : ((f - s) / s) * 100
 
-function priceoscillator(fn, K, column, fast, slow, matype, unstable, name)
+# `prefix = false` gives the bare output name of a price-bar indicator (PVO).
+function priceoscillator(fn, K, column, fast, slow, matype, unstable, name;
+    prefix::Bool = true)
     checkrange(fn, "fastperiod", fast, 2, 100_000)
     checkrange(fn, "slowperiod", slow, 2, 100_000)
     checkmatype(fn, "matype", matype)
     checkunstable(unstable)
     fast, slow = minmax(fast, slow)
     C = colname(column)
-    s = PriceOscillator{K,matype,C,outname(C, name)}(Int(fast), Int(slow), Int(unstable))
+    N = outname(prefix ? C : nothing, name)
+    s = PriceOscillator{K,matype,C,N}(Int(fast), Int(slow), Int(unstable))
     return withterms(s, column)
 end
 

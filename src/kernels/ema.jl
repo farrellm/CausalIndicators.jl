@@ -13,8 +13,10 @@ end
 """
     EMAKernel(T, period[, k = 2 / (period + 1)])
 
-An EMA kernel over element type `T` (see [`floattype`](@ref)). `k` is the
-smoothing factor; MACDFix and T3 pass their own.
+An EMA kernel over element type `T` (see [`floattype`](@ref)), seeded with
+the simple average of its first `period` bars. `k` is the smoothing factor;
+MACDFix passes its own, and ADOSC passes its periods' factors at `period = 1`,
+an EMA seeded with its first bar.
 """
 function EMAKernel(::Type{T}, period::Integer, k::Real = 2 / (period + 1)) where {T}
     p = checkperiod("EMAKernel", period)
@@ -38,9 +40,9 @@ function step!(e::EMAKernel{T}, x::Real) where {T}
     v = convert(T, x)
     n = e.n += 1
     if n > e.period
-        # Period 1 copies the bar (TA-Lib's period1_identity); the recursion
-        # would lose it to the rounding of `v - prev`.
-        e.prev = e.period == 1 ? v : fma(v - e.prev, e.k, e.prev)
+        # `k = 1` (period 1) copies the bar (TA-Lib's period1_identity); the
+        # recursion would lose it to the rounding of `v - prev`.
+        e.prev = isone(e.k) ? v : fma(v - e.prev, e.k, e.prev)
     else
         seedadd!(e.seed, v)
         n < e.period && return missing

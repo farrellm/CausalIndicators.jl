@@ -6,8 +6,8 @@ TA-Lib's technical indicators as causal, streaming building blocks for
 [CausalFrames.jl](https://github.com/farrellm/CausalFrames.jl) pipelines. See
 [DESIGN.md](DESIGN.md) for the design and the implementation stages. This is
 under construction: stages S1 (moving averages, rolling operators and price
-transforms), S2 (momentum I) and S3 (directional movement and volatility) have
-landed.
+transforms), S2 (momentum I), S3 (directional movement and volatility) and S4
+(statistics and volume) have landed.
 
 ```julia
 using CausalFrames, CausalIndicators, Dates
@@ -24,7 +24,7 @@ Structured indicators (sums, extrema and their dependents) take their window
 from `addrollingcolumns`, so TA-Lib's `period = p` is `Bars(p)`. Recursive ones
 take a `period` keyword and run under `addsummarycolumns`. Output columns are
 `missing` for TA-Lib's lookback. Functions that compare with the bar `period`
-back (the MOM/ROC family, Aroon) take `Bars(period + 1)`. Indicators with a
+back (the MOM/ROC family, Aroon, PercentRank100, RVOL) take `Bars(period + 1)`. Indicators with a
 TA-Lib unstable period, their own or inherited, take an `unstable` keyword.
 
 ## Indicators
@@ -66,6 +66,19 @@ TA-Lib unstable period, their own or inherited, take an `unstable` keyword.
 | `KC` | `KeltnerChannels(; period = 20, atrperiod = 10, nbdev = 2)` | `addsummarycolumns` |
 | `SAR`, `SAREXT` | `SAR(; acceleration = 0.02, maximum = 0.2)`, `SARExt(; startvalue = 0, …)` | `addsummarycolumns` |
 | `SUPERTREND` | `SuperTrend(; period = 10, multiplier = 3.0)` | `addsummarycolumns` |
+| `LINEARREG`, `LINEARREG_SLOPE`, `LINEARREG_INTERCEPT`, `LINEARREG_ANGLE`, `TSF` | `LinearReg(:x)`, `LinearRegSlope(:x)`, `LinearRegIntercept(:x)`, `LinearRegAngle(:x)`, `TSF(:x)` | `Bars(14)` |
+| `PERCENTRANK` | `PercentRank100(:x)` | `Bars(101)` (period + 1) |
+| `BETA` | `Beta(:x, :y; period = 5)` | `addsummarycolumns` |
+| `AD` | `AD(; high, low, close, volume)` | `addsummarycolumns` |
+| `ADOSC` | `ADOSC(; fastperiod = 3, slowperiod = 10)` | `addsummarycolumns` |
+| `CMF` | `CMF(; high, low, close, volume)` | `Bars(20)` |
+| `EFI` | `EFI(; period = 13)` | `addsummarycolumns` |
+| `MARKETFI` | `MarketFI(; high, low, volume)` | either (bar-local) |
+| `OBV` | `OBV(:x; volume = :volume)` | `addsummarycolumns` |
+| `NVI`, `PVI`, `PVT` | `NVI(; close, volume)`, `PVI(; …)`, `PVT(; …)` | `addsummarycolumns` |
+| `PVO` | `PVO(; fastperiod = 12, slowperiod = 26, matype = :ema)` | `addsummarycolumns` |
+| `RVOL` | `RVOL(; volume)` | `Bars(21)` (period + 1) |
+| `VWAP` | `VWAP(; high, low, close, volume)` | `addsummarycolumns` (a key per session) |
 
 These TA-Lib functions are CausalFrames summarizers already, so this package
 only tests them and adds no constructor:
@@ -79,6 +92,8 @@ only tests them and adds no constructor:
 | `MAXINDEX`, `MININDEX`, `MINMAXINDEX` | `MaxIndex(:x)`, `MinIndex(:x)` (bars since the extreme, newest tie wins) | `Bars(30)` |
 | `VAR` | `Variance(:x; corrected = false)` | `Bars(5)` |
 | `AVGDEV` | `MeanAbsDev(:x)` | `Bars(14)` |
+| `CORREL` | `Correlation(:x, :y)` (`NaN` on a flat window, where TA-Lib gives 0) | `Bars(30)` |
+| `PERCENTILE` | `Quantile(:x, percentile / 100; interpolation = :nearestrank)` | `Bars(30)` |
 
 ## Development
 
