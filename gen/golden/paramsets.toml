@@ -261,3 +261,51 @@ PVO = [
 PVT = []
 RVOL = [{optInTimePeriod = 1}, {optInTimePeriod = 5}]
 VWAP = []
+
+# S5. MA types use TA_MAType's order (see MA above).
+AC = [
+    {optInFastPeriod = 2, optInSlowPeriod = 3, optInSignalPeriod = 2},
+    {optInFastPeriod = 34, optInSlowPeriod = 5, optInSignalPeriod = 5},
+]
+AO = [
+    {optInFastPeriod = 2, optInSlowPeriod = 3},
+    {optInFastPeriod = 34, optInSlowPeriod = 5},
+]
+CMOU = [{optInTimePeriod = 2}, {optInTimePeriod = 5}, {optInTimePeriod = 30}]
+COPPOCK = [
+    {optInWMAPeriod = 1, optInROC1Period = 11, optInROC2Period = 14},
+    {optInWMAPeriod = 5, optInROC1Period = 14, optInROC2Period = 3},
+    {optInWMAPeriod = 2, optInROC1Period = 1, optInROC2Period = 1},
+]
+DPO = [{optInTimePeriod = 2}, {optInTimePeriod = 3}, {optInTimePeriod = 5}, {optInTimePeriod = 10}]
+ER = [{optInTimePeriod = 2}, {optInTimePeriod = 30}]
+ERI = [{optInTimePeriod = 1}, {optInTimePeriod = 2}, {optInTimePeriod = 13, unstable = 3}]
+FOSC = [{optInTimePeriod = 2}, {optInTimePeriod = 14}]
+FRACTAL = [
+    {optInLeftBars = 1, optInRightBars = 1},
+    {optInLeftBars = 1, optInRightBars = 5},
+    {optInLeftBars = 5, optInRightBars = 1},
+    {optInLeftBars = 3, optInRightBars = 3},
+]
+HA = [{unstable = 1}, {unstable = 5}]
+IMI = [{optInTimePeriod = 2}, {optInTimePeriod = 5}]
+KDJ = [
+    {optInSlowK_MAType = 0, optInSlowD_MAType = 0},
+    {optInFastK_Period = 2, optInSlowK_Period = 1, optInSlowD_Period = 1},
+    {optInFastK_Period = 9, optInSlowK_Period = 1, optInSlowD_Period = 3},
+    {unstable = 3},
+]
+QSTICK = [{optInTimePeriod = 1}, {optInTimePeriod = 2}, {optInTimePeriod = 20}]
+SMI = [
+    {optInTimePeriod = 2, optInFastPeriod = 2, optInSlowPeriod = 2, optInSignalPeriod = 2},
+    {optInTimePeriod = 5, optInFastPeriod = 3, optInSlowPeriod = 10, optInSignalPeriod = 4},
+    {unstable = 2},
+]
+TSI = [
+    {optInFirstPeriod = 13, optInSecondPeriod = 25},
+    {optInFirstPeriod = 2, optInSecondPeriod = 2},
+    {unstable = 2},
+]
+VHF = [{optInTimePeriod = 2}, {optInTimePeriod = 5}, {optInTimePeriod = 14}]
+VORTEX = [{optInTimePeriod = 1}, {optInTimePeriod = 2}, {optInTimePeriod = 21}]
+WAD = []

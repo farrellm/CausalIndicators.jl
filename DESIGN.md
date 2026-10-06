@@ -133,6 +133,11 @@ table records which:
    - `AD`, `CMF` and `VWAP` read `Sum`s of namespaced row terms (`:ad_mfv`,
      shared by `AD` and `CMF`, and `:vwap_pv`, `:vwap_v`), `RVOL` reads
      `Count`, `Sum` and `Last`, and `MarketFI` reads `Last`.
+   - `QStick` reads the `Mean` of the row term `:qstick_body`, and `IMI` the
+     `Sum`s of `:imi_up` and `:imi_dn`.
+   - `FOSC` reads `Count`, `Sum`, `AgeWeightedSum` and `Last` over
+     `Bars(period + 1)`: the `TSF` of the window's older bars, against the
+     newest.
 3. **Move it into CausalFrames.** If an indicator needs a *generic* accumulator
    or operator that CausalFrames lacks, it is first added to CausalFrames as a
    prerequisite PR, with its own tests, docs and DESIGN.md entry. The indicator
@@ -269,7 +274,8 @@ g. **`CausalFrames.barwindow(s, n, intypes)`, a count-window state** (#81),
      state holding one takes its type as a type parameter.
 
    Recursive states cannot get a window through a transform, so they use this.
-   Its users are KAMA, MFI, ULTOSC, AO, TRIMA, the Stoch family's %K,
+   Its users are KAMA and ER, MFI, ULTOSC, AO and AC, CMOU, VHF, Vortex, DPO,
+   Coppock, SMI, Fractal, TRIMA, the Stoch family's %K,
    `MAKernel`'s `:sma` and `:wma`, `BollingerBands(; matype)` and RVI (a
    `Std`), CVI and ADXR (a `First` of their own earlier values), MassIndex (a
    `Sum`), Beta (`Covariance`, `Variance` and `Mean` of the returns) and
@@ -357,11 +363,13 @@ given parameters.
     ATR's, and `CVI` and `MassIndex` EMA's (`MassIndex` once per EMA stage).
   - `ADOSC` and `EFI` inherit EMA's, and `PVO` its dispatched type's. TA-Lib's
     YAML flags none of the three, but each lookback calls one that has it.
+  - `ERI`, `SMI` and `TSI` inherit EMA's, and `KDJ` its dispatched types', in
+    the same way. `HeikinAshi` has its own, which only delays the output.
   - `ATR`, `NATR`, `PlusDM`, `MinusDM`, `PlusDI`, `MinusDI`, `DX`, `ADX` and
     `RVI` have their own. At period 1 the DMs and DIs ignore it, as TA-Lib's
     period-1 arms do.
   - One keyword sets them all, as `TA_FUNC_UNST_ALL` does.
-  - For the chained EMAs (`DEMA`, `TEMA`, `MACD`, `TRIX`) the inherited period
+  - For the chained EMAs (`DEMA`, `TEMA`, `MACD`, `TRIX`, `SMI`, `TSI`) the inherited period
     changes the values, not only the first bar: each EMA stage passes its
     unstable bars before it feeds the next.
 
@@ -453,6 +461,7 @@ The name table's "Tier" column records it.
   - `MidPoint`, `MidPrice`, `Donchian`, `WillR`
   - `Aroon`/`AroonOsc` (`MaxIndex`/`MinIndex` and `Count`)
   - `MOM`/`ROC*` (`First`/`Last`)
+  - `FOSC` (`Count`, `Sum`, `AgeWeightedSum`, `Last` under `Bars(period + 1)`)
   - `TRange` (`First`/`Last` under `Bars(2)`)
 
   By the no-duplication rule, each of these is a CausalFrames summarizer or a
@@ -465,17 +474,19 @@ The name table's "Tier" column records it.
 - **Plain** (`Summarizer`). These have no lawful `combine!`, so they are folded
   row by row:
   - recursive filters: the EMA family, Wilder smoothing, `MACD`, `KAMA`, `T3`,
-    `MAMA`, the Hilbert family
+    `MAMA`, the Hilbert family, `ERI`, `SMI`, `TSI`, `HeikinAshi`
   - everything with an `matype` keyword: `MA`, `MACDExt`, `APO`/`PPO`/`PVO`,
     `Stoch*`, `KDJ`, and `BollingerBands(:x; matype)`. Passing `matype` at all
     selects the plain form; without it, `BollingerBands(:x)` is the Group-tier
     SMA form under a `Bars` window.
   - path-dependent states: `SAR`, `SARExt`, `SuperTrend`, `OBV`, `PVT`, `NVI`,
-    `PVI`, `ADOSC`
+    `PVI`, `ADOSC`, `WAD`
   - indicators that feed a per-row term needing the previous bar into a window
     or a recursion: `RSI`/`CMO`, `ATR`/`NATR`, the ±DM/±DI/DX/ADX family, `CVI`,
     `MassIndex`, `RVI`, `KeltnerChannels`, `MFI`, `ULTOSC`, `Beta` returns,
-    `EFI`, `Vortex`
+    `EFI`, `Vortex`, `CMOU`, `ER`, `VHF`
+  - indicators with two windows of different lengths, or a window over a
+    derived series: `AO`, `AC`, `DPO`, `Coppock`, `Fractal`
   - candlesticks
 
   A plain indicator that needs a window takes TA-Lib's `period` keyword and
@@ -502,7 +513,9 @@ TA-Lib's default window is listed as `window: Bars(n)` in the name table.
   back (`MOM`, the `ROC` family) read `First`/`Last` over the whole window.
   `RVOL`, which compares the current bar with the mean of the `period` bars
   before it, reads `Count`, `Sum` and `Last` and computes that mean as
-  `(Sum − Last) / period`, with `period` the window's `Count` minus one. `PercentRank100` ranks the current bar against the
+  `(Sum − Last) / period`, with `period` the window's `Count` minus one. `FOSC`
+  compares the current bar with the forecast from the `period` bars before it.
+  `PercentRank100` ranks the current bar against the
   `period` bars before it. `Aroon` and `AroonOsc` find the extremes over the
   current bar and the `period` before it, and read `period` back as the
   window's `Count` minus one. In every case the window includes the current
@@ -538,6 +551,9 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
     `WilderKernel` seeded with `period − 1` bars, or kept raw at period 1. The
     ±DM, ±DI, DX, ADX and ADXR states read it. DX repeats its previous value
     where it is undefined, and ADX holds, as TA-Lib does.
+  - `ERKernel` (S5): Kaufman's efficiency ratio, a `barwindow` `Sum` of `|Δx|`
+    and a `First` of the bar `period` back, with ta_ER.c's flat-window guard.
+    `ER` emits it, and `KAMAKernel` embeds it, so the two stay one computation.
   - `MAKernel{M}`: the moving-average family behind a type parameter.
     - It is used by `MA`, `MACDExt`, `APO`/`PPO`/`PVO`, `Stoch*`, `KDJ` and
       non-SMA `BollingerBands`.
@@ -557,6 +573,13 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
       unstable period).
     - Every kernel copies its input at period 1 (TA-Lib's
       `period1_identity`).
+  - The S5 plain indicators share one summarizer, `BarIndicator` (in
+    `src/barindicator.jl`): it reads the input columns, skips a bar with any
+    `missing`, and steps a per-indicator kernel built from an immutable spec,
+    which returns the outputs or `nothing` during the lookback. Their windows
+    go through two internal dependents under `barwindow`: `Sums` (the window
+    sums of several columns, also behind MFI and ULTOSC) and `Extremes` (the
+    highest high and lowest low).
   - `CandleAverages` (S7): TA-Lib's per-setting body and shadow averages, built
     on count-windowed CausalFrames `Mean` states.
 
@@ -606,7 +629,8 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
 | File | Content |
 |---|---|
 | `src/CausalIndicators.jl` | module, includes, exports |
-| `src/kernels/*.jl` | `EMAKernel`, `WilderKernel`, `SMAKernel`, `MAKernel`, `GainLossKernel`, `FastKKernel`, `ATRKernel`, `DMKernel`, `CandleAverages` |
+| `src/kernels/*.jl` | `EMAKernel`, `WilderKernel`, `SMAKernel`, `MAKernel`, `ERKernel`, `GainLossKernel`, `FastKKernel`, `ATRKernel`, `DMKernel`, `CandleAverages` |
+| `src/barindicator.jl` | `BarIndicator`, the plain summarizer shared by the S5 indicators |
 | `src/overlap.jl` | moving averages and bands |
 | `src/momentum.jl` | momentum indicators |
 | `src/volatility.jl` | volatility indicators |
@@ -789,6 +813,9 @@ README rows together, and updates this document where reality differs.
   **Complete.**
 - **S5:** the TA-Lib 0.8 additions (18): AC, AO, CMOU, Coppock, DPO, ERI, ER,
   FOSC, Fractal, IMI, KDJ, QStick, SMI, TSI, VHF, Vortex, WAD, HeikinAshi.
+  FOSC claimed the Group tier, as a dependent under `Bars(period + 1)`, and
+  ERI, SMI, TSI, KDJ and HeikinAshi gained `unstable`. It needed no upstream
+  addition. **Complete.**
 - **S6:** the Hilbert-transform cycle family and `MAMA` (7).
 - **S7:** the 61 candlestick patterns and `CandleSettings`.
 
@@ -918,24 +945,24 @@ All 182 in-scope TA-Lib functions. The table is generated from the pinned YAML.
 | `RVOL` | `RVOL` | S4 | dependent: `Count`, `Sum`, `Last` over n+1 bars | Group | volume | window: Bars(21) (period + 1) | (one column) |
 | `TSF` | `TSF` | S4 | dependent (upstream): `AgeWeightedSum`, `Sum`, `Count` | Group | real | window: Bars(14) | (one column) |
 | `VWAP` | `VWAP` | S4 | dependent (upstream): row-term `Sum`, `Sum` (no window) | Group | high, low, close, volume | no window (`addsummarycolumns`) | (one column) |
-| `AC` | `AC` | S5 | new state | plain | high, low | fastperiod=5, slowperiod=34, signalperiod=5 | (one column) |
+| `AC` | `AC` | S5 | new state (three `Mean` windows) | plain | high, low | fastperiod=5, slowperiod=34, signalperiod=5 | (one column) |
 | `AO` | `AO` | S5 | new state (two `Mean` windows) | plain | high, low | fastperiod=5, slowperiod=34 | (one column) |
-| `CMOU` | `CMOU` | S5 | new state (previous bar) | plain | real | period=14 | (one column) |
-| `COPPOCK` | `Coppock` | S5 | new state | plain | real | wmaperiod=10, roc1period=11, roc2period=14 | (one column) |
-| `DPO` | `DPO` | S5 | new state | plain | real | period=20 | (one column) |
-| `ER` | `ER` | S5 | new state | plain | real | period=10 | (one column) |
-| `ERI` | `ERI` | S5 | new state | plain | high, low, close | period=13 | bullpower, bearpower |
-| `FOSC` | `FOSC` | S5 | new state | plain | real | period=5 | (one column) |
-| `FRACTAL` | `Fractal` | S5 | new state | plain | high, low | leftbars=2, rightbars=2 | swinghigh, swinglow |
-| `HA` | `HeikinAshi` | S5 | new state | plain | open, high, low, close | — | haopen, hahigh, halow, haclose |
+| `CMOU` | `CMOU` | S5 | new state (previous bar; `Sum` windows) | plain | real | period=14 | (one column) |
+| `COPPOCK` | `Coppock` | S5 | new state (`First` windows, `WMAKernel`) | plain | real | wmaperiod=10, roc1period=11, roc2period=14 | (one column) |
+| `DPO` | `DPO` | S5 | new state (`Mean` and `First` windows) | plain | real | period=20 | (one column) |
+| `ER` | `ER` | S5 | new state (`ERKernel`, shared with `KAMA`) | plain | real | period=10 | (one column) |
+| `ERI` | `ERI` | S5 | new state (`EMAKernel`) | plain | high, low, close | period=13, unstable=0 | bullpower, bearpower |
+| `FOSC` | `FOSC` | S5 | dependent (upstream): `AgeWeightedSum`, `Sum`, `Count`, `Last` | Group | real | window: Bars(6) (period + 1) | (one column) |
+| `FRACTAL` | `Fractal` | S5 | new state (`Max`, `Min` and `First` windows) | plain | high, low | leftbars=2, rightbars=2 | swinghigh, swinglow (`Int`) |
+| `HA` | `HeikinAshi` | S5 | new state | plain | open, high, low, close | unstable=0 | haopen, hahigh, halow, haclose |
 | `IMI` | `IMI` | S5 | dependent (upstream): row-term `Sum`s | Group | open, close | window: Bars(14) | (one column) |
-| `KDJ` | `KDJ` | S5 | new state | plain | high, low, close | fastkperiod=9, slowkperiod=3, slowkmatype=:rma, slowdperiod=3, slowdmatype=:rma | k, d, j |
-| `QSTICK` | `QStick` | S5 | dependent (upstream): row-term `Sum`, `Count` | Group | open, close | window: Bars(10) | (one column) |
-| `SMI` | `SMI` | S5 | new state | plain | high, low, close | period=13, fastperiod=2, slowperiod=25, signalperiod=9 | smi, smisignal |
-| `TSI` | `TSI` | S5 | new state | plain | real | firstperiod=25, secondperiod=13 | (one column) |
-| `VHF` | `VHF` | S5 | new state | plain | real | period=28 | (one column) |
-| `VORTEX` | `Vortex` | S5 | new state | plain | high, low, close | period=14 | plusvi, minusvi |
-| `WAD` | `WAD` | S5 | new state | plain | high, low, close | — | (one column) |
+| `KDJ` | `KDJ` | S5 | new state (`Stoch`'s) | plain | high, low, close | fastkperiod=9, slowkperiod=3, slowkmatype=:rma, slowdperiod=3, slowdmatype=:rma, unstable=0 | k, d, j |
+| `QSTICK` | `QStick` | S5 | dependent (upstream): row-term `Mean` | Group | open, close | window: Bars(10) | (one column) |
+| `SMI` | `SMI` | S5 | new state (`Max`/`Min` window, chained `EMAKernel`s) | plain | high, low, close | period=13, fastperiod=2, slowperiod=25, signalperiod=9, unstable=0 | smi, smisignal |
+| `TSI` | `TSI` | S5 | new state (previous bar, chained `EMAKernel`s) | plain | real | firstperiod=25, secondperiod=13, unstable=0 | (one column) |
+| `VHF` | `VHF` | S5 | new state (previous bar; `Max`, `Min`, `Sum` windows) | plain | real | period=28 | (one column) |
+| `VORTEX` | `Vortex` | S5 | new state (previous bar; `Sum` windows) | plain | high, low, close | period=14 | plusvi, minusvi |
+| `WAD` | `WAD` | S5 | new state (previous close, a `Sum`) | plain | high, low, close | — | (one column) |
 | `HT_DCPERIOD` | `HTDCPeriod` | S6 | new state | plain | real | — | (one column) |
 | `HT_DCPHASE` | `HTDCPhase` | S6 | new state | plain | real | — | (one column) |
 | `HT_PHASOR` | `HTPhasor` | S6 | new state | plain | real | — | inphase, quadrature |

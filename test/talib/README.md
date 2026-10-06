@@ -18,7 +18,9 @@ These files have no file-scope tables at all:
       other series), the zero previous price and price-scale invariance (S4).
       The Wilkinson, NIST Norris and outlier-transit legs wait for
       `test_reference.c`.
-- [ ] `test_cmou.c`
+- [x] `test_cmou.c`: the Tulip/pandas oracle at 1e-12, the all-up, all-down,
+      flat and hand-computed windows, and the empty window over the spiked
+      LCG corpus (`lcgsym`), exactly 0 at all 18,096 flat bars (S5)
 - [x] `test_correl.c`, in part: a two-pass oracle, the [−1, 1] range,
       self-correlation, affine invariance with the sign of the scale, and the
       flat window, which gives `NaN` where TA-Lib gives 0 (DESIGN.md,
@@ -114,6 +116,37 @@ These files have checks outside their extracted tables:
 - [x] `test_vwap.c`: both shapes' oracle and pinned values at 1e-14 relative,
       the leading zero volume, the zero-volume and non-finite bars, and the
       session reset by key (S4)
+
+- [x] `test_dpo.c`: the Tulip/pandas oracle at 1e-12, the Tulip and Achelis
+      book vectors, both arms of the lookback and the constants of a line (S5)
+- [x] `test_fosc.c`: the Achelis and Tulip book vectors, the Tulip and
+      trading-signals oracles at 1e-10, FOSC as TSF one bar earlier, and the
+      zero close (S5)
+- [x] `test_vhf.c`: the oracle at 1e-12, the book vectors, a direct scan of
+      every window with the [0, 1] bound, and the flat 0 (S5)
+- [x] `test_eri.c`: the pins at 1e-12, the shared EMA, the period-1 copy on
+      the non-Sterbenz pair, and the unstable grid (S5)
+- [x] `test_vortex.c`: the pins at 1e-12, TRange and the movements through
+      window sums at every grid period, and the halt after a spread bar (S5)
+- [x] `test_tsi.c`: the oracle and the trading-signals tail at 1e-12, the
+      unstable grid's lookback, and the flat 0 (S5)
+- [x] `test_imi.c`: its table, and the flat (50), all-up and all-down windows
+      (S5)
+- [x] `test_kdj.c`: the Tulip (RMA) and trading-signals (SMA) oracles at
+      2e-12, and the delegation to Stoch with J = 3K − 2D over the grid and
+      three MA types (S5)
+- [x] `test_fractal.c`: the corpus and synthetic flag lists in full, the bars
+      where both fire, and the flat and monotone shapes (S5)
+- [x] `test_ha.c`: both oracles exactly, the signed zeros' sign bits and the
+      unstable period (S5)
+- [x] `test_composite1.c`, S5 part: AO and AC against SMAs of the median price,
+      QStick's book vectors and its SMA of the body (S5)
+- [x] `test_composite2.c`, S5 part: Coppock as the WMA of two ROCs, SMI from
+      the window's extremes and chained EMAs, and ER as the ratio KAMA adapts
+      to (S5)
+- [x] `test_quote_unit.c`, S5 part: the 2^-60 CMOU and SMI oracles and their
+      [−100, 100] range (S5)
+- [x] `test_per_hlc.c` WAD: its table rows and the book and Tulip vectors (S5)
 
 Not ported, being out of scope:
 
