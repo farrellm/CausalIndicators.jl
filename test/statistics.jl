@@ -61,17 +61,14 @@ tavar(x, p) = only(foldseries(Variance(:x; corrected = false), (; x); window = B
             end
         end
         @test all(shiftok)
-        # Scale invariance: var(c·x) = c²·var(x). Under Bars(2) a window of two
-        # close values has a tiny variance, and CausalFrames' shifted co-moment
-        # still cancels there (to ~1e-7), so that period is broken until
-        # CausalFrames.jl#91 is fixed.
+        # Scale invariance: var(c·x) = c²·var(x), including Bars(2), where a
+        # window of two close values has a tiny variance.
         base = 100 .+ 20 .* lcgsym(0x5EED1234, 300)
         scaleok(p) = all((1e3, 1e-3, 7.5)) do c
             v0, v1 = tavar(base, p), tavar(c .* base, p)
             all(i -> abs(v1[i] - c^2 * v0[i]) <= 1e-9 * c^2 * v0[i], p:300)
         end
-        @test scaleok(10) && scaleok(25)
-        @test_broken scaleok(2)
+        @test scaleok(2) && scaleok(10) && scaleok(25)
         # Non-negativity under a spike, a level shift and a 1e8 level, and an
         # exactly constant series gives exactly 0.
         x = [1e8 + ((i * 13) % 7 - 3) * 0.01 for i in 0:499]
