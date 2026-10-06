@@ -16,7 +16,9 @@ export MA, EMA, RMA, DEMA, TEMA, TRIMA, KAMA, T3, HMA, ZLEMA, MAVP, WMA, VWMA,
     PlusDM, MinusDM, PlusDI, MinusDI, DX, ADX, ADXR,
     TRange, ATR, NATR, ADR, CVI, MassIndex, RVI,
     SAR, SARExt, BollingerBands, AccBands, KeltnerChannels, Donchian, SuperTrend,
-    StdDev
+    StdDev, LinearReg, LinearRegSlope, LinearRegIntercept, LinearRegAngle, TSF,
+    PercentRank100, Beta,
+    AD, ADOSC, CMF, EFI, MarketFI, NVI, OBV, PVI, PVO, PVT, RVOL, VWAP
 
 include("kernels/common.jl")
 include("kernels/ema.jl")
@@ -35,5 +37,6 @@ include("price.jl")
 include("momentum.jl")
 include("volatility.jl")
 include("statistics.jl")
+include("volume.jl")
 
 end

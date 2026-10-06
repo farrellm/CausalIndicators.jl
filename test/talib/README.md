@@ -13,10 +13,23 @@ stage that implements the function. Each entry is ticked when its port lands.
 
 These files have no file-scope tables at all:
 
-- [ ] `test_beta.c`
+- [x] `test_beta.c`, in part: a two-pass oracle over TA_SREF at periods 1, 2,
+      5 and 20, a series against itself, the flat index (flat and varying
+      other series), the zero previous price and price-scale invariance (S4).
+      The Wilkinson, NIST Norris and outlier-transit legs wait for
+      `test_reference.c`.
 - [ ] `test_cmou.c`
-- [ ] `test_correl.c`
-- [ ] `test_linearreg.c`
+- [x] `test_correl.c`, in part: a two-pass oracle, the [−1, 1] range,
+      self-correlation, affine invariance with the sign of the scale, and the
+      flat window, which gives `NaN` where TA-Lib gives 0 (DESIGN.md,
+      "Testing") (S4). The pandas, NIST Norris and small-scale legs wait for
+      `test_reference.c`.
+- [x] `test_linearreg.c`, in part: a direct least-squares fit of every window,
+      the internal consistency of the five outputs, the affine identity, the
+      constant window, an exact line and the large print leaving no residue
+      (S4). The Wilkinson, ladder and NIST NumAcc legs wait for
+      `test_reference.c`; the reseed legs test TA-Lib's running sums, which
+      CausalFrames' compensated sums replace.
 - [x] `test_mavp.c`: the per-bar oracle (MAVP equals `MA(p)` started at
       MAVP's first output) for every MA type, with and without an unstable
       period, and the min/max/NaN clamping (S1). The in-place and truncation
@@ -84,6 +97,23 @@ These files have checks outside their extracted tables:
 - [x] `test_quote_unit.c`, S3 part: the 2^-60 oracles for NATR, ADX, ADXR,
       DX, ±DI and ACCBANDS, and the [0, 100] range of the DI family. The
       power-of-two invariance leg is not ported.
+
+- [x] `test_per_hlcv.c`, `test_per_hl.c`, `test_per_cv.c`: the AD, ADOSC,
+      BETA, CORREL, NVI, PVI and PVT rows, the PVT oracle at 1e-12 and the
+      zero-previous-close and overflow edges (S4)
+- [x] `test_cmf.c`: the shapes and range, the oracle at 1e-13, TA-Lib's own
+      pinned output at 1e-15 (it pins it bitwise), and the zero-volume, flat,
+      malformed, close-at-high/low/middle, full-window and short-input edges
+      (S4)
+- [x] `test_marketfi.c`: the pins at 1e-12 and the zero-volume bar (S4)
+- [x] `test_percentile.c`: the oracle bit for bit, the textbook example, the
+      exact integer rank against sorted windows and the 0/100 extremes (S4)
+- [x] `test_percentrank.c`: the oracle bit for bit, the count map and the
+      strict tie rule (S4)
+- [x] `test_rvol.c`: the oracle at 1e-13 and the dead window (S4)
+- [x] `test_vwap.c`: both shapes' oracle and pinned values at 1e-14 relative,
+      the leading zero volume, the zero-volume and non-finite bars, and the
+      session reset by key (S4)
 
 Not ported, being out of scope:
 

@@ -224,3 +224,40 @@ RVI = [
     {optInTimePeriod = 14, optInStdDevPeriod = 30},
     {optInTimePeriod = 14, optInStdDevPeriod = 10, unstable = 4},
 ]
+
+# S4.
+AD = []
+ADOSC = [
+    {optInFastPeriod = 5, optInSlowPeriod = 2},
+    {optInFastPeriod = 2, optInSlowPeriod = 5},
+    {optInFastPeriod = 3, optInSlowPeriod = 10, unstable = 3},
+]
+BETA = [{optInTimePeriod = 1}, {optInTimePeriod = 2}, {optInTimePeriod = 20}]
+CMF = [{optInTimePeriod = 2}, {optInTimePeriod = 14}, {optInTimePeriod = 21}]
+CORREL = [{optInTimePeriod = 2}, {optInTimePeriod = 20}]
+EFI = [{optInTimePeriod = 1}, {optInTimePeriod = 2}, {optInTimePeriod = 13, unstable = 2}]
+LINEARREG = [{optInTimePeriod = 2}, {optInTimePeriod = 5}, {optInTimePeriod = 30}]
+LINEARREG_ANGLE = [{optInTimePeriod = 2}, {optInTimePeriod = 5}, {optInTimePeriod = 30}]
+LINEARREG_INTERCEPT = [{optInTimePeriod = 2}, {optInTimePeriod = 5}, {optInTimePeriod = 30}]
+LINEARREG_SLOPE = [{optInTimePeriod = 2}, {optInTimePeriod = 5}, {optInTimePeriod = 30}]
+TSF = [{optInTimePeriod = 2}, {optInTimePeriod = 5}, {optInTimePeriod = 30}]
+MARKETFI = []
+NVI = []
+OBV = []
+PERCENTILE = [
+    {optInTimePeriod = 2, optInPercentile = 0.0},
+    {optInTimePeriod = 5, optInPercentile = 10.0},
+    {optInTimePeriod = 10, optInPercentile = 90.0},
+    {optInTimePeriod = 7, optInPercentile = 100.0},
+]
+PERCENTRANK = [{optInTimePeriod = 2}, {optInTimePeriod = 3}, {optInTimePeriod = 20}]
+PVI = []
+PVO = [
+    {optInMAType = 0},
+    {optInMAType = 6},
+    {optInFastPeriod = 26, optInSlowPeriod = 12},
+    {optInMAType = 1, unstable = 2},
+]
+PVT = []
+RVOL = [{optInTimePeriod = 1}, {optInTimePeriod = 5}]
+VWAP = []

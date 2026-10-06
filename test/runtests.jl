@@ -26,6 +26,7 @@ include("helpers.jl")
     include("rolling.jl")
     include("statistics.jl")
     include("volatility.jl")
+    include("volume.jl")
 
     # JET can lag pre-release Julia; the checks are the same on every released
     # version, so skipping them there loses nothing.

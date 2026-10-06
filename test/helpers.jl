@@ -158,23 +158,24 @@ For every `(dataset, params)` golden of TA-Lib function `fn`, call
 `run(params::Dict, data)`, which returns one vector per golden output column
 named in `outputs` (in that order), and check each against the golden with
 [`goldenmatch`](@ref). `skip(data, params, i)`, if given, excludes bar `i` (1-based)
-from the comparison. It returns the number of series checked.
+from the comparison. The absolute tolerance is [`goldenatol`](@ref) of the
+`input` column, or `atol` if given. It returns the number of series checked.
 """
 function checkgoldens(run, fn; outputs, input = :close, skip = nothing,
-    convert = (want, data, params) -> want)
+    convert = (want, data, params) -> want, atol = nothing)
     n = 0
     for ((ds, ps), golden) in sort(collect(loadgolden(fn)); by = first)
         data = DATASETS[ds]()
         p = parseparams(ps)
         got = run(p, data)
-        atol = goldenatol(data[input])
+        tol = something(atol, goldenatol(data[input]))
         for (g, o) in zip(got, outputs)
             want = convert(golden[o], data, p)
             if skip !== nothing
                 keep = [!skip(data, p, i) for i in eachindex(want)]
                 g, want = g[keep], want[keep]
             end
-            ok = goldenmatch(g, want; rtol = 1e-9, atol)
+            ok = goldenmatch(g, want; rtol = 1e-9, atol = tol)
             ok || @info "golden series failed" fn ds ps o
             @test ok
             n += 1
@@ -299,10 +300,12 @@ refolded(t::CausalFrames.Termed) = CausalFrames.Termed(Refold(t.summarizer), t.t
 # The decimals a table value was written with, which set its tolerance. The
 # extractor evaluates the C literals, so a value can carry a representation
 # error (0.7333000000000001); 15 significant digits recover the literal.
-decimals(v) = (
-    s = string(round(v; sigdigits = 15));
-    occursin('.', s) ? length(s) - findlast('.', s) : 0
-)
+function decimals(v)
+    s = string(round(v; sigdigits = 15))
+    m, e = occursin('e', s) ? split(s, 'e') : (s, "0")
+    d = occursin('.', m) ? length(m) - findlast('.', m) : 0
+    return max(d - parse(Int, e), 0)
+end
 
 """
     tablerun(run, data, startidx, endidx, lookback) -> Vector
@@ -339,7 +342,10 @@ function checkrow(got, row; out = "oneOfTheExpectedOutReal",
     @test findfirst(!ismissing, got) - 1 == beg
     if value
         want = row[out]
-        @test got[beg+row[index]+1] ≈ want atol = 10.0^-decimals(want)
+        # A literal at 17 digits is held to 1e-14 relative: the compensated sums
+        # differ from TA-Lib's running ones in the last digits.
+        @test got[beg+row[index]+1] ≈ want atol =
+            max(10.0^-decimals(want), 1e-14 * abs(want))
     end
     return nothing
 end
