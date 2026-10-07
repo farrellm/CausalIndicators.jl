@@ -211,7 +211,7 @@ CausalFrames.fresh(k::CandleKernel{P,T,A,L,H}) where {P,T,A,L,H} =
         hikkakefresh(k.hikkake), 0, NEVER)
 function CausalFrames.fresh!(k::CandleKernel{P,T}) where {P,T}
     n = k.nbars
-    map(a -> fresh_avg!(a, n), k.avgs)
+    foreach(a -> fresh_avg!(a, n), values(k.avgs))
     refill!(k.open, n, T)
     refill!(k.high, n, T)
     refill!(k.low, n, T)
