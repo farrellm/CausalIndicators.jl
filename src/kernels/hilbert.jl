@@ -6,10 +6,9 @@
 #
 # TA-Lib keeps each FIR's taps in odd/even three-slot buffers; tracing its
 # `hilbertIdx` shows those are exactly the lags 2, 4 and 6 whatever the start
-# parity, so here every lag line is a CausalFrames `WindowValues` under
-# `barwindow`, prefilled with TA-Lib's zeros (which also gets past
-# `barwindow`'s missing-until-full gate). The arithmetic follows TA-Lib's
-# order term by term.
+# parity, so here every lag line is a `lagwindow` (kernels/common.jl), a
+# CausalFrames `WindowValues` under `barwindow` prefilled with TA-Lib's zeros.
+# The arithmetic follows TA-Lib's order term by term.
 #
 # A non-finite input poisons the core for good, as TA-Lib's running WMA sums
 # do: every later real output is NaN. The windows are then never read again,
@@ -17,22 +16,6 @@
 
 const HT_A = 0.0962
 const HT_B = 0.5769
-
-# The lag windows: `n` zeros' worth of history, as TA-Lib initializes them.
-lagwindow(::Type{T}, n) where {T} =
-    prefill!(CausalFrames.barwindow(CausalFrames.WindowValues(:x), n, (x = T,)), n, T)
-function prefill!(w, n, ::Type{T}) where {T}
-    for _ in 1:n
-        update!(w, (x = zero(T),))
-    end
-    return w
-end
-refill!(w, n, ::Type{T}) where {T} = prefill!(fresh!(w), n, T)
-
-# The window's values, oldest first in `vals[head:end]`; `lag(v, k)` is the
-# value `k` bars back (0 = newest). Prefilled, the window is always full.
-@inline windowvals(w) = value(w).x_windowvalues
-@inline lag(wv, k) = @inbounds wv.vals[end-k]
 
 # One Hilbert FIR, `(a·x₀ + b·x₂ − b·x₄ − a·x₆)·adj` in TA-Lib's order, over the
 # window `wv` with its newest `off` values skipped (jI reads the detrender

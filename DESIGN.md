@@ -280,7 +280,8 @@ g. **`CausalFrames.barwindow(s, n, intypes)`, a count-window state** (#81),
    `Std`), CVI and ADXR (a `First` of their own earlier values), MassIndex (a
    `Sum`), Beta (`Covariance`, `Variance` and `Mean` of the returns), the
    Hilbert family and MAMA (`WindowValues` as lag lines, and the `WMA`
-   smoother) and `CandleAverages`.
+   smoother) and the candlesticks' `CandleKernel` (a `Mean` per setting, and
+   `WindowValues` as lag lines).
 
 h. **`MeanAbsDev(column)`**, the mean absolute deviation about the mean,
    `Σ|x − mean| / n`. It is a fieldless dependent over `Mean` and
@@ -344,7 +345,10 @@ h. **`MeanAbsDev(column)`**, the mean absolute deviation about the mean,
 - **Integer inputs** are widened to `Float64` (or to the column's float type if
   it is wider).
 - **Integer outputs.**
-  - Candlestick patterns emit `Int`: −100, 0 or 100.
+  - Candlestick patterns emit `Int`: 100 (bullish), −100 (bearish) or 0, as
+    TA-Lib does. Its weaker forms add ±80 (`Engulfing`, `Harami`,
+    `HaramiCross`, where one end of the bodies matches) and ±200 (a Hikkake
+    confirmation).
   - The index forms emit `Int` *bars since* the extreme (0 = this bar), not
     TA-Lib's absolute array index, which is meaningless in a stream. The tests
     convert between the two.
@@ -456,6 +460,13 @@ A bar count cannot be turned into a time span in general, so the caller chooses
     as TA-Lib's running WMA sums do, though the CausalFrames smoother itself
     would recover: every later real output is NaN, and `HTTrendMode` emits 1,
     as TA-Lib's comparisons with NaN give.
+  - A candlestick pattern emits 0 while a non-finite price, or a non-finite
+    average, is among the bars and thresholds it reads, as TA-Lib's
+    comparisons with NaN are false. Its averages are CausalFrames `Mean`s, so
+    they recover once the bar leaves their window, and so does the pattern.
+    TA-Lib's running totals stay NaN for good, so there every pattern that reads
+    an average emits 0 from then on. The goldens hold no NaN, and
+    `test/candles.jl` pins the recovery.
 
 ## Structure and fast paths
 
@@ -606,8 +617,25 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
     go through two internal dependents under `barwindow`: `Sums` (the window
     sums of several columns, also behind MFI and ULTOSC) and `Extremes` (the
     highest high and lowest low).
-  - `CandleAverages` (S7): TA-Lib's per-setting body and shadow averages, built
-    on count-windowed CausalFrames `Mean` states.
+  - `CandleKernel` and its `CandleAverage`s (S7, `src/kernels/candle.jl`):
+    the bars and thresholds a candlestick pattern reads back.
+    - TA-Lib compares a candle part with `factor` times the average of the
+      setting's measure over the `avgperiod` bars **before** the candle
+      (`TA_CANDLEAVERAGE`). With `avgperiod` 0 it compares with the candle's own
+      measure.
+    - Each setting a pattern reads is one `CandleAverage`. It holds a
+      `barwindow` `Mean` of the measure and a lag line of each bar's threshold.
+      The threshold is formed before the bar's own measure is folded. A pattern
+      reading the setting at bar `i − ℓ` reads the lag line `ℓ` back, which is
+      the average TA-Lib keeps a separate running total for.
+    - The prices are four more lag lines. The lag lines are the Hilbert
+      family's `lagwindow`s (`src/kernels/common.jl`): `WindowValues` under
+      `barwindow`, prefilled with zeros.
+    - `WindowValues` counts NaN rather than storing it, so a lag line is fed
+      0 for a NaN. The kernel remembers the last bar with a non-finite price
+      or threshold instead (see "Missing and non-finite inputs").
+    - The Hikkake pair adds `HikkakeState`, the countdown and the saved
+      high and low of TA-Lib's pattern state.
 
   Window sums, extrema and the ring buffer are never kernels. They are
   CausalFrames states and `CausalFrames.barwindow`.
@@ -645,17 +673,35 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
     user namespaces: users write `using CausalIndicators.Candles` or
     `Candles.Hammer()`.
   - The 11 TA-Lib candle settings form an immutable `CandleSettings`, passed as
-    a keyword and defaulting to TA-Lib's defaults. They are `BodyLong`,
-    `BodyVeryLong`, `BodyShort`, `BodyDoji`, `ShadowLong`, `ShadowVeryLong`,
-    `ShadowShort`, `ShadowVeryShort`, `Near`, `Far` and `Equal`.
+    the `settings` keyword and defaulting to TA-Lib's defaults. They are
+    `bodylong`, `bodyverylong`, `bodyshort`, `bodydoji`, `shadowlong`,
+    `shadowverylong`, `shadowshort`, `shadowveryshort`, `near`, `far` and
+    `equal`. Each is a `CandleSetting(range, avgperiod, factor)`, with
+    `range` one of `:realbody`, `:highlow` and `:shadows`, validated as
+    `TA_SetCandleSettings` validates it. No pattern reads `bodyverylong`, in
+    TA-Lib either.
   - TA-Lib has a global settings table instead, which is not reproduced.
+  - Every pattern is a `BarIndicator` over a `CandleSpec{P}` (the settings and
+    `penetration`), with `P` the pattern's Julia name. Per pattern, the files
+    `src/candles/{single,double,triple,multi}.jl` give four things:
+    - `candleshape`: the settings it reads and the bars it reads back
+    - `candlelookback`: its `TA_CDL*_Lookback`, in the settings' periods
+    - `candle`: its condition, copied term by term from `ta_CDL<P>.c` in
+      TA-Lib's operation order, `fma` included
+    - for the Hikkake pair, `hikkakepattern`
+  - The state is a `CandleKernel` (see "Kernels"). A pattern's output is
+    `:cdl<name>`, TA-Lib's name in lowercase, as for `:ha` and `:kc`.
+  - The Hikkake state steps from bar `lookback − 3`, where TA-Lib's loop
+    starts it.
+  - The seven patterns with `optInPenetration` take `penetration`, in
+    [0, ∞) for TA-Lib's [0, `TA_REAL_MAX`].
 
 ### Module layout
 
 | File | Content |
 |---|---|
 | `src/CausalIndicators.jl` | module, includes, exports |
-| `src/kernels/*.jl` | `EMAKernel`, `WilderKernel`, `SMAKernel`, `MAKernel`, `ERKernel`, `GainLossKernel`, `FastKKernel`, `ATRKernel`, `DMKernel`, `HilbertKernel`, `MAMAKernel`, `CandleAverages` |
+| `src/kernels/*.jl` | `EMAKernel`, `WilderKernel`, `SMAKernel`, `MAKernel`, `ERKernel`, `GainLossKernel`, `FastKKernel`, `ATRKernel`, `DMKernel`, `HilbertKernel`, `MAMAKernel`, `CandleKernel` (with `CandleSettings`) |
 | `src/barindicator.jl` | `BarIndicator`, the plain summarizer shared by the S5 indicators |
 | `src/overlap.jl` | moving averages and bands |
 | `src/momentum.jl` | momentum indicators |
@@ -665,7 +711,7 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
 | `src/price.jl` | price transforms |
 | `src/rolling.jl` | reserved: the TA-Lib *Math Operators* group is CausalFrames only (S1), so it has no file yet |
 | `src/cycle.jl` | the Hilbert-transform family and `MAMA` |
-| `src/candles/*.jl` | the `Candles` submodule |
+| `src/candles/*.jl` | the `Candles` submodule: `Candles.jl` (the module, `CandleSpec`, the constructors) and the patterns by bar count |
 | `test/foldseries.jl` | the test-only batch driver |
 | `test/helpers.jl` | loaders for the data, tables and goldens; allocation and streaming-property helpers |
 | `gen/` | the TA-Lib test extractor and golden generator (not part of the package) |
@@ -778,6 +824,20 @@ the goldens check every bar.
     the upstream most-recent rule may differ (see (d)). Their extracted table
     rows check only shape. `AROON` and `AROONOSC` share the upstream rule and
     skip nothing.
+- **Candlesticks.** Every `CDL*` golden also runs at rows 1–4 of
+  test_candlestick.c's `cdlGlobalsMatrix`, over both datasets, as the parameter
+  set `cdlrow=r`. `dump_golden`'s `cdl.<Setting>=<range>:<avg>:<factor>`
+  arguments set them. The C test checks the matrix only between languages, so
+  these goldens are its oracle. Every candlestick golden matches exactly: the
+  compensated averages flip no threshold.
+- **The candlestick MC/DC builders.** test_candlestick.c builds bars by hand to
+  sit on each pattern's decision boundaries, a 10,000-line condition model.
+  Rather than port it, `gen/candles/capture.c` links the C test against the
+  static library with `-Wl,--wrap` on every `TA_CDL*` entry point. It records
+  each builder call (the bars, the settings in force, `startIdx`/`endIdx` and
+  TA-Lib's outputs) to `test/talib/candles/mcdc.txt.gz`, and the test still
+  has to pass. `test/candles.jl` replays every record exactly. Calls on the
+  252-bar history are not recorded, since the goldens cover them.
 - **Running it.** The generator runs by hand when the pin moves. It is not
   built in CI, so CI needs no C toolchain.
 
@@ -817,7 +877,7 @@ README rows together, and updates this document where reality differs.
     on Julia ≥ 1.11 plus a CI `Pkg.develop(url = …)` step on 1.10.
   - the core kernels: `EMAKernel`, `WilderKernel`, `SMAKernel`, and
     `MAKernel` with `:sma`, `:ema` and `:rma`. The other MA types land with
-    their stages, and `CandleAverages` lands in S7.
+    their stages, and the candlesticks' `CandleKernel` landed in S7.
   - the data and table extractors, all extracted tables, the golden generator
     with the `EMA`/`RMA` goldens, `test/foldseries.jl` and the test helpers
   - CI with Aqua, JET and a JuliaFormatter check
@@ -845,7 +905,9 @@ README rows together, and updates this document where reality differs.
 - **S6:** the Hilbert-transform cycle family and `MAMA` (7). They share one
   `HilbertKernel`, all seven gained `unstable` (a pure delay), and `:mama`
   became a `matype` everywhere. It needed no upstream addition. **Complete.**
-- **S7:** the 61 candlestick patterns and `CandleSettings`.
+- **S7:** the 61 candlestick patterns and `CandleSettings`, in the `Candles`
+  submodule over one `CandleKernel`. It needed no upstream addition.
+  **Complete.**
 
 A stage PR may find that an indicator can claim a stronger tier, or needs
 another upstream addition. It then amends the name table and "Upstream
@@ -998,64 +1060,64 @@ All 182 in-scope TA-Lib functions. The table is generated from the pinned YAML.
 | `HT_TRENDLINE` | `HTTrendline` | S6 | new state (`HilbertKernel`) | plain | real | unstable=0 | (one column) |
 | `HT_TRENDMODE` | `HTTrendMode` | S6 | new state (`HilbertKernel`) | plain | real | unstable=0 | (one column, `Int`) |
 | `MAMA` | `MAMA` | S6 | new state (`MAMAKernel`) | plain | real | fastlimit=0.5, slowlimit=0.05, unstable=0 | mama, fama |
-| `CDL2CROWS` | `Candles.TwoCrows` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDL3BLACKCROWS` | `Candles.ThreeBlackCrows` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDL3INSIDE` | `Candles.ThreeInside` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDL3LINESTRIKE` | `Candles.ThreeLineStrike` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDL3OUTSIDE` | `Candles.ThreeOutside` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDL3STARSINSOUTH` | `Candles.ThreeStarsInTheSouth` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDL3WHITESOLDIERS` | `Candles.ThreeWhiteSoldiers` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLABANDONEDBABY` | `Candles.AbandonedBaby` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | penetration=0.3 | (one column) |
-| `CDLADVANCEBLOCK` | `Candles.AdvanceBlock` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLBELTHOLD` | `Candles.BeltHold` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLBREAKAWAY` | `Candles.Breakaway` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLCLOSINGMARUBOZU` | `Candles.ClosingMarubozu` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLCONCEALBABYSWALL` | `Candles.ConcealingBabySwallow` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLCOUNTERATTACK` | `Candles.Counterattack` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLDARKCLOUDCOVER` | `Candles.DarkCloudCover` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | penetration=0.5 | (one column) |
-| `CDLDOJI` | `Candles.Doji` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLDOJISTAR` | `Candles.DojiStar` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLDRAGONFLYDOJI` | `Candles.DragonflyDoji` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLENGULFING` | `Candles.Engulfing` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLEVENINGDOJISTAR` | `Candles.EveningDojiStar` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | penetration=0.3 | (one column) |
-| `CDLEVENINGSTAR` | `Candles.EveningStar` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | penetration=0.3 | (one column) |
-| `CDLGAPSIDESIDEWHITE` | `Candles.GapSideSideWhite` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLGRAVESTONEDOJI` | `Candles.GravestoneDoji` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLHAMMER` | `Candles.Hammer` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLHANGINGMAN` | `Candles.HangingMan` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLHARAMI` | `Candles.Harami` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLHARAMICROSS` | `Candles.HaramiCross` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLHIGHWAVE` | `Candles.HighWave` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLHIKKAKE` | `Candles.Hikkake` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLHIKKAKEMOD` | `Candles.HikkakeMod` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLHOMINGPIGEON` | `Candles.HomingPigeon` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLIDENTICAL3CROWS` | `Candles.IdenticalThreeCrows` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLINNECK` | `Candles.InNeck` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLINVERTEDHAMMER` | `Candles.InvertedHammer` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLKICKING` | `Candles.Kicking` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLKICKINGBYLENGTH` | `Candles.KickingByLength` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLLADDERBOTTOM` | `Candles.LadderBottom` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLLONGLEGGEDDOJI` | `Candles.LongLeggedDoji` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLLONGLINE` | `Candles.LongLine` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLMARUBOZU` | `Candles.Marubozu` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLMATCHINGLOW` | `Candles.MatchingLow` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLMATHOLD` | `Candles.MatHold` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | penetration=0.5 | (one column) |
-| `CDLMORNINGDOJISTAR` | `Candles.MorningDojiStar` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | penetration=0.3 | (one column) |
-| `CDLMORNINGSTAR` | `Candles.MorningStar` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | penetration=0.3 | (one column) |
-| `CDLONNECK` | `Candles.OnNeck` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLPIERCING` | `Candles.Piercing` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLRICKSHAWMAN` | `Candles.RickshawMan` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLRISEFALL3METHODS` | `Candles.RiseFallThreeMethods` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLSEPARATINGLINES` | `Candles.SeparatingLines` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLSHOOTINGSTAR` | `Candles.ShootingStar` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLSHORTLINE` | `Candles.ShortLine` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLSPINNINGTOP` | `Candles.SpinningTop` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLSTALLEDPATTERN` | `Candles.StalledPattern` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLSTICKSANDWICH` | `Candles.StickSandwich` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLTAKURI` | `Candles.Takuri` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLTASUKIGAP` | `Candles.TasukiGap` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLTHRUSTING` | `Candles.Thrusting` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLTRISTAR` | `Candles.Tristar` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLUNIQUE3RIVER` | `Candles.UniqueThreeRiver` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLUPSIDEGAP2CROWS` | `Candles.UpsideGapTwoCrows` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
-| `CDLXSIDEGAP3METHODS` | `Candles.XSideGapThreeMethods` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
+| `CDL2CROWS` | `Candles.TwoCrows` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDL3BLACKCROWS` | `Candles.ThreeBlackCrows` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDL3INSIDE` | `Candles.ThreeInside` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDL3LINESTRIKE` | `Candles.ThreeLineStrike` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDL3OUTSIDE` | `Candles.ThreeOutside` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDL3STARSINSOUTH` | `Candles.ThreeStarsInTheSouth` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDL3WHITESOLDIERS` | `Candles.ThreeWhiteSoldiers` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLABANDONEDBABY` | `Candles.AbandonedBaby` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | penetration=0.3, settings=CandleSettings() | (one column, `Int`) |
+| `CDLADVANCEBLOCK` | `Candles.AdvanceBlock` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLBELTHOLD` | `Candles.BeltHold` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLBREAKAWAY` | `Candles.Breakaway` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLCLOSINGMARUBOZU` | `Candles.ClosingMarubozu` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLCONCEALBABYSWALL` | `Candles.ConcealingBabySwallow` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLCOUNTERATTACK` | `Candles.Counterattack` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLDARKCLOUDCOVER` | `Candles.DarkCloudCover` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | penetration=0.5, settings=CandleSettings() | (one column, `Int`) |
+| `CDLDOJI` | `Candles.Doji` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLDOJISTAR` | `Candles.DojiStar` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLDRAGONFLYDOJI` | `Candles.DragonflyDoji` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLENGULFING` | `Candles.Engulfing` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLEVENINGDOJISTAR` | `Candles.EveningDojiStar` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | penetration=0.3, settings=CandleSettings() | (one column, `Int`) |
+| `CDLEVENINGSTAR` | `Candles.EveningStar` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | penetration=0.3, settings=CandleSettings() | (one column, `Int`) |
+| `CDLGAPSIDESIDEWHITE` | `Candles.GapSideSideWhite` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLGRAVESTONEDOJI` | `Candles.GravestoneDoji` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLHAMMER` | `Candles.Hammer` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLHANGINGMAN` | `Candles.HangingMan` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLHARAMI` | `Candles.Harami` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLHARAMICROSS` | `Candles.HaramiCross` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLHIGHWAVE` | `Candles.HighWave` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLHIKKAKE` | `Candles.Hikkake` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLHIKKAKEMOD` | `Candles.HikkakeMod` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLHOMINGPIGEON` | `Candles.HomingPigeon` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLIDENTICAL3CROWS` | `Candles.IdenticalThreeCrows` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLINNECK` | `Candles.InNeck` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLINVERTEDHAMMER` | `Candles.InvertedHammer` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLKICKING` | `Candles.Kicking` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLKICKINGBYLENGTH` | `Candles.KickingByLength` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLLADDERBOTTOM` | `Candles.LadderBottom` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLLONGLEGGEDDOJI` | `Candles.LongLeggedDoji` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLLONGLINE` | `Candles.LongLine` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLMARUBOZU` | `Candles.Marubozu` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLMATCHINGLOW` | `Candles.MatchingLow` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLMATHOLD` | `Candles.MatHold` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | penetration=0.5, settings=CandleSettings() | (one column, `Int`) |
+| `CDLMORNINGDOJISTAR` | `Candles.MorningDojiStar` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | penetration=0.3, settings=CandleSettings() | (one column, `Int`) |
+| `CDLMORNINGSTAR` | `Candles.MorningStar` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | penetration=0.3, settings=CandleSettings() | (one column, `Int`) |
+| `CDLONNECK` | `Candles.OnNeck` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLPIERCING` | `Candles.Piercing` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLRICKSHAWMAN` | `Candles.RickshawMan` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLRISEFALL3METHODS` | `Candles.RiseFallThreeMethods` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLSEPARATINGLINES` | `Candles.SeparatingLines` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLSHOOTINGSTAR` | `Candles.ShootingStar` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLSHORTLINE` | `Candles.ShortLine` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLSPINNINGTOP` | `Candles.SpinningTop` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLSTALLEDPATTERN` | `Candles.StalledPattern` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLSTICKSANDWICH` | `Candles.StickSandwich` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLTAKURI` | `Candles.Takuri` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLTASUKIGAP` | `Candles.TasukiGap` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLTHRUSTING` | `Candles.Thrusting` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLTRISTAR` | `Candles.Tristar` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLUNIQUE3RIVER` | `Candles.UniqueThreeRiver` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLUPSIDEGAP2CROWS` | `Candles.UpsideGapTwoCrows` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `CDLXSIDEGAP3METHODS` | `Candles.XSideGapThreeMethods` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |

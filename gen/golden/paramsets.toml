@@ -332,3 +332,41 @@ MAMA = [
     {optInFastLimit = 0.2, optInSlowLimit = 0.2},
     {unstable = 3},
 ]
+
+# S7. The penetration patterns at the tables' 0 and at a deep penetration. Every
+# CDL* function also runs at cdlGlobalsMatrix rows 1-4 (generate.jl adds them).
+
+CDLABANDONEDBABY = [
+    {optInPenetration = 0.0},
+    {optInPenetration = 0.8},
+]
+
+CDLDARKCLOUDCOVER = [
+    {optInPenetration = 0.0},
+    {optInPenetration = 0.8},
+]
+
+CDLEVENINGDOJISTAR = [
+    {optInPenetration = 0.0},
+    {optInPenetration = 0.8},
+]
+
+CDLEVENINGSTAR = [
+    {optInPenetration = 0.0},
+    {optInPenetration = 0.8},
+]
+
+CDLMATHOLD = [
+    {optInPenetration = 0.0},
+    {optInPenetration = 0.8},
+]
+
+CDLMORNINGDOJISTAR = [
+    {optInPenetration = 0.0},
+    {optInPenetration = 0.8},
+]
+
+CDLMORNINGSTAR = [
+    {optInPenetration = 0.0},
+    {optInPenetration = 0.8},
+]
