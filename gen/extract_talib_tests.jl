@@ -12,6 +12,12 @@
 # evaluator does not handle. A row inside a preprocessor conditional lists it in
 # `cond` (`"!TA_FUNC_NO_RANGE_CHECK"`), and rows of the range-check block also
 # carry `rangecheck = true`: TA-Lib's parameter-range error tests.
+#
+# It also writes test/talib/tables/ta_test_reference.toml from the shared
+# numerical-reference battery that test_reference.c checks: the datasets in
+# ta_regtest/ta_test_reference.c, the exact-rational goldens in
+# ta_test_reference_golden.c, and the NIST Norris certificate and its
+# exact-for-these-doubles values, `#define`d in the two headers (`[defines]`).
 
 using TOML
 
@@ -105,7 +111,34 @@ function main(root::AbstractString)
         println(rpad(f, 26), "tables=", ntab, " rows=", nrow, " arrays=", narr)
     end
     println("\nNo file-scope tables (hand-port): ", join(empty_, ", "))
+    extractreference(root, outdir)
     return empty_
+end
+
+# The reference battery: two sources' arrays in one table, plus the headers'
+# scalar `#define`s.
+function extractreference(root, outdir)
+    reldir = "src/tools/ta_regtest"
+    arrays = Dict{String,Any}()
+    for f in ("ta_test_reference.c", "ta_test_reference_golden.c")
+        merge!(arrays, extractfile(joinpath(root, reldir, f), "$reldir/$f")["arrays"])
+    end
+    defines = Dict{String,Any}()
+    for f in ("ta_test_reference.h", "ta_test_reference_golden.h")
+        for m in eachmatch(r"#define\s+(TA_TEST_REF_\w+)\s+\(\s*([-+0-9.eE]+)\s*\)",
+            read(joinpath(root, reldir, f), String))
+            defines[m[1]] = parse(Float64, m[2])
+        end
+    end
+    res = Dict{String,Any}("source" => "$reldir/ta_test_reference{,_golden}.{c,h}",
+        "commit" => TALIB_COMMIT, "arrays" => arrays, "defines" => defines)
+    open(joinpath(outdir, "ta_test_reference.toml"), "w") do io
+        println(io, "# Extracted by gen/extract_talib_tests.jl from TA-Lib ",
+            TALIB_COMMIT[1:7], ":", res["source"], ". Do not edit.")
+        TOML.print(io, res; sorted = true)
+    end
+    println("ta_test_reference         arrays=", length(arrays), " defines=",
+        length(defines))
 end
 
 isinteractive() || main(ARGS[1])
