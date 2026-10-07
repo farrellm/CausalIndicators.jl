@@ -275,9 +275,9 @@ extremeswindow(n, ::Type{T}) where {T} =
     CausalFrames.barwindow(Extremes{:high,:low}(), n, (high = T, low = T))
 
 function checkmatype(fn, kw, matype)
-    matype in MATYPES && matype !== :mama || throw(
+    matype in MATYPES || throw(
         ArgumentError(
-            "$fn $kw must be one of $(join(map(repr, filter(!=(:mama), MATYPES)), ", ")), " *
+            "$fn $kw must be one of $(join(map(repr, MATYPES), ", ")), " *
             "got $(repr(matype))",
         ))
     return matype
@@ -364,6 +364,8 @@ are zero. The averages are seeded with the mean of the first `period` moves.
 The lookback is `period`, and `unstable` is TA-Lib's unstable period.
 
 $PLAIN_DOC$SKIP_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/rsi/rsi.yaml`, `rsi.md`.
 """
 RSI(column::ColumnSpec; period::Integer = 14, unstable::Integer = 0, name::Symbol = :rsi) =
@@ -378,6 +380,8 @@ TA-Lib's `CMO`, Chande's momentum oscillator, in `:{column}_cmo`:
 period.
 
 $PLAIN_DOC$SKIP_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/cmo/cmo.yaml`, `cmo.md`.
 """
 CMO(column::ColumnSpec; period::Integer = 14, unstable::Integer = 0, name::Symbol = :cmo) =
@@ -500,6 +504,8 @@ the next, so it changes the values as well as delaying them.
 
 $MACD_DOC
 $PLAIN_DOC$SKIP_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/macd/macd.yaml`, `macd.md`.
 """
 function MACD(column::ColumnSpec; fastperiod::Integer = 12, slowperiod::Integer = 26,
@@ -520,6 +526,8 @@ TA-Lib's fixed smoothing factors 0.15 and 0.075 in place of `2/(p + 1)`.
 
 $MACD_DOC
 $PLAIN_DOC$SKIP_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/macdfix/macdfix.yaml`, `macdfix.md`.
 """
 function MACDFix(column::ColumnSpec; signalperiod::Integer = 9, unstable::Integer = 0,
@@ -537,12 +545,13 @@ end
 TA-Lib's `MACDEXT`, [`MACD`](@ref) with any moving-average types, in
 `:{column}_macdext_macd`, `:{column}_macdext_macdsignal` and
 `:{column}_macdext_macdhist`. The types are `matype` symbols as for
-[`MA`](@ref) (`:mama` lands with S6), and each average follows `MA`'s rules,
-period-1 copy included. `unstable` applies to every average whose type has an
+[`MA`](@ref), and each average follows `MA`'s rules, period-1 copy included. `unstable` applies to every average whose type has an
 unstable period.
 
 $MACD_DOC
 $PLAIN_DOC$SKIP_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/macdext/macdext.yaml`, `macdext.md`.
 """
 function MACDExt(column::ColumnSpec; fastperiod::Integer = 12, fastmatype::Symbol = :sma,
@@ -628,8 +637,8 @@ function priceoscillator(fn, K, column, fast, slow, matype, unstable, name;
 end
 
 const PO_DOC = """
-The averages are `matype` moving averages as for [`MA`](@ref) (`:mama` lands
-with S6), both started at the first bar. TA-Lib swaps the periods if
+The averages are `matype` moving averages as for [`MA`](@ref), both started at
+the first bar. TA-Lib swaps the periods if
 `slowperiod < fastperiod`. `unstable` is the unstable period of `matype`, if it
 has one.
 """
@@ -643,6 +652,8 @@ TA-Lib's `APO`, the absolute price oscillator `fast − slow`, in
 
 $PO_DOC
 $PLAIN_DOC$SKIP_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/apo/apo.yaml`, `apo.md`.
 """
 APO(column::ColumnSpec; fastperiod::Integer = 12, slowperiod::Integer = 26,
@@ -658,6 +669,8 @@ TA-Lib's `PPO`, the percentage price oscillator `(fast − slow)/slow·100`, in
 
 $PO_DOC
 $PLAIN_DOC$SKIP_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/ppo/ppo.yaml`, `ppo.md`.
 """
 PPO(column::ColumnSpec; fastperiod::Integer = 12, slowperiod::Integer = 26,
@@ -836,8 +849,7 @@ const STOCH_DOC = """
 %K is where the close sits in the `fastkperiod`-bar high-low range, as a
 percentage (0 where TA-Lib finds the range zero), read through CausalFrames'
 windowed `Max`, `Min` and `Last`. The smoothings are `matype` moving averages
-as for [`MA`](@ref) (`:mama` lands with S6), and `unstable` is the unstable
-period of each that has one. Both outputs start together, on the first bar %D
+as for [`MA`](@ref), and `unstable` is the unstable period of each that has one. Both outputs start together, on the first bar %D
 has a value. A bar with any input `missing` leaves the state unchanged and
 emits `missing`.
 """
@@ -853,6 +865,8 @@ of slow %K.
 
 $STOCH_DOC
 $PLAIN_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/stoch/stoch.yaml`, `stoch.md`.
 """
 function Stoch(; high::ColumnSpec = :high, low::ColumnSpec = :low,
@@ -881,6 +895,8 @@ TA-Lib's `STOCHF`, the fast stochastic, in `:stochf_fastk` and
 
 $STOCH_DOC
 $PLAIN_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/stochf/stochf.yaml`, `stochf.md`.
 """
 function StochF(; high::ColumnSpec = :high, low::ColumnSpec = :low,
@@ -908,6 +924,8 @@ RSI's unstable period and that of `fastdmatype`, if it has one, as
 
 $STOCH_DOC
 $PLAIN_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/stochrsi/stochrsi.yaml`, `stochrsi.md`.
 """
 function StochRSI(column::ColumnSpec; period::Integer = 14, fastkperiod::Integer = 5,
@@ -1022,6 +1040,7 @@ The window sums are CausalFrames `Sum`s under `CausalFrames.barwindow`.
 $PLAIN_DOC
 A bar with any input `missing` leaves the state unchanged and emits `missing`.
 
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/ultosc/ultosc.yaml`, `ultosc.md`.
 """
 function ULTOSC(; high::ColumnSpec = :high, low::ColumnSpec = :low,
@@ -1120,6 +1139,7 @@ The flow sums are CausalFrames `Sum`s under `CausalFrames.barwindow`.
 $PLAIN_DOC
 A bar with any input `missing` leaves the state unchanged and emits `missing`.
 
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/mfi/mfi.yaml`, `mfi.md`.
 """
 function MFI(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
@@ -1324,6 +1344,8 @@ bar's raw +DM with lookback 1, whatever `unstable` is.
 
 $DM_DOC
 $DIR_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/plus_dm/plus_dm.yaml`, `plus_dm.md`.
 """
 PlusDM(; high::ColumnSpec = :high, low::ColumnSpec = :low, period::Integer = 14,
@@ -1338,6 +1360,8 @@ TA-Lib's `MINUS_DM`, the smoothed −DM, in `:minusdm`, as [`PlusDM`](@ref).
 
 $DM_DOC
 $DIR_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/minus_dm/minus_dm.yaml`, `minus_dm.md`.
 """
 MinusDM(; high::ColumnSpec = :high, low::ColumnSpec = :low, period::Integer = 14,
@@ -1357,6 +1381,8 @@ lookback 1 whatever `unstable` is.
 $DI_DOC
 $DM_DOC
 $DIR_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/plus_di/plus_di.yaml`, `plus_di.md`.
 """
 PlusDI(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
@@ -1374,6 +1400,8 @@ TA-Lib's `MINUS_DI`, the negative directional indicator, in `:minusdi`, as
 $DI_DOC
 $DM_DOC
 $DIR_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/minus_di/minus_di.yaml`, `minus_di.md`.
 """
 MinusDI(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
@@ -1391,6 +1419,8 @@ is `period`, plus `unstable`, TA-Lib's unstable period.
 
 $DI_DOC
 $DIR_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/dx/dx.yaml`, `dx.md`.
 """
 DX(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
@@ -1412,6 +1442,8 @@ lookback is `2·period − 1`, plus `unstable`, TA-Lib's unstable period.
 
 $ADX_DOC
 $DIR_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/adx/adx.yaml`, `adx.md`.
 """
 ADX(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
@@ -1429,6 +1461,8 @@ read from a CausalFrames `First` under `CausalFrames.barwindow`.
 
 $ADX_DOC
 $DIR_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/adxr/adxr.yaml`, `adxr.md`.
 """
 ADXR(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
@@ -1599,6 +1633,8 @@ longer period minus 1. The averages are CausalFrames `Mean`s under
 `CausalFrames.barwindow`.
 
 $S5_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/ao/ao.yaml`, `ao.md`.
 """
 function AO(; high::ColumnSpec = :high, low::ColumnSpec = :low, fastperiod::Integer = 5,
@@ -1618,6 +1654,8 @@ lookback is the longer of `fastperiod` and `slowperiod`, plus `signalperiod`,
 minus 2.
 
 $S5_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/ac/ac.yaml`, `ac.md`.
 """
 function AC(; high::ColumnSpec = :high, low::ColumnSpec = :low, fastperiod::Integer = 5,
@@ -1684,6 +1722,8 @@ window. Unlike [`CMO`](@ref) the sums are plain window sums, CausalFrames
 lookback is `period`.
 
 $S5_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/cmou/cmou.yaml`, `cmou.md`.
 """
 function CMOU(column::ColumnSpec; period::Integer = 14, name::Symbol = :cmou)
@@ -1720,6 +1760,8 @@ and a flat window give exactly 1. It is the ratio [`KAMA`](@ref) adapts to,
 from the same kernel. The lookback is `period`.
 
 $S5_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/er/er.yaml`, `er.md`.
 """
 function ER(column::ColumnSpec; period::Integer = 10, name::Symbol = :er)
@@ -1782,6 +1824,8 @@ flat window. The extremes are CausalFrames `Max` and `Min` and the path a
 `Sum`, under `CausalFrames.barwindow`. The lookback is `period`.
 
 $S5_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/vhf/vhf.yaml`, `vhf.md`.
 """
 function VHF(column::ColumnSpec; period::Integer = 28, name::Symbol = :vhf)
@@ -1845,6 +1889,8 @@ the true range, or both 0 when that is zero. The sums are CausalFrames `Sum`s
 under `CausalFrames.barwindow`. The lookback is `period`.
 
 $S5_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/vortex/vortex.yaml`, `vortex.md`.
 """
 function Vortex(; high::ColumnSpec = :high, low::ColumnSpec = :low,
@@ -1893,6 +1939,8 @@ CausalFrames `Mean` and the lagged value a `First`, under
 `CausalFrames.barwindow`.
 
 $S5_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/dpo/dpo.yaml`, `dpo.md`.
 """
 function DPO(column::ColumnSpec; period::Integer = 20, name::Symbol = :dpo)
@@ -1941,7 +1989,9 @@ TA-Lib's `COPPOCK`, the Coppock curve, in `:{column}_coppock`: the
 and `roc2period`-bar [`ROC`](@ref)s, each 0 over a zero base. The lookback is
 the longer ROC period plus `wmaperiod − 1`. The lagged values are CausalFrames
 `First`s, and the WMA the package's `WMA` dependent, under
-`CausalFrames.barwindow`.
+`CausalFrames.barwindow`. Coppock designed the curve for monthly bars, and
+TA-Lib's defaults are his month counts: on daily bars they span weeks, not
+the year and more he intended.
 
 $S5_DOC
 TA-Lib: `ta_codegen/input/coppock/coppock.yaml`, `coppock.md`.
@@ -1988,6 +2038,8 @@ the high and the low less the `period`-bar EMA of the close. The lookback is
 inherits; it delays the first output without changing the values.
 
 $S5_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/eri/eri.yaml`, `eri.md`.
 """
 function ERI(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
@@ -2082,6 +2134,8 @@ first bar. The lookback is `1 + (firstperiod − 1) + (secondperiod − 1)` plus
 twice `unstable`.
 
 $S5_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/tsi/tsi.yaml`, `tsi.md`.
 """
 function TSI(column::ColumnSpec; firstperiod::Integer = 25, secondperiod::Integer = 13,
@@ -2148,6 +2202,8 @@ EMA's unstable period, which TA-Lib's SMI inherits: each of the three EMA
 stages passes it before it feeds the next.
 
 $S5_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/smi/smi.yaml`, `smi.md`.
 """
 function SMI(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
@@ -2172,6 +2228,8 @@ TA-Lib's `KDJ`, the stochastic as Chinese-market platforms draw it, in
 
 $STOCH_DOC
 $PLAIN_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/kdj/kdj.yaml`, `kdj.md`.
 """
 function KDJ(; high::ColumnSpec = :high, low::ColumnSpec = :low,

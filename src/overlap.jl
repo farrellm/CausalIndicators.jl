@@ -218,6 +218,13 @@ fresh state, a cold start per window. The output is `missing` for TA-Lib's
 lookback (plus `unstable`) bars.
 """
 
+# For the indicators whose defaults are their author's daily-chart parameters.
+const DAILY_DOC = """
+The defaults are TA-Lib's, which are the author's parameters for daily bars.
+Periods count bars, not days, so on other bar sizes the defaults span other
+lengths of time: choose the parameters for your bars.
+"""
+
 const SKIP_DOC = """
 A `missing` input bar leaves the state unchanged and emits `missing`.
 """
@@ -236,14 +243,15 @@ unchanged and emits `missing`. The output is `missing` for TA-Lib's lookback
 
 TA-Lib's `MA`: the `matype` moving average of `column` in `:{column}_ma`.
 `matype` is one of `:sma`, `:ema`, `:wma`, `:dema`, `:tema`, `:trima`,
-`:kama`, `:t3`, `:hma`, `:zlema` and `:rma` (`:mama` lands with S6). It always
+`:kama`, `:mama`, `:t3`, `:hma`, `:zlema` and `:rma`. It always
 returns a plain summarizer. The window-agnostic SMA is CausalFrames' `Mean`
 under a `Bars` window.
 
 `unstable` is TA-Lib's unstable period for the dispatched function, and it
 applies only to the types that have one (`:ema`, `:dema`, `:tema`, `:kama`,
-`:t3`, `:zlema`, `:rma`). Period 1 copies the input with lookback 0, as
-`TA_MA` does. `:t3` uses `vfactor = 0.7`, as `TA_MA` does.
+`:mama`, `:t3`, `:zlema`, `:rma`). Period 1 copies the input with lookback 0, as
+`TA_MA` does. `:t3` uses `vfactor = 0.7`, as `TA_MA` does. `:mama` ignores the
+period and is [`MAMA`](@ref)'s MAMA line at its default limits, lookback 32.
 
 $MA_DOC_COMMON
 TA-Lib: `ta_codegen/input/ma/ma.yaml`, `ma.md`.
@@ -255,7 +263,6 @@ function MA(column::ColumnSpec; period::Integer = 30, matype::Symbol = :sma,
             "MA matype must be one of $(join(map(repr, MATYPES), ", ")), " *
             "got $(repr(matype))",
         ))
-    matype === :mama && throw(ArgumentError("MA matype :mama is not implemented yet"))
     # TA_MA ignores the unstable period of types that have none.
     u = matype in UNSTABLE_MATYPES ? unstable : 0
     checkunstable(unstable)
@@ -413,7 +420,7 @@ function MAVP(column::ColumnSpec, periods::ColumnSpec; minperiod::Integer = 2,
     checkrange("MAVP", "maxperiod", maxperiod, 1, 100_000)
     minperiod <= maxperiod || throw(
         ArgumentError("MAVP minperiod ($minperiod) must not exceed maxperiod ($maxperiod)"))
-    matype in MATYPES && matype !== :mama || throw(
+    matype in MATYPES || throw(
         ArgumentError("MAVP matype $(repr(matype)) is not supported"))
     checkunstable(unstable)
     u = matype in UNSTABLE_MATYPES ? Int(unstable) : 0
@@ -580,7 +587,7 @@ population standard deviations of `column` above and below it.
   is a dependent over CausalFrames' `Mean` and `Std(corrected = false)` (Group
   tier). It is window-agnostic: TA-Lib's `BBANDS(period = p)` with the SMA is
   `BollingerBands(:x)` under `Bars(p)`. It takes no `period`.
-- **With `matype`** (any `matype` symbol of [`MA`](@ref); `:mama` lands with S6)
+- **With `matype`** (any `matype` symbol of [`MA`](@ref))
   it is a plain summarizer over a `period`-bar moving average and a CausalFrames
   `Std(corrected = false)` under `CausalFrames.barwindow`. The lookback is the
   larger of the average's and `period − 1`, and `unstable` is the unstable
@@ -591,6 +598,7 @@ CausalFrames bakes `corrected` into the state type, not the output name, so the
 structured form cannot share a call with a corrected `Std` or `Variance` over
 the same column; put them in separate calls.
 
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/bbands/bbands.yaml`, `bbands.md`.
 """
 function BollingerBands(column::ColumnSpec; nbdevup::Real = 2, nbdevdn::Real = 2,
@@ -770,6 +778,7 @@ unstable period TA-Lib's KC inherits.
 $PLAIN_DOC
 A bar with any input `missing` leaves the state unchanged and emits `missing`.
 
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/kc/kc.yaml`, `kc.md`.
 """
 function KeltnerChannels(; high::ColumnSpec = :high, low::ColumnSpec = :low,
@@ -954,6 +963,8 @@ to `maximum`. When a bar's range reaches the SAR it reverses, emitting the old
 extreme point as the SAR.
 
 $SAR_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/sar/sar.yaml`, `sar.md`.
 """
 function SAR(; high::ColumnSpec = :high, low::ColumnSpec = :low,
@@ -978,6 +989,8 @@ reversal the emitted SAR moves `offsetonreverse` times itself away from the
 price.
 
 $SAR_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/sarext/sarext.yaml`, `sarext.md`.
 """
 function SARExt(; high::ColumnSpec = :high, low::ColumnSpec = :low,
@@ -1101,6 +1114,7 @@ finite `warmup` makes it split-invariant.
 $PLAIN_DOC
 A bar with any input `missing` leaves the state unchanged and emits `missing`.
 
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/supertrend/supertrend.yaml`, `supertrend.md`.
 """
 function SuperTrend(; high::ColumnSpec = :high, low::ColumnSpec = :low,

@@ -327,14 +327,16 @@ function tablerun(run, data, startidx, endidx, lookback)
 end
 
 """
-    checkrow(got, row; out = "oneOfTheExpectedOutReal", index = "oneOfTheExpectedOutRealIndex")
+    checkrow(got, row; out = "oneOfTheExpectedOutReal", index = "oneOfTheExpectedOutRealIndex",
+             atol = nothing)
 
 The assertions of DESIGN.md "Testing" for one TA-Lib table row: the first
 emitted bar is `expectedBegIdx`, `expectedNbElement` bars are emitted, and the
-value at `expectedBegIdx + index` matches to the row's precision.
+value at `expectedBegIdx + index` matches to the row's precision, or to `atol`
+if given.
 """
 function checkrow(got, row; out = "oneOfTheExpectedOutReal",
-    index = "oneOfTheExpectedOutRealIndex", value = true)
+    index = "oneOfTheExpectedOutRealIndex", value = true, atol = nothing)
     nb = row["expectedNbElement"]
     @test count(!ismissing, got) == nb
     nb == 0 && return nothing
@@ -344,8 +346,8 @@ function checkrow(got, row; out = "oneOfTheExpectedOutReal",
         want = row[out]
         # A literal at 17 digits is held to 1e-14 relative: the compensated sums
         # differ from TA-Lib's running ones in the last digits.
-        @test got[beg+row[index]+1] ≈ want atol =
-            max(10.0^-decimals(want), 1e-14 * abs(want))
+        tol = something(atol, max(10.0^-decimals(want), 1e-14 * abs(want)))
+        @test got[beg+row[index]+1] ≈ want atol = tol
     end
     return nothing
 end

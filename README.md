@@ -7,7 +7,8 @@ TA-Lib's technical indicators as causal, streaming building blocks for
 [DESIGN.md](DESIGN.md) for the design and the implementation stages. This is
 under construction: stages S1 (moving averages, rolling operators and price
 transforms), S2 (momentum I), S3 (directional movement and volatility), S4
-(statistics and volume) and S5 (the TA-Lib 0.8 additions) have landed.
+(statistics and volume), S5 (the TA-Lib 0.8 additions) and S6 (the Hilbert
+cycle family and MAMA) have landed.
 
 ```julia
 using CausalFrames, CausalIndicators, Dates
@@ -26,6 +27,14 @@ take a `period` keyword and run under `addsummarycolumns`. Output columns are
 `missing` for TA-Lib's lookback. Functions that compare with the bar `period`
 back (the MOM/ROC family, Aroon, PercentRank100, RVOL, FOSC) take `Bars(period + 1)`. Indicators with a
 TA-Lib unstable period, their own or inherited, take an `unstable` keyword.
+
+Bars can be any size, daily or minute or tick, because every period and window
+counts bars, not days. The defaults, here and in the table below, are TA-Lib's,
+and most are their authors' parameters for daily charts: Wilder's 14,
+MACD's 12/26/9, Bollinger's 20. On other bar sizes they span other lengths of
+time, so choose the parameters for your bars. The docstrings note where a
+default or constant assumes daily bars. One example is the Hilbert family's
+6–50-bar cycle range; another is Coppock, whose defaults are month counts.
 
 ## Indicators
 
@@ -96,6 +105,10 @@ TA-Lib unstable period, their own or inherited, take an `unstable` keyword.
 | `VORTEX` | `Vortex(; period = 14)` | `addsummarycolumns` |
 | `WAD` | `WAD(; high, low, close)` | `addsummarycolumns` |
 | `HA` | `HeikinAshi(; open, high, low, close)` | `addsummarycolumns` |
+| `HT_DCPERIOD`, `HT_DCPHASE`, `HT_TRENDLINE` | `HTDCPeriod(:x)`, `HTDCPhase(:x)`, `HTTrendline(:x)` | `addsummarycolumns` |
+| `HT_PHASOR`, `HT_SINE` | `HTPhasor(:x)` (inphase, quadrature), `HTSine(:x)` (sine, leadsine) | `addsummarycolumns` |
+| `HT_TRENDMODE` | `HTTrendMode(:x)` (`Int`: 1 trend, 0 cycle) | `addsummarycolumns` |
+| `MAMA` | `MAMA(:x; fastlimit = 0.5, slowlimit = 0.05)` (mama, fama); also `matype = :mama` | `addsummarycolumns` |
 
 These TA-Lib functions are CausalFrames summarizers already, so this package
 only tests them and adds no constructor:

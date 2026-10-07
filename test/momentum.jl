@@ -471,7 +471,7 @@ end
         end
         @test_throws ArgumentError MACD(:x; fastperiod = 1)
         @test_throws ArgumentError MACD(:x; signalperiod = 0)
-        @test_throws ArgumentError MACDExt(:x; slowmatype = :mama)
+        @test_throws ArgumentError MACDExt(:x; slowmatype = :nope)
         @test_throws ArgumentError APO(:x; matype = :nope)
         @test_throws ArgumentError TRIX(:x; period = 0)
         @test_throws ArgumentError Stoch(; fastkperiod = 0)

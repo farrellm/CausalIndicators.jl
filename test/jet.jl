@@ -1,13 +1,13 @@
 # Targeted JET checks: every kernel's per-bar path must be free of runtime
 # dispatch, including the CausalFrames barwindows embedded in the window
-# kernels, and so must every plain state's update! (S1 to S5).
+# kernels, and so must every plain state's update! (S1 to S6).
 
 using JET
 
 @testset "JET" begin
     for k in (EMAKernel(Float64, 5), WilderKernel(Float64, 5),
         WilderKernel(Float64, 5; form = :sum), SMAKernel(Float64, 5),
-        (MAKernel(Float64, m, 5; unstable = 1) for m in MATYPES if m !== :mama)...)
+        (MAKernel(Float64, m, 5; unstable = 1) for m in MATYPES)...)
         JET.@test_opt step!(k, 1.5)
         JET.@test_opt step!(k, missing)
         JET.@test_opt current(k)
@@ -41,7 +41,16 @@ using JET
     er = ERKernel(Float64, 5)
     JET.@test_opt step!(er, 1.5)
     JET.@test_opt fresh!(er)
-    for s in vcat(PLAIN_S2, PLAIN_S3, PLAIN_S4, PLAIN_S5)
+    # The S6 Hilbert core and MAMA.
+    for k in (HilbertKernel(Float64, 12), HilbertKernel(Float64, 37; nsmooth = 50))
+        JET.@test_opt step!(k, 1.5)
+        JET.@test_opt fresh!(k)
+    end
+    mk = MAMAKernel(Float64, 0.5, 0.05)
+    JET.@test_opt step!(mk, 1.5)
+    JET.@test_opt current(mk)
+    JET.@test_opt fresh!(mk)
+    for s in vcat(PLAIN_S2, PLAIN_S3, PLAIN_S4, PLAIN_S5, PLAIN_S6)
         st = fresh(s, S2_INTYPES)
         JET.@test_opt CausalFrames.update!(st, row)
         JET.@test_opt CausalFrames.update!(st, merge(row, (close = missing,)))

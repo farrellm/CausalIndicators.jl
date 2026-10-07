@@ -169,14 +169,14 @@ const KERNELS =
         end
         # TA-Lib's lookbacks (ta_MA.c dispatch) at period 7, unstable 2.
         for (m, lb) in ((:sma, 6), (:ema, 8), (:wma, 6), (:dema, 16), (:tema, 24),
-            (:trima, 6), (:kama, 9), (:t3, 38), (:hma, 7), (:zlema, 11), (:rma, 8))
+            (:trima, 6), (:kama, 9), (:mama, 34), (:t3, 38), (:hma, 7), (:zlema, 11),
+            (:rma, 8))
             @test lookback(MAKernel(Float64, m, 7; unstable = 2)) == lb
             # TA_MA copies at period 1 with lookback 0, whatever the unstable period.
             @test lookback(MAKernel(Float64, m, 1; unstable = 2)) == 0
         end
         @test lookback(MAKernel(Float64, :dema, 1; unstable = 2, identity = false)) == 4
         @test lookback(MAKernel(Float64, :kama, 1; unstable = 2, identity = false)) == 2
-        @test_throws ArgumentError MAKernel(Float64, :mama, 5)
         @test_throws ArgumentError MAKernel(Float64, :ema, 5; unstable = -1)
         @test_throws ArgumentError T3Kernel(Float64, 5, 1.5)
         @test_throws ArgumentError MAKernel(Float64, :nope, 5)

@@ -17,10 +17,10 @@ const MATYPES = (:sma, :ema, :wma, :dema, :tema, :trima, :kama, :mama, :t3, :hma
 
 """
 The MA types whose TA-Lib lookback includes an unstable period: their own
-(`:ema`, `:kama`, `:t3`, `:rma`) or EMA's, which `:dema`, `:tema` and `:zlema`
-inherit.
+(`:ema`, `:kama`, `:mama`, `:t3`, `:rma`) or EMA's, which `:dema`, `:tema` and
+`:zlema` inherit.
 """
-const UNSTABLE_MATYPES = (:ema, :dema, :tema, :kama, :t3, :zlema, :rma)
+const UNSTABLE_MATYPES = (:ema, :dema, :tema, :kama, :mama, :t3, :zlema, :rma)
 
 mutable struct MAKernel{M,K}
     const inner::K
@@ -62,12 +62,13 @@ makernel(::Val{:dema}, ::Type{T}, p, u, vf) where {T} = DEMAKernel(T, p; unstabl
 makernel(::Val{:tema}, ::Type{T}, p, u, vf) where {T} = TEMAKernel(T, p; unstable = u)
 makernel(::Val{:trima}, ::Type{T}, p, u, vf) where {T} = TRIMAKernel(T, p)
 makernel(::Val{:kama}, ::Type{T}, p, u, vf) where {T} = KAMAKernel(T, p)
+# TA_MA's MAMA ignores the period and uses the default limits (ta_MA.c).
+makernel(::Val{:mama}, ::Type{T}, p, u, vf) where {T} =
+    MAMAKernel(T, 0.5, 0.05; copy = p == 1)
 makernel(::Val{:t3}, ::Type{T}, p, u, vf) where {T} = T3Kernel(T, p, vf)
 makernel(::Val{:hma}, ::Type{T}, p, u, vf) where {T} = HMAKernel(T, p)
 makernel(::Val{:zlema}, ::Type{T}, p, u, vf) where {T} = ZLEMAKernel(T, p)
 makernel(::Val{:rma}, ::Type{T}, p, u, vf) where {T} = WilderKernel(T, p)
-makernel(::Val{M}, ::Type, p, u, vf) where {M} =
-    throw(ArgumentError("MAKernel matype $(repr(M)) is not implemented yet"))
 
 # TA-Lib's `TA_<FN>_Lookback` for each type at period `p` and unstable period
 # `u` (ta_MA.c's dispatch, then each function's own).
@@ -78,6 +79,7 @@ malookback(::Val{:dema}, p, u) = 2 * (p - 1 + u)
 malookback(::Val{:tema}, p, u) = 3 * (p - 1 + u)
 malookback(::Val{:trima}, p, u) = p - 1
 malookback(::Val{:kama}, p, u) = (p == 1 ? 0 : p) + u
+malookback(::Val{:mama}, p, u) = 32 + u
 malookback(::Val{:t3}, p, u) = 6 * (p - 1) + u
 malookback(::Val{:hma}, p, u) = (p - 1) + (isqrt(p) - 1)
 malookback(::Val{:zlema}, p, u) = (p - 1) ÷ 2 + p - 1 + u
