@@ -4,7 +4,8 @@
 TA-Lib's technical indicators as causal, streaming CausalFrames summarizers.
 One row is one bar, of any size: every period counts bars, not days. TA-Lib's
 defaults are its authors' parameters for daily bars, so choose the parameters
-for yours. See DESIGN.md for the design and the staging of the implementation.
+for yours. The candlestick patterns are in the `CausalIndicators.Candles`
+submodule. See DESIGN.md for the design and the staging of the implementation.
 """
 module CausalIndicators
 
@@ -37,6 +38,7 @@ include("kernels/gainloss.jl")
 include("kernels/stoch.jl")
 include("kernels/atr.jl")
 include("kernels/dm.jl")
+include("kernels/candle.jl")
 
 include("barindicator.jl")
 
@@ -47,5 +49,7 @@ include("volatility.jl")
 include("statistics.jl")
 include("volume.jl")
 include("cycle.jl")
+
+include("candles/Candles.jl")
 
 end

@@ -1,6 +1,6 @@
 # Targeted JET checks: every kernel's per-bar path must be free of runtime
 # dispatch, including the CausalFrames barwindows embedded in the window
-# kernels, and so must every plain state's update! (S1 to S6).
+# kernels, and so must every plain state's update! (S1 to S7).
 
 using JET
 
@@ -50,7 +50,7 @@ using JET
     JET.@test_opt step!(mk, 1.5)
     JET.@test_opt current(mk)
     JET.@test_opt fresh!(mk)
-    for s in vcat(PLAIN_S2, PLAIN_S3, PLAIN_S4, PLAIN_S5, PLAIN_S6)
+    for s in vcat(PLAIN_S2, PLAIN_S3, PLAIN_S4, PLAIN_S5, PLAIN_S6, PLAIN_S7)
         st = fresh(s, S2_INTYPES)
         JET.@test_opt CausalFrames.update!(st, row)
         JET.@test_opt CausalFrames.update!(st, merge(row, (close = missing,)))

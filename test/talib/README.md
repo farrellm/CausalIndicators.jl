@@ -3,8 +3,9 @@
 `tables/*.toml` are extracted from TA-Lib 0.8.1 (commit `2aa8eb0`)
 `src/tools/ta_regtest/ta_test_func/test_*.c` by `gen/extract_talib_tests.jl`;
 `../data/*.csv` by `gen/extract_talib_data.jl`; `../golden/*.csv.gz` by
-`gen/golden/generate.jl`. See the repository README for regenerating them, and
-DESIGN.md "Testing" for how they are used.
+`gen/golden/generate.jl`; `candles/mcdc.txt.gz` by `gen/candles/capture.jl`.
+See the repository README for regenerating them, and DESIGN.md "Testing" for
+how they are used.
 
 ## Hand-ported tests
 
@@ -47,8 +48,17 @@ These files have no file-scope tables at all:
 
 These files have checks outside their extracted tables:
 
-- [ ] `test_candlestick.c`: the `cdlGlobalsMatrix` settings matrix drives
-      `CandleSettings` (S7)
+- [x] `test_candlestick.c` (S7). The `cdlGlobalsMatrix` settings rows are
+      oracled by goldens: every CDL* golden also runs at rows 1–4 on both
+      datasets (`cdlrow=r`), since the C test only compares languages with
+      each other there. The MC/DC pattern builders (`pb_*`, the Hikkake and
+      marquee predicate gates) are not ported. Instead `gen/candles/capture.c`
+      links the C test with every `TA_CDL*` entry point wrapped and records
+      each builder call's bars and TA-Lib's answers in
+      `candles/mcdc.txt.gz`, which `test/candles.jl` replays exactly. Its
+      `tableTest` rows (bar 0 alone, no output) are checked too. Not ported:
+      `doRangeTest`, the per-setting coverage sweep and the server legs, which
+      have no stream counterpart.
 - [ ] `test_period_boundary.c`: period-1 and minimum-period boundaries, and
       the abstract sweep over every parameter grid
 - [x] `test_rolling_extremum.c`: the block-scan oracle for MIN, MAX, MINMAX,

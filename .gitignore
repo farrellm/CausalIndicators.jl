@@ -1,2 +1,3 @@
 /Manifest*.toml
 /gen/golden/dump_golden
+/gen/candles/capture

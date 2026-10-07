@@ -4,11 +4,11 @@
 
 TA-Lib's technical indicators as causal, streaming building blocks for
 [CausalFrames.jl](https://github.com/farrellm/CausalFrames.jl) pipelines. See
-[DESIGN.md](DESIGN.md) for the design and the implementation stages. This is
-under construction: stages S1 (moving averages, rolling operators and price
+[DESIGN.md](DESIGN.md) for the design and the implementation stages. All seven
+stages have landed: S1 (moving averages, rolling operators and price
 transforms), S2 (momentum I), S3 (directional movement and volatility), S4
-(statistics and volume), S5 (the TA-Lib 0.8 additions) and S6 (the Hilbert
-cycle family and MAMA) have landed.
+(statistics and volume), S5 (the TA-Lib 0.8 additions), S6 (the Hilbert cycle
+family and MAMA) and S7 (the candlestick patterns).
 
 ```julia
 using CausalFrames, CausalIndicators, Dates
@@ -125,6 +125,91 @@ only tests them and adds no constructor:
 | `CORREL` | `Correlation(:x, :y)` (`NaN` on a flat window, where TA-Lib gives 0) | `Bars(30)` |
 | `PERCENTILE` | `Quantile(:x, percentile / 100; interpolation = :nearestrank)` | `Bars(30)` |
 
+## Candlestick patterns
+
+TA-Lib's 61 `CDL*` patterns live in the `CausalIndicators.Candles` submodule,
+so their names stay out of your namespace unless you ask for them. Each takes
+`open`, `high`, `low` and `close` keywords (defaulting to those columns), runs
+under `addsummarycolumns`, and emits `Int` in `:cdl<name>`. The values are 100
+(bullish), −100 (bearish) or 0. Engulfing, Harami and HaramiCross give ±80 for
+their weaker forms, and the Hikkake pair gives ±200 on a confirmation bar.
+
+```julia
+using CausalIndicators.Candles
+
+loose = CandleSettings(; bodydoji = CandleSetting(:highlow, 10, 0.2))
+p |> addsummarycolumns([Hammer(), Engulfing(), Doji(; settings = loose, name = :doji20),
+    MorningStar(; penetration = 0.5)]; key = :symbol)
+```
+
+The thresholds a pattern compares against are TA-Lib's 11 candle settings
+(`TA_SetCandleSettings`). Here they are an immutable `CandleSettings`, passed
+as `settings`. Each setting is a `CandleSetting(range, avgperiod, factor)`.
+
+| TA-Lib | `Candles.` |
+|---|---|
+| `CDL2CROWS` | `TwoCrows()` |
+| `CDL3BLACKCROWS` | `ThreeBlackCrows()` |
+| `CDL3INSIDE` | `ThreeInside()` |
+| `CDL3LINESTRIKE` | `ThreeLineStrike()` |
+| `CDL3OUTSIDE` | `ThreeOutside()` |
+| `CDL3STARSINSOUTH` | `ThreeStarsInTheSouth()` |
+| `CDL3WHITESOLDIERS` | `ThreeWhiteSoldiers()` |
+| `CDLABANDONEDBABY` | `AbandonedBaby(; penetration = 0.3)` |
+| `CDLADVANCEBLOCK` | `AdvanceBlock()` |
+| `CDLBELTHOLD` | `BeltHold()` |
+| `CDLBREAKAWAY` | `Breakaway()` |
+| `CDLCLOSINGMARUBOZU` | `ClosingMarubozu()` |
+| `CDLCONCEALBABYSWALL` | `ConcealingBabySwallow()` |
+| `CDLCOUNTERATTACK` | `Counterattack()` |
+| `CDLDARKCLOUDCOVER` | `DarkCloudCover(; penetration = 0.5)` |
+| `CDLDOJI` | `Doji()` |
+| `CDLDOJISTAR` | `DojiStar()` |
+| `CDLDRAGONFLYDOJI` | `DragonflyDoji()` |
+| `CDLENGULFING` | `Engulfing()` |
+| `CDLEVENINGDOJISTAR` | `EveningDojiStar(; penetration = 0.3)` |
+| `CDLEVENINGSTAR` | `EveningStar(; penetration = 0.3)` |
+| `CDLGAPSIDESIDEWHITE` | `GapSideSideWhite()` |
+| `CDLGRAVESTONEDOJI` | `GravestoneDoji()` |
+| `CDLHAMMER` | `Hammer()` |
+| `CDLHANGINGMAN` | `HangingMan()` |
+| `CDLHARAMI` | `Harami()` |
+| `CDLHARAMICROSS` | `HaramiCross()` |
+| `CDLHIGHWAVE` | `HighWave()` |
+| `CDLHIKKAKE` | `Hikkake()` |
+| `CDLHIKKAKEMOD` | `HikkakeMod()` |
+| `CDLHOMINGPIGEON` | `HomingPigeon()` |
+| `CDLIDENTICAL3CROWS` | `IdenticalThreeCrows()` |
+| `CDLINNECK` | `InNeck()` |
+| `CDLINVERTEDHAMMER` | `InvertedHammer()` |
+| `CDLKICKING` | `Kicking()` |
+| `CDLKICKINGBYLENGTH` | `KickingByLength()` |
+| `CDLLADDERBOTTOM` | `LadderBottom()` |
+| `CDLLONGLEGGEDDOJI` | `LongLeggedDoji()` |
+| `CDLLONGLINE` | `LongLine()` |
+| `CDLMARUBOZU` | `Marubozu()` |
+| `CDLMATCHINGLOW` | `MatchingLow()` |
+| `CDLMATHOLD` | `MatHold(; penetration = 0.5)` |
+| `CDLMORNINGDOJISTAR` | `MorningDojiStar(; penetration = 0.3)` |
+| `CDLMORNINGSTAR` | `MorningStar(; penetration = 0.3)` |
+| `CDLONNECK` | `OnNeck()` |
+| `CDLPIERCING` | `Piercing()` |
+| `CDLRICKSHAWMAN` | `RickshawMan()` |
+| `CDLRISEFALL3METHODS` | `RiseFallThreeMethods()` |
+| `CDLSEPARATINGLINES` | `SeparatingLines()` |
+| `CDLSHOOTINGSTAR` | `ShootingStar()` |
+| `CDLSHORTLINE` | `ShortLine()` |
+| `CDLSPINNINGTOP` | `SpinningTop()` |
+| `CDLSTALLEDPATTERN` | `StalledPattern()` |
+| `CDLSTICKSANDWICH` | `StickSandwich()` |
+| `CDLTAKURI` | `Takuri()` |
+| `CDLTASUKIGAP` | `TasukiGap()` |
+| `CDLTHRUSTING` | `Thrusting()` |
+| `CDLTRISTAR` | `Tristar()` |
+| `CDLUNIQUE3RIVER` | `UniqueThreeRiver()` |
+| `CDLUPSIDEGAP2CROWS` | `UpsideGapTwoCrows()` |
+| `CDLXSIDEGAP3METHODS` | `XSideGapThreeMethods()` |
+
 ## Development
 
 CausalFrames is not registered. On Julia 1.11 and later, Pkg reads its URL from
@@ -145,13 +230,20 @@ regenerate them, or to add goldens for a new function:
 git clone https://github.com/TA-Lib/ta-lib ~/workspace/ta-lib
 git -C ~/workspace/ta-lib checkout 2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788
 cmake -S ~/workspace/ta-lib -B ~/workspace/ta-lib/build
-cmake --build ~/workspace/ta-lib/build --target ta-lib
+cmake --build ~/workspace/ta-lib/build --target ta-lib ta-lib-static
 
 julia --project=gen gen/extract_talib_data.jl ~/workspace/ta-lib    # test/data
 julia --project=gen gen/extract_talib_tests.jl ~/workspace/ta-lib   # test/talib/tables
 make -C gen/golden TALIB=~/workspace/ta-lib
 julia --project=gen gen/golden/generate.jl ~/workspace/ta-lib EMA RMA ...   # test/golden
+make -C gen/candles TALIB=~/workspace/ta-lib
+julia --project=gen gen/candles/capture.jl ~/workspace/ta-lib       # test/talib/candles
 ```
+
+The candlestick goldens also run at the settings rows of `test_candlestick.c`.
+`gen/candles` captures that file's pattern-builder calls, which sit on each
+pattern's decision boundaries, by linking it against the static library with
+every `TA_CDL*` entry point wrapped.
 
 Before generating a function's goldens, add the parameter sets its tables use
 to `gen/golden/paramsets.toml`.

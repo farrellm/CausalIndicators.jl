@@ -2,6 +2,7 @@
  * prints every output for every bar, for CausalIndicators' golden tests.
  *
  *     dump_golden DATASET.csv FUNC [optInName=value ...] [unstable=k]
+ *                 [cdl.Setting=rangeType:avgPeriod:factor ...]
  *
  * DATASET.csv has a header naming some of open, high, low, close, volume. Inputs
  * are bound by the function's own input descriptions:
@@ -10,7 +11,10 @@
  *     order, except an input named inPeriods (MAVP), which takes the synthetic
  *     series 2 + (i mod 29).
  * Optional inputs keep TA-Lib's defaults unless given. unstable=k is
- * TA_SetUnstablePeriod(TA_FUNC_UNST_ALL, k).
+ * TA_SetUnstablePeriod(TA_FUNC_UNST_ALL, k). cdl.Setting=r:a:f is
+ * TA_SetCandleSettings(TA_Setting, r, a, f), Setting one of TA_CandleSettingType's
+ * names (BodyLong, ..., Equal) and r a TA_RangeType (0 RealBody, 1 HighLow,
+ * 2 Shadows).
  *
  * Output on stdout: a `# inputs:` comment line giving the binding, then a CSV
  * header `index,<output names>`, then one line per bar. Bars before outBegIdx
@@ -33,6 +37,10 @@ static const char *colnames[MAXCOLS] = {"open", "high", "low", "close", "volume"
 static double *cols[MAXCOLS];
 static int ncols_present[MAXCOLS];
 static int nrows;
+
+static const char *cdlsettings[TA_AllCandleSettings] = {
+   "BodyLong", "BodyVeryLong", "BodyShort", "BodyDoji", "ShadowLong", "ShadowVeryLong",
+   "ShadowShort", "ShadowVeryShort", "Near", "Far", "Equal"};
 
 static void die(const char *msg, const char *arg)
 {
@@ -153,6 +161,18 @@ int main(int argc, char **argv)
       *eq = '\0';
       if (strcmp(argv[a], "unstable") == 0) {
          check(TA_SetUnstablePeriod(TA_FUNC_UNST_ALL, atoi(eq + 1)), "TA_SetUnstablePeriod");
+         continue;
+      }
+      if (strncmp(argv[a], "cdl.", 4) == 0) {
+         int st, rt, avg;
+         double factor;
+         for (st = 0; st < TA_AllCandleSettings; st++)
+            if (strcmp(argv[a] + 4, cdlsettings[st]) == 0) break;
+         if (st == TA_AllCandleSettings) die("unknown candle setting", argv[a]);
+         if (sscanf(eq + 1, "%d:%d:%lf", &rt, &avg, &factor) != 3)
+            die("expected rangeType:avgPeriod:factor for", argv[a]);
+         check(TA_SetCandleSettings((TA_CandleSettingType)st, (TA_RangeType)rt, avg, factor),
+               argv[a]);
          continue;
       }
       for (j = 0; j < info->nbOptInput; j++) {

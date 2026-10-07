@@ -63,3 +63,24 @@ const TA_EPSILON = 1e-14
 
 # TA-Lib's true range: the bar's range widened to the previous close.
 @inline truerange(h, l, cprev) = max(h - l, abs(cprev - h), abs(cprev - l))
+
+# Lag lines: a CausalFrames `WindowValues` under `barwindow`, prefilled with
+# zeros so it is full from the first bar (which also gets past `barwindow`'s
+# missing-until-full gate). `WindowValues` counts NaN rather than storing it, so
+# a lag line must only ever be fed non-NaN values, or its lags misalign. The
+# Hilbert core (kernels/hilbert.jl) and the candlesticks (kernels/candle.jl)
+# use them. `lagwindow(T, n)` holds `n` zeros' worth of history.
+lagwindow(::Type{T}, n) where {T} =
+    prefill!(CausalFrames.barwindow(CausalFrames.WindowValues(:x), n, (x = T,)), n, T)
+function prefill!(w, n, ::Type{T}) where {T}
+    for _ in 1:n
+        update!(w, (x = zero(T),))
+    end
+    return w
+end
+refill!(w, n, ::Type{T}) where {T} = prefill!(fresh!(w), n, T)
+
+# The window's values, oldest first in `vals[head:end]`; `lag(v, k)` is the
+# value `k` bars back (0 = newest). Prefilled, the window is always full.
+@inline windowvals(w) = value(w).x_windowvalues
+@inline lag(wv, k) = @inbounds wv.vals[end-k]
