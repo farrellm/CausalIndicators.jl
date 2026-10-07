@@ -1,0 +1,11 @@
+[deps]
+CausalFrames = "388faf74-d151-4224-8c39-96f47ad15296"
+CausalIndicators = "2e4c3c01-7b3a-448c-a723-d6bf3f693fd3"
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+
+[sources]
+CausalFrames = {url = "https://github.com/farrellm/CausalFrames.jl", rev = "master"}
+CausalIndicators = {path = ".."}
+
+[compat]
+Documenter = "1.17.0"
