@@ -1,3 +1,5 @@
-/Manifest*.toml
+Manifest*.toml
+/docs/build/
+/docs/src/index.md
 /gen/golden/dump_golden
 /gen/candles/capture
