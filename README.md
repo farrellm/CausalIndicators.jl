@@ -210,6 +210,13 @@ as `settings`. Each setting is a `CandleSetting(range, avgperiod, factor)`.
 | `CDLUPSIDEGAP2CROWS` | `UpsideGapTwoCrows()` |
 | `CDLXSIDEGAP3METHODS` | `XSideGapThreeMethods()` |
 
+## Acknowledgements
+
+The indicators, and the reference tables, datasets and goldens the tests check
+against, come from [TA-Lib](https://ta-lib.org) by Mario Fortier, under the
+BSD 3-Clause license. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+CausalIndicators is not affiliated with or endorsed by TA-Lib.
+
 ## Development
 
 CausalFrames is not registered. On Julia 1.11 and later, Pkg reads its URL from

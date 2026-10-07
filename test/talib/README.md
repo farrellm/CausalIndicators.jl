@@ -5,7 +5,9 @@
 `../data/*.csv` by `gen/extract_talib_data.jl`; `../golden/*.csv.gz` by
 `gen/golden/generate.jl`; `candles/mcdc.txt.gz` by `gen/candles/capture.jl`.
 See the repository README for regenerating them, and DESIGN.md "Testing" for
-how they are used.
+how they are used. Like `../data` and `../golden`, they are derived from
+TA-Lib and distributed under its BSD 3-Clause license; see
+[THIRD_PARTY_NOTICES.md](../../THIRD_PARTY_NOTICES.md).
 
 ## Hand-ported tests
 
