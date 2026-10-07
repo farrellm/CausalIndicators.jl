@@ -278,8 +278,9 @@ g. **`CausalFrames.barwindow(s, n, intypes)`, a count-window state** (#81),
    Coppock, SMI, Fractal, TRIMA, the Stoch family's %K,
    `MAKernel`'s `:sma` and `:wma`, `BollingerBands(; matype)` and RVI (a
    `Std`), CVI and ADXR (a `First` of their own earlier values), MassIndex (a
-   `Sum`), Beta (`Covariance`, `Variance` and `Mean` of the returns) and
-   `CandleAverages`.
+   `Sum`), Beta (`Covariance`, `Variance` and `Mean` of the returns), the
+   Hilbert family and MAMA (`WindowValues` as lag lines, and the `WMA`
+   smoother) and `CandleAverages`.
 
 h. **`MeanAbsDev(column)`**, the mean absolute deviation about the mean,
    `Σ|x − mean| / n`. It is a fieldless dependent over `Mean` and
@@ -343,6 +344,7 @@ h. **`MeanAbsDev(column)`**, the mean absolute deviation about the mean,
     TA-Lib's absolute array index, which is meaningless in a stream. The tests
     convert between the two.
   - `SuperTrend`'s trend emits `Int` 1 (up) or −1 (down).
+  - `HTTrendMode` emits `Int` 1 (trend) or 0 (cycle).
 
 ## Semantics
 
@@ -365,6 +367,10 @@ given parameters.
     YAML flags none of the three, but each lookback calls one that has it.
   - `ERI`, `SMI` and `TSI` inherit EMA's, and `KDJ` its dispatched types', in
     the same way. `HeikinAshi` has its own, which only delays the output.
+  - The Hilbert family (`HTDCPeriod`, `HTDCPhase`, `HTPhasor`, `HTSine`,
+    `HTTrendline`, `HTTrendMode`) and `MAMA` have their own, which also only
+    delays the output: TA-Lib always starts their price smoother at the first
+    bar (`trailingWMAIdx = 0`), whatever the unstable period.
   - `ATR`, `NATR`, `PlusDM`, `MinusDM`, `PlusDI`, `MinusDI`, `DX`, `ADX` and
     `RVI` have their own. At period 1 the DMs and DIs ignore it, as TA-Lib's
     period-1 arms do.
@@ -392,7 +398,9 @@ order:
 
 **Every sum is a CausalFrames compensated sum,** including these seeds, which
 come from embedded CausalFrames `Sum`/`Mean` states rather than a plain `+=`
-loop. There is one summation implementation across both packages, with no
+loop. The exception is a scan recomputed from a window's values at each bar,
+which is a plain loop, as CausalFrames' own `MeanAbsDev` scan is: the Hilbert
+family's DC-phase DFT and trendline mean, in TA-Lib's order. There is one summation implementation across both packages, with no
 sliding-sum drift. Values therefore agree with TA-Lib to the golden tolerance,
 usually more accurately than TA-Lib's own running sums, but they are not
 bit-identical.
@@ -439,6 +447,10 @@ A bar count cannot be turned into a time span in general, so the caller chooses
   - Structured indicators recover once a nonfinite bar leaves the window,
     because CausalFrames' sums are compensated and count nonfinite terms.
   - Recursive ones do not recover, as in TA-Lib.
+  - The Hilbert family and `MAMA` poison their state at a non-finite input,
+    as TA-Lib's running WMA sums do, though the CausalFrames smoother itself
+    would recover: every later real output is NaN, and `HTTrendMode` emits 1,
+    as TA-Lib's comparisons with NaN give.
 
 ## Structure and fast paths
 
@@ -551,6 +563,15 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
     `WilderKernel` seeded with `period − 1` bars, or kept raw at period 1. The
     ±DM, ±DI, DX, ADX and ADXR states read it. DX repeats its previous value
     where it is undefined, and ADX holds, as TA-Lib does.
+  - `HilbertKernel` (S6): Ehlers' Hilbert-transform core behind the HT family
+    and MAMA. Its 4-bar price smoother is a `WMAKernel`. Each of the four
+    FIRs (detrender, Q1, jI, jQ) reads lags 2, 4 and 6 of its input, which is
+    all TA-Lib's odd/even three-slot buffers hold. Those lag lines are
+    `barwindow`s over `CausalFrames.WindowValues`, prefilled with TA-Lib's
+    zeros. The DC-phase DFT (`HTDCPhase`, `HTSine`, `HTTrendMode`) reads a
+    50-bar window of the smoothed price, and the trendline (`HTTrendline`,
+    `HTTrendMode`) a 50-bar window of the raw price, both in the same way.
+    `MAMAKernel` adds MAMA and FAMA on top, and `MAKernel{:mama}` embeds it.
   - `ERKernel` (S5): Kaufman's efficiency ratio, a `barwindow` `Sum` of `|Δx|`
     and a `First` of the bar `period` back, with ta_ER.c's flat-window guard.
     `ER` emits it, and `KAMAKernel` embeds it, so the two stay one computation.
@@ -563,8 +584,8 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
       `EMAKernel`s), `TRIMAKernel` (two `SMAKernel`s), `KAMAKernel`
       (`barwindow`s around `Sum` and `First`), `HMAKernel` (three
       `WMAKernel`s) and `ZLEMAKernel` (`barwindow` around `First`, then an
-      `EMAKernel`). `:mama` lands in S6, and until then the constructor
-      rejects it with an `ArgumentError`.
+      `EMAKernel`). S6 adds `:mama`, a `MAMAKernel` at TA_MA's limits (0.5,
+      0.05), which ignores the period and has lookback `32 + unstable`.
     - Unlike the other kernels, its `lookback` is TA-Lib's whole lookback for
       the type, unstable period included, and `step!` gates its own output.
       Its `identity` keyword selects `TA_MA`'s period-1 rule, a copy with
@@ -629,7 +650,7 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
 | File | Content |
 |---|---|
 | `src/CausalIndicators.jl` | module, includes, exports |
-| `src/kernels/*.jl` | `EMAKernel`, `WilderKernel`, `SMAKernel`, `MAKernel`, `ERKernel`, `GainLossKernel`, `FastKKernel`, `ATRKernel`, `DMKernel`, `CandleAverages` |
+| `src/kernels/*.jl` | `EMAKernel`, `WilderKernel`, `SMAKernel`, `MAKernel`, `ERKernel`, `GainLossKernel`, `FastKKernel`, `ATRKernel`, `DMKernel`, `HilbertKernel`, `MAMAKernel`, `CandleAverages` |
 | `src/barindicator.jl` | `BarIndicator`, the plain summarizer shared by the S5 indicators |
 | `src/overlap.jl` | moving averages and bands |
 | `src/momentum.jl` | momentum indicators |
@@ -816,7 +837,9 @@ README rows together, and updates this document where reality differs.
   FOSC claimed the Group tier, as a dependent under `Bars(period + 1)`, and
   ERI, SMI, TSI, KDJ and HeikinAshi gained `unstable`. It needed no upstream
   addition. **Complete.**
-- **S6:** the Hilbert-transform cycle family and `MAMA` (7).
+- **S6:** the Hilbert-transform cycle family and `MAMA` (7). They share one
+  `HilbertKernel`, all seven gained `unstable` (a pure delay), and `:mama`
+  became a `matype` everywhere. It needed no upstream addition. **Complete.**
 - **S7:** the 61 candlestick patterns and `CandleSettings`.
 
 A stage PR may find that an indicator can claim a stronger tier, or needs
@@ -963,13 +986,13 @@ All 182 in-scope TA-Lib functions. The table is generated from the pinned YAML.
 | `VHF` | `VHF` | S5 | new state (previous bar; `Max`, `Min`, `Sum` windows) | plain | real | period=28 | (one column) |
 | `VORTEX` | `Vortex` | S5 | new state (previous bar; `Sum` windows) | plain | high, low, close | period=14 | plusvi, minusvi |
 | `WAD` | `WAD` | S5 | new state (previous close, a `Sum`) | plain | high, low, close | — | (one column) |
-| `HT_DCPERIOD` | `HTDCPeriod` | S6 | new state | plain | real | — | (one column) |
-| `HT_DCPHASE` | `HTDCPhase` | S6 | new state | plain | real | — | (one column) |
-| `HT_PHASOR` | `HTPhasor` | S6 | new state | plain | real | — | inphase, quadrature |
-| `HT_SINE` | `HTSine` | S6 | new state | plain | real | — | sine, leadsine |
-| `HT_TRENDLINE` | `HTTrendline` | S6 | new state | plain | real | — | (one column) |
-| `HT_TRENDMODE` | `HTTrendMode` | S6 | new state | plain | real | — | (one column) |
-| `MAMA` | `MAMA` | S6 | new state | plain | real | fastlimit=0.5, slowlimit=0.05 | mama, fama |
+| `HT_DCPERIOD` | `HTDCPeriod` | S6 | new state (`HilbertKernel`) | plain | real | unstable=0 | (one column) |
+| `HT_DCPHASE` | `HTDCPhase` | S6 | new state (`HilbertKernel`) | plain | real | unstable=0 | (one column) |
+| `HT_PHASOR` | `HTPhasor` | S6 | new state (`HilbertKernel`) | plain | real | unstable=0 | inphase, quadrature |
+| `HT_SINE` | `HTSine` | S6 | new state (`HilbertKernel`) | plain | real | unstable=0 | sine, leadsine |
+| `HT_TRENDLINE` | `HTTrendline` | S6 | new state (`HilbertKernel`) | plain | real | unstable=0 | (one column) |
+| `HT_TRENDMODE` | `HTTrendMode` | S6 | new state (`HilbertKernel`) | plain | real | unstable=0 | (one column, `Int`) |
+| `MAMA` | `MAMA` | S6 | new state (`MAMAKernel`) | plain | real | fastlimit=0.5, slowlimit=0.05, unstable=0 | mama, fama |
 | `CDL2CROWS` | `Candles.TwoCrows` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
 | `CDL3BLACKCROWS` | `Candles.ThreeBlackCrows` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |
 | `CDL3INSIDE` | `Candles.ThreeInside` | S7 | new state (shared `CandleAverages`) | plain | open, high, low, close | — | (one column) |

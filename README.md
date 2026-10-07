@@ -7,7 +7,8 @@ TA-Lib's technical indicators as causal, streaming building blocks for
 [DESIGN.md](DESIGN.md) for the design and the implementation stages. This is
 under construction: stages S1 (moving averages, rolling operators and price
 transforms), S2 (momentum I), S3 (directional movement and volatility), S4
-(statistics and volume) and S5 (the TA-Lib 0.8 additions) have landed.
+(statistics and volume), S5 (the TA-Lib 0.8 additions) and S6 (the Hilbert
+cycle family and MAMA) have landed.
 
 ```julia
 using CausalFrames, CausalIndicators, Dates
@@ -96,6 +97,10 @@ TA-Lib unstable period, their own or inherited, take an `unstable` keyword.
 | `VORTEX` | `Vortex(; period = 14)` | `addsummarycolumns` |
 | `WAD` | `WAD(; high, low, close)` | `addsummarycolumns` |
 | `HA` | `HeikinAshi(; open, high, low, close)` | `addsummarycolumns` |
+| `HT_DCPERIOD`, `HT_DCPHASE`, `HT_TRENDLINE` | `HTDCPeriod(:x)`, `HTDCPhase(:x)`, `HTTrendline(:x)` | `addsummarycolumns` |
+| `HT_PHASOR`, `HT_SINE` | `HTPhasor(:x)` (inphase, quadrature), `HTSine(:x)` (sine, leadsine) | `addsummarycolumns` |
+| `HT_TRENDMODE` | `HTTrendMode(:x)` (`Int`: 1 trend, 0 cycle) | `addsummarycolumns` |
+| `MAMA` | `MAMA(:x; fastlimit = 0.5, slowlimit = 0.05)` (mama, fama); also `matype = :mama` | `addsummarycolumns` |
 
 These TA-Lib functions are CausalFrames summarizers already, so this package
 only tests them and adds no constructor:

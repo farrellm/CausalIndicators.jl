@@ -261,7 +261,7 @@ const PLAIN_S4 = [
         @test_throws ArgumentError ADOSC(; fastperiod = 1)
         @test_throws ArgumentError ADOSC(; unstable = -1)
         @test_throws ArgumentError EFI(; period = 0)
-        @test_throws ArgumentError PVO(; matype = :mama)
+        @test_throws ArgumentError PVO(; matype = :nope)
         @test_throws ArgumentError PVO(; slowperiod = 1)
         @test_throws ArgumentError Beta(:a, :b; period = 0)
         @test keys(CausalFrames.emptyvalue(Beta(:a, :b; name = :b5))) == (:a_b_b5,)

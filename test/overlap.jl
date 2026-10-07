@@ -86,7 +86,7 @@ mavpperiods(n) = [2.0 + (i % 29) for i in 0:(n-1)]
         for r in rows
             r["id"] == "TA_ANY_MA_TEST" || continue
             m = Symbol(lowercase(replace(r["optInMAType_1"], "TA_MAType_" => "")))
-            m === :mama && continue  # S6
+            m === :mama && continue  # on MEDPRICE, in test/cycle.jl
             p = r["optInTimePeriod"]
             if r["expectedRetCode"] == "TA_BAD_PARAM"
                 @test_throws ArgumentError MA(:x; period = p, matype = m)
@@ -201,7 +201,7 @@ mavpperiods(n) = [2.0 + (i % 29) for i in 0:(n-1)]
         end
         @test_throws ArgumentError MAVP(:x, :p; minperiod = 5, maxperiod = 4)
         @test_throws ArgumentError MAVP(:x, :p; minperiod = 0)
-        @test_throws ArgumentError MAVP(:x, :p; matype = :mama)
+        @test_throws ArgumentError MAVP(:x, :p; matype = :nope)
         # A missing period emits missing; the kernels still step.
         t = (
             x = collect(1.0:10.0),
@@ -226,7 +226,6 @@ mavpperiods(n) = [2.0 + (i % 29) for i in 0:(n-1)]
         @test_throws ArgumentError EMA(:x; unstable = -1)
         @test_throws ArgumentError T3(:x; vfactor = 1.5)
         @test_throws ArgumentError MA(:x; matype = :nope)
-        @test_throws ArgumentError MA(:x; matype = :mama)
         # TA_MA ignores the unstable period of types that have none.
         @test isequal(foldseries(MA(:close; matype = :wma, unstable = 3), loadref()),
             foldseries(MA(:close; matype = :wma), loadref()))
@@ -599,7 +598,7 @@ sarext(p) = SARExt(; startvalue = get(p, :optInStartValue, 0),
               BollingerBands(:x) isa CausalFrames.Termed
         @test_throws ArgumentError BollingerBands(:x; period = 10)
         @test_throws ArgumentError BollingerBands(:x; matype = :ema, period = 1)
-        @test_throws ArgumentError BollingerBands(:x; matype = :mama)
+        @test_throws ArgumentError BollingerBands(:x; matype = :nope)
         @test_throws ArgumentError KeltnerChannels(; period = 1)
         @test_throws ArgumentError KeltnerChannels(; atrperiod = 0)
         @test_throws ArgumentError SAR(; acceleration = -0.1)

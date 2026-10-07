@@ -67,8 +67,12 @@ These files have checks outside their extracted tables:
 - [x] `test_adx.c`, `test_trange.c`, `test_sar.c`, `test_bbands.c`,
       `test_avgdev.c`: their tables (S3). Not ported: in-place aliasing,
       `checkDataSame` and the `doRangeTest` sub-range sweeps, which a stream
-      has no counterpart for; test_bbands.c's MAMA alignment (S6) and its legs
-      built on `ta_test_reference.c` data (NumAcc, pandas, tick ladder).
+      has no counterpart for, and test_bbands.c's legs built on
+      `ta_test_reference.c` data (NumAcc, pandas, tick ladder).
+- [x] `test_bbands.c` MAMA alignment (#99): at periods 20, 33, 34, 40, 50 and
+      100 the bands start at `max(32, period − 1)` and the middle band is
+      `MA(:mama)` (S6). The `startIdx` cases re-anchor TA-Lib's MAMA, which a
+      stream has no counterpart for.
 - [x] `test_stddev.c`: its table, STDDEV and VAR non-negativity, shift
       invariance, the exactly constant window, scale invariance at periods 2,
       10 and 25, and the flat tail. The flat tail is held to var.c's relative floor rather than exact
@@ -147,6 +151,8 @@ These files have checks outside their extracted tables:
 - [x] `test_quote_unit.c`, S5 part: the 2^-60 CMOU and SMI oracles and their
       [−100, 100] range (S5)
 - [x] `test_per_hlc.c` WAD: its table rows and the book and Tulip vectors (S5)
+- [x] `test_1in_1out.c`, `test_1in_2out.c` and `test_ma.c`'s MAMA/FAMA rows:
+      the tables, on the median price as the C tests feed them (S6)
 
 Not ported, being out of scope:
 

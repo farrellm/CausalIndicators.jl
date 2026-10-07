@@ -275,9 +275,9 @@ extremeswindow(n, ::Type{T}) where {T} =
     CausalFrames.barwindow(Extremes{:high,:low}(), n, (high = T, low = T))
 
 function checkmatype(fn, kw, matype)
-    matype in MATYPES && matype !== :mama || throw(
+    matype in MATYPES || throw(
         ArgumentError(
-            "$fn $kw must be one of $(join(map(repr, filter(!=(:mama), MATYPES)), ", ")), " *
+            "$fn $kw must be one of $(join(map(repr, MATYPES), ", ")), " *
             "got $(repr(matype))",
         ))
     return matype
@@ -537,8 +537,7 @@ end
 TA-Lib's `MACDEXT`, [`MACD`](@ref) with any moving-average types, in
 `:{column}_macdext_macd`, `:{column}_macdext_macdsignal` and
 `:{column}_macdext_macdhist`. The types are `matype` symbols as for
-[`MA`](@ref) (`:mama` lands with S6), and each average follows `MA`'s rules,
-period-1 copy included. `unstable` applies to every average whose type has an
+[`MA`](@ref), and each average follows `MA`'s rules, period-1 copy included. `unstable` applies to every average whose type has an
 unstable period.
 
 $MACD_DOC
@@ -628,8 +627,8 @@ function priceoscillator(fn, K, column, fast, slow, matype, unstable, name;
 end
 
 const PO_DOC = """
-The averages are `matype` moving averages as for [`MA`](@ref) (`:mama` lands
-with S6), both started at the first bar. TA-Lib swaps the periods if
+The averages are `matype` moving averages as for [`MA`](@ref), both started at
+the first bar. TA-Lib swaps the periods if
 `slowperiod < fastperiod`. `unstable` is the unstable period of `matype`, if it
 has one.
 """
@@ -836,8 +835,7 @@ const STOCH_DOC = """
 %K is where the close sits in the `fastkperiod`-bar high-low range, as a
 percentage (0 where TA-Lib finds the range zero), read through CausalFrames'
 windowed `Max`, `Min` and `Last`. The smoothings are `matype` moving averages
-as for [`MA`](@ref) (`:mama` lands with S6), and `unstable` is the unstable
-period of each that has one. Both outputs start together, on the first bar %D
+as for [`MA`](@ref), and `unstable` is the unstable period of each that has one. Both outputs start together, on the first bar %D
 has a value. A bar with any input `missing` leaves the state unchanged and
 emits `missing`.
 """

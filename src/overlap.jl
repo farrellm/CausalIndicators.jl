@@ -236,14 +236,15 @@ unchanged and emits `missing`. The output is `missing` for TA-Lib's lookback
 
 TA-Lib's `MA`: the `matype` moving average of `column` in `:{column}_ma`.
 `matype` is one of `:sma`, `:ema`, `:wma`, `:dema`, `:tema`, `:trima`,
-`:kama`, `:t3`, `:hma`, `:zlema` and `:rma` (`:mama` lands with S6). It always
+`:kama`, `:mama`, `:t3`, `:hma`, `:zlema` and `:rma`. It always
 returns a plain summarizer. The window-agnostic SMA is CausalFrames' `Mean`
 under a `Bars` window.
 
 `unstable` is TA-Lib's unstable period for the dispatched function, and it
 applies only to the types that have one (`:ema`, `:dema`, `:tema`, `:kama`,
-`:t3`, `:zlema`, `:rma`). Period 1 copies the input with lookback 0, as
-`TA_MA` does. `:t3` uses `vfactor = 0.7`, as `TA_MA` does.
+`:mama`, `:t3`, `:zlema`, `:rma`). Period 1 copies the input with lookback 0, as
+`TA_MA` does. `:t3` uses `vfactor = 0.7`, as `TA_MA` does. `:mama` ignores the
+period and is [`MAMA`](@ref)'s MAMA line at its default limits, lookback 32.
 
 $MA_DOC_COMMON
 TA-Lib: `ta_codegen/input/ma/ma.yaml`, `ma.md`.
@@ -255,7 +256,6 @@ function MA(column::ColumnSpec; period::Integer = 30, matype::Symbol = :sma,
             "MA matype must be one of $(join(map(repr, MATYPES), ", ")), " *
             "got $(repr(matype))",
         ))
-    matype === :mama && throw(ArgumentError("MA matype :mama is not implemented yet"))
     # TA_MA ignores the unstable period of types that have none.
     u = matype in UNSTABLE_MATYPES ? unstable : 0
     checkunstable(unstable)
@@ -413,7 +413,7 @@ function MAVP(column::ColumnSpec, periods::ColumnSpec; minperiod::Integer = 2,
     checkrange("MAVP", "maxperiod", maxperiod, 1, 100_000)
     minperiod <= maxperiod || throw(
         ArgumentError("MAVP minperiod ($minperiod) must not exceed maxperiod ($maxperiod)"))
-    matype in MATYPES && matype !== :mama || throw(
+    matype in MATYPES || throw(
         ArgumentError("MAVP matype $(repr(matype)) is not supported"))
     checkunstable(unstable)
     u = matype in UNSTABLE_MATYPES ? Int(unstable) : 0
@@ -580,7 +580,7 @@ population standard deviations of `column` above and below it.
   is a dependent over CausalFrames' `Mean` and `Std(corrected = false)` (Group
   tier). It is window-agnostic: TA-Lib's `BBANDS(period = p)` with the SMA is
   `BollingerBands(:x)` under `Bars(p)`. It takes no `period`.
-- **With `matype`** (any `matype` symbol of [`MA`](@ref); `:mama` lands with S6)
+- **With `matype`** (any `matype` symbol of [`MA`](@ref))
   it is a plain summarizer over a `period`-bar moving average and a CausalFrames
   `Std(corrected = false)` under `CausalFrames.barwindow`. The lookback is the
   larger of the average's and `period − 1`, and `unstable` is the unstable

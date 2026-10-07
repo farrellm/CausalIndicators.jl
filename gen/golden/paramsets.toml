@@ -18,8 +18,8 @@ RMA = [
 ]
 
 # S1. MA covers each type through TA_MA's dispatch (optInMAType is TA_MAType's
-# order: 0 SMA, 1 EMA, 2 WMA, 3 DEMA, 4 TEMA, 5 TRIMA, 6 KAMA, 8 T3, 9 HMA,
-# 12 ZLEMA, 13 RMA), plus period 1, which TA_MA copies with lookback 0.
+# order: 0 SMA, 1 EMA, 2 WMA, 3 DEMA, 4 TEMA, 5 TRIMA, 6 KAMA, 7 MAMA (S6), 8 T3,
+# 9 HMA, 12 ZLEMA, 13 RMA), plus period 1, which TA_MA copies with lookback 0.
 MA = [
     {optInMAType = 1},
     {optInMAType = 2},
@@ -33,6 +33,9 @@ MA = [
     {optInMAType = 13},
     {optInTimePeriod = 1, optInMAType = 3},
     {optInTimePeriod = 10, optInMAType = 3, unstable = 2},
+    {optInMAType = 7},
+    {optInTimePeriod = 1, optInMAType = 7},
+    {optInMAType = 7, unstable = 2},
 ]
 
 SMA = [{optInTimePeriod = 2}]
@@ -64,6 +67,7 @@ MAVP = [
     {optInMinPeriod = 2, optInMaxPeriod = 10, optInMAType = 1},
     {optInMinPeriod = 3, optInMaxPeriod = 20, optInMAType = 6},
     {optInMinPeriod = 2, optInMaxPeriod = 30, optInMAType = 3},
+    {optInMinPeriod = 2, optInMaxPeriod = 10, optInMAType = 7},
 ]
 VWMA = [{optInTimePeriod = 1}, {optInTimePeriod = 14}]
 SUM = [{optInTimePeriod = 2}, {optInTimePeriod = 14}]
@@ -99,12 +103,14 @@ MACDEXT = [
     {optInFastPeriod = 26, optInFastMAType = 2, optInSlowPeriod = 12, optInSlowMAType = 0},
     {optInFastMAType = 6, optInSlowMAType = 1, optInSignalMAType = 0},
     {optInFastMAType = 3, optInSlowMAType = 4, optInSignalMAType = 8, unstable = 1},
+    {optInFastMAType = 7, optInSlowMAType = 1, optInSignalMAType = 7},
 ]
 APO = [
     {optInMAType = 0},
     {optInFastPeriod = 26, optInSlowPeriod = 12, optInMAType = 0},
     {optInMAType = 6},
     {unstable = 3},
+    {optInMAType = 7},
 ]
 PPO = [
     {optInFastPeriod = 2, optInSlowPeriod = 3, optInMAType = 0},
@@ -129,6 +135,7 @@ STOCHF = [
     {optInFastD_Period = 1},
     {optInFastD_MAType = 1, unstable = 2},
     {optInFastK_Period = 14, optInFastD_MAType = 4},
+    {optInFastD_MAType = 7, unstable = 1},
 ]
 STOCHRSI = [
     {optInTimePeriod = 14, optInFastK_Period = 14, optInFastD_Period = 1},
@@ -188,6 +195,8 @@ BBANDS = [
     {optInMAType = 1, unstable = 3},
     {optInTimePeriod = 10, optInMAType = 6},
     {optInTimePeriod = 2, optInMAType = 2},
+    {optInMAType = 7},
+    {optInTimePeriod = 40, optInMAType = 7},
 ]
 STDDEV = [{optInTimePeriod = 2}, {optInNbDev = 1.5}, {optInTimePeriod = 20, optInNbDev = 2.0}]
 VAR = [{optInTimePeriod = 1}, {optInTimePeriod = 2}, {optInTimePeriod = 20}]
@@ -309,3 +318,17 @@ TSI = [
 VHF = [{optInTimePeriod = 2}, {optInTimePeriod = 5}, {optInTimePeriod = 14}]
 VORTEX = [{optInTimePeriod = 1}, {optInTimePeriod = 2}, {optInTimePeriod = 21}]
 WAD = []
+
+# S6. The Hilbert family and MAMA have no period; their unstable period only
+# delays the output.
+HT_DCPERIOD = [{unstable = 2}]
+HT_DCPHASE = [{unstable = 2}]
+HT_PHASOR = [{unstable = 2}]
+HT_SINE = [{unstable = 2}]
+HT_TRENDLINE = [{unstable = 2}]
+HT_TRENDMODE = [{unstable = 2}]
+MAMA = [
+    {optInFastLimit = 0.9, optInSlowLimit = 0.1},
+    {optInFastLimit = 0.2, optInSlowLimit = 0.2},
+    {unstable = 3},
+]
