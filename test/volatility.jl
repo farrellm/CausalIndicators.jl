@@ -33,7 +33,7 @@ oracle(got, want; rtol = 1e-12, atol = 1e-12) = isapprox(got, want; rtol, atol)
                 (foldseries(s, data)[out],)
             end
         end
-        checkgoldens("ADR"; outputs = (:outReal,)) do p, data
+        checkgoldens("ADR"; accepts = WINDOW, outputs = (:outReal,)) do p, data
             (foldseries(ADR(), data; window = Bars(get(p, :optInTimePeriod, 14))).w_adr,)
         end
         checkgoldens("CVI"; outputs = (:outReal,)) do p, data

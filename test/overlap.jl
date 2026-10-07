@@ -7,6 +7,10 @@ using CausalIndicators: MovingAverageState, MAVPState, UNSTABLE_MATYPES
 const MATYPE_CODES = Dict(0 => :sma, 1 => :ema, 2 => :wma, 3 => :dema, 4 => :tema,
     5 => :trima, 6 => :kama, 7 => :mama, 8 => :t3, 9 => :hma, 12 => :zlema, 13 => :rma)
 
+# A golden's optInMAType code as a matype symbol. A code past TA_MAType (the
+# boundary sweep's rejected value) maps to a symbol no constructor accepts.
+matypecode(c) = get(MATYPE_CODES, c, Symbol(:ta_matype_, c))
+
 # A table row's TA_MAType identifier as a matype symbol.
 tablematype(s) = Symbol(lowercase(replace(s, "TA_MAType_" => "")))
 
@@ -48,7 +52,7 @@ mavpperiods(n) = [2.0 + (i % 29) for i in 0:(n-1)]
     @testset "MA goldens" begin
         checkgoldens("MA"; outputs = (:outReal,)) do p, data
             s = MA(:close; period = get(p, :optInTimePeriod, 30),
-                matype = MATYPE_CODES[get(p, :optInMAType, 0)],
+                matype = matypecode(get(p, :optInMAType, 0)),
                 unstable = get(p, :unstable, 0))
             (foldseries(s, data).close_ma,)
         end
@@ -58,7 +62,7 @@ mavpperiods(n) = [2.0 + (i % 29) for i in 0:(n-1)]
         checkgoldens("MAVP"; outputs = (:outReal,)) do p, data
             s = MAVP(:close, :periods; minperiod = get(p, :optInMinPeriod, 2),
                 maxperiod = get(p, :optInMaxPeriod, 30),
-                matype = MATYPE_CODES[get(p, :optInMAType, 0)])
+                matype = matypecode(get(p, :optInMAType, 0)))
             t = merge(data, (periods = mavpperiods(length(data.close)),))
             (foldseries(s, t).close_mavp,)
         end
@@ -70,7 +74,7 @@ mavpperiods(n) = [2.0 + (i % 29) for i in 0:(n-1)]
             ("VWMA", VWMA(:close), :w_close_vwma, 30),
             ("MIDPOINT", MidPoint(:close), :w_close_midpoint, 14),
             ("MIDPRICE", MidPrice(), :w_midprice, 14))
-            checkgoldens(fn; outputs = (:outReal,)) do p, data
+            checkgoldens(fn; accepts = WINDOW, outputs = (:outReal,)) do p, data
                 w = Bars(get(p, :optInTimePeriod, default))
                 (foldseries(s, data; window = w)[out],)
             end
@@ -325,14 +329,14 @@ sarext(p) = SARExt(; startvalue = get(p, :optInStartValue, 0),
 
 @testset "bands, SAR and SuperTrend" begin
     @testset "goldens" begin
-        checkgoldens("DONCHIAN"; outputs = BANDS) do p, data
+        checkgoldens("DONCHIAN"; accepts = WINDOW, outputs = BANDS) do p, data
             Tuple(foldseries(Donchian(), data; window = Bars(get(p, :optInTimePeriod, 20))))
         end
-        checkgoldens("ACCBANDS"; outputs = BANDS) do p, data
+        checkgoldens("ACCBANDS"; accepts = WINDOW, outputs = BANDS) do p, data
             Tuple(foldseries(AccBands(), data; window = Bars(get(p, :optInTimePeriod, 20))))
         end
-        checkgoldens("BBANDS"; outputs = BANDS) do p, data
-            m = MATYPE_CODES[get(p, :optInMAType, 0)]
+        checkgoldens("BBANDS"; accepts = WINDOW, outputs = BANDS) do p, data
+            m = matypecode(get(p, :optInMAType, 0))
             per = get(p, :optInTimePeriod, 20)
             up, dn = get(p, :optInNbDevUp, 2.0), get(p, :optInNbDevDn, 2.0)
             # The SMA runs both forms: the structured one has no unstable period.

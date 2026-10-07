@@ -24,7 +24,7 @@ const PLAIN_S4 = [
                 unstable = get(p, :unstable, 0))
             (foldseries(s, data).adosc,)
         end
-        checkgoldens("CMF"; outputs = (:outReal,)) do p, data
+        checkgoldens("CMF"; accepts = WINDOW, outputs = (:outReal,)) do p, data
             (foldseries(CMF(), data; window = Bars(get(p, :optInTimePeriod, 20))).w_cmf,)
         end
         checkgoldens("EFI"; outputs = (:outReal,), input = :volume) do p, data
@@ -48,11 +48,11 @@ const PLAIN_S4 = [
         checkgoldens("PVO"; outputs = (:outReal,)) do p, data
             s = PVO(; fastperiod = get(p, :optInFastPeriod, 12),
                 slowperiod = get(p, :optInSlowPeriod, 26),
-                matype = CausalIndicators.MATYPES[get(p, :optInMAType, 1)+1],
+                matype = matypecode(get(p, :optInMAType, 1)),
                 unstable = get(p, :unstable, 0))
             (foldseries(s, data).pvo,)
         end
-        checkgoldens("RVOL"; outputs = (:outReal,)) do p, data
+        checkgoldens("RVOL"; accepts = WINDOW, outputs = (:outReal,)) do p, data
             (
                 foldseries(RVOL(), data; window = Bars(get(p, :optInTimePeriod, 20) + 1)).w_rvol,
             )

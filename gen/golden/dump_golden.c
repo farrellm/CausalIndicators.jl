@@ -3,6 +3,7 @@
  *
  *     dump_golden DATASET.csv FUNC [optInName=value ...] [unstable=k]
  *                 [cdl.Setting=rangeType:avgPeriod:factor ...]
+ *     dump_golden --meta FUNC
  *
  * DATASET.csv has a header naming some of open, high, low, close, volume. Inputs
  * are bound by the function's own input descriptions:
@@ -20,8 +21,16 @@
  * header `index,<output names>`, then one line per bar. Bars before outBegIdx
  * have empty cells; reals print with %.17g so they round-trip exactly.
  *
+ * --meta prints FUNC's optional inputs instead, one per line, for the
+ * parameter-boundary sweep (test_period_boundary.c's testMinBoundarySweep):
+ *   <name> irange <default> <min> <max>
+ *   <name> rrange <default> <min> <max>
+ *   <name> ilist <default> <value> ...
+ *   <name> rlist <default> <value> ...
+ *
  * Exit status: 0 on success, 2 on usage or TA-Lib errors, 3 when the dataset
- * lacks a column the function needs (the caller skips that dataset).
+ * lacks a column the function needs (the caller skips that dataset), 4 when
+ * TA-Lib rejects the parameters with TA_BAD_PARAM, at set time or at the call.
  */
 
 #include <stdio.h>
@@ -50,6 +59,10 @@ static void die(const char *msg, const char *arg)
 
 static void check(TA_RetCode rc, const char *what)
 {
+   if (rc == TA_BAD_PARAM) {
+      fprintf(stderr, "dump_golden: %s: TA_BAD_PARAM\n", what);
+      exit(4);
+   }
    if (rc != TA_SUCCESS) {
       TA_RetCodeInfo info;
       TA_SetRetCodeInfo(rc, &info);
@@ -98,6 +111,47 @@ static double *need(int c)
    return cols[c];
 }
 
+static int meta(const char *fn)
+{
+   const TA_FuncHandle *handle;
+   const TA_FuncInfo *info;
+   check(TA_Initialize(), "TA_Initialize");
+   check(TA_GetFuncHandle(fn, &handle), fn);
+   check(TA_GetFuncInfo(handle, &info), "TA_GetFuncInfo");
+   for (unsigned int j = 0; j < info->nbOptInput; j++) {
+      const TA_OptInputParameterInfo *opt;
+      check(TA_GetOptInputParameterInfo(handle, j, &opt), "TA_GetOptInputParameterInfo");
+      printf("%s", opt->paramName);
+      switch (opt->type) {
+      case TA_OptInput_IntegerRange: {
+         const TA_IntegerRange *r = opt->dataSet;
+         printf(" irange %.17g %d %d", opt->defaultValue, r->min, r->max);
+         break;
+      }
+      case TA_OptInput_RealRange: {
+         const TA_RealRange *r = opt->dataSet;
+         printf(" rrange %.17g %.17g %.17g", opt->defaultValue, r->min, r->max);
+         break;
+      }
+      case TA_OptInput_IntegerList: {
+         const TA_IntegerList *l = opt->dataSet;
+         printf(" ilist %.17g", opt->defaultValue);
+         for (unsigned int e = 0; e < l->nbElement; e++) printf(" %d", l->data[e].value);
+         break;
+      }
+      case TA_OptInput_RealList: {
+         const TA_RealList *l = opt->dataSet;
+         printf(" rlist %.17g", opt->defaultValue);
+         for (unsigned int e = 0; e < l->nbElement; e++) printf(" %.17g", l->data[e].value);
+         break;
+      }
+      }
+      printf("\n");
+   }
+   TA_Shutdown();
+   return 0;
+}
+
 int main(int argc, char **argv)
 {
    const TA_FuncHandle *handle;
@@ -111,6 +165,7 @@ int main(int argc, char **argv)
    int outint[16];
 
    if (argc < 3) die("usage: dump_golden DATASET.csv FUNC [name=value ...]", NULL);
+   if (strcmp(argv[1], "--meta") == 0) return meta(argv[2]);
    readcsv(argv[1]);
    check(TA_Initialize(), "TA_Initialize");
    check(TA_GetFuncHandle(argv[2], &handle), argv[2]);

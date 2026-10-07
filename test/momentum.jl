@@ -5,7 +5,7 @@
 using CausalIndicators: GainLossKernel, FastKKernel, malookback
 
 # The MA type of a golden's `optIn…MAType` parameter, or `default`.
-matypeof(p, k, default) = MATYPE_CODES[get(p, k, default)]
+matypeof(p, k, default) = matypecode(get(p, k, default))
 
 # One of each plain S2 state, for the allocation and JET checks.
 const PLAIN_S2 = [
@@ -156,13 +156,17 @@ end
             ("WILLR", WillR(), :w_willr, 14, 0),
             ("CCI", CCI(), :w_cci, 14, 0),
             ("AROONOSC", AroonOsc(), :w_aroonosc, 14, 1))
-            checkgoldens(fn; outputs = (:outReal,)) do p, data
+            checkgoldens(fn; accepts = WINDOW, outputs = (:outReal,)) do p, data
                 w = Bars(get(p, :optInTimePeriod, default) + extra)
                 (foldseries(s, data; window = w)[out],)
             end
         end
         # Aroon's newest-wins tie-break is CausalFrames', so no row is skipped.
-        checkgoldens("AROON"; outputs = (:outAroonDown, :outAroonUp)) do p, data
+        checkgoldens(
+            "AROON";
+            accepts = WINDOW,
+            outputs = (:outAroonDown, :outAroonUp),
+        ) do p, data
             o = foldseries(Aroon(), data; window = Bars(get(p, :optInTimePeriod, 14) + 1))
             (o.w_aroon_aroondown, o.w_aroon_aroonup)
         end
