@@ -294,6 +294,11 @@ h. **`MeanAbsDev(column)`**, the mean absolute deviation about the mean,
 
 ## Model
 
+- **Defaults assume daily bars, the code does not.** Every period counts bars,
+  so any bar size works. TA-Lib's defaults, which the keywords keep, are mostly
+  their authors' daily-chart parameters, and a few constants are too (the
+  Hilbert family's 6–50-bar cycle clamp, `HTTrendMode`'s 1.5% threshold). The
+  docstrings of the indicators concerned say so, through a shared paragraph.
 - **One row is one bar.** Indicators never look at `:time` except through the
   transform folding them. Bars come from anywhere, whether a bar file, or
   `intervalize`/`summarizecycles` over ticks, as in the example above. Under

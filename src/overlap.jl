@@ -218,6 +218,13 @@ fresh state, a cold start per window. The output is `missing` for TA-Lib's
 lookback (plus `unstable`) bars.
 """
 
+# For the indicators whose defaults are their author's daily-chart parameters.
+const DAILY_DOC = """
+The defaults are TA-Lib's, which are the author's parameters for daily bars.
+Periods count bars, not days, so on other bar sizes the defaults span other
+lengths of time: choose the parameters for your bars.
+"""
+
 const SKIP_DOC = """
 A `missing` input bar leaves the state unchanged and emits `missing`.
 """
@@ -591,6 +598,7 @@ CausalFrames bakes `corrected` into the state type, not the output name, so the
 structured form cannot share a call with a corrected `Std` or `Variance` over
 the same column; put them in separate calls.
 
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/bbands/bbands.yaml`, `bbands.md`.
 """
 function BollingerBands(column::ColumnSpec; nbdevup::Real = 2, nbdevdn::Real = 2,
@@ -770,6 +778,7 @@ unstable period TA-Lib's KC inherits.
 $PLAIN_DOC
 A bar with any input `missing` leaves the state unchanged and emits `missing`.
 
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/kc/kc.yaml`, `kc.md`.
 """
 function KeltnerChannels(; high::ColumnSpec = :high, low::ColumnSpec = :low,
@@ -954,6 +963,8 @@ to `maximum`. When a bar's range reaches the SAR it reverses, emitting the old
 extreme point as the SAR.
 
 $SAR_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/sar/sar.yaml`, `sar.md`.
 """
 function SAR(; high::ColumnSpec = :high, low::ColumnSpec = :low,
@@ -978,6 +989,8 @@ reversal the emitted SAR moves `offsetonreverse` times itself away from the
 price.
 
 $SAR_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/sarext/sarext.yaml`, `sarext.md`.
 """
 function SARExt(; high::ColumnSpec = :high, low::ColumnSpec = :low,
@@ -1101,6 +1114,7 @@ finite `warmup` makes it split-invariant.
 $PLAIN_DOC
 A bar with any input `missing` leaves the state unchanged and emits `missing`.
 
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/supertrend/supertrend.yaml`, `supertrend.md`.
 """
 function SuperTrend(; high::ColumnSpec = :high, low::ColumnSpec = :low,

@@ -414,6 +414,7 @@ ADOSC is path-dependent, as AD is: no `warmup` makes it split-invariant.
 $PLAIN_DOC
 A bar with any input `missing` leaves the state unchanged and emits `missing`.
 
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/adosc/adosc.yaml`, `adosc.md`.
 """
 function ADOSC(; high::ColumnSpec = :high, low::ColumnSpec = :low,
@@ -487,6 +488,7 @@ inherits.
 $PLAIN_DOC
 A bar with any input `missing` leaves the state unchanged and emits `missing`.
 
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/efi/efi.yaml`, `efi.md`.
 """
 function EFI(; close::ColumnSpec = :close, volume::ColumnSpec = :volume,
@@ -510,6 +512,8 @@ the volume, in `:pvo`. A slow average TA-Lib finds zero gives 0. It is
 
 $PO_DOC
 $PLAIN_DOC$SKIP_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/pvo/pvo.yaml`, `pvo.md`.
 """
 PVO(; volume::ColumnSpec = :volume, fastperiod::Integer = 12, slowperiod::Integer = 26,

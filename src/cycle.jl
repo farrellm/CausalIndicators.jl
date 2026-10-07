@@ -10,6 +10,13 @@ first bar seen. `unstable` is TA-Lib's unstable period for the function: it
 delays the first output without changing the values.
 """
 
+# Ehlers' calibration, shared by the family and MAMA.
+const HT_BARS_DOC = """
+The Hilbert transform's constants are Ehlers', for daily bars. It holds the
+measured cycle period to 6–50 bars, so on other bar sizes a cycle longer than
+50 bars reads as 50 and one shorter than 6 as 6.
+"""
+
 # F names the function: :dcperiod, :phasor (Hilbert from bar 13, lookback 32),
 # :dcphase, :sine, :trendline, :trendmode (from bar 38, lookback 63).
 struct HTSpec{F}
@@ -99,6 +106,7 @@ in `:{column}_htdcperiod`: the homodyne discriminator's period, clamped to
 [6, 50] bars and smoothed twice. The price is first smoothed by a 4-bar WMA.
 The lookback is 32 bars.
 
+$HT_BARS_DOC
 $HT_DOC
 TA-Lib: `ta_codegen/input/ht_dcperiod/ht_dcperiod.yaml`, `ht_dcperiod.md`.
 """
@@ -114,6 +122,7 @@ TA-Lib's `HT_DCPHASE`, the dominant cycle phase in degrees, in
 smoothed price over the dominant cycle period (see [`HTDCPeriod`](@ref)),
 advanced to compensate for the smoother's lag. The lookback is 63 bars.
 
+$HT_BARS_DOC
 $HT_DOC
 TA-Lib: `ta_codegen/input/ht_dcphase/ht_dcphase.yaml`, `ht_dcphase.md`.
 """
@@ -128,6 +137,7 @@ TA-Lib's `HT_PHASOR`, the Hilbert transform's phasor components, in
 `:{column}_htphasor_inphase` (the detrended price, 3 bars late) and
 `:{column}_htphasor_quadrature`. The lookback is 32 bars.
 
+$HT_BARS_DOC
 $HT_DOC
 TA-Lib: `ta_codegen/input/ht_phasor/ht_phasor.yaml`, `ht_phasor.md`.
 """
@@ -142,6 +152,7 @@ TA-Lib's `HT_SINE`, Ehlers' sine wave indicator, in `:{column}_htsine_sine`
 and `:{column}_htsine_leadsine`: the sines of the dominant cycle phase (see
 [`HTDCPhase`](@ref)) and of the phase 45° ahead. The lookback is 63 bars.
 
+$HT_BARS_DOC
 $HT_DOC
 TA-Lib: `ta_codegen/input/ht_sine/ht_sine.yaml`, `ht_sine.md`.
 """
@@ -157,6 +168,7 @@ TA-Lib's `HT_TRENDLINE`, Ehlers' instantaneous trendline, in
 period (see [`HTDCPeriod`](@ref)), smoothed by a 4-bar WMA of those means. The
 lookback is 63 bars.
 
+$HT_BARS_DOC
 $HT_DOC
 TA-Lib: `ta_codegen/input/ht_trendline/ht_trendline.yaml`, `ht_trendline.md`.
 """
@@ -173,7 +185,10 @@ TA-Lib's `HT_TRENDMODE`, Ehlers' trend-versus-cycle mode, in
 a phase advancing at the cycle's rate keeps it, and a smoothed price 1.5% or
 more away from [`HTTrendline`](@ref)'s line is a trend. The lookback is 63
 bars. After a non-finite input it emits 1, as TA-Lib's comparisons with NaN do.
+The 1.5% threshold is sized for daily moves: on short bars the price seldom
+strays that far from the trendline, so cycle mode (0) is reported more often.
 
+$HT_BARS_DOC
 $HT_DOC
 TA-Lib: `ta_codegen/input/ht_trendmode/ht_trendmode.yaml`, `ht_trendmode.md`.
 """
@@ -219,7 +234,10 @@ average, is the EMA of MAMA at half the factor. Both limits must be in
 [0.01, 0.99]. The lookback is 32 bars. `MA(…; matype = :mama)` is the MAMA
 line at the default limits.
 
+$HT_BARS_DOC
 $HT_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/mama/mama.yaml`, `mama.md`.
 """
 function MAMA(column::ColumnSpec; fastlimit::Real = 0.5, slowlimit::Real = 0.05,

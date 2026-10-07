@@ -131,6 +131,8 @@ of the first `period` true ranges. The lookback is `period`, plus `unstable`,
 TA-Lib's unstable period. At period 1 it is the true range.
 
 $PRICEBAR_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/atr/atr.yaml`, `atr.md`.
 """
 ATR(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
@@ -146,6 +148,8 @@ zero close. The lookback is `period`, plus `unstable`, TA-Lib's unstable
 period. At period 1 TA-Lib does not normalize, so it is the true range.
 
 $PRICEBAR_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/natr/natr.yaml`, `natr.md`.
 """
 NATR(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
@@ -213,6 +217,8 @@ the earlier EMA is exactly 0. The lookback is `period − 1 + rocperiod`, plus
 read from a CausalFrames `First` under `CausalFrames.barwindow`.
 
 $PRICEBAR_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/cvi/cvi.yaml`, `cvi.md`.
 """
 function CVI(; high::ColumnSpec = :high, low::ColumnSpec = :low, period::Integer = 10,
@@ -298,6 +304,8 @@ period TA-Lib's MASSI inherits for each EMA. The sum is a CausalFrames `Sum`
 under `CausalFrames.barwindow`.
 
 $PRICEBAR_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/massi/massi.yaml`, `massi.md`.
 """
 function MassIndex(; high::ColumnSpec = :high, low::ColumnSpec = :low,
@@ -391,6 +399,8 @@ standard deviation is a CausalFrames `Std(corrected = false)` under
 `CausalFrames.barwindow`.
 
 $PLAIN_DOC$SKIP_DOC
+
+$DAILY_DOC
 TA-Lib: `ta_codegen/input/rvi/rvi.yaml`, `rvi.md`.
 """
 function RVI(column::ColumnSpec; period::Integer = 14, stddevperiod::Integer = 10,

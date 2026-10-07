@@ -28,6 +28,14 @@ take a `period` keyword and run under `addsummarycolumns`. Output columns are
 back (the MOM/ROC family, Aroon, PercentRank100, RVOL, FOSC) take `Bars(period + 1)`. Indicators with a
 TA-Lib unstable period, their own or inherited, take an `unstable` keyword.
 
+Bars can be any size, daily or minute or tick, because every period and window
+counts bars, not days. The defaults, here and in the table below, are TA-Lib's,
+and most are their authors' parameters for daily charts: Wilder's 14,
+MACD's 12/26/9, Bollinger's 20. On other bar sizes they span other lengths of
+time, so choose the parameters for your bars. The docstrings note where a
+default or constant assumes daily bars. One example is the Hilbert family's
+6–50-bar cycle range; another is Coppock, whose defaults are month counts.
+
 ## Indicators
 
 | TA-Lib | CausalIndicators | Runs under |

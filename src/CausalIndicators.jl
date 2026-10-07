@@ -2,7 +2,9 @@
     CausalIndicators
 
 TA-Lib's technical indicators as causal, streaming CausalFrames summarizers.
-See DESIGN.md for the design and the staging of the implementation.
+One row is one bar, of any size: every period counts bars, not days. TA-Lib's
+defaults are its authors' parameters for daily bars, so choose the parameters
+for yours. See DESIGN.md for the design and the staging of the implementation.
 """
 module CausalIndicators
 
