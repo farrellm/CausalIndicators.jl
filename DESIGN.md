@@ -778,6 +778,15 @@ the goldens check every bar.
     It also runs at every parameter set `gen/golden/paramsets.toml` lists for
     it, over the 252-bar set only. The list holds the sets the tables use, and
     `unstable = k` among them is `TA_SetUnstablePeriod`.
+  - **Boundary sweep.** Every function also runs test_period_boundary.c's
+    parameter grid over the 252-bar set, derived from TA-Lib's own metadata
+    (`dump_golden --meta`): each integer range at min, min+1, default±1 and a
+    period past the data, each list value, and each real range's min, default
+    and max within 1e6. The out-of-range min−1, max+1 and one past a list are
+    run too. A set TA-Lib rejects has no rows, only a `# rejected:` header
+    line, and the tests require an `ArgumentError` for it. Two exceptions: a
+    structured indicator's period is its `Bars` window, which takes any n ≥ 1,
+    and `TA_MAType_DISABLED` and `TA_MAType_DEFAULT` have no `matype`.
   - **Missing volume.** A function that needs volume runs on the 252-bar set
     only.
   - **Input binding.** A price input takes the columns its flags name. The
@@ -819,6 +828,11 @@ the goldens check every bar.
     bound, σ ≤ 1e-6·level, rather than to 0. RVI's and MassIndex's flat edges
     stay exact, because a flat series routes nothing to RVI's legs and gives
     MassIndex an exact ratio of 1.
+  - **VWMA under `Bars(1)`.** TA-Lib's VWMA copies its input at period 1
+    (#184). `VWMA` is `Σ(P·V)/ΣV` under any window, and on two-decimal prices
+    with six-digit volumes (P·V)/V does not always give back P. The reference
+    series happens to round-trip, so its goldens match. test_period_boundary.c's
+    hostile series hold the copy `@test_broken`.
   - The index forms (`MAXINDEX`, `MININDEX`, `MINMAXINDEX`) skip rows whose
     window holds a tied extreme, where TA-Lib's path-dependent tie-break and
     the upstream most-recent rule may differ (see (d)). Their extracted table

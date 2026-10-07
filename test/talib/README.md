@@ -37,10 +37,7 @@ These files have no file-scope tables at all:
       MAVP's first output) for every MA type, with and without an unstable
       period, and the min/max/NaN clamping (S1). The in-place and truncation
       legs have no counterpart in a stream.
-- [ ] `test_open_contract.c`
 - [ ] `test_reference.c` (with `ta_test_reference.c` and its golden header)
-- [ ] `test_s_overflow.c`
-- [ ] `test_variants.c`
 - [x] `test_wma.c`: W2 (drift does not grow down an 8000-bar series) and W3
       (a 1000× print does not contaminate later windows), against an exact
       per-window WMA (S1). W1 needs `test_reference.c`'s golden header and
@@ -59,8 +56,20 @@ These files have checks outside their extracted tables:
       `tableTest` rows (bar 0 alone, no output) are checked too. Not ported:
       `doRangeTest`, the per-setting coverage sweep and the server legs, which
       have no stream counterpart.
-- [ ] `test_period_boundary.c`: period-1 and minimum-period boundaries, and
-      the abstract sweep over every parameter grid
+- [x] `test_period_boundary.c`. Its abstract sweep (`testMinBoundarySweep`)
+      is part of the goldens: `gen/golden/generate.jl` derives each function's
+      boundary grid from TA-Lib's metadata, so every in-range value is checked
+      bar by bar, and `checkgoldens` requires an `ArgumentError` for each set
+      TA-Lib rejects. The exceptions are the periods a structured indicator
+      takes as its `Bars` window (`accepts = WINDOW`), and TA_MAType_DISABLED
+      and TA_MAType_DEFAULT, which have no `matype`. `test/boundary.jl` ports
+      the rest: the period-1 lookbacks, every moving average copying its input
+      at period 1 on the reference and both hostile series, the MACD family at
+      signal period 1 (with the hostile grid), the period-1 pins and the
+      LINEARREG ramp at period 1025. VWMA's period-1 copy on the round-trip and
+      Sterbenz series is `@test_broken`: under `Bars(1)` it is (P·V)/V. CORREL(1)
+      gives `NaN` where TA-Lib gives 0, as for every flat window. The in-place,
+      `doRangeTest` and stream-surface legs have no counterpart in a fold.
 - [x] `test_rolling_extremum.c`: the block-scan oracle for MIN, MAX, MINMAX,
       MIDPOINT, MIDPRICE and WILLR, ported as a naive window scan over periods
       straddling the block edges (S1; WILLR in S2).
@@ -169,3 +178,14 @@ Not ported, being out of scope:
 - `test_div_zero.c` covers `DIV`, an element-wise operator
 - `test_stream_finite.c` covers the C API's rejection of non-finite single
   values, which has no counterpart here
+
+These files have no counterpart here, so nothing is ported:
+
+- `test_open_contract.c`: a rejected streaming `Open` must leave the caller's
+  output buffers untouched. A summarizer writes no caller buffers, and its first
+  value's bar is what every golden's lookback rows already pin.
+- `test_s_overflow.c`: the single-precision (`TA_S_`) vector arithmetic. The
+  element-wise math functions are out of scope (DESIGN.md, "Scope"), and there
+  are no float entry points.
+- `test_variants.c`: `TA_S_<N>` equals `TA_<N>` on widened inputs. There is
+  one generic method per indicator, not a float twin of it.

@@ -21,6 +21,21 @@
 # as the parameter set `cdlrow=r`, over both datasets: those rows are the
 # matrix's oracle, since test_candlestick.c only compares languages with each
 # other there.
+#
+# Every function also runs test_period_boundary.c's parameter-boundary grid
+# (testMinBoundarySweep), derived from its own metadata (`dump_golden --meta`),
+# over the 252-bar set, one optional input at a time with the rest at their
+# defaults:
+#   - an integer range at min, min+1, default-1, default+1 and a period past the
+#     data (min(max, 253)), and at the out-of-range min-1 and max+1;
+#   - an integer list at every value and one past the highest, except
+#     TA_MAType_DISABLED and TA_MAType_DEFAULT (10 and 11), which have no
+#     `matype` symbol (DESIGN.md, "Implementation architecture");
+#   - a real range at min, default and max where they are within 1e6, as the C
+#     sweep skips TA-Lib's effectively unbounded ranges. A real list at every
+#     value.
+# A set TA-Lib rejects with TA_BAD_PARAM has no rows; it is listed in the header
+# as `# rejected: <params>`, and the tests require an ArgumentError there.
 
 using TOML
 
@@ -56,6 +71,7 @@ function runone(bin, data, fn, p)
     err = IOBuffer()
     proc = run(pipeline(ignorestatus(`$bin $data $fn $args`); stdout = out, stderr = err))
     proc.exitcode == 3 && return nothing
+    proc.exitcode == 4 && return :rejected
     proc.exitcode == 0 || error("dump_golden $fn $args: ", String(take!(err)))
     lines = split(String(take!(out)), '\n'; keepempty = false)
     return lines[1], lines[2], lines[3:end]
@@ -67,10 +83,16 @@ function generate(bin, fn, sets)
     mkpath(outdir)
     inputs = header = nothing
     body = IOBuffer()
+    rejected = String[]
     for ds in DATASETS, p in sets
         ds == "gdata10000" && !isempty(p) && keys(p) != Set(["cdlrow"]) && continue
         r = runone(bin, joinpath(datadir, "$ds.csv"), fn, p)
         r === nothing && continue
+        if r === :rejected
+            ds == "ref252" || error("$fn $(paramstring(p)): rejected on $ds only")
+            push!(rejected, paramstring(p))
+            continue
+        end
         inputs = r[1]
         header = r[2]
         ps = paramstring(p)
@@ -83,10 +105,46 @@ function generate(bin, fn, sets)
     open(pipeline(`gzip -9n`; stdout = path), "w") do io
         println(io, "# TA-Lib ", TALIB_COMMIT, " ", fn)
         println(io, inputs)
+        foreach(r -> println(io, "# rejected: ", r), rejected)
         println(io, "dataset,params,", header)
         write(io, take!(body))
     end
-    println(path, ": ", length(sets), " parameter sets, ", filesize(path), " bytes")
+    println(path, ": ", length(sets), " parameter sets (", length(rejected),
+        " rejected), ", filesize(path), " bytes")
+end
+
+# The last bar of the 252-bar set, which the sweep's past-the-data period
+# straddles as test_period_boundary.c's endIdx + 2 does.
+const SWEEP_ENDIDX = 251
+const NO_MATYPE = (10, 11)
+
+# test_period_boundary.c's boundary grid for `fn` (see the header).
+function sweepsets(bin, fn)
+    sets = Dict{String,Any}[]
+    for line in eachline(`$bin --meta $fn`)
+        f = split(line)
+        name, kind, def = f[1], f[2], parse(Float64, f[3])
+        add(v) = push!(sets, Dict{String,Any}(name => v))
+        if kind == "irange"
+            lo, hi, d = parse(Int, f[4]), parse(Int, f[5]), Int(def)
+            for v in unique([lo, lo + 1, d - 1, d + 1, min(hi, SWEEP_ENDIDX + 2)])
+                lo <= v <= hi && v != d && add(v)
+            end
+            add(lo - 1)
+            hi <= 1_000_000 && add(hi + 1)
+        elseif kind == "ilist"
+            vals = parse.(Int, f[4:end])
+            foreach(v -> v != Int(def) && !(v in NO_MATYPE) && add(v), vals)
+            add(maximum(vals) + 1)
+        elseif kind == "rrange"
+            for v in unique(parse.(Float64, [f[4], f[3], f[5]]))
+                isfinite(v) && abs(v) <= 1e6 && v != def && add(v)
+            end
+        elseif kind == "rlist"
+            foreach(v -> v != def && add(v), parse.(Float64, f[4:end]))
+        end
+    end
+    return sets
 end
 
 function main(root, fns)
@@ -96,7 +154,9 @@ function main(root, fns)
     sets = TOML.parsefile(joinpath(@__DIR__, "paramsets.toml"))
     for fn in fns
         extra = startswith(fn, "CDL") ? [Dict{String,Any}("cdlrow" => r) for r in 1:4] : []
-        generate(bin, fn, [Dict{String,Any}(); get(sets, fn, Dict{String,Any}[]); extra])
+        listed = [Dict{String,Any}(); get(sets, fn, Dict{String,Any}[]); extra]
+        sweep = filter(p -> !(p in listed), sweepsets(bin, fn))
+        generate(bin, fn, [listed; sweep])
     end
 end
 

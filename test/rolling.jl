@@ -10,31 +10,31 @@ tiedskip(default) =
 @testset "rolling" begin
     @testset "CausalFrames-only goldens" begin
         w(p, d) = Bars(get(p, :optInTimePeriod, d))
-        checkgoldens("SUM"; outputs = (:outReal,)) do p, data
+        checkgoldens("SUM"; accepts = WINDOW, outputs = (:outReal,)) do p, data
             (foldseries(Sum(:close), data; window = w(p, 30)).w_close_sum,)
         end
         checkgoldens("CUMSUM"; outputs = (:outReal,)) do p, data
             (foldseries(Sum(:close), data).close_sum,)
         end
-        checkgoldens("MAX"; outputs = (:outReal,)) do p, data
+        checkgoldens("MAX"; accepts = WINDOW, outputs = (:outReal,)) do p, data
             (foldseries(Max(:close), data; window = w(p, 30)).w_close_max,)
         end
-        checkgoldens("MIN"; outputs = (:outReal,)) do p, data
+        checkgoldens("MIN"; accepts = WINDOW, outputs = (:outReal,)) do p, data
             (foldseries(Min(:close), data; window = w(p, 30)).w_close_min,)
         end
-        checkgoldens("MINMAX"; outputs = (:outMin, :outMax)) do p, data
+        checkgoldens("MINMAX"; accepts = WINDOW, outputs = (:outMin, :outMax)) do p, data
             o = foldseries([Min(:close), Max(:close)], data; window = w(p, 30))
             (o.w_close_min, o.w_close_max)
         end
-        checkgoldens("MAXINDEX"; outputs = (:outInteger,), skip = tiedskip(30),
+        checkgoldens("MAXINDEX"; accepts = WINDOW, outputs = (:outInteger,), skip = tiedskip(30),
             convert = sincefromindex) do p, data
             (foldseries(MaxIndex(:close), data; window = w(p, 30)).w_close_maxindex,)
         end
-        checkgoldens("MININDEX"; outputs = (:outInteger,), skip = tiedskip(30),
+        checkgoldens("MININDEX"; accepts = WINDOW, outputs = (:outInteger,), skip = tiedskip(30),
             convert = sincefromindex) do p, data
             (foldseries(MinIndex(:close), data; window = w(p, 30)).w_close_minindex,)
         end
-        checkgoldens("MINMAXINDEX"; outputs = (:outMinIdx, :outMaxIdx),
+        checkgoldens("MINMAXINDEX"; accepts = WINDOW, outputs = (:outMinIdx, :outMaxIdx),
             skip = tiedskip(30), convert = sincefromindex) do p, data
             o = foldseries([MinIndex(:close), MaxIndex(:close)], data; window = w(p, 30))
             (o.w_close_minindex, o.w_close_maxindex)

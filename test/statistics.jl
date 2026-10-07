@@ -9,16 +9,16 @@ tavar(x, p) = only(foldseries(Variance(:x; corrected = false), (; x); window = B
 
 @testset "statistics" begin
     @testset "goldens" begin
-        checkgoldens("STDDEV"; outputs = (:outReal,)) do p, data
+        checkgoldens("STDDEV"; accepts = WINDOW, outputs = (:outReal,)) do p, data
             s = StdDev(:close; nbdev = get(p, :optInNbDev, 1.0))
             (
                 foldseries(s, data; window = Bars(get(p, :optInTimePeriod, 5))).w_close_stddev,
             )
         end
-        checkgoldens("VAR"; outputs = (:outReal,)) do p, data
+        checkgoldens("VAR"; accepts = WINDOW, outputs = (:outReal,)) do p, data
             (tavar(data.close, get(p, :optInTimePeriod, 5)),)
         end
-        checkgoldens("AVGDEV"; outputs = (:outReal,)) do p, data
+        checkgoldens("AVGDEV"; accepts = WINDOW, outputs = (:outReal,)) do p, data
             s = MeanAbsDev(:close)
             (
                 foldseries(s, data; window = Bars(get(p, :optInTimePeriod, 14))).w_close_meanabsdev,
@@ -113,16 +113,16 @@ tavar(x, p) = only(foldseries(Variance(:x; corrected = false), (; x); window = B
         for (fn, ctor) in (("LINEARREG", LinearReg), ("LINEARREG_SLOPE", LinearRegSlope),
             ("LINEARREG_INTERCEPT", LinearRegIntercept),
             ("LINEARREG_ANGLE", LinearRegAngle), ("TSF", TSF))
-            checkgoldens(fn; outputs = (:outReal,)) do p, data
+            checkgoldens(fn; accepts = WINDOW, outputs = (:outReal,)) do p, data
                 w = Bars(get(p, :optInTimePeriod, 14))
                 (only(foldseries(ctor(:close), data; window = w)),)
             end
         end
-        checkgoldens("PERCENTRANK"; outputs = (:outReal,)) do p, data
+        checkgoldens("PERCENTRANK"; accepts = WINDOW, outputs = (:outReal,)) do p, data
             w = Bars(get(p, :optInTimePeriod, 100) + 1)
             (only(foldseries(PercentRank100(:close), data; window = w)),)
         end
-        checkgoldens("PERCENTILE"; outputs = (:outReal,)) do p, data
+        checkgoldens("PERCENTILE"; accepts = WINDOW, outputs = (:outReal,)) do p, data
             s = Quantile(:close, get(p, :optInPercentile, 50.0) / 100;
                 interpolation = :nearestrank)
             (only(foldseries(s, data; window = Bars(get(p, :optInTimePeriod, 30)))),)
@@ -131,7 +131,7 @@ tavar(x, p) = only(foldseries(Variance(:x; corrected = false), (; x); window = B
         # 0 and CausalFrames NaN (DESIGN.md, "Testing"). Those bars are checked
         # in "test_correl.c" below.
         flat(x, i, p) = i >= p && allequal(@view x[(i-p+1):i])
-        checkgoldens("CORREL"; outputs = (:outReal,),
+        checkgoldens("CORREL"; accepts = WINDOW, outputs = (:outReal,),
             skip = (d, p, i) -> (n = get(p, :optInTimePeriod, 30);
                 flat(d.close, i, n) || flat(d.high, i, n))) do p, data
             w = Bars(get(p, :optInTimePeriod, 30))

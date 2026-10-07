@@ -62,7 +62,7 @@ tablearray(t, name) = Float64.(t["arrays"][name]["values"])
             (out.eri_bullpower, out.eri_bearpower)
         end
         # FOSC is a percentage of a cancellation, the close less its forecast.
-        checkgoldens("FOSC"; outputs = (:outReal,), atol = 1e-9) do p, data
+        checkgoldens("FOSC"; accepts = WINDOW, outputs = (:outReal,), atol = 1e-9) do p, data
             n = get(p, :optInTimePeriod, 5)
             (foldseries(FOSC(:close), data; window = Bars(n + 1)).w_close_fosc,)
         end
@@ -80,20 +80,20 @@ tablearray(t, name) = Float64.(t["arrays"][name]["values"])
             out = foldseries(HeikinAshi(; unstable = get(p, :unstable, 0)), data)
             (out.ha_haopen, out.ha_hahigh, out.ha_halow, out.ha_haclose)
         end
-        checkgoldens("IMI"; outputs = (:outReal,), atol = 1e-9) do p, data
+        checkgoldens("IMI"; accepts = WINDOW, outputs = (:outReal,), atol = 1e-9) do p, data
             (foldseries(IMI(), data; window = Bars(get(p, :optInTimePeriod, 14))).w_imi,)
         end
         checkgoldens("KDJ"; outputs = (:outK, :outD, :outJ), atol = 1e-9) do p, data
             s = KDJ(; fastkperiod = get(p, :optInFastK_Period, 9),
                 slowkperiod = get(p, :optInSlowK_Period, 3),
-                slowkmatype = MATYPE_CODES[get(p, :optInSlowK_MAType, 13)],
+                slowkmatype = matypecode(get(p, :optInSlowK_MAType, 13)),
                 slowdperiod = get(p, :optInSlowD_Period, 3),
-                slowdmatype = MATYPE_CODES[get(p, :optInSlowD_MAType, 13)],
+                slowdmatype = matypecode(get(p, :optInSlowD_MAType, 13)),
                 unstable = get(p, :unstable, 0))
             out = foldseries(s, data)
             (out.kdj_k, out.kdj_d, out.kdj_j)
         end
-        checkgoldens("QSTICK"; outputs = (:outReal,)) do p, data
+        checkgoldens("QSTICK"; accepts = WINDOW, outputs = (:outReal,)) do p, data
             (
                 foldseries(QStick(), data; window = Bars(get(p, :optInTimePeriod, 10))).w_qstick,
             )

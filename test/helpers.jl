@@ -47,6 +47,23 @@ function loadgolden(fn)
     return groups
 end
 
+"""
+    loadrejected(fn) -> Vector{String}
+
+The `params` keys of the parameter sets TA-Lib rejected with `TA_BAD_PARAM`
+for function `fn` (the boundary sweep's out-of-range values, listed in the
+golden's header as `# rejected: …`).
+"""
+function loadrejected(fn)
+    path = joinpath(TESTDIR, "golden", "$fn.csv.gz")
+    out = String[]
+    for line in eachline(IOBuffer(transcode(GzipDecompressor, read(path))))
+        startswith(line, '#') || break
+        startswith(line, "# rejected: ") && push!(out, line[13:end])
+    end
+    return out
+end
+
 allowmissing(v::AbstractVector{T}) where {T} =
     convert(Vector{Union{Missing,nonmissingtype(T)}}, v)
 
@@ -151,8 +168,14 @@ near zero and the gap between compensated sums and TA-Lib's running sums.
 """
 goldenatol(xs) = 1e-9 * maximum(x -> isfinite(x) ? abs(x) : 0.0, xs)
 
+"""The TA-Lib functions whose goldens [`checkgoldens`](@ref) has checked."""
+const CHECKED_GOLDENS = Set{String}()
+
+"""TA-Lib's period parameter that a structured indicator takes as its window."""
+const WINDOW = (:optInTimePeriod,)
+
 """
-    checkgoldens(run, fn; outputs, input = :close, skip = nothing)
+    checkgoldens(run, fn; outputs, input = :close, skip = nothing, accepts = ())
 
 For every `(dataset, params)` golden of TA-Lib function `fn`, call
 `run(params::Dict, data)`, which returns one vector per golden output column
@@ -160,9 +183,30 @@ named in `outputs` (in that order), and check each against the golden with
 [`goldenmatch`](@ref). `skip(data, params, i)`, if given, excludes bar `i` (1-based)
 from the comparison. The absolute tolerance is [`goldenatol`](@ref) of the
 `input` column, or `atol` if given. It returns the number of series checked.
+
+Every parameter set TA-Lib rejects ([`loadrejected`](@ref)) must make `run`
+throw an `ArgumentError`, except a set over the TA-Lib parameters named in
+`accepts`. Those are the periods a structured indicator takes as its `Bars`
+window, where TA-Lib's range does not apply: `Bars(n)` takes any `n ≥ 1`
+(DESIGN.md, "Windows").
 """
 function checkgoldens(run, fn; outputs, input = :close, skip = nothing,
-    convert = (want, data, params) -> want, atol = nothing)
+    convert = (want, data, params) -> want, atol = nothing, accepts = ())
+    push!(CHECKED_GOLDENS, fn)
+    ref = loadref()
+    for ps in loadrejected(fn)
+        p = parseparams(ps)
+        all(in(accepts), keys(p)) && continue
+        threw = try
+            run(p, ref)
+            false
+        catch e
+            e isa ArgumentError || rethrow()
+            true
+        end
+        threw || @info "accepted a set TA-Lib rejects" fn ps
+        @test threw
+    end
     n = 0
     for ((ds, ps), golden) in sort(collect(loadgolden(fn)); by = first)
         data = DATASETS[ds]()
