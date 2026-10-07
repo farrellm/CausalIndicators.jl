@@ -1,6 +1,7 @@
 # CausalIndicators
 
 [![Build Status](https://github.com/farrellm/CausalIndicators.jl/actions/workflows/CI.yml/badge.svg?branch=master)](https://github.com/farrellm/CausalIndicators.jl/actions/workflows/CI.yml?query=branch%3Amaster)
+[![Coverage](https://codecov.io/gh/farrellm/CausalIndicators.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/farrellm/CausalIndicators.jl)
 
 TA-Lib's technical indicators as causal, streaming building blocks for
 [CausalFrames.jl](https://github.com/farrellm/CausalFrames.jl) pipelines. See
