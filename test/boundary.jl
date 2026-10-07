@@ -52,7 +52,8 @@ end
 
     @testset "lookbacks at period 1" begin
         # SourceForge bug 84: TA_MACD_Lookback(2, 7, 1) == 6.
-        for (s, lb) in ((MACD(:close; fastperiod = 2, slowperiod = 7, signalperiod = 1), 6),
+        for (s, lb) in
+            ((MACD(:close; fastperiod = 2, slowperiod = 7, signalperiod = 1), 6),
             (MACD(:close; fastperiod = 2, slowperiod = 7, signalperiod = 2), 7),
             (MACD(:close; fastperiod = 12, slowperiod = 26, signalperiod = 1), 25),
             (MACDFix(:close; signalperiod = 1), 25),
@@ -112,7 +113,7 @@ end
     @testset "MACD family at signal period 1" begin
         # The signal line is the MACD line and the histogram exactly 0.
         signalisline(o) = (o = map(collect ∘ skipmissing, Tuple(o));
-        o[2] == o[1] && all(iszero, o[3]))
+            o[2] == o[1] && all(iszero, o[3]))
         outs(s) = foldseries(s, ref)
         sig1 = outs(MACD(:close; signalperiod = 1))
         @test firstvalid(sig1[1]) == 25
@@ -172,13 +173,15 @@ end
         @test all(isapprox.(f.stochf_fastk[5:end], rawk; atol = 1e-9))
         @test isequal(f.stochf_fastd, f.stochf_fastk)
         for m in (:sma, :ema)
-            s = foldseries(Stoch(; fastkperiod = 5, slowkperiod = 1, slowkmatype = m,
+            s = foldseries(
+                Stoch(; fastkperiod = 5, slowkperiod = 1, slowkmatype = m,
                     slowdperiod = 1, slowdmatype = m), ref)
             @test isequal(s.stoch_slowk, f.stochf_fastk)
             @test isequal(s.stoch_slowd, f.stochf_fastk)
         end
         # STOCHRSI(14, 1, 1): a one-bar %K window has no range, so 0 throughout.
-        sr = foldseries(StochRSI(:close; period = 14, fastkperiod = 1, fastdperiod = 1), ref)
+        sr =
+            foldseries(StochRSI(:close; period = 14, fastkperiod = 1, fastdperiod = 1), ref)
         @test all(o -> firstvalid(o) == 14 && all(iszero, skipmissing(o)), sr)
 
         mom = foldseries(MOM(:close), ref; window = Bars(2)).w_close_mom

@@ -16,7 +16,8 @@ const LADDER_PERIODS = Int.(refarr("golden_ladder_periods"))
 
 exact(v) = Rational{BigInt}.(v)
 roundexact(q) = setprecision(() -> Float64(BigFloat(numerator(q)) / denominator(q)), 320)
-sqrtexact(q) = setprecision(() -> Float64(sqrt(BigFloat(numerator(q)) / denominator(q))), 320)
+sqrtexact(q) =
+    setprecision(() -> Float64(sqrt(BigFloat(numerator(q)) / denominator(q))), 320)
 
 # The window's deviations scaled by n, n·x − Σx, exact.
 devs(w) = (q = exact(w); length(q) .* q .- sum(q))
@@ -272,12 +273,17 @@ corr(x, y, p) = windowed(Correlation(:x, :y), (; x, y), p)
         # CausalFrames' windowed Covariance and Variance keep a residue of the
         # spike's return once it has left the window, so these rungs are broken
         # until an upstream re-anchor (TA-Lib's beta.c re-seeds its sums).
-        broken = Set([(1, 1e3, 5); [(1, s, p) for s in (1e5, 1e8, 1e12, 1e-3, 1e-9)
-            for p in (5, 14, 30)]; (2, 1e3, 5); (2, 1e5, 5); (2, 1e8, 5); (2, 1e8, 30);
-            [(2, 1e12, p) for p in (5, 14, 30)]; (2, 1e-3, 5); (2, 1e-3, 30);
-            [(2, 1e-9, p) for p in (5, 14, 30)]])
+        broken = Set(
+            [(1, 1e3, 5);
+                [(1, s, p) for s in (1e5, 1e8, 1e12, 1e-3, 1e-9)
+                 for p in (5, 14, 30)]; (2, 1e3, 5); (2, 1e5, 5); (2, 1e8, 5);
+                (2, 1e8, 30);
+                [(2, 1e12, p) for p in (5, 14, 30)]; (2, 1e-3, 5); (2, 1e-3, 30);
+                [(2, 1e-9, p) for p in (5, 14, 30)]],
+        )
         @test length(broken) == 28
-        for axis in 1:2, spike in (1.1e2, 2.0e2, 1.0e3, 1.0e5, 1.0e8, 1.0e12, 1.0e-3, 1.0e-9),
+        for axis in 1:2,
+            spike in (1.1e2, 2.0e2, 1.0e3, 1.0e5, 1.0e8, 1.0e12, 1.0e-3, 1.0e-9),
             p in (5, 14, 30)
 
             x = [100.0 + ((i * 37) % 11) * 0.01 for i in 0:399]
@@ -327,7 +333,10 @@ corr(x, y, p) = windowed(Correlation(:x, :y), (; x, y), p)
         for p in LADDER_PERIODS
             out = fits(ladder, p)
             @test all(eachindex(golden("ladder_p$(p)_slope"))) do k
-                want = map(o -> golden("ladder_p$(p)_$o")[k], ("slope", "intercept", "fit", "tsf"))
+                want = map(
+                    o -> golden("ladder_p$(p)_$o")[k],
+                    ("slope", "intercept", "fit", "tsf"),
+                )
                 lrok(ladder, p, out, k + p - 1, k - 1, want)
             end
         end
@@ -350,7 +359,8 @@ corr(x, y, p) = windowed(Correlation(:x, :y), (; x, y), p)
         for p in LADDER_PERIODS
             got = windowed(WMA(:x), (x = ladder,), p)
             g = golden("ladder_p$(p)_wma")
-            @test all(k -> abs(got[k+p-1] - g[k]) <= 60 * eps() * wmascale(ladder[k:(k+p-1)]),
+            @test all(
+                k -> abs(got[k+p-1] - g[k]) <= 60 * eps() * wmascale(ladder[k:(k+p-1)]),
                 eachindex(g))
         end
     end
@@ -420,14 +430,19 @@ corr(x, y, p) = windowed(Correlation(:x, :y), (; x, y), p)
         halfwidth(b, i, k) = (b[1][i] - b[3][i]) / k
         readback(mid, k, sigma) = 8 * abs(mid) * eps() / (k * sigma)
         bands(x, p; up = 1.0, dn = 1.0) =
-            Tuple(foldseries(BollingerBands(:x; nbdevup = up, nbdevdn = dn), (; x);
-                window = Bars(p)))
+            Tuple(
+                foldseries(BollingerBands(:x; nbdevup = up, nbdevdn = dn), (; x);
+                    window = Bars(p)),
+            )
         # (#243) The tick ladder under SMA, EMA and WMA middle bands.
         ticks60 = refarr("ticks60")
         for base in (0.0, 100.0), m in (:sma, :ema, :wma), d in 0:11
             x = base .+ ticks60 .* (1e-2 / 10.0^d)
-            b = Tuple(foldseries(BollingerBands(:x; matype = m, period = 5, nbdevup = 2,
-                    nbdevdn = 3), (; x)))
+            b = Tuple(
+                foldseries(
+                    BollingerBands(:x; matype = m, period = 5, nbdevup = 2,
+                        nbdevdn = 3), (; x)),
+            )
             first_ = findfirst(!ismissing, b[1])
             ok = all(first_:60) do i
                 w = x[(i-4):i]
@@ -446,7 +461,8 @@ corr(x, y, p) = windowed(Correlation(:x, :y), (; x, y), p)
             n = length(x)
             sigma = sqrt(i == 1 ? 2 / 3 : 10 / 1001)
             b = bands(x, n)
-            @test abs(halfwidth(b, n, 2) - sigma) / sigma <= tol + readback(b[2][n], 2, sigma)
+            @test abs(halfwidth(b, n, 2) - sigma) / sigma <=
+                  tol + readback(b[2][n], 2, sigma)
         end
         # (R2, R3) pandas' arrays and the ladder, against the goldens. The bands
         # never cross.

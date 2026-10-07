@@ -162,7 +162,11 @@ end
             end
         end
         # Aroon's newest-wins tie-break is CausalFrames', so no row is skipped.
-        checkgoldens("AROON"; accepts = WINDOW, outputs = (:outAroonDown, :outAroonUp)) do p, data
+        checkgoldens(
+            "AROON";
+            accepts = WINDOW,
+            outputs = (:outAroonDown, :outAroonUp),
+        ) do p, data
             o = foldseries(Aroon(), data; window = Bars(get(p, :optInTimePeriod, 14) + 1))
             (o.w_aroon_aroondown, o.w_aroon_aroonup)
         end

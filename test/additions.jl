@@ -62,7 +62,12 @@ tablearray(t, name) = Float64.(t["arrays"][name]["values"])
             (out.eri_bullpower, out.eri_bearpower)
         end
         # FOSC is a percentage of a cancellation, the close less its forecast.
-        checkgoldens("FOSC"; accepts = WINDOW, outputs = (:outReal,), atol = 1e-9) do p, data
+        checkgoldens(
+            "FOSC";
+            accepts = WINDOW,
+            outputs = (:outReal,),
+            atol = 1e-9,
+        ) do p, data
             n = get(p, :optInTimePeriod, 5)
             (foldseries(FOSC(:close), data; window = Bars(n + 1)).w_close_fosc,)
         end

@@ -26,11 +26,13 @@ tiedskip(default) =
             o = foldseries([Min(:close), Max(:close)], data; window = w(p, 30))
             (o.w_close_min, o.w_close_max)
         end
-        checkgoldens("MAXINDEX"; accepts = WINDOW, outputs = (:outInteger,), skip = tiedskip(30),
+        checkgoldens("MAXINDEX"; accepts = WINDOW, outputs = (:outInteger,),
+            skip = tiedskip(30),
             convert = sincefromindex) do p, data
             (foldseries(MaxIndex(:close), data; window = w(p, 30)).w_close_maxindex,)
         end
-        checkgoldens("MININDEX"; accepts = WINDOW, outputs = (:outInteger,), skip = tiedskip(30),
+        checkgoldens("MININDEX"; accepts = WINDOW, outputs = (:outInteger,),
+            skip = tiedskip(30),
             convert = sincefromindex) do p, data
             (foldseries(MinIndex(:close), data; window = w(p, 30)).w_close_minindex,)
         end
