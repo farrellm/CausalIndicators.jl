@@ -11,7 +11,7 @@ CausalFrames = {url = "https://github.com/farrellm/CausalFrames.jl", rev = "mast
 
 [compat]
 Aqua = "0.8"
-CSV = "0.10"
+CSV = "0.10, 1.1"
 CausalFrames = "1"
 CodecZlib = "0.7"
 DataFrames = "1.8"
