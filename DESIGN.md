@@ -833,14 +833,12 @@ the goldens check every bar.
     with six-digit volumes (P·V)/V does not always give back P. The reference
     series happens to round-trip, so its goldens match. test_period_boundary.c's
     hostile series hold the copy `@test_broken`.
-  - **A large value leaving a window.** test_reference.c's battery found that
-    CausalFrames' windowed co-moments do not fully recover once a value far
-    larger than the rest of the window has left it. On pandas GH#52407,
-    `Variance` keeps a ~3e-48 residue of a 3e-16 value where the exact variance
-    is ~1e-96. `Correlation` gives `NaN` after a 3e37 value has left. `Beta`'s
-    returns keep 28 of test_beta.c's 48 outlier-transit rungs above its bound.
-    TA-Lib re-seeds its sums when a leaving term dwarfs them, so the fix is
-    upstream, a re-anchor. Until then those legs are `@test_broken`.
+  - **A large value leaving a window.** TA-Lib re-seeds its sums when a
+    leaving term dwarfs them. CausalFrames' windowed sums and co-moments refold
+    from the window's rows when that happens (CausalFrames.jl#123, fixing #97),
+    so pandas GH#52407's `Variance`, `Correlation` after a 3e37 value and all 48
+    of test_beta.c's outlier-transit rungs hold their bounds once the value has
+    left.
   - **BETA's no-variance guard.** `betavalue` zeroes the slope where the
     returns' variance is under 1e-14 of `var + mean²`. The pinned beta.c
     measures from a shifted origin instead (#242), so returns of ~1e-8 that
