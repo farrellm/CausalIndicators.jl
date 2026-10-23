@@ -22,8 +22,7 @@ These files have no file-scope tables at all:
       The Wilkinson, NIST Norris and outlier-transit legs are in
       `test/reference.jl`. Wilkinson BIG and LITTLE (W.IV.B) are
       `@test_broken`: `betavalue` keeps the pre-#242 guard, which zeroes a
-      slope on returns of ~1e-8. So are 28 of the 48 outlier-transit rungs,
-      where CausalFrames' windowed co-moments keep the spike's residue.
+      slope on returns of ~1e-8.
 - [x] `test_cmou.c`: the Tulip/pandas oracle at 1e-12, the all-up, all-down,
       flat and hand-computed windows, and the empty window over the spiked
       LCG corpus (`lcgsym`), exactly 0 at all 18,096 flat bars (S5)
@@ -31,8 +30,7 @@ These files have no file-scope tables at all:
       self-correlation, affine invariance with the sign of the scale, and the
       flat window, which gives `NaN` where TA-Lib gives 0 (DESIGN.md,
       "Testing") (S4). The pandas, NIST Norris, exact-identity, range and
-      small-scale legs are in `test/reference.jl`. The last two extreme-range
-      windows are `@test_broken`: `NaN` once the 3e37 value has left them.
+      small-scale legs are in `test/reference.jl`.
 - [x] `test_linearreg.c`, in part: a direct least-squares fit of every window,
       the internal consistency of the five outputs, the affine identity, the
       constant window, an exact line and the large print leaving no residue
@@ -99,7 +97,7 @@ These files have checks outside their extracted tables:
       `checkDataSame` and the `doRangeTest` sub-range sweeps, which a stream
       has no counterpart for. test_bbands.c's legs built on
       `ta_test_reference.c` data (NumAcc, pandas, ladder, tick ladder) are in
-      `test/reference.jl`. GH#52407 is `@test_broken`, as for STDDEV.
+      `test/reference.jl`.
 - [x] `test_bbands.c` MAMA alignment (#99): at periods 20, 33, 34, 40, 50 and
       100 the bands start at `max(32, period − 1)` and the middle band is
       `MA(:mama)` (S6). The `startIdx` cases re-anchor TA-Lib's MAMA, which a
@@ -110,9 +108,6 @@ These files have checks outside their extracted tables:
       0 (DESIGN.md, "Testing"). The legs run on the C test's own LCG data
       (`lcgsym`) (S3). The `ta_test_reference.c` legs (pandas, the two-pass
       oracle, NIST StRD, the small-scale ladder) are in `test/reference.jl`.
-      GH#52407 is `@test_broken`: once its 3e-16 value has left the window,
-      CausalFrames' windowed `Variance` keeps a ~3e-48 residue of it where the
-      variance is ~1e-96.
 - [x] `test_kc.c`: the gData and TA_SREF shapes and ta4j oracles, the
       composition (middle = EMA of the typical price from the first output,
       bands = middle ± nbdev·ATR) and nbdev 0 (S3)

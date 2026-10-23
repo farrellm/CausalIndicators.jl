@@ -200,13 +200,11 @@ corr(x, y, p) = windowed(Correlation(:x, :y), (; x, y), p)
             r = corr(sx .+ off, sy .+ off, 5)
             @test all(k -> relerr(r[k+4], golden(g)[k]) <= 1e-12, eachindex(golden(g)))
         end
-        # The last two extreme-range windows are NaN once the 3e37 value has
-        # left them: CausalFrames' windowed co-moments do not recover from it.
         for (ds, p, g) in (("nonan", 3, "corr_nonan"), ("extreme", 5, "corr_extreme"))
             r = corr(refarr("pd_$(ds)_x"), refarr("pd_$(ds)_y"), p)
             for k in eachindex(golden(g))
                 ok = -1 <= r[k+p-1] <= 1 && relerr(r[k+p-1], golden(g)[k]) <= 1e-5
-                @test ok broken = ds == "extreme" && k >= 6
+                @test ok
             end
         end
         # (C2) NIST StRD Norris: the certificate, and the exact answer for these
@@ -269,19 +267,6 @@ corr(x, y, p) = windowed(Correlation(:x, :y), (; x, y), p)
         # the window; once it has left, the slope is the window's own again.
         # Judged on the scale sd(y)/sd(x) a slope lives on, at the C test's 1e-9
         # plus the window's conditioning.
-        #
-        # CausalFrames' windowed Covariance and Variance keep a residue of the
-        # spike's return once it has left the window, so these rungs are broken
-        # until an upstream re-anchor (TA-Lib's beta.c re-seeds its sums).
-        broken = Set(
-            [(1, 1e3, 5);
-                [(1, s, p) for s in (1e5, 1e8, 1e12, 1e-3, 1e-9)
-                 for p in (5, 14, 30)]; (2, 1e3, 5); (2, 1e5, 5); (2, 1e8, 5);
-                (2, 1e8, 30);
-                [(2, 1e12, p) for p in (5, 14, 30)]; (2, 1e-3, 5); (2, 1e-3, 30);
-                [(2, 1e-9, p) for p in (5, 14, 30)]],
-        )
-        @test length(broken) == 28
         for axis in 1:2,
             spike in (1.1e2, 2.0e2, 1.0e3, 1.0e5, 1.0e8, 1.0e12, 1.0e-3, 1.0e-9),
             p in (5, 14, 30)
@@ -298,10 +283,10 @@ corr(x, y, p) = windowed(Correlation(:x, :y), (; x, y), p)
                 scale = sdx > 0 ? refstd(ry) / sdx : 0.0
                 norm = max(abs(want), scale)
                 norm == 0 && return true
-                tol = p == 5 && spike >= 1e5 ? 1.2e-7 : 1e-9
+                tol = 1e-9
                 abs(got[bar] - want) / norm <= tol + 100 * kappa * eps()
             end
-            @test ok broken = (axis, spike, p) in broken
+            @test ok
         end
     end
 
@@ -387,14 +372,10 @@ corr(x, y, p) = windowed(Correlation(:x, :y), (; x, y), p)
         end
         # pandas GH#47721 and GH#52407 against the goldens; GH#42064 and random
         # data at three magnitudes against the exact oracle.
-        # GH#52407's windows after its 3e-16 value has left carry a ~3e-48
-        # residue of it where the exact variance is ~1e-96 to 1e-102:
-        # CausalFrames' windowed Variance does not re-anchor.
         for (ds, p) in (("var47721", 6), ("var52407", 3))
             x, g = refarr("pd_$ds"), golden(ds)
             v = var(x, p)
-            @test all(k -> varok(v[k+p-1], g[k], x[k:(k+p-1)]), eachindex(g)) broken =
-                ds == "var52407"
+            @test all(k -> varok(v[k+p-1], g[k], x[k:(k+p-1)]), eachindex(g))
         end
         a = zeros(1000)
         a[1] = 1000.0
@@ -480,8 +461,7 @@ corr(x, y, p) = windowed(Correlation(:x, :y), (; x, y), p)
                 ke = abs(refmean(w)) / g[k] * eps()
                 abs(dev - g[k]) / g[k] <= 1e-11 + 1e-6 * ke^2 + readback(b[2][i], 2, g[k])
             end
-            # GH#52407, as for VAR above.
-            @test ok broken = x === sets[2][1]
+            @test ok
         end
     end
 end
