@@ -807,14 +807,11 @@ the goldens check every bar.
     also fail on the gap between compensated sums and TA-Lib's drifting running
     sums.
   - Integer outputs must match exactly.
-  - **`AgeWeightedSum` on a constant series.** Its windowed `downdate!` (and
-    `combine!`) round the product `(n − 1)·x` and drop that error, so a
-    constant series loses the same rounding every bar and drifts linearly
-    (about 6e-12 relative after 100,000 bars at `Bars(3)`; ordinary data shows
-    no drift). A flat `LINEARREG` slope is therefore round-off, not exactly 0.
-    The fix is upstream, an error-free product as #92 gave the co-moments, and
-    the `test_linearreg.c` port holds the exact-zero leg `@test_broken` until
-    then.
+  - **`AgeWeightedSum` on a constant series.** Its windowed `downdate!` and
+    `combine!` keep the rounding of `(n − 1)·x` (CausalFrames.jl#94, fixed by
+    #95), so a constant series does not drift. Every full window gives the
+    same flat `LINEARREG` slope, which is 0 up to the one rounding of the fit
+    itself (`test/statistics.jl` holds it to 1e-13).
   - **Correlation of a flat window.** TA-Lib's `CORREL` gives 0 where either
     series has no spread in the window. CausalFrames' `Correlation` gives `NaN`
     there (0/0). `CORREL` stays CausalFrames only, as `VAR` does with its flat
