@@ -216,7 +216,8 @@ medprice(r) = (close = (r.high .+ r.low) ./ 2,)
         mkrow(x) = (time = 1, open = x, high = x + 1, low = x - 1, close = x, volume = 1e5)
         for s in PLAIN_S6
             st = CausalFrames.fresh(s, S2_INTYPES)
-            for x in 100.0 .+ randn(rng, 120)
+            # past the 50-bar lag window's last growth, near bar 122 on Julia 1.11+
+            for x in 100.0 .+ randn(rng, 300)
                 CausalFrames.update!(st, mkrow(x))
             end
             @test allocs(CausalFrames.update!, st, mkrow(101.5)) == 0
