@@ -183,86 +183,69 @@ rvolvalue(n, s, v) = v / ((s - v) / (n - 1))
 # ---------------------------------------------------------------------------
 # Cumulative states: OBV, PVT, NVI and PVI
 
-# `K` is `:obv`, `:pvt`, `:nvi` or `:pvi`. Each reads a price column `C` and the
-# volume `V`, and keeps the previous bar's price and volume.
-struct VolumeTotal{K,C,V,N} <: Summarizer end
+# `K` is `:obv`, `:pvt`, `:nvi` or `:pvi`. Each reads a price and the volume,
+# and keeps the previous bar's price and volume.
+struct VolumeTotal{K} end
 
-mutable struct VolumeTotalState{K,C,V,N,S,T} <: SummarizerState
+mutable struct VolumeTotalKernel{K,S,T}
     const total::S
     n::Int
     prevc::T
     prevv::T
     index::T
-    out::Union{Missing,T}
 end
-
-CausalFrames.emptyvalue(::VolumeTotal{K,C,V,N}) where {K,C,V,N} =
-    NamedTuple{(N,)}((missing,))
 
 # NVI and PVI start at 1000 (ta_NVI.c, ta_PVI.c).
 startindex(::Val{K}, ::Type{T}) where {K,T} = K === :nvi || K === :pvi ? T(1000) : zero(T)
 
-function CausalFrames.fresh(::VolumeTotal{K,C,V,N}, intypes::NamedTuple) where {K,C,V,N}
-    T = pricetype(intypes, (C, V))
-    s = seedsum(T)
-    return VolumeTotalState{K,C,V,N,typeof(s),T}(s, 0, zero(T), zero(T),
-        startindex(Val(K), T), missing)
-end
-CausalFrames.fresh(st::VolumeTotalState{K,C,V,N,S,T}) where {K,C,V,N,S,T} =
-    VolumeTotalState{K,C,V,N,S,T}(fresh(st.total), 0, zero(T), zero(T),
-        startindex(Val(K), T), missing)
-function CausalFrames.fresh!(st::VolumeTotalState{K,C,V,N,S,T}) where {K,C,V,N,S,T}
-    fresh!(st.total)
-    st.n = 0
-    st.prevc = st.prevv = zero(T)
-    st.index = startindex(Val(K), T)
-    st.out = missing
-    return st
+barkernel(::VolumeTotal{K}, ::Type{T}) where {K,T} =
+    (
+        s = seedsum(T);
+        VolumeTotalKernel{K,typeof(s),T}(s, 0, zero(T), zero(T),
+            startindex(Val(K), T))
+    )
+function CausalFrames.fresh!(k::VolumeTotalKernel{K,S,T}) where {K,S,T}
+    fresh!(k.total)
+    k.n = 0
+    k.prevc = k.prevv = zero(T)
+    k.index = startindex(Val(K), T)
+    return k
 end
 
-@inline function CausalFrames.update!(
-    st::VolumeTotalState{K,C,V,N,S,T},
-    row,
-) where {K,C,V,N,S,T}
-    c0, v0 = row[C], row[V]
-    st.out = missing
-    anymissing(c0, v0) && return nothing
-    c, v = convert(T, c0), convert(T, v0)
-    if (st.n += 1) == 1
+@inline function barstep!(k::VolumeTotalKernel{K}, c::T, v::T) where {K,T}
+    if (k.n += 1) == 1
         # Each function compares its first bar with itself.
-        st.prevc, st.prevv = c, v
-        K === :obv && seedadd!(st.total, v)
+        k.prevc, k.prevv = c, v
+        K === :obv && seedadd!(k.total, v)
     end
-    st.out = volumetotal!(Val(K), st, c, v)
-    st.prevc, st.prevv = c, v
-    return nothing
+    out = volumetotal!(Val(K), k, c, v)
+    k.prevc, k.prevv = c, v
+    return (out,)
 end
-@inline CausalFrames.value(st::VolumeTotalState{K,C,V,N,S,T}) where {K,C,V,N,S,T} =
-    NamedTuple{(N,),Tuple{Union{Missing,T}}}((st.out,))
 
 # ta_OBV.c: the volume added on a rise and subtracted on a fall.
-@inline function volumetotal!(::Val{:obv}, st, c, v)
-    c > st.prevc ? seedadd!(st.total, v) : c < st.prevc && seedadd!(st.total, -v)
-    return seedtotal(st.total)
+@inline function volumetotal!(::Val{:obv}, k, c, v)
+    c > k.prevc ? seedadd!(k.total, v) : c < k.prevc && seedadd!(k.total, -v)
+    return seedtotal(k.total)
 end
 # ta_PVT.c: the volume times the fractional change, none over a zero close.
-@inline function volumetotal!(::Val{:pvt}, st, c, v)
-    p = st.prevc
-    p != 0 && seedadd!(st.total, ((c - p) / p) * v)
-    return seedtotal(st.total)
+@inline function volumetotal!(::Val{:pvt}, k, c, v)
+    p = k.prevc
+    p != 0 && seedadd!(k.total, ((c - p) / p) * v)
+    return seedtotal(k.total)
 end
 # ta_NVI.c and ta_PVI.c: the index compounds the fractional change on a bar
 # whose volume fell (NVI) or rose (PVI), keeping its last finite value.
-@inline volumetotal!(::Val{:nvi}, st, c, v) = compound!(st, c, v < st.prevv)
-@inline volumetotal!(::Val{:pvi}, st, c, v) = compound!(st, c, v > st.prevv)
-@inline function compound!(st, c, moved)
-    p = st.prevc
+@inline volumetotal!(::Val{:nvi}, k, c, v) = compound!(k, c, v < k.prevv)
+@inline volumetotal!(::Val{:pvi}, k, c, v) = compound!(k, c, v > k.prevv)
+@inline function compound!(k, c, moved)
+    p = k.prevc
     if moved && p != 0
-        x = st.index
+        x = k.index
         x += ((c - p) / p) * x
-        isfinite(x) && (st.index = x)
+        isfinite(x) && (k.index = x)
     end
-    return st.index
+    return k.index
 end
 
 const CUMULATIVE_DOC = """
@@ -272,7 +255,7 @@ makes it split-invariant, and a key restarts it. It is a plain summarizer (no
 with any input `missing` leaves the state unchanged and emits `missing`.
 """
 
-volumetotal(K, C, V, N, specs...) = withterms(VolumeTotal{K,C,V,N}(), specs...)
+volumetotal(K, N, specs...) = barindicator(VolumeTotal{K}(), (N,), specs...)
 
 """
     OBV(column::ColumnSpec; volume = :volume, name = :obv) -> Summarizer
@@ -286,8 +269,7 @@ $CUMULATIVE_DOC
 TA-Lib: `ta_codegen/input/obv/obv.yaml`, `obv.md`.
 """
 OBV(column::ColumnSpec; volume::ColumnSpec = :volume, name::Symbol = :obv) =
-    volumetotal(:obv, colname(column), colname(volume), outname(colname(column), name),
-        column, volume)
+    volumetotal(:obv, outname(colname(column), name), column, volume)
 
 """
     PVT(; close = :close, volume = :volume, name = :pvt) -> Summarizer
@@ -301,7 +283,7 @@ $CUMULATIVE_DOC
 TA-Lib: `ta_codegen/input/pvt/pvt.yaml`, `pvt.md`.
 """
 PVT(; close::ColumnSpec = :close, volume::ColumnSpec = :volume, name::Symbol = :pvt) =
-    volumetotal(:pvt, colname(close), colname(volume), name, close, volume)
+    volumetotal(:pvt, name, close, volume)
 
 const VOLUMEINDEX_DOC = """
 A zero previous close leaves the index unchanged, and so does a change that
@@ -319,7 +301,7 @@ $CUMULATIVE_DOC
 TA-Lib: `ta_codegen/input/nvi/nvi.yaml`, `nvi.md`.
 """
 NVI(; close::ColumnSpec = :close, volume::ColumnSpec = :volume, name::Symbol = :nvi) =
-    volumetotal(:nvi, colname(close), colname(volume), name, close, volume)
+    volumetotal(:nvi, name, close, volume)
 
 """
     PVI(; close = :close, volume = :volume, name = :pvi) -> Summarizer
@@ -332,70 +314,40 @@ $CUMULATIVE_DOC
 TA-Lib: `ta_codegen/input/pvi/pvi.yaml`, `pvi.md`.
 """
 PVI(; close::ColumnSpec = :close, volume::ColumnSpec = :volume, name::Symbol = :pvi) =
-    volumetotal(:pvi, colname(close), colname(volume), name, close, volume)
+    volumetotal(:pvi, name, close, volume)
 
 # ---------------------------------------------------------------------------
 # ADOSC
 
-struct ADOSCSummarizer{H,L,C,V,N} <: Summarizer
+struct ADOSCSpec
     fastperiod::Int
     slowperiod::Int
     unstable::Int
 end
 
-mutable struct ADOSCState{H,L,C,V,N,S,E,T} <: SummarizerState
+mutable struct ADOSCKernel{S,E}
     const ad::S
     const fast::E
     const slow::E
     const lookback::Int
-    out::Union{Missing,T}
 end
-
-CausalFrames.emptyvalue(::ADOSCSummarizer{H,L,C,V,N}) where {H,L,C,V,N} =
-    NamedTuple{(N,)}((missing,))
 
 # ta_ADOSC.c seeds both EMAs with the first A/D value: `EMAKernel` at period 1
 # with each period's factor.
 adoscema(::Type{T}, period) where {T} = EMAKernel(T, 1, 2 / (period + 1))
 
-function CausalFrames.fresh(
-    s::ADOSCSummarizer{H,L,C,V,N},
-    intypes::NamedTuple,
-) where {H,L,C,V,N}
-    T = pricetype(intypes, (H, L, C, V))
-    ad = seedsum(T)
-    f, sl = adoscema(T, s.fastperiod), adoscema(T, s.slowperiod)
-    lb = max(s.fastperiod, s.slowperiod) - 1 + s.unstable
-    return ADOSCState{H,L,C,V,N,typeof(ad),typeof(f),T}(ad, f, sl, lb, missing)
-end
-CausalFrames.fresh(st::ADOSCState{H,L,C,V,N,S,E,T}) where {H,L,C,V,N,S,E,T} =
-    ADOSCState{H,L,C,V,N,S,E,T}(fresh(st.ad), fresh(st.fast), fresh(st.slow),
-        st.lookback, missing)
-function CausalFrames.fresh!(st::ADOSCState)
-    fresh!(st.ad)
-    fresh!(st.fast)
-    fresh!(st.slow)
-    st.out = missing
-    return st
-end
+barkernel(s::ADOSCSpec, ::Type{T}) where {T} =
+    ADOSCKernel(seedsum(T), adoscema(T, s.fastperiod), adoscema(T, s.slowperiod),
+        max(s.fastperiod, s.slowperiod) - 1 + s.unstable)
+CausalFrames.fresh!(k::ADOSCKernel) = (fresh!(k.ad); fresh!(k.fast); fresh!(k.slow); k)
 
-@inline function CausalFrames.update!(
-    st::ADOSCState{H,L,C,V,N,S,E,T},
-    row,
-) where {H,L,C,V,N,S,E,T}
-    h, l, c, v = row[H], row[L], row[C], row[V]
-    st.out = missing
-    anymissing(h, l, c, v) && return nothing
-    seedadd!(st.ad,
-        moneyflowvolume(convert(T, h), convert(T, l), convert(T, c), convert(T, v)))
-    ad = seedtotal(st.ad)
-    f = step!(st.fast, ad)::T
-    sl = step!(st.slow, ad)::T
-    nseen(st.fast) > st.lookback && (st.out = f - sl)
-    return nothing
+@inline function barstep!(k::ADOSCKernel, h::T, l::T, c::T, v::T) where {T}
+    seedadd!(k.ad, moneyflowvolume(h, l, c, v))
+    ad = seedtotal(k.ad)
+    f = step!(k.fast, ad)::T
+    sl = step!(k.slow, ad)::T
+    return nseen(k.fast) > k.lookback ? (f - sl,) : nothing
 end
-@inline CausalFrames.value(st::ADOSCState{H,L,C,V,N,S,E,T}) where {H,L,C,V,N,S,E,T} =
-    NamedTuple{(N,),Tuple{Union{Missing,T}}}((st.out,))
 
 """
     ADOSC(; high = :high, low = :low, close = :close, volume = :volume,
@@ -411,9 +363,7 @@ line is a CausalFrames compensated `Sum`.
 
 ADOSC is path-dependent, as AD is: no `warmup` makes it split-invariant.
 
-$PLAIN_DOC
-A bar with any input `missing` leaves the state unchanged and emits `missing`.
-
+$PRICEBAR_DOC
 $DAILY_DOC
 TA-Lib: `ta_codegen/input/adosc/adosc.yaml`, `adosc.md`.
 """
@@ -422,59 +372,42 @@ function ADOSC(; high::ColumnSpec = :high, low::ColumnSpec = :low,
     slowperiod::Integer = 10, unstable::Integer = 0, name::Symbol = :adosc)
     checkrange("ADOSC", "fastperiod", fastperiod, 2, 100_000)
     checkrange("ADOSC", "slowperiod", slowperiod, 2, 100_000)
-    s = ADOSCSummarizer{colname(high),colname(low),colname(close),colname(volume),name}(
-        Int(fastperiod), Int(slowperiod), checkunstable(unstable))
-    return withterms(s, high, low, close, volume)
+    s = ADOSCSpec(fastperiod, slowperiod, checkunstable(unstable))
+    return barindicator(s, (name,), high, low, close, volume)
 end
 
 # ---------------------------------------------------------------------------
 # EFI
 
-struct EFISummarizer{C,V,N} <: Summarizer
+struct EFISpec
     period::Int
     unstable::Int
 end
 
-mutable struct EFIState{C,V,N,E,T} <: SummarizerState
+mutable struct EFIKernel{E,T}
     const ema::E
     const unstable::Int
     n::Int
     prevc::T
-    out::Union{Missing,T}
 end
 
-CausalFrames.emptyvalue(::EFISummarizer{C,V,N}) where {C,V,N} = NamedTuple{(N,)}((missing,))
-
-function CausalFrames.fresh(s::EFISummarizer{C,V,N}, intypes::NamedTuple) where {C,V,N}
-    T = pricetype(intypes, (C, V))
-    e = EMAKernel(T, s.period)
-    return EFIState{C,V,N,typeof(e),T}(e, s.unstable, 0, zero(T), missing)
-end
-CausalFrames.fresh(st::EFIState{C,V,N,E,T}) where {C,V,N,E,T} =
-    EFIState{C,V,N,E,T}(fresh(st.ema), st.unstable, 0, zero(T), missing)
-function CausalFrames.fresh!(st::EFIState{C,V,N,E,T}) where {C,V,N,E,T}
-    fresh!(st.ema)
-    st.n = 0
-    st.prevc = zero(T)
-    st.out = missing
-    return st
+barkernel(s::EFISpec, ::Type{T}) where {T} =
+    EFIKernel(EMAKernel(T, s.period), s.unstable, 0, zero(T))
+function CausalFrames.fresh!(k::EFIKernel{E,T}) where {E,T}
+    fresh!(k.ema)
+    k.n = 0
+    k.prevc = zero(T)
+    return k
 end
 
-@inline function CausalFrames.update!(st::EFIState{C,V,N,E,T}, row) where {C,V,N,E,T}
-    c0, v0 = row[C], row[V]
-    st.out = missing
-    anymissing(c0, v0) && return nothing
-    c = convert(T, c0)
-    prev = st.prevc
-    st.prevc = c
-    (st.n += 1) == 1 && return nothing
-    e = st.ema
-    f = step!(e, (c - prev) * convert(T, v0))
-    nseen(e) > lookback(e) + st.unstable && (st.out = f)
-    return nothing
+@inline function barstep!(k::EFIKernel, c::T, v::T) where {T}
+    prev = k.prevc
+    k.prevc = c
+    (k.n += 1) == 1 && return nothing
+    e = k.ema
+    f = step!(e, (c - prev) * v)
+    return nseen(e) > lookback(e) + k.unstable ? (f::T,) : nothing
 end
-@inline CausalFrames.value(st::EFIState{C,V,N,E,T}) where {C,V,N,E,T} =
-    NamedTuple{(N,),Tuple{Union{Missing,T}}}((st.out,))
 
 """
     EFI(; close = :close, volume = :volume, period = 13, unstable = 0, name = :efi)
@@ -485,18 +418,14 @@ force `(close − previous close)·volume`, seeded with the mean of the first
 for the first force, plus `unstable`, EMA's unstable period, which TA-Lib's EFI
 inherits.
 
-$PLAIN_DOC
-A bar with any input `missing` leaves the state unchanged and emits `missing`.
-
+$PRICEBAR_DOC
 $DAILY_DOC
 TA-Lib: `ta_codegen/input/efi/efi.yaml`, `efi.md`.
 """
 function EFI(; close::ColumnSpec = :close, volume::ColumnSpec = :volume,
     period::Integer = 13, unstable::Integer = 0, name::Symbol = :efi)
     checkrange("EFI", "period", period, 1, 100_000)
-    s = EFISummarizer{colname(close),colname(volume),name}(Int(period),
-        checkunstable(unstable))
-    return withterms(s, close, volume)
+    return barindicator(EFISpec(period, checkunstable(unstable)), (name,), close, volume)
 end
 
 # ---------------------------------------------------------------------------

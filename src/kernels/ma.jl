@@ -43,11 +43,7 @@ of [`MATYPES`](@ref).
 """
 function MAKernel(::Type{T}, matype::Symbol, period::Integer; unstable::Integer = 0,
     vfactor::Real = 0.7, identity::Bool = true) where {T}
-    matype in MATYPES || throw(
-        ArgumentError(
-            "MAKernel matype must be one of $(join(map(repr, MATYPES), ", ")), " *
-            "got $(repr(matype))",
-        ))
+    checkmatype("MAKernel", "matype", matype)
     p = checkperiod("MAKernel", period)
     u = identity && p == 1 ? 0 : checkunstable(unstable)
     inner = makernel(Val(matype), T, p, u, vfactor)

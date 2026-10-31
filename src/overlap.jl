@@ -2,52 +2,6 @@
 # are dependents over CausalFrames accumulators, and the recursive moving
 # averages, which are plain summarizers over `MAKernel`.
 
-# A dependent's state: fieldless, with the output name `N`, the names `Ds` of
-# the dependency values it reads and its formula `F` (a singleton function type)
-# as type parameters, so the two-argument `value` infers. The value type comes
-# from the dependencies' declared field types, as in CausalFrames' own
-# dependents, so a `missing` dependency keeps its `Union{Missing,…}`.
-struct DerivedValue{N,Ds,F} <: SummarizerState end
-
-derivedvalue(n::Symbol, ds::Tuple, f) = DerivedValue{n,ds,typeof(f)}()
-
-@inline function CausalFrames.value(::DerivedValue{N,Ds,F},
-    vals::NamedTuple) where {N,Ds,F}
-    V = Base.promote_op(F.instance, map(d -> fieldtype(typeof(vals), d), Ds)...)
-    return NamedTuple{(N,),Tuple{V}}((F.instance(map(d -> vals[d], Ds)...),))
-end
-
-CausalFrames.fresh(st::DerivedValue) = st
-CausalFrames.fresh!(st::DerivedValue) = st
-@inline CausalFrames.update!(::DerivedValue, row) = nothing
-@inline CausalFrames.downdate!(::DerivedValue, row) = nothing
-CausalFrames.combine!(::DerivedValue, ::DerivedValue, ::DerivedValue) = nothing
-
-# The same for a formula `F` returning one value per output name in `Ns`, as a
-# tuple.
-struct DerivedValues{Ns,Ds,F} <: SummarizerState end
-
-derivedvalues(ns::Tuple, ds::Tuple, f) = DerivedValues{ns,ds,typeof(f)}()
-
-@inline function CausalFrames.value(::DerivedValues{Ns,Ds,F},
-    vals::NamedTuple) where {Ns,Ds,F}
-    V = Base.promote_op(F.instance, map(d -> fieldtype(typeof(vals), d), Ds)...)
-    return NamedTuple{Ns,V}(F.instance(map(d -> vals[d], Ds)...))
-end
-
-CausalFrames.fresh(st::DerivedValues) = st
-CausalFrames.fresh!(st::DerivedValues) = st
-@inline CausalFrames.update!(::DerivedValues, row) = nothing
-@inline CausalFrames.downdate!(::DerivedValues, row) = nothing
-CausalFrames.combine!(::DerivedValues, ::DerivedValues, ::DerivedValues) = nothing
-
-# A formula `F` lifted over `missing`: `missing` if any argument is, else
-# `F(args...)`. A fieldless singleton, so it can be a dependent's formula.
-struct Lifted{F} end
-lifted(f) = Lifted{typeof(f)}()
-@inline (::Lifted{F})(args...) where {F} =
-    any(ismissing, args) ? missing : F.instance(args...)
-
 midvalue(a, b) = (a + b) / 2
 
 # ---------------------------------------------------------------------------
@@ -75,7 +29,7 @@ struct WMA{C} <: GroupSummarizer end
 WMA(column::ColumnSpec) = withterms(WMA{colname(column)}(), column)
 
 CausalFrames.dependencies(::WMA{C}) where {C} = (Count(), Sum(C), AgeWeightedSum(C))
-CausalFrames.emptyvalue(::WMA{C}) where {C} = NamedTuple{(Symbol(C, :_wma),)}((missing,))
+CausalFrames.emptyvalue(::WMA{C}) where {C} = missings((Symbol(C, :_wma),))
 CausalFrames.fresh(::WMA{C}, ::NamedTuple) where {C} =
     derivedvalue(Symbol(C, :_wma), (:count, Symbol(C, :_sum), Symbol(C, :_ageweightedsum)),
         wmavalue)
@@ -106,7 +60,7 @@ dotname(a, b) = Symbol(canonicaldot(a, b)[1], :_, canonicaldot(a, b)[2], :_dotpr
 
 CausalFrames.dependencies(::VWMA{C,V}) where {C,V} =
     (Count(), DotProduct(canonicaldot(C, V)...), Sum(V), Last(C))
-CausalFrames.emptyvalue(::VWMA{C}) where {C} = NamedTuple{(Symbol(C, :_vwma),)}((missing,))
+CausalFrames.emptyvalue(::VWMA{C}) where {C} = missings((Symbol(C, :_vwma),))
 CausalFrames.fresh(::VWMA{C,V}, ::NamedTuple) where {C,V} =
     derivedvalue(Symbol(C, :_vwma),
         (:count, dotname(C, V), Symbol(V, :_sum), lastname(C)), vwmavalue)
@@ -127,7 +81,7 @@ MidPoint(column::ColumnSpec) = withterms(MidPoint{colname(column)}(), column)
 
 CausalFrames.dependencies(::MidPoint{C}) where {C} = (Max(C), Min(C))
 CausalFrames.emptyvalue(::MidPoint{C}) where {C} =
-    NamedTuple{(Symbol(C, :_midpoint),)}((missing,))
+    missings((Symbol(C, :_midpoint),))
 CausalFrames.fresh(::MidPoint{C}, ::NamedTuple) where {C} =
     derivedvalue(Symbol(C, :_midpoint), (Symbol(C, :_max), Symbol(C, :_min)), midvalue)
 
@@ -152,54 +106,22 @@ CausalFrames.fresh(::MidPrice{H,L}, ::NamedTuple) where {H,L} =
 # ---------------------------------------------------------------------------
 # Recursive moving averages
 
-"""
-    MovingAverage{M,C,N}
-
-The plain summarizer behind every recursive moving average: an
-[`MAKernel`](@ref) of type `M` over column `C`, emitted as `N`. It is built by
-[`MA`](@ref), [`EMA`](@ref), [`DEMA`](@ref), [`TEMA`](@ref), [`TRIMA`](@ref),
-[`KAMA`](@ref), [`T3`](@ref), [`HMA`](@ref), [`ZLEMA`](@ref) and
-[`RMA`](@ref), not directly.
-"""
-struct MovingAverage{M,C,N} <: Summarizer
+# Every recursive moving average is a `BarIndicator` over an `MAKernel` of type
+# `M`, built by `MA`, `EMA`, `DEMA`, `TEMA`, `TRIMA`, `KAMA`, `T3`, `HMA`,
+# `ZLEMA` and `RMA`.
+struct MASpec{M}
     period::Int
     unstable::Int
     vfactor::Float64
     identity::Bool
 end
 
-mutable struct MovingAverageState{C,N,K,T} <: SummarizerState
-    const kernel::K
-    out::Union{Missing,T}
-end
+barkernel(s::MASpec{M}, ::Type{T}) where {M,T} =
+    MAKernel(T, M, s.period; s.unstable, s.vfactor, s.identity)
 
-CausalFrames.emptyvalue(::MovingAverage{M,C,N}) where {M,C,N} =
-    NamedTuple{(N,)}((missing,))
-
-function CausalFrames.fresh(s::MovingAverage{M,C,N}, intypes::NamedTuple) where {M,C,N}
-    T = floattype(intypes[C])
-    k = MAKernel(T, M, s.period; s.unstable, s.vfactor, s.identity)
-    return MovingAverageState{C,N,typeof(k),T}(k, missing)
-end
-
-CausalFrames.fresh(st::MovingAverageState{C,N,K,T}) where {C,N,K,T} =
-    MovingAverageState{C,N,K,T}(fresh(st.kernel), missing)
-function CausalFrames.fresh!(st::MovingAverageState)
-    fresh!(st.kernel)
-    st.out = missing
-    return st
-end
-
-@inline CausalFrames.update!(st::MovingAverageState{C}, row) where {C} =
-    (st.out = step!(st.kernel, row[C]); nothing)
-
-@inline CausalFrames.value(st::MovingAverageState{C,N,K,T}) where {C,N,K,T} =
-    NamedTuple{(N,),Tuple{Union{Missing,T}}}((st.out,))
-
-function checkrange(fn, kw, x, lo, hi)
-    lo <= x <= hi ||
-        throw(ArgumentError("$fn $kw must be in [$lo, $hi] (TA-Lib's range), got $x"))
-    return x
+@inline function barstep!(k::MAKernel, x)
+    v = step!(k, x)
+    return ismissing(v) ? nothing : (v,)
 end
 
 function movingaverage(fn, matype, column, period, unstable, name;
@@ -208,30 +130,9 @@ function movingaverage(fn, matype, column, period, unstable, name;
     checkunstable(unstable)
     matype in UNSTABLE_MATYPES || unstable == 0 ||
         throw(ArgumentError("$fn has no unstable period (matype $(repr(matype)))"))
-    C = colname(column)
-    s = MovingAverage{matype,C,Symbol(C, :_, name)}(Int(period), Int(unstable),
-        Float64(vfactor), identity)
-    return withterms(s, column)
+    s = MASpec{matype}(period, unstable, vfactor, identity)
+    return barindicator(s, (outname(colname(column), name),), column)
 end
-
-# The docstring paragraphs shared by the plain indicators of every file.
-const PLAIN_DOC = """
-It is a plain summarizer (no `combine!`), so it belongs under
-`addsummarycolumns`. Under `addrollingcolumns` each window re-folds from a
-fresh state, a cold start per window. The output is `missing` for TA-Lib's
-lookback (plus `unstable`) bars.
-"""
-
-# For the indicators whose defaults are their author's daily-chart parameters.
-const DAILY_DOC = """
-The defaults are TA-Lib's, which are the author's parameters for daily bars.
-Periods count bars, not days, so on other bar sizes the defaults span other
-lengths of time: choose the parameters for your bars.
-"""
-
-const SKIP_DOC = """
-A `missing` input bar leaves the state unchanged and emits `missing`.
-"""
 
 const MA_DOC_COMMON = """
 It is a plain summarizer (no `combine!`), so it belongs under
@@ -262,14 +163,10 @@ TA-Lib: `ta_codegen/input/ma/ma.yaml`, `ma.md`.
 """
 function MA(column::ColumnSpec; period::Integer = 30, matype::Symbol = :sma,
     unstable::Integer = 0, name::Symbol = :ma)
-    matype in MATYPES || throw(
-        ArgumentError(
-            "MA matype must be one of $(join(map(repr, MATYPES), ", ")), " *
-            "got $(repr(matype))",
-        ))
+    checkmatype("MA", "matype", matype)
+    checkunstable(unstable)
     # TA_MA ignores the unstable period of types that have none.
     u = matype in UNSTABLE_MATYPES ? unstable : 0
-    checkunstable(unstable)
     return movingaverage("MA", matype, column, period, u, name; identity = true)
 end
 
@@ -424,13 +321,11 @@ function MAVP(column::ColumnSpec, periods::ColumnSpec; minperiod::Integer = 2,
     checkrange("MAVP", "maxperiod", maxperiod, 1, 100_000)
     minperiod <= maxperiod || throw(
         ArgumentError("MAVP minperiod ($minperiod) must not exceed maxperiod ($maxperiod)"))
-    matype in MATYPES || throw(
-        ArgumentError("MAVP matype $(repr(matype)) is not supported"))
+    checkmatype("MAVP", "matype", matype)
     checkunstable(unstable)
     u = matype in UNSTABLE_MATYPES ? Int(unstable) : 0
     C = colname(column)
-    s = MAVPSummarizer{matype,C,colname(periods),Symbol(C, :_, name)}(Int(minperiod),
-        Int(maxperiod), u)
+    s = MAVPSummarizer{matype,C,colname(periods),outname(C, name)}(minperiod, maxperiod, u)
     return withterms(s, column, periods)
 end
 
@@ -443,8 +338,7 @@ mutable struct MAVPState{C,P,N,K,T} <: SummarizerState
     out::Union{Missing,T}
 end
 
-CausalFrames.emptyvalue(::MAVPSummarizer{M,C,P,N}) where {M,C,P,N} =
-    NamedTuple{(N,)}((missing,))
+CausalFrames.emptyvalue(::MAVPSummarizer{M,C,P,N}) where {M,C,P,N} = missings((N,))
 
 function CausalFrames.fresh(s::MAVPSummarizer{M,C,P,N}, intypes::NamedTuple) where {M,C,P,N}
     T = floattype(intypes[C])
@@ -514,7 +408,7 @@ Donchian(; high::ColumnSpec = :high, low::ColumnSpec = :low) =
 
 CausalFrames.dependencies(::Donchian{H,L}) where {H,L} = (Max(H), Min(L))
 CausalFrames.emptyvalue(::Donchian) =
-    NamedTuple{outnames(nothing, :donchian, BAND_SUFFIXES)}((missing, missing, missing))
+    missings(outnames(nothing, :donchian, BAND_SUFFIXES))
 CausalFrames.fresh(::Donchian{H,L}, ::NamedTuple) where {H,L} =
     derivedvalues(outnames(nothing, :donchian, BAND_SUFFIXES),
         (Symbol(H, :_max), Symbol(L, :_min)), donchianvalues)
@@ -558,7 +452,7 @@ accbands(H, L, C, specs...) =
 CausalFrames.dependencies(::AccBands{H,L,C}) where {H,L,C} =
     (Mean(:accbands_up), Mean(C), Mean(:accbands_dn))
 CausalFrames.emptyvalue(::AccBands) =
-    NamedTuple{outnames(nothing, :accbands, BAND_SUFFIXES)}((missing, missing, missing))
+    missings(outnames(nothing, :accbands, BAND_SUFFIXES))
 CausalFrames.fresh(::AccBands{H,L,C}, ::NamedTuple) where {H,L,C} =
     derivedvalues(outnames(nothing, :accbands, BAND_SUFFIXES),
         (:accbands_up_mean, Symbol(C, :_mean), :accbands_dn_mean), tuple)
@@ -621,9 +515,8 @@ function BollingerBands(column::ColumnSpec; nbdevup::Real = 2, nbdevdn::Real = 2
     checkrange("BollingerBands", "period", p, 2, 100_000)
     checkmatype("BollingerBands", "matype", matype)
     checkunstable(unstable)
-    s = BollingerSummarizer{matype,C,outnames(C, name, BAND_SUFFIXES)}(Int(p), up, dn,
-        Int(unstable))
-    return withterms(s, column)
+    return barindicator(BollingerSpec{matype}(p, up, dn, unstable),
+        outnames(C, name, BAND_SUFFIXES), column)
 end
 
 struct BollingerSMA{C,U,D} <: GroupSummarizer end
@@ -631,81 +524,52 @@ struct BollingerSMA{C,U,D} <: GroupSummarizer end
 CausalFrames.dependencies(::BollingerSMA{C}) where {C} =
     (Mean(C), Std(C; corrected = false))
 CausalFrames.emptyvalue(::BollingerSMA{C}) where {C} =
-    NamedTuple{outnames(C, :bbands, BAND_SUFFIXES)}((missing, missing, missing))
+    missings(outnames(C, :bbands, BAND_SUFFIXES))
 CausalFrames.fresh(::BollingerSMA{C,U,D}, ::NamedTuple) where {C,U,D} =
     derivedvalues(outnames(C, :bbands, BAND_SUFFIXES),
         (Symbol(C, :_mean), Symbol(C, :_std)),
         BandsFormula{U,D}())
 
-struct BollingerSummarizer{M,C,Ns} <: Summarizer
+struct BollingerSpec{M}
     period::Int
     nbdevup::Float64
     nbdevdn::Float64
     unstable::Int
 end
 
-mutable struct BollingerState{C,Ns,K,W,T} <: SummarizerState
+mutable struct BollingerKernel{K,W,T}
     const ma::K
     const std::W
     const nbdevup::T
     const nbdevdn::T
-    bands::Union{Missing,NTuple{3,T}}
 end
 
-CausalFrames.emptyvalue(::BollingerSummarizer{M,C,Ns}) where {M,C,Ns} =
-    NamedTuple{Ns}((missing, missing, missing))
-
-function CausalFrames.fresh(
-    s::BollingerSummarizer{M,C,Ns},
-    intypes::NamedTuple,
-) where {M,C,Ns}
-    T = floattype(intypes[C])
+function barkernel(s::BollingerSpec{M}, ::Type{T}) where {M,T}
     k = MAKernel(T, M, s.period; s.unstable)
     w = CausalFrames.barwindow(Std(:x; corrected = false), s.period, (x = T,))
-    return BollingerState{C,Ns,typeof(k),typeof(w),T}(k, w, T(s.nbdevup), T(s.nbdevdn),
-        missing)
+    return BollingerKernel(k, w, T(s.nbdevup), T(s.nbdevdn))
 end
-CausalFrames.fresh(st::BollingerState{C,Ns,K,W,T}) where {C,Ns,K,W,T} =
-    BollingerState{C,Ns,K,W,T}(fresh(st.ma), fresh(st.std), st.nbdevup, st.nbdevdn, missing)
-function CausalFrames.fresh!(st::BollingerState)
-    fresh!(st.ma)
-    fresh!(st.std)
-    st.bands = missing
-    return st
-end
+CausalFrames.fresh!(k::BollingerKernel) = (fresh!(k.ma); fresh!(k.std); k)
 
-@inline function CausalFrames.update!(
-    st::BollingerState{C,Ns,K,W,T},
-    row,
-) where {C,Ns,K,W,T}
-    x = row[C]
-    st.bands = missing
-    ismissing(x) && return nothing
-    v = convert(T, x)
-    m = step!(st.ma, v)
-    update!(st.std, (x = v,))
-    sd = value(st.std).x_std
+@inline function barstep!(k::BollingerKernel{K,W,T}, x::T) where {K,W,T}
+    m = step!(k.ma, x)
+    update!(k.std, (x = x,))
+    sd = value(k.std).x_std
     (ismissing(m) || ismissing(sd)) && return nothing
-    st.bands = bbandsvalues(m::T, sd::T, st.nbdevup, st.nbdevdn)
-    return nothing
-end
-@inline function CausalFrames.value(st::BollingerState{C,Ns,K,W,T}) where {C,Ns,K,W,T}
-    b = st.bands
-    vals = ismissing(b) ? (missing, missing, missing) : b
-    return NamedTuple{Ns,NTuple{3,Union{Missing,T}}}(vals)
+    return bbandsvalues(m::T, sd::T, k.nbdevup, k.nbdevdn)
 end
 
 # ---------------------------------------------------------------------------
 # Keltner channels
 
-struct KeltnerSummarizer{H,L,C,Ns} <: Summarizer
+struct KeltnerSpec
     period::Int
     atrperiod::Int
     nbdev::Float64
     unstable::Int
 end
 
-mutable struct KeltnerState{H,L,C,Ns,E,A,T} <: SummarizerState
+mutable struct KeltnerKernel{E,A,T}
     const ema::E
     const atr::A
     const nbdev::T
@@ -713,58 +577,33 @@ mutable struct KeltnerState{H,L,C,Ns,E,A,T} <: SummarizerState
     const emaoffset::Int
     const atroffset::Int
     n::Int
-    bands::Union{Missing,NTuple{3,T}}
 end
 
-CausalFrames.emptyvalue(::KeltnerSummarizer{H,L,C,Ns}) where {H,L,C,Ns} =
-    NamedTuple{Ns}((missing, missing, missing))
-
-function CausalFrames.fresh(
-    s::KeltnerSummarizer{H,L,C,Ns},
-    intypes::NamedTuple,
-) where {H,L,C,Ns}
-    T = pricetype(intypes, (H, L, C))
+function barkernel(s::KeltnerSpec, ::Type{T}) where {T}
     e = EMAKernel(T, s.period)
     a = ATRKernel(T, s.atrperiod)
     # Both legs first emit on the same bar, as ta_KC.c anchors them: the one
     # with the shorter lookback starts that much later.
     le, la = lookback(e) + s.unstable, lookback(a) + s.unstable
     L0 = max(le, la)
-    return KeltnerState{H,L,C,Ns,typeof(e),typeof(a),T}(e, a, T(s.nbdev), s.unstable,
-        L0 - le, L0 - la, 0, missing)
+    return KeltnerKernel(e, a, T(s.nbdev), s.unstable, L0 - le, L0 - la, 0)
 end
-CausalFrames.fresh(st::KeltnerState{H,L,C,Ns,E,A,T}) where {H,L,C,Ns,E,A,T} =
-    KeltnerState{H,L,C,Ns,E,A,T}(fresh(st.ema), fresh(st.atr), st.nbdev, st.unstable,
-        st.emaoffset, st.atroffset, 0, missing)
-function CausalFrames.fresh!(st::KeltnerState)
-    fresh!(st.ema)
-    fresh!(st.atr)
-    st.n = 0
-    st.bands = missing
-    return st
+function CausalFrames.fresh!(k::KeltnerKernel)
+    fresh!(k.ema)
+    fresh!(k.atr)
+    k.n = 0
+    return k
 end
 
-@inline function CausalFrames.update!(st::KeltnerState{H,L,C,Ns,E,A,T},
-    row) where {H,L,C,Ns,E,A,T}
-    h, l, c = row[H], row[L], row[C]
-    st.bands = missing
-    anymissing(h, l, c) && return nothing
-    h, l, c = convert(T, h), convert(T, l), convert(T, c)
-    n = st.n += 1
-    n > st.emaoffset && step!(st.ema, (h + l + c) / 3)
-    n > st.atroffset && step!(st.atr, h, l, c)
-    a = st.atr
-    (emitted(st.ema, st.unstable) && nseen(a) > lookback(a) + st.unstable) ||
-        return nothing
-    mid = st.ema.prev
-    w = a.wilder.prev * st.nbdev
-    st.bands = (mid + w, mid, mid - w)
-    return nothing
-end
-@inline function CausalFrames.value(st::KeltnerState{H,L,C,Ns,E,A,T}) where {H,L,C,Ns,E,A,T}
-    b = st.bands
-    vals = ismissing(b) ? (missing, missing, missing) : b
-    return NamedTuple{Ns,NTuple{3,Union{Missing,T}}}(vals)
+@inline function barstep!(k::KeltnerKernel{E,A,T}, h::T, l::T, c::T) where {E,A,T}
+    n = k.n += 1
+    n > k.emaoffset && step!(k.ema, (h + l + c) / 3)
+    n > k.atroffset && step!(k.atr, h, l, c)
+    a = k.atr
+    (emitted(k.ema, k.unstable) && nseen(a) > lookback(a) + k.unstable) || return nothing
+    mid = k.ema.prev
+    w = a.wilder.prev * k.nbdev
+    return (mid + w, mid, mid - w)
 end
 
 """
@@ -779,9 +618,7 @@ to emit first on the same bar, as TA-Lib aligns them, so the lookback is the
 larger of `period − 1` and `atrperiod`, plus `unstable`, the EMA and ATR
 unstable period TA-Lib's KC inherits.
 
-$PLAIN_DOC
-A bar with any input `missing` leaves the state unchanged and emits `missing`.
-
+$PRICEBAR_DOC
 $DAILY_DOC
 TA-Lib: `ta_codegen/input/kc/kc.yaml`, `kc.md`.
 """
@@ -791,17 +628,15 @@ function KeltnerChannels(; high::ColumnSpec = :high, low::ColumnSpec = :low,
     checkrange("KeltnerChannels", "period", period, 2, 100_000)
     checkrange("KeltnerChannels", "atrperiod", atrperiod, 1, 100_000)
     checkunstable(unstable)
-    s = KeltnerSummarizer{colname(high),colname(low),colname(close),
-        outnames(nothing, name, BAND_SUFFIXES)}(Int(period), Int(atrperiod),
-        Float64(nbdev), Int(unstable))
-    return withterms(s, high, low, close)
+    return barindicator(KeltnerSpec(period, atrperiod, nbdev, unstable),
+        outnames(nothing, name, BAND_SUFFIXES), high, low, close)
 end
 
 # ---------------------------------------------------------------------------
 # Parabolic SAR
 
 # `K` is `:sar` (the SAR itself) or `:sarext` (signed: negative while short).
-struct SARSummarizer{K,H,L,N} <: Summarizer
+struct SARSpec{K}
     startvalue::Float64
     offset::Float64
     initlong::Float64
@@ -812,7 +647,7 @@ struct SARSummarizer{K,H,L,N} <: Summarizer
     maxshort::Float64
 end
 
-mutable struct SARState{K,H,L,N,T} <: SummarizerState
+mutable struct SARKernel{K,T}
     const startvalue::T
     const offset::T
     const initlong::T
@@ -829,55 +664,39 @@ mutable struct SARState{K,H,L,N,T} <: SummarizerState
     afshort::T
     newhigh::T
     newlow::T
-    out::Union{Missing,T}
 end
 
-CausalFrames.emptyvalue(::SARSummarizer{K,H,L,N}) where {K,H,L,N} =
-    NamedTuple{(N,)}((missing,))
-
-function CausalFrames.fresh(s::SARSummarizer{K,H,L,N}, intypes::NamedTuple) where {K,H,L,N}
-    T = pricetype(intypes, (H, L))
+function barkernel(s::SARSpec{K}, ::Type{T}) where {K,T}
     z = zero(T)
-    return SARState{K,H,L,N,T}(s.startvalue, s.offset, s.initlong, s.accellong,
-        s.maxlong, s.initshort, s.accelshort, s.maxshort, 0, true, z, z, z, z, z, z,
-        missing)
+    return fresh!(
+        SARKernel{K,T}(s.startvalue, s.offset, s.initlong, s.accellong,
+            s.maxlong, s.initshort, s.accelshort, s.maxshort, 0, true, z, z, z, z, z, z),
+    )
 end
-CausalFrames.fresh(st::SARState{K,H,L,N,T}) where {K,H,L,N,T} = fresh!(
-    SARState{K,H,L,N,T}(st.startvalue, st.offset, st.initlong, st.accellong, st.maxlong,
-        st.initshort, st.accelshort, st.maxshort, 0, true, zero(T), zero(T), zero(T),
-        zero(T), zero(T), zero(T), missing))
-function CausalFrames.fresh!(st::SARState{K,H,L,N,T}) where {K,H,L,N,T}
-    st.n = 0
-    st.islong = true
-    st.sar = st.ep = st.newhigh = st.newlow = zero(T)
-    st.aflong = st.initlong
-    st.afshort = st.initshort
-    st.out = missing
-    return st
+function CausalFrames.fresh!(k::SARKernel{K,T}) where {K,T}
+    k.n = 0
+    k.islong = true
+    k.sar = k.ep = k.newhigh = k.newlow = zero(T)
+    k.aflong = k.initlong
+    k.afshort = k.initshort
+    return k
 end
 
-@inline function CausalFrames.update!(st::SARState{K,H,L,N,T}, row) where {K,H,L,N,T}
-    h, l = row[H], row[L]
-    st.out = missing
-    anymissing(h, l) && return nothing
-    h, l = convert(T, h), convert(T, l)
-    n = st.n += 1
+@inline function barstep!(k::SARKernel{K,T}, h::T, l::T) where {K,T}
+    n = k.n += 1
     if n == 1
-        st.newhigh, st.newlow = h, l
+        k.newhigh, k.newlow = h, l
         return nothing
     end
-    n == 2 && sarstart!(st, h, l)
-    st.out = sarstep!(st, h, l)
-    return nothing
+    n == 2 && sarstart!(k, h, l)
+    return (sarstep!(k, h, l),)
 end
-@inline CausalFrames.value(st::SARState{K,H,L,N,T}) where {K,H,L,N,T} =
-    NamedTuple{(N,),Tuple{Union{Missing,T}}}((st.out,))
 
 # ta_SAREXT.c's start on the second bar: the direction from the first two bars'
 # −DM (long unless the down move wins), or from the sign of `startvalue`; the
 # SAR at the previous bar's extreme or `|startvalue|`; the extreme point at
 # this bar's. Then the "cheat": this bar also stands in for the previous one.
-function sarstart!(st::SARState, h, l)
+function sarstart!(st::SARKernel, h, l)
     sv = st.startvalue
     if sv == 0
         diffp = h - st.newhigh
@@ -897,7 +716,7 @@ end
 # One bar of ta_SAREXT.c's loop: the value emitted is the SAR going into the
 # bar, or on a reversal the old extreme point clamped to the two bars' range and
 # offset; then the SAR moves `af` of the way to the extreme point, clamped.
-function sarstep!(st::SARState{K,H,L,N,T}, h, l) where {K,H,L,N,T}
+function sarstep!(st::SARKernel{K}, h, l) where {K}
     prevlow, prevhigh = st.newlow, st.newhigh
     st.newlow, st.newhigh = l, h
     sar = st.sar
@@ -944,17 +763,14 @@ function sarsummarizer(K, high, low, name, sv, off, il, al, ml, is, as, ms)
     # ta_SAREXT.c caps the initial and step factors at the maximum.
     il, al = min(il, ml), min(al, ml)
     is, as = min(is, ms), min(as, ms)
-    s = SARSummarizer{K,colname(high),colname(low),name}(sv, off, il, al, ml, is, as, ms)
-    return withterms(s, high, low)
+    return barindicator(SARSpec{K}(sv, off, il, al, ml, is, as, ms), (name,), high, low)
 end
 
 const SAR_DOC = """
 It is path-dependent: its value depends on the bar the state starts at, so no
 finite `warmup` makes it split-invariant. The lookback is 1.
 
-$PLAIN_DOC
-A bar with any input `missing` leaves the state unchanged and emits `missing`.
-"""
+$PRICEBAR_DOC"""
 
 """
     SAR(; high = :high, low = :low, acceleration = 0.02, maximum = 0.2, name = :sar)
@@ -1020,13 +836,15 @@ end
 # ---------------------------------------------------------------------------
 # SuperTrend
 
-struct SuperTrendSummarizer{H,L,C,Ns} <: Summarizer
+struct SuperTrendSpec
     period::Int
     multiplier::Float64
     unstable::Int
 end
 
-mutable struct SuperTrendState{H,L,C,Ns,A,T} <: SummarizerState
+barouttypes(::SuperTrendSpec, ::Type{T}, n) where {T} = Tuple{T,Int}
+
+mutable struct SuperTrendKernel{A,T}
     const atr::A
     const multiplier::T
     const unstable::Int
@@ -1035,31 +853,19 @@ mutable struct SuperTrendState{H,L,C,Ns,A,T} <: SummarizerState
     upper::T
     lower::T
     prevclose::T
-    out::Union{Missing,T}
-    trend::Union{Missing,Int}
 end
 
-CausalFrames.emptyvalue(::SuperTrendSummarizer{H,L,C,Ns}) where {H,L,C,Ns} =
-    NamedTuple{Ns}((missing, missing))
-
-function CausalFrames.fresh(s::SuperTrendSummarizer{H,L,C,Ns},
-    intypes::NamedTuple) where {H,L,C,Ns}
-    T = pricetype(intypes, (H, L, C))
-    a = ATRKernel(T, s.period)
+function barkernel(s::SuperTrendSpec, ::Type{T}) where {T}
     z = zero(T)
-    return SuperTrendState{H,L,C,Ns,typeof(a),T}(a, T(s.multiplier), s.unstable, false,
-        true, z, z, z, missing, missing)
+    return SuperTrendKernel(ATRKernel(T, s.period), T(s.multiplier), s.unstable, false,
+        true, z, z, z)
 end
-CausalFrames.fresh(st::SuperTrendState{H,L,C,Ns,A,T}) where {H,L,C,Ns,A,T} =
-    SuperTrendState{H,L,C,Ns,A,T}(fresh(st.atr), st.multiplier, st.unstable, false, true,
-        zero(T), zero(T), zero(T), missing, missing)
-function CausalFrames.fresh!(st::SuperTrendState{H,L,C,Ns,A,T}) where {H,L,C,Ns,A,T}
-    fresh!(st.atr)
-    st.started = false
-    st.isup = true
-    st.upper = st.lower = st.prevclose = zero(T)
-    st.out = st.trend = missing
-    return st
+function CausalFrames.fresh!(k::SuperTrendKernel{A,T}) where {A,T}
+    fresh!(k.atr)
+    k.started = false
+    k.isup = true
+    k.upper = k.lower = k.prevclose = zero(T)
+    return k
 end
 
 # ta_SUPERTREND.c: bands `(h + l)/2 ± multiplier·ATR`. The first bar takes
@@ -1067,38 +873,29 @@ end
 # close crossed it; the trend turns down when the close falls below the lower
 # band and up when it rises above the upper one; the line is the lower band in
 # an uptrend and the upper one in a downtrend.
-@inline function CausalFrames.update!(st::SuperTrendState{H,L,C,Ns,A,T},
-    row) where {H,L,C,Ns,A,T}
-    h, l, c = row[H], row[L], row[C]
-    st.out = st.trend = missing
-    anymissing(h, l, c) && return nothing
-    h, l, c = convert(T, h), convert(T, l), convert(T, c)
-    a = st.atr
+@inline function barstep!(k::SuperTrendKernel{A,T}, h::T, l::T, c::T) where {A,T}
+    a = k.atr
     step!(a, h, l, c)
-    nseen(a) > lookback(a) + st.unstable || return nothing
+    nseen(a) > lookback(a) + k.unstable || return nothing
     med = (h + l) / 2
-    band = st.multiplier * a.wilder.prev
+    band = k.multiplier * a.wilder.prev
     bu, bl = med + band, med - band
-    if st.started
-        (bu < st.upper || st.prevclose > st.upper) && (st.upper = bu)
-        (bl > st.lower || st.prevclose < st.lower) && (st.lower = bl)
-        if st.isup
-            c < st.lower && (st.isup = false)
+    if k.started
+        (bu < k.upper || k.prevclose > k.upper) && (k.upper = bu)
+        (bl > k.lower || k.prevclose < k.lower) && (k.lower = bl)
+        if k.isup
+            c < k.lower && (k.isup = false)
         else
-            c > st.upper && (st.isup = true)
+            c > k.upper && (k.isup = true)
         end
     else
-        st.started = true
-        st.isup = true
-        st.upper, st.lower = bu, bl
+        k.started = true
+        k.isup = true
+        k.upper, k.lower = bu, bl
     end
-    st.prevclose = c
-    st.out = st.isup ? st.lower : st.upper
-    st.trend = st.isup ? 1 : -1
-    return nothing
+    k.prevclose = c
+    return k.isup ? (k.lower, 1) : (k.upper, -1)
 end
-@inline CausalFrames.value(st::SuperTrendState{H,L,C,Ns,A,T}) where {H,L,C,Ns,A,T} =
-    NamedTuple{Ns,Tuple{Union{Missing,T},Union{Missing,Int}}}((st.out, st.trend))
 
 """
     SuperTrend(; high = :high, low = :low, close = :close, period = 10,
@@ -1115,9 +912,7 @@ plus `unstable`, the ATR unstable period TA-Lib's SUPERTREND inherits.
 It is path-dependent: its value depends on the bar the state starts at, so no
 finite `warmup` makes it split-invariant.
 
-$PLAIN_DOC
-A bar with any input `missing` leaves the state unchanged and emits `missing`.
-
+$PRICEBAR_DOC
 $DAILY_DOC
 TA-Lib: `ta_codegen/input/supertrend/supertrend.yaml`, `supertrend.md`.
 """
@@ -1127,8 +922,6 @@ function SuperTrend(; high::ColumnSpec = :high, low::ColumnSpec = :low,
     checkrange("SuperTrend", "period", period, 2, 100_000)
     checkrange("SuperTrend", "multiplier", multiplier, 0, Inf)
     checkunstable(unstable)
-    s = SuperTrendSummarizer{colname(high),colname(low),colname(close),
-        outnames(nothing, name, (:supertrend, :trend))}(Int(period), Float64(multiplier),
-        Int(unstable))
-    return withterms(s, high, low, close)
+    return barindicator(SuperTrendSpec(period, multiplier, unstable),
+        outnames(nothing, name, (:supertrend, :trend)), high, low, close)
 end

@@ -144,7 +144,7 @@ The zero-lag EMA over element type `T`.
 """
 function ZLEMAKernel(::Type{T}, period::Integer) where {T}
     e = EMAKernel(T, period)
-    w = CausalFrames.barwindow(First(:x), (e.period - 1) ÷ 2 + 1, (x = T,))
+    w = lagged((e.period - 1) ÷ 2 + 1, T)
     return ZLEMAKernel{T,typeof(e.seed),typeof(w)}(0, w, e)
 end
 

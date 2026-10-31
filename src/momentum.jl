@@ -20,7 +20,7 @@ pricechange(K, column) = withterms(PriceChange{K,colname(column)}(), column)
 
 CausalFrames.dependencies(::PriceChange{K,C}) where {K,C} = (First(C), Last(C))
 CausalFrames.emptyvalue(::PriceChange{K,C}) where {K,C} =
-    NamedTuple{(Symbol(C, :_, K),)}((missing,))
+    missings((Symbol(C, :_, K),))
 CausalFrames.fresh(::PriceChange{K,C}, ::NamedTuple) where {K,C} =
     derivedvalue(Symbol(C, :_, K), (Symbol(C, :_first), Symbol(C, :_last)),
         lifted(changevalue(Val(K))))
@@ -248,94 +248,28 @@ function ccivalue(tp, mean, mad)
 end
 
 # ---------------------------------------------------------------------------
-# Plain summarizers: shared pieces
-
-# An internal dependent emitting the sums of columns `Cs` as one tuple, for a
-# `barwindow` that needs several: MFI's money flows, ULTOSC's pressure and
-# range, CMOU's moves and Vortex's movements and range.
-struct Sums{Cs} <: GroupSummarizer end
-
-CausalFrames.dependencies(::Sums{Cs}) where {Cs} = map(Sum, Cs)
-CausalFrames.emptyvalue(::Sums) = (; sums = missing)
-CausalFrames.fresh(::Sums{Cs}, ::NamedTuple) where {Cs} =
-    derivedvalue(:sums, map(c -> Symbol(c, :_sum), Cs), tuple)
-
-sumswindow(Cs, n, ::Type{T}) where {T} =
-    CausalFrames.barwindow(Sums{Cs}(), n, NamedTuple{Cs}(map(_ -> T, Cs)))
-
-# The same for the extremes of a window: the highest `H` and the lowest `L`.
-struct Extremes{H,L} <: GroupSummarizer end
-
-CausalFrames.dependencies(::Extremes{H,L}) where {H,L} = (Max(H), Min(L))
-CausalFrames.emptyvalue(::Extremes) = (; extremes = missing)
-CausalFrames.fresh(::Extremes{H,L}, ::NamedTuple) where {H,L} =
-    derivedvalue(:extremes, (Symbol(H, :_max), Symbol(L, :_min)), tuple)
-
-extremeswindow(n, ::Type{T}) where {T} =
-    CausalFrames.barwindow(Extremes{:high,:low}(), n, (high = T, low = T))
-
-function checkmatype(fn, kw, matype)
-    matype in MATYPES || throw(
-        ArgumentError(
-            "$fn $kw must be one of $(join(map(repr, MATYPES), ", ")), " *
-            "got $(repr(matype))",
-        ))
-    return matype
-end
-
-# The output names of a plain indicator: a single-series one prefixes its
-# input column, a price-bar one (`C === nothing`) does not, and a multi-output
-# one appends each output's suffix.
-outname(C::Symbol, name) = Symbol(C, :_, name)
-outname(::Nothing, name) = name
-outnames(C, name, suffixes) = map(s -> Symbol(outname(C, name), :_, s), suffixes)
-
-# Missing-checked reads of a row's inputs.
-@inline anymissing(xs...) = any(ismissing, xs)
-
-# ---------------------------------------------------------------------------
 # RSI and CMO
 
-struct GainLossOscillator{K,C,N} <: Summarizer
+struct GainLossSpec{K}
     period::Int
     unstable::Int
 end
 
-mutable struct GainLossState{K,C,N,G,T} <: SummarizerState
-    const kernel::G
+mutable struct GainLossOscillator{K,G}
+    const gainloss::G
     const unstable::Int
-    out::Union{Missing,T}
 end
 
-CausalFrames.emptyvalue(::GainLossOscillator{K,C,N}) where {K,C,N} =
-    NamedTuple{(N,)}((missing,))
+barkernel(s::GainLossSpec{K}, ::Type{T}) where {K,T} =
+    (g = GainLossKernel(T, s.period); GainLossOscillator{K,typeof(g)}(g, s.unstable))
+CausalFrames.fresh!(o::GainLossOscillator) = (fresh!(o.gainloss); o)
 
-function CausalFrames.fresh(s::GainLossOscillator{K,C,N}, intypes::NamedTuple) where {K,C,N}
-    T = floattype(intypes[C])
-    k = GainLossKernel(T, s.period)
-    return GainLossState{K,C,N,typeof(k),T}(k, s.unstable, missing)
+@inline function barstep!(o::GainLossOscillator{K}, x) where {K}
+    k = o.gainloss
+    gl = step!(k, x)
+    nseen(k) > lookback(k) + o.unstable || return nothing
+    return (gainlossvalue(Val(K), gl),)
 end
-CausalFrames.fresh(st::GainLossState{K,C,N,G,T}) where {K,C,N,G,T} =
-    GainLossState{K,C,N,G,T}(fresh(st.kernel), st.unstable, missing)
-function CausalFrames.fresh!(st::GainLossState)
-    fresh!(st.kernel)
-    st.out = missing
-    return st
-end
-
-@inline function CausalFrames.update!(st::GainLossState{K,C}, row) where {K,C}
-    x = row[C]
-    if ismissing(x)
-        st.out = missing
-        return nothing
-    end
-    gl = step!(st.kernel, x)
-    k = st.kernel
-    st.out = nseen(k) > lookback(k) + st.unstable ? gainlossvalue(Val(K), gl) : missing
-    return nothing
-end
-@inline CausalFrames.value(st::GainLossState{K,C,N,G,T}) where {K,C,N,G,T} =
-    NamedTuple{(N,),Tuple{Union{Missing,T}}}((st.out,))
 
 # ta_RSI.c and ta_CMO.c: 0 where the smoothed moves sum to zero.
 function gainlossvalue(::Val{:rsi}, (g, l))
@@ -350,9 +284,8 @@ end
 function gainlossoscillator(fn, K, column, period, unstable, name)
     checkrange(fn, "period", period, 2, 100_000)
     checkunstable(unstable)
-    C = colname(column)
-    s = GainLossOscillator{K,C,outname(C, name)}(Int(period), Int(unstable))
-    return withterms(s, column)
+    return barindicator(GainLossSpec{K}(period, unstable),
+        (outname(colname(column), name),), column)
 end
 
 """
@@ -394,26 +327,21 @@ const MACD_SUFFIXES = (:macd, :macdsignal, :macdhist)
 
 # `K` is `:macd`, `:macdfix` or `:macdext`, which sets how the kernels are
 # built; `FM`, `SM` and `GM` are the fast, slow and signal MA types.
-struct MACDSummarizer{K,FM,SM,GM,C,Ns} <: Summarizer
+struct MACDSpec{K,FM,SM,GM}
     fastperiod::Int
     slowperiod::Int
     signalperiod::Int
     unstable::Int
 end
 
-mutable struct MACDState{C,Ns,F,S,G,T} <: SummarizerState
+mutable struct MACDKernel{F,S,G}
     const fast::F
     const slow::S
     const signal::G
     const fastoffset::Int
     const slowoffset::Int
     n::Int
-    macd::Union{Missing,T}
-    signalout::Union{Missing,T}
 end
-
-CausalFrames.emptyvalue(::MACDSummarizer{K,FM,SM,GM,C,Ns}) where {K,FM,SM,GM,C,Ns} =
-    NamedTuple{Ns}((missing, missing, missing))
 
 macdkernels(::Val{:macd}, s, T) =
     (MAKernel(T, :ema, s.fastperiod; s.unstable, identity = false),
@@ -422,53 +350,34 @@ macdkernels(::Val{:macd}, s, T) =
 macdkernels(::Val{:macdfix}, s, T) =
     (fixedemakernel(T, 12, 0.15; s.unstable), fixedemakernel(T, 26, 0.075; s.unstable),
         MAKernel(T, :ema, s.signalperiod; s.unstable, identity = false))
-macdkernels(::Val{:macdext}, s::MACDSummarizer{K,FM,SM,GM}, T) where {K,FM,SM,GM} =
+macdkernels(::Val{:macdext}, s::MACDSpec{K,FM,SM,GM}, T) where {K,FM,SM,GM} =
     (MAKernel(T, FM, s.fastperiod; s.unstable), MAKernel(T, SM, s.slowperiod; s.unstable),
         MAKernel(T, GM, s.signalperiod; s.unstable))
 
-function CausalFrames.fresh(s::MACDSummarizer{K,FM,SM,GM,C,Ns},
-    intypes::NamedTuple) where {K,FM,SM,GM,C,Ns}
-    T = floattype(intypes[C])
+function barkernel(s::MACDSpec{K}, ::Type{T}) where {K,T}
     f, sl, g = macdkernels(Val(K), s, T)
     # Both averages first emit on the same bar, as macd.c and macdext.c align
     # them: the one with the shorter lookback starts that much later.
     L = max(lookback(f), lookback(sl))
-    return MACDState{C,Ns,typeof(f),typeof(sl),typeof(g),T}(f, sl, g, L - lookback(f),
-        L - lookback(sl), 0, missing, missing)
+    return MACDKernel(f, sl, g, L - lookback(f), L - lookback(sl), 0)
 end
-CausalFrames.fresh(st::MACDState{C,Ns,F,S,G,T}) where {C,Ns,F,S,G,T} =
-    MACDState{C,Ns,F,S,G,T}(fresh(st.fast), fresh(st.slow), fresh(st.signal),
-        st.fastoffset, st.slowoffset, 0, missing, missing)
-function CausalFrames.fresh!(st::MACDState)
-    fresh!(st.fast)
-    fresh!(st.slow)
-    fresh!(st.signal)
-    st.n = 0
-    st.macd = missing
-    st.signalout = missing
-    return st
+function CausalFrames.fresh!(k::MACDKernel)
+    fresh!(k.fast)
+    fresh!(k.slow)
+    fresh!(k.signal)
+    k.n = 0
+    return k
 end
 
-@inline function CausalFrames.update!(st::MACDState{C,Ns,F,S,G,T}, row) where {C,Ns,F,S,G,T}
-    x = row[C]
-    st.macd = st.signalout = missing
-    ismissing(x) && return nothing
-    n = st.n += 1
-    vf = n > st.fastoffset ? step!(st.fast, x) : missing
-    vs = n > st.slowoffset ? step!(st.slow, x) : missing
+@inline function barstep!(k::MACDKernel, x)
+    n = k.n += 1
+    vf = n > k.fastoffset ? step!(k.fast, x) : missing
+    vs = n > k.slowoffset ? step!(k.slow, x) : missing
     (ismissing(vf) || ismissing(vs)) && return nothing
     m = vf - vs
-    sig = step!(st.signal, m)
+    sig = step!(k.signal, m)
     ismissing(sig) && return nothing
-    st.macd = m
-    st.signalout = sig
-    return nothing
-end
-
-@inline function CausalFrames.value(st::MACDState{C,Ns,F,S,G,T}) where {C,Ns,F,S,G,T}
-    m, s = st.macd, st.signalout
-    h = ismissing(m) || ismissing(s) ? missing : m - s
-    return NamedTuple{Ns,NTuple{3,Union{Missing,T}}}((m, s, h))
+    return (m, sig, m - sig)
 end
 
 function macdsummarizer(K, fm, sm, gm, column, fast, slow, signal, unstable, name)
@@ -478,9 +387,8 @@ function macdsummarizer(K, fm, sm, gm, column, fast, slow, signal, unstable, nam
         fast, slow = slow, fast
         fm, sm = sm, fm
     end
-    s = MACDSummarizer{K,fm,sm,gm,C,outnames(C, name, MACD_SUFFIXES)}(Int(fast),
-        Int(slow), Int(signal), Int(checkunstable(unstable)))
-    return withterms(s, column)
+    s = MACDSpec{K,fm,sm,gm}(fast, slow, signal, checkunstable(unstable))
+    return barindicator(s, outnames(C, name, MACD_SUFFIXES), column)
 end
 
 const MACD_DOC = """
@@ -570,54 +478,31 @@ end
 # ---------------------------------------------------------------------------
 # APO and PPO
 
-struct PriceOscillator{K,M,C,N} <: Summarizer
+struct PriceOscillatorSpec{K,M}
     fastperiod::Int
     slowperiod::Int
     unstable::Int
 end
 
-mutable struct PriceOscillatorState{K,C,N,F,S,T} <: SummarizerState
+mutable struct PriceOscillator{K,F,S}
     const fast::F
     const slow::S
-    out::Union{Missing,T}
 end
 
-CausalFrames.emptyvalue(::PriceOscillator{K,M,C,N}) where {K,M,C,N} =
-    NamedTuple{(N,)}((missing,))
-
-function CausalFrames.fresh(
-    s::PriceOscillator{K,M,C,N},
-    intypes::NamedTuple,
-) where {K,M,C,N}
-    T = floattype(intypes[C])
+function barkernel(s::PriceOscillatorSpec{K,M}, ::Type{T}) where {K,M,T}
     f = MAKernel(T, M, s.fastperiod; s.unstable)
     sl = MAKernel(T, M, s.slowperiod; s.unstable)
-    return PriceOscillatorState{K,C,N,typeof(f),typeof(sl),T}(f, sl, missing)
+    return PriceOscillator{K,typeof(f),typeof(sl)}(f, sl)
 end
-CausalFrames.fresh(st::PriceOscillatorState{K,C,N,F,S,T}) where {K,C,N,F,S,T} =
-    PriceOscillatorState{K,C,N,F,S,T}(fresh(st.fast), fresh(st.slow), missing)
-function CausalFrames.fresh!(st::PriceOscillatorState)
-    fresh!(st.fast)
-    fresh!(st.slow)
-    st.out = missing
-    return st
-end
+CausalFrames.fresh!(k::PriceOscillator) = (fresh!(k.fast); fresh!(k.slow); k)
 
 # Both averages start at the first bar, as ta_APO.c's two TA_MA calls do over a
 # whole series; the output starts with the slow one.
-@inline function CausalFrames.update!(st::PriceOscillatorState{K,C}, row) where {K,C}
-    x = row[C]
-    if ismissing(x)
-        st.out = missing
-        return nothing
-    end
-    vf = step!(st.fast, x)
-    vs = step!(st.slow, x)
-    st.out = ismissing(vf) || ismissing(vs) ? missing : oscillatorvalue(Val(K), vf, vs)
-    return nothing
+@inline function barstep!(k::PriceOscillator{K}, x) where {K}
+    vf = step!(k.fast, x)
+    vs = step!(k.slow, x)
+    return ismissing(vf) || ismissing(vs) ? nothing : (oscillatorvalue(Val(K), vf, vs),)
 end
-@inline CausalFrames.value(st::PriceOscillatorState{K,C,N,F,S,T}) where {K,C,N,F,S,T} =
-    NamedTuple{(N,),Tuple{Union{Missing,T}}}((st.out,))
 
 oscillatorvalue(::Val{:apo}, f, s) = f - s
 oscillatorvalue(::Val{:ppo}, f, s) = iszerota(s) ? zero(s) : ((f - s) / s) * 100
@@ -630,10 +515,8 @@ function priceoscillator(fn, K, column, fast, slow, matype, unstable, name;
     checkmatype(fn, "matype", matype)
     checkunstable(unstable)
     fast, slow = minmax(fast, slow)
-    C = colname(column)
-    N = outname(prefix ? C : nothing, name)
-    s = PriceOscillator{K,matype,C,N}(Int(fast), Int(slow), Int(unstable))
-    return withterms(s, column)
+    N = outname(prefix ? colname(column) : nothing, name)
+    return barindicator(PriceOscillatorSpec{K,matype}(fast, slow, unstable), (N,), column)
 end
 
 const PO_DOC = """
@@ -680,53 +563,36 @@ PPO(column::ColumnSpec; fastperiod::Integer = 12, slowperiod::Integer = 26,
 # ---------------------------------------------------------------------------
 # TRIX
 
-struct TRIXSummarizer{C,N} <: Summarizer
+struct TRIXSpec
     period::Int
     unstable::Int
 end
 
-mutable struct TRIXState{C,N,K,T} <: SummarizerState
+mutable struct TRIXKernel{K,T}
     const tema::K
     started::Bool
     prev::T
-    out::Union{Missing,T}
 end
 
-CausalFrames.emptyvalue(::TRIXSummarizer{C,N}) where {C,N} = NamedTuple{(N,)}((missing,))
-
-function CausalFrames.fresh(s::TRIXSummarizer{C,N}, intypes::NamedTuple) where {C,N}
-    T = floattype(intypes[C])
-    k = TEMAKernel(T, s.period; s.unstable)
-    return TRIXState{C,N,typeof(k),T}(k, false, zero(T), missing)
-end
-CausalFrames.fresh(st::TRIXState{C,N,K,T}) where {C,N,K,T} =
-    TRIXState{C,N,K,T}(fresh(st.tema), false, zero(T), missing)
-function CausalFrames.fresh!(st::TRIXState{C,N,K,T}) where {C,N,K,T}
-    fresh!(st.tema)
-    st.started = false
-    st.prev = zero(T)
-    st.out = missing
-    return st
+barkernel(s::TRIXSpec, ::Type{T}) where {T} =
+    TRIXKernel(TEMAKernel(T, s.period; s.unstable), false, zero(T))
+function CausalFrames.fresh!(k::TRIXKernel{K,T}) where {K,T}
+    fresh!(k.tema)
+    k.started = false
+    k.prev = zero(T)
+    return k
 end
 
 # The triple EMA is TEMAKernel's three gated stages (ta_TRIX.c chains them as
 # ta_TEMA.c does); TRIX is the one-bar rate of change of the third.
-@inline function CausalFrames.update!(st::TRIXState{C,N,K,T}, row) where {C,N,K,T}
-    x = row[C]
-    st.out = missing
-    ismissing(x) && return nothing
-    ismissing(step!(st.tema, x)) && return nothing
-    e3 = current(st.tema.e3)::T
-    if st.started
-        p = st.prev
-        st.out = p != 0 ? ((e3 / p) - 1) * 100 : zero(T)
-    end
-    st.started = true
-    st.prev = e3
-    return nothing
+@inline function barstep!(k::TRIXKernel{K,T}, x::T) where {K,T}
+    ismissing(step!(k.tema, x)) && return nothing
+    e3 = current(k.tema.e3)::T
+    started, p = k.started, k.prev
+    k.started, k.prev = true, e3
+    started || return nothing
+    return (p != 0 ? ((e3 / p) - 1) * 100 : zero(T),)
 end
-@inline CausalFrames.value(st::TRIXState{C,N,K,T}) where {C,N,K,T} =
-    NamedTuple{(N,),Tuple{Union{Missing,T}}}((st.out,))
 
 """
     TRIX(column::ColumnSpec; period = 30, unstable = 0, name = :trix)
@@ -743,8 +609,7 @@ function TRIX(column::ColumnSpec; period::Integer = 30, unstable::Integer = 0,
     name::Symbol = :trix)
     checkrange("TRIX", "period", period, 1, 100_000)
     checkunstable(unstable)
-    C = colname(column)
-    return withterms(TRIXSummarizer{C,outname(C, name)}(Int(period), Int(unstable)),
+    return barindicator(TRIXSpec(period, unstable), (outname(colname(column), name),),
         column)
 end
 
@@ -753,9 +618,8 @@ end
 
 # `K` is `:stoch` (%K, slow %K, slow %D), `:kdj` (Stoch's, plus J), `:stochf`
 # (%K, %D) or `:stochrsi` (RSI, its %K, %D); `KM` and `DM` are the MA types of
-# the two smoothings (`KM` unused but by Stoch and KDJ). `Is` are the input columns: high, low, close, or the one
-# series.
-struct StochSummarizer{K,KM,DM,Is,Ns} <: Summarizer
+# the two smoothings (`KM` unused but by Stoch and KDJ).
+struct StochSpec{K,KM,DM}
     period::Int
     fastk::Int
     slowk::Int
@@ -763,87 +627,55 @@ struct StochSummarizer{K,KM,DM,Is,Ns} <: Summarizer
     unstable::Int
 end
 
-mutable struct StochState{K,Is,Ns,G,F,S,D,T} <: SummarizerState
+mutable struct StochKernel{K,G,F,S,D}
     const rsi::G
     const fastk::F
     const slowk::S
     const d::D
     const unstable::Int
-    k::Union{Missing,T}
-    dout::Union{Missing,T}
 end
 
-CausalFrames.emptyvalue(::StochSummarizer{K,KM,DM,Is,Ns}) where {K,KM,DM,Is,Ns} =
-    NamedTuple{Ns}(map(_ -> missing, Ns))
-
-function CausalFrames.fresh(s::StochSummarizer{K,KM,DM,Is,Ns},
-    intypes::NamedTuple) where {K,KM,DM,Is,Ns}
-    T = floattype(promote_type(map(c -> nonmissingtype(intypes[c]), Is)...))
+function barkernel(s::StochSpec{K,KM,DM}, ::Type{T}) where {K,KM,DM,T}
     rsi = K === :stochrsi ? GainLossKernel(T, s.period) : nothing
     fk = FastKKernel(T, s.fastk, K === :stochrsi ? :x : :hlc)
     sk = K === :stoch || K === :kdj ? MAKernel(T, KM, s.slowk; s.unstable) : nothing
     d = MAKernel(T, DM, s.d; s.unstable)
-    return StochState{K,Is,Ns,typeof(rsi),typeof(fk),typeof(sk),typeof(d),T}(rsi, fk, sk,
-        d, s.unstable, missing, missing)
+    return StochKernel{K,typeof(rsi),typeof(fk),typeof(sk),typeof(d)}(rsi, fk, sk, d,
+        s.unstable)
 end
-CausalFrames.fresh(st::StochState{K,Is,Ns,G,F,S,D,T}) where {K,Is,Ns,G,F,S,D,T} =
-    StochState{K,Is,Ns,G,F,S,D,T}(freshornothing(st.rsi), fresh(st.fastk),
-        freshornothing(st.slowk), fresh(st.d), st.unstable, missing, missing)
-function CausalFrames.fresh!(st::StochState)
-    st.rsi === nothing || fresh!(st.rsi)
-    fresh!(st.fastk)
-    st.slowk === nothing || fresh!(st.slowk)
-    fresh!(st.d)
-    st.k = st.dout = missing
-    return st
+function CausalFrames.fresh!(k::StochKernel)
+    maybefresh!(k.rsi)
+    fresh!(k.fastk)
+    maybefresh!(k.slowk)
+    fresh!(k.d)
+    return k
 end
 
-freshornothing(::Nothing) = nothing
-freshornothing(k) = fresh(k)
-
-# %K from the row: the window's %K of high, low and close, or of the RSI.
-@inline function stochfastk(
-    st::StochState{:stochrsi,Is,Ns,G,F,S,D,T},
-    row,
-) where {Is,Ns,G,F,S,D,T}
-    x = row[Is[1]]
-    ismissing(x) && return missing
-    gl = step!(st.rsi, x)
-    nseen(st.rsi) > lookback(st.rsi) + st.unstable || return missing
-    return step!(st.fastk, gainlossvalue(Val(:rsi), gl::Tuple{T,T}))
+# %K of the RSI, or of high, low and close.
+@inline function barstep!(k::StochKernel{:stochrsi}, x::T) where {T}
+    gl = step!(k.rsi, x)
+    nseen(k.rsi) > lookback(k.rsi) + k.unstable || return nothing
+    return stochsmooth(k, step!(k.fastk, gainlossvalue(Val(:rsi), gl::Tuple{T,T})))
 end
-@inline function stochfastk(st::StochState, row)
-    H, L, C = stochcolumns(st)
-    h, l, c = row[H], row[L], row[C]
-    anymissing(h, l, c) && return missing
-    return step!(st.fastk, h, l, c)
-end
-stochcolumns(::StochState{K,Is}) where {K,Is} = Is
+@inline barstep!(k::StochKernel, h::T, l::T, c::T) where {T} =
+    stochsmooth(k, step!(k.fastk, h, l, c))
 
-# The smoothed %K: Stoch's slow %K, or %K itself.
-@inline stochslowk(st::Union{StochState{:stoch},StochState{:kdj}}, k) =
-    step!(st.slowk, k)
-@inline stochslowk(::StochState, k) = k
-
-@inline function CausalFrames.update!(st::StochState, row)
-    st.k = st.dout = missing
-    fk = stochfastk(st, row)
+# The outputs from %K: Stoch's slow %K (or %K itself) and its %D.
+@inline function stochsmooth(k::StochKernel{K}, fk) where {K}
     ismissing(fk) && return nothing
-    k = stochslowk(st, fk)
-    ismissing(k) && return nothing
-    d = step!(st.d, k)
+    sk = stochslowk(k, fk)
+    ismissing(sk) && return nothing
+    d = step!(k.d, sk)
     ismissing(d) && return nothing
-    st.k = k
-    st.dout = d
-    return nothing
+    return stochouts(Val(K), sk, d)
 end
-@inline CausalFrames.value(st::StochState{K,Is,Ns,G,F,S,D,T}) where {K,Is,Ns,G,F,S,D,T} =
-    NamedTuple{Ns,NTuple{length(Ns),Union{Missing,T}}}(stochouts(Val(K), st.k, st.dout))
+
+@inline stochslowk(k::Union{StochKernel{:stoch},StochKernel{:kdj}}, fk) = step!(k.slowk, fk)
+@inline stochslowk(::StochKernel, fk) = fk
 
 @inline stochouts(::Val, k, d) = (k, d)
 # ta_KDJ.c: J is `3·K − 2·D`, unclamped.
-@inline stochouts(::Val{:kdj}, k, d) =
-    (k, d, ismissing(k) || ismissing(d) ? missing : 3 * k - 2 * d)
+@inline stochouts(::Val{:kdj}, k, d) = (k, d, 3 * k - 2 * d)
 
 const STOCH_DOC = """
 %K is where the close sits in the `fastkperiod`-bar high-low range, as a
@@ -879,11 +711,9 @@ function Stoch(; high::ColumnSpec = :high, low::ColumnSpec = :low,
     checkmatype("Stoch", "slowkmatype", slowkmatype)
     checkmatype("Stoch", "slowdmatype", slowdmatype)
     checkunstable(unstable)
-    Is = (colname(high), colname(low), colname(close))
-    s = StochSummarizer{:stoch,slowkmatype,slowdmatype,Is,
-        outnames(nothing, name, (:slowk, :slowd))}(0, Int(fastkperiod), Int(slowkperiod),
-        Int(slowdperiod), Int(unstable))
-    return withterms(s, high, low, close)
+    s = StochSpec{:stoch,slowkmatype,slowdmatype}(0, fastkperiod, slowkperiod,
+        slowdperiod, unstable)
+    return barindicator(s, outnames(nothing, name, (:slowk, :slowd)), high, low, close)
 end
 
 """
@@ -906,11 +736,8 @@ function StochF(; high::ColumnSpec = :high, low::ColumnSpec = :low,
     checkrange("StochF", "fastdperiod", fastdperiod, 1, 100_000)
     checkmatype("StochF", "fastdmatype", fastdmatype)
     checkunstable(unstable)
-    Is = (colname(high), colname(low), colname(close))
-    s = StochSummarizer{:stochf,:sma,fastdmatype,Is,
-        outnames(nothing, name, (:fastk, :fastd))}(0, Int(fastkperiod), 0,
-        Int(fastdperiod), Int(unstable))
-    return withterms(s, high, low, close)
+    s = StochSpec{:stochf,:sma,fastdmatype}(0, fastkperiod, 0, fastdperiod, unstable)
+    return barindicator(s, outnames(nothing, name, (:fastk, :fastd)), high, low, close)
 end
 
 """
@@ -936,21 +763,19 @@ function StochRSI(column::ColumnSpec; period::Integer = 14, fastkperiod::Integer
     checkrange("StochRSI", "fastdperiod", fastdperiod, 1, 100_000)
     checkmatype("StochRSI", "fastdmatype", fastdmatype)
     checkunstable(unstable)
-    C = colname(column)
-    s = StochSummarizer{:stochrsi,:sma,fastdmatype,(C,),
-        outnames(C, name, (:fastk, :fastd))}(Int(period), Int(fastkperiod), 0,
-        Int(fastdperiod), Int(unstable))
-    return withterms(s, column)
+    s = StochSpec{:stochrsi,:sma,fastdmatype}(period, fastkperiod, 0, fastdperiod,
+        unstable)
+    return barindicator(s, outnames(colname(column), name, (:fastk, :fastd)), column)
 end
 
 # ---------------------------------------------------------------------------
 # ULTOSC
 
-struct ULTOSCSummarizer{H,L,C,N} <: Summarizer
+struct ULTOSCSpec
     periods::NTuple{3,Int}
 end
 
-mutable struct ULTOSCState{H,L,C,N,W1,W2,W3,T} <: SummarizerState
+mutable struct ULTOSCKernel{W1,W2,W3,T}
     const periods::NTuple{3,Int}
     const w1::W1
     const w2::W2
@@ -958,33 +783,20 @@ mutable struct ULTOSCState{H,L,C,N,W1,W2,W3,T} <: SummarizerState
     n::Int
     prevclose::T
     nullrun::Int
-    out::Union{Missing,T}
 end
 
-CausalFrames.emptyvalue(::ULTOSCSummarizer{H,L,C,N}) where {H,L,C,N} =
-    NamedTuple{(N,)}((missing,))
-
-function CausalFrames.fresh(
-    s::ULTOSCSummarizer{H,L,C,N},
-    intypes::NamedTuple,
-) where {H,L,C,N}
-    T = floattype(promote_type(map(c -> nonmissingtype(intypes[c]), (H, L, C))...))
+function barkernel(s::ULTOSCSpec, ::Type{T}) where {T}
     w1, w2, w3 = map(p -> sumswindow((:bp, :tr), p, T), s.periods)
-    return ULTOSCState{H,L,C,N,typeof(w1),typeof(w2),typeof(w3),T}(s.periods, w1, w2, w3,
-        0, zero(T), 0, missing)
+    return ULTOSCKernel(s.periods, w1, w2, w3, 0, zero(T), 0)
 end
-CausalFrames.fresh(st::ULTOSCState{H,L,C,N,W1,W2,W3,T}) where {H,L,C,N,W1,W2,W3,T} =
-    ULTOSCState{H,L,C,N,W1,W2,W3,T}(st.periods, fresh(st.w1), fresh(st.w2), fresh(st.w3),
-        0, zero(T), 0, missing)
-function CausalFrames.fresh!(st::ULTOSCState{H,L,C,N,W1,W2,W3,T}) where {H,L,C,N,W1,W2,W3,T}
-    fresh!(st.w1)
-    fresh!(st.w2)
-    fresh!(st.w3)
-    st.n = 0
-    st.prevclose = zero(T)
-    st.nullrun = 0
-    st.out = missing
-    return st
+function CausalFrames.fresh!(k::ULTOSCKernel{W1,W2,W3,T}) where {W1,W2,W3,T}
+    fresh!(k.w1)
+    fresh!(k.w2)
+    fresh!(k.w3)
+    k.n = 0
+    k.prevclose = zero(T)
+    k.nullrun = 0
+    return k
 end
 
 # One period's buying pressure over its true range, 0 for a window with no
@@ -995,35 +807,28 @@ end
     return a / b
 end
 
-@inline function CausalFrames.update!(st::ULTOSCState{H,L,C,N,W1,W2,W3,T},
-    row) where {H,L,C,N,W1,W2,W3,T}
-    h, l, c = row[H], row[L], row[C]
-    st.out = missing
-    anymissing(h, l, c) && return nothing
-    h, l, c = convert(T, h), convert(T, l), convert(T, c)
-    n = st.n += 1
-    cy = st.prevclose
-    st.prevclose = c
+@inline function barstep!(k::ULTOSCKernel{W1,W2,W3,T}, h::T, l::T,
+    c::T) where {W1,W2,W3,T}
+    n = k.n += 1
+    cy = k.prevclose
+    k.prevclose = c
     n == 1 && return nothing
     bp = c - min(l, cy)
     tr = truerange(h, l, cy)
     term = (bp = bp, tr = tr)
-    update!(st.w1, term)
-    update!(st.w2, term)
-    update!(st.w3, term)
-    p1, p2, p3 = st.periods
-    st.nullrun = tr == 0 && bp == 0 ? min(st.nullrun + 1, p3) : 0
-    s3 = value(st.w3).sums
+    update!(k.w1, term)
+    update!(k.w2, term)
+    update!(k.w3, term)
+    p1, p2, p3 = k.periods
+    k.nullrun = tr == 0 && bp == 0 ? min(k.nullrun + 1, p3) : 0
+    s3 = value(k.w3).sums
     ismissing(s3) && return nothing
-    s1 = value(st.w1).sums::Tuple{T,T}
-    s2 = value(st.w2).sums::Tuple{T,T}
-    nr = st.nullrun
+    s1 = value(k.w1).sums::Tuple{T,T}
+    s2 = value(k.w2).sums::Tuple{T,T}
+    nr = k.nullrun
     v = 4 * ultratio(s1, nr, p1) + 2 * ultratio(s2, nr, p2) + ultratio(s3, nr, p3)
-    st.out = 100 * (v / 7)
-    return nothing
+    return (100 * (v / 7),)
 end
-@inline CausalFrames.value(st::ULTOSCState{H,L,C,N,W1,W2,W3,T}) where {H,L,C,N,W1,W2,W3,T} =
-    NamedTuple{(N,),Tuple{Union{Missing,T}}}((st.out,))
 
 """
     ULTOSC(; high = :high, low = :low, close = :close, timeperiod1 = 7,
@@ -1037,9 +842,7 @@ from the shortest period to the longest, as TA-Lib sorts them, and scaled to
 
 The window sums are CausalFrames `Sum`s under `CausalFrames.barwindow`.
 
-$PLAIN_DOC
-A bar with any input `missing` leaves the state unchanged and emits `missing`.
-
+$PRICEBAR_DOC
 $DAILY_DOC
 TA-Lib: `ta_codegen/input/ultosc/ultosc.yaml`, `ultosc.md`.
 """
@@ -1050,79 +853,56 @@ function ULTOSC(; high::ColumnSpec = :high, low::ColumnSpec = :low,
     checkrange("ULTOSC", "timeperiod2", timeperiod2, 1, 100_000)
     checkrange("ULTOSC", "timeperiod3", timeperiod3, 1, 100_000)
     ps = Tuple(sort([Int(timeperiod1), Int(timeperiod2), Int(timeperiod3)]))
-    s = ULTOSCSummarizer{colname(high),colname(low),colname(close),name}(ps)
-    return withterms(s, high, low, close)
+    return barindicator(ULTOSCSpec(ps), (name,), high, low, close)
 end
 
 # ---------------------------------------------------------------------------
 # MFI
 
-struct MFISummarizer{H,L,C,V,N} <: Summarizer
+struct MFISpec
     period::Int
 end
 
-mutable struct MFIState{H,L,C,V,N,W,T} <: SummarizerState
+mutable struct MFIKernel{W,T}
     const period::Int
     const window::W
     n::Int
     prevtp::T
     nullrun::Int
-    out::Union{Missing,T}
 end
 
-CausalFrames.emptyvalue(::MFISummarizer{H,L,C,V,N}) where {H,L,C,V,N} =
-    NamedTuple{(N,)}((missing,))
-
-function CausalFrames.fresh(
-    s::MFISummarizer{H,L,C,V,N},
-    intypes::NamedTuple,
-) where {H,L,C,V,N}
-    T = floattype(promote_type(map(c -> nonmissingtype(intypes[c]), (H, L, C, V))...))
-    w = sumswindow((:pos, :neg), s.period, T)
-    return MFIState{H,L,C,V,N,typeof(w),T}(s.period, w, 0, zero(T), 0, missing)
-end
-CausalFrames.fresh(st::MFIState{H,L,C,V,N,W,T}) where {H,L,C,V,N,W,T} =
-    MFIState{H,L,C,V,N,W,T}(st.period, fresh(st.window), 0, zero(T), 0, missing)
-function CausalFrames.fresh!(st::MFIState{H,L,C,V,N,W,T}) where {H,L,C,V,N,W,T}
-    fresh!(st.window)
-    st.n = 0
-    st.prevtp = zero(T)
-    st.nullrun = 0
-    st.out = missing
-    return st
+barkernel(s::MFISpec, ::Type{T}) where {T} =
+    MFIKernel(s.period, sumswindow((:pos, :neg), s.period, T), 0, zero(T), 0)
+function CausalFrames.fresh!(k::MFIKernel{W,T}) where {W,T}
+    fresh!(k.window)
+    k.n = 0
+    k.prevtp = zero(T)
+    k.nullrun = 0
+    return k
 end
 
-@inline function CausalFrames.update!(
-    st::MFIState{H,L,C,V,N,W,T},
-    row,
-) where {H,L,C,V,N,W,T}
-    h, l, c, v = row[H], row[L], row[C], row[V]
-    st.out = missing
-    anymissing(h, l, c, v) && return nothing
-    tp = (convert(T, h) + convert(T, l) + convert(T, c)) / 3
-    n = st.n += 1
-    prev = st.prevtp
-    st.prevtp = tp
+@inline function barstep!(k::MFIKernel{W,T}, h::T, l::T, c::T, v::T) where {W,T}
+    tp = (h + l + c) / 3
+    n = k.n += 1
+    prev = k.prevtp
+    k.prevtp = tp
     n == 1 && return nothing
     d = tp - prev
     # mfi.c: a move TA-Lib finds zero carries no flow, and a falling bar's flow
     # is negative.
-    mf = iszeroscaled(d, abs(tp) + abs(prev)) ? zero(T) : tp * convert(T, v)
+    mf = iszeroscaled(d, abs(tp) + abs(prev)) ? zero(T) : tp * v
     pos, neg = d < 0 ? (zero(T), mf) : (mf, zero(T))
-    update!(st.window, (pos = pos, neg = neg))
-    st.nullrun = mf == 0 ? min(st.nullrun + 1, st.period) : 0
-    sums = value(st.window).sums
+    update!(k.window, (pos = pos, neg = neg))
+    k.nullrun = mf == 0 ? min(k.nullrun + 1, k.period) : 0
+    sums = value(k.window).sums
     ismissing(sums) && return nothing
     # A window of null bars has exactly zero flow, whatever round-off the
     # sliding sums hold (mfi.c's nullRun).
-    p, q = st.nullrun >= st.period ? (zero(T), zero(T)) : sums
+    p, q = k.nullrun >= k.period ? (zero(T), zero(T)) : sums
     total = p + q
     pc = p < 0 ? zero(T) : p > total ? total : p
-    st.out = total <= 0 ? zero(T) : 100 * (pc / total)
-    return nothing
+    return (total <= 0 ? zero(T) : 100 * (pc / total),)
 end
-@inline CausalFrames.value(st::MFIState{H,L,C,V,N,W,T}) where {H,L,C,V,N,W,T} =
-    NamedTuple{(N,),Tuple{Union{Missing,T}}}((st.out,))
 
 """
     MFI(; high = :high, low = :low, close = :close, volume = :volume, period = 14,
@@ -1136,32 +916,28 @@ last `period` bars, or 0 when there is no flow. The lookback is `period`.
 
 The flow sums are CausalFrames `Sum`s under `CausalFrames.barwindow`.
 
-$PLAIN_DOC
-A bar with any input `missing` leaves the state unchanged and emits `missing`.
-
+$PRICEBAR_DOC
 $DAILY_DOC
 TA-Lib: `ta_codegen/input/mfi/mfi.yaml`, `mfi.md`.
 """
 function MFI(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
     volume::ColumnSpec = :volume, period::Integer = 14, name::Symbol = :mfi)
     checkrange("MFI", "period", period, 2, 100_000)
-    s = MFISummarizer{colname(high),colname(low),colname(close),colname(volume),name}(
-        Int(period))
-    return withterms(s, high, low, close, volume)
+    return barindicator(MFISpec(period), (name,), high, low, close, volume)
 end
 
 # ---------------------------------------------------------------------------
 # Directional movement: ±DM, ±DI, DX, ADX and ADXR
 
 # `K` is `:plusdm`, `:minusdm`, `:plusdi`, `:minusdi`, `:dx`, `:adx` or
-# `:adxr`; `C` is `nothing` for the DMs, which read no close.
-struct DirectionalSummarizer{K,H,L,C,N} <: Summarizer
+# `:adxr`.
+struct DirectionalSpec{K}
     period::Int
     unstable::Int
 end
 
-mutable struct DirectionalState{K,H,L,C,N,D,S,A,T} <: SummarizerState
-    const kernel::D
+mutable struct DirectionalKernel{K,D,S,A,T}
+    const dm::D
     const unstable::Int
     const invperiod::T
     const adxseed::S
@@ -1169,84 +945,56 @@ mutable struct DirectionalState{K,H,L,C,N,D,S,A,T} <: SummarizerState
     ndx::Int
     lastdx::T
     adx::T
-    out::Union{Missing,T}
 end
 
-CausalFrames.emptyvalue(::DirectionalSummarizer{K,H,L,C,N}) where {K,H,L,C,N} =
-    NamedTuple{(N,)}((missing,))
-
-dicolumns(H, L, ::Nothing) = (H, L)
-dicolumns(H, L, C) = (H, L, C)
-
-function CausalFrames.fresh(s::DirectionalSummarizer{K,H,L,C,N},
-    intypes::NamedTuple) where {K,H,L,C,N}
-    T = floattype(promote_type(map(c -> nonmissingtype(intypes[c]), dicolumns(H, L, C))...))
-    k = DMKernel(T, s.period)
-    lag = K === :adxr ? CausalFrames.barwindow(First(:x), s.period, (x = T,)) : nothing
+function barkernel(s::DirectionalSpec{K}, ::Type{T}) where {K,T}
+    dm = DMKernel(T, s.period)
+    lag = K === :adxr ? lagged(s.period, T) : nothing
     seed = seedsum(T)
-    return DirectionalState{K,H,L,C,N,typeof(k),typeof(seed),typeof(lag),T}(k, s.unstable,
-        one(T) / T(s.period), seed, lag, 0, zero(T), zero(T), missing)
+    return DirectionalKernel{K,typeof(dm),typeof(seed),typeof(lag),T}(dm, s.unstable,
+        one(T) / T(s.period), seed, lag, 0, zero(T), zero(T))
 end
-CausalFrames.fresh(st::DirectionalState{K,H,L,C,N,D,S,A,T}) where {K,H,L,C,N,D,S,A,T} =
-    DirectionalState{K,H,L,C,N,D,S,A,T}(fresh(st.kernel), st.unstable, st.invperiod,
-        fresh(st.adxseed), freshornothing(st.lag), 0, zero(T), zero(T), missing)
-function CausalFrames.fresh!(
-    st::DirectionalState{K,H,L,C,N,D,S,A,T},
-) where {K,H,L,C,N,D,S,A,T}
-    fresh!(st.kernel)
-    fresh!(st.adxseed)
-    st.lag === nothing || fresh!(st.lag)
-    st.ndx = 0
-    st.lastdx = st.adx = zero(T)
-    st.out = missing
-    return st
+function CausalFrames.fresh!(k::DirectionalKernel{K,D,S,A,T}) where {K,D,S,A,T}
+    fresh!(k.dm)
+    fresh!(k.adxseed)
+    maybefresh!(k.lag)
+    k.ndx = 0
+    k.lastdx = k.adx = zero(T)
+    return k
 end
 
-dirclose(row, L, ::Nothing) = row[L]
-dirclose(row, L, C) = row[C]
-
-@inline function CausalFrames.update!(st::DirectionalState{K,H,L,C}, row) where {K,H,L,C}
-    h, l, c = row[H], row[L], dirclose(row, L, C)
-    st.out = missing
-    anymissing(h, l, c) && return nothing
-    step!(st.kernel, h, l, c)
-    directional!(Val(K), st)
-    return nothing
-end
-@inline CausalFrames.value(
-    st::DirectionalState{K,H,L,C,N,D,S,A,T},
-) where {K,H,L,C,N,D,S,A,T} =
-    NamedTuple{(N,),Tuple{Union{Missing,T}}}((st.out,))
+# The DMs read no close; the low stands in for it in the unused true range.
+@inline barstep!(k::DirectionalKernel{K}, h::T, l::T) where {K,T} =
+    (step!(k.dm, h, l, l); directional!(Val(K), k))
+@inline barstep!(k::DirectionalKernel{K}, h::T, l::T, c::T) where {K,T} =
+    (step!(k.dm, h, l, c); directional!(Val(K), k))
 
 # ta_PLUS_DM.c: the smoothed sum, or the raw DM at period 1, whose lookback
 # ignores the unstable period.
 function directional!(::Union{Val{:plusdm},Val{:minusdm}},
-    st::DirectionalState{K}) where {K}
-    k = st.kernel
-    p = k.period
-    lb = p == 1 ? 1 : p - 1 + st.unstable
-    nseen(k) > lb || return nothing
-    pdm, mdm, _ = dmsums(k)
-    st.out = K === :plusdm ? pdm : mdm
-    return nothing
+    k::DirectionalKernel{K}) where {K}
+    dm = k.dm
+    p = dm.period
+    lb = p == 1 ? 1 : p - 1 + k.unstable
+    nseen(dm) > lb || return nothing
+    pdm, mdm, _ = dmsums(dm)
+    return (K === :plusdm ? pdm : mdm,)
 end
 
 # ta_PLUS_DI.c: `100·DM/TR`, or at period 1 the bar's `DM/TR` without the 100,
 # TA-Lib's historical quirk; 0 where there is no range.
 function directional!(::Union{Val{:plusdi},Val{:minusdi}},
-    st::DirectionalState{K,H,L,C,N,D,S,A,T}) where {K,H,L,C,N,D,S,A,T}
-    k = st.kernel
-    p = k.period
-    lb = p == 1 ? 1 : p + st.unstable
-    nseen(k) > lb || return nothing
-    pdm, mdm, tr = dmsums(k)
-    dm = K === :plusdi ? pdm : mdm
-    st.out = if p == 1
-        dm > 0 ? (tr <= 0 ? zero(T) : dm / tr) : zero(T)
-    else
-        tr > 0 ? 100 * (dm / tr) : zero(T)
+    k::DirectionalKernel{K,D,S,A,T}) where {K,D,S,A,T}
+    dm = k.dm
+    p = dm.period
+    lb = p == 1 ? 1 : p + k.unstable
+    nseen(dm) > lb || return nothing
+    pdm, mdm, tr = dmsums(dm)
+    v = K === :plusdi ? pdm : mdm
+    if p == 1
+        return (v > 0 ? (tr <= 0 ? zero(T) : v / tr) : zero(T),)
     end
-    return nothing
+    return (tr > 0 ? 100 * (v / tr) : zero(T),)
 end
 
 # ta_DX.c: the bar's DX and whether TA-Lib's guards (some range, and DIs that
@@ -1261,59 +1009,48 @@ end
 end
 
 # A guarded DX repeats the previous one (0 before the first), as ta_DX.c does.
-function directional!(::Val{:dx}, st::DirectionalState)
-    k = st.kernel
-    nseen(k) > k.period + st.unstable || return nothing
-    ok, dx = dxvalue(dmsums(k))
-    ok && (st.lastdx = dx)
-    st.out = st.lastdx
-    return nothing
+function directional!(::Val{:dx}, k::DirectionalKernel)
+    dm = k.dm
+    nseen(dm) > dm.period + k.unstable || return nothing
+    ok, dx = dxvalue(dmsums(dm))
+    ok && (k.lastdx = dx)
+    return (k.lastdx,)
 end
 
 # ta_ADX.c: the mean of the first `period` DX values (a guarded one adds
 # nothing), then `adx − (adx − dx)/period`, held on a guarded bar. Returns
 # whether the ADX is past its lookback and unstable period.
-function adxstep!(st::DirectionalState{K,H,L,C,N,D,S,A,T}) where {K,H,L,C,N,D,S,A,T}
-    k = st.kernel
-    p = k.period
-    nseen(k) > p || return false
-    n = st.ndx += 1
-    ok, dx = dxvalue(dmsums(k))
+function adxstep!(k::DirectionalKernel)
+    dm = k.dm
+    p = dm.period
+    nseen(dm) > p || return false
+    n = k.ndx += 1
+    ok, dx = dxvalue(dmsums(dm))
     if n <= p
-        ok && seedadd!(st.adxseed, dx)
-        n == p && (st.adx = seedtotal(st.adxseed) / p)
+        ok && seedadd!(k.adxseed, dx)
+        n == p && (k.adx = seedtotal(k.adxseed) / p)
     elseif ok
-        st.adx = st.adx - (st.adx - dx) * st.invperiod
+        k.adx = k.adx - (k.adx - dx) * k.invperiod
     end
-    return n >= p + st.unstable
+    return n >= p + k.unstable
 end
 
-function directional!(::Val{:adx}, st::DirectionalState)
-    adxstep!(st) && (st.out = st.adx)
-    return nothing
-end
+directional!(::Val{:adx}, k::DirectionalKernel) = adxstep!(k) ? (k.adx,) : nothing
 
 # ta_ADXR.c: the mean of today's ADX and the one `period − 1` bars back, read
 # from a CausalFrames `First` over the last `period` ADX values.
-function directional!(
-    ::Val{:adxr},
-    st::DirectionalState{K,H,L,C,N,D,S,A,T},
-) where {K,H,L,C,N,D,S,A,T}
-    adxstep!(st) || return nothing
-    update!(st.lag, (x = st.adx,))
-    old = value(st.lag).x_first
-    st.out = ismissing(old) ? missing : (st.adx + old) / 2
-    return nothing
+function directional!(::Val{:adxr}, k::DirectionalKernel)
+    adxstep!(k) || return nothing
+    update!(k.lag, (x = k.adx,))
+    old = value(k.lag).x_first
+    return ismissing(old) ? nothing : ((k.adx + old) / 2,)
 end
 
 function directional(fn, K, high, low, close, period, unstable, name; minperiod)
     checkrange(fn, "period", period, minperiod, 100_000)
     checkunstable(unstable)
-    H, L = colname(high), colname(low)
-    C = close === nothing ? nothing : colname(close)
-    s = DirectionalSummarizer{K,H,L,C,name}(Int(period), Int(unstable))
     specs = close === nothing ? (high, low) : (high, low, close)
-    return withterms(s, specs...)
+    return barindicator(DirectionalSpec{K}(period, unstable), (name,), specs...)
 end
 
 const DM_DOC = """
@@ -1330,11 +1067,6 @@ directional movement and the true range, each seeded with its first
 `period − 1` values (0 where the summed range is not positive).
 """
 
-const DIR_DOC = """
-$PLAIN_DOC
-A bar with any input `missing` leaves the state unchanged and emits `missing`.
-"""
-
 """
     PlusDM(; high = :high, low = :low, period = 14, unstable = 0, name = :plusdm)
 
@@ -1343,7 +1075,7 @@ TA-Lib's `PLUS_DM`, the smoothed +DM, in `:plusdm`. The lookback is
 bar's raw +DM with lookback 1, whatever `unstable` is.
 
 $DM_DOC
-$DIR_DOC
+$PRICEBAR_DOC
 
 $DAILY_DOC
 TA-Lib: `ta_codegen/input/plus_dm/plus_dm.yaml`, `plus_dm.md`.
@@ -1359,7 +1091,7 @@ PlusDM(; high::ColumnSpec = :high, low::ColumnSpec = :low, period::Integer = 14,
 TA-Lib's `MINUS_DM`, the smoothed −DM, in `:minusdm`, as [`PlusDM`](@ref).
 
 $DM_DOC
-$DIR_DOC
+$PRICEBAR_DOC
 
 $DAILY_DOC
 TA-Lib: `ta_codegen/input/minus_dm/minus_dm.yaml`, `minus_dm.md`.
@@ -1380,7 +1112,7 @@ lookback 1 whatever `unstable` is.
 
 $DI_DOC
 $DM_DOC
-$DIR_DOC
+$PRICEBAR_DOC
 
 $DAILY_DOC
 TA-Lib: `ta_codegen/input/plus_di/plus_di.yaml`, `plus_di.md`.
@@ -1399,7 +1131,7 @@ TA-Lib's `MINUS_DI`, the negative directional indicator, in `:minusdi`, as
 
 $DI_DOC
 $DM_DOC
-$DIR_DOC
+$PRICEBAR_DOC
 
 $DAILY_DOC
 TA-Lib: `ta_codegen/input/minus_di/minus_di.yaml`, `minus_di.md`.
@@ -1418,7 +1150,7 @@ it repeats the previous DX (0 before the first), as TA-Lib does. The lookback
 is `period`, plus `unstable`, TA-Lib's unstable period.
 
 $DI_DOC
-$DIR_DOC
+$PRICEBAR_DOC
 
 $DAILY_DOC
 TA-Lib: `ta_codegen/input/dx/dx.yaml`, `dx.md`.
@@ -1441,7 +1173,7 @@ TA-Lib's `ADX`, Wilder's average directional movement index, in `:adx`. The
 lookback is `2·period − 1`, plus `unstable`, TA-Lib's unstable period.
 
 $ADX_DOC
-$DIR_DOC
+$PRICEBAR_DOC
 
 $DAILY_DOC
 TA-Lib: `ta_codegen/input/adx/adx.yaml`, `adx.md`.
@@ -1460,7 +1192,7 @@ TA-Lib's `ADXR`, the average of today's [`ADX`](@ref) and the one
 read from a CausalFrames `First` under `CausalFrames.barwindow`.
 
 $ADX_DOC
-$DIR_DOC
+$PRICEBAR_DOC
 
 $DAILY_DOC
 TA-Lib: `ta_codegen/input/adxr/adxr.yaml`, `adxr.md`.
@@ -1560,7 +1292,7 @@ FOSC(column::ColumnSpec) = withterms(FOSC{colname(column)}(), column)
 
 CausalFrames.dependencies(::FOSC{C}) where {C} =
     (Count(), Sum(C), AgeWeightedSum(C), Last(C))
-CausalFrames.emptyvalue(::FOSC{C}) where {C} = NamedTuple{(Symbol(C, :_fosc),)}((missing,))
+CausalFrames.emptyvalue(::FOSC{C}) where {C} = missings((Symbol(C, :_fosc),))
 CausalFrames.fresh(::FOSC{C}, ::NamedTuple) where {C} =
     derivedvalue(Symbol(C, :_fosc),
         (:count, Symbol(C, :_sum), Symbol(C, :_ageweightedsum), lastname(C)),
@@ -1578,11 +1310,6 @@ end
 # ---------------------------------------------------------------------------
 # The S5 kernels
 
-const S5_DOC = """
-$PLAIN_DOC
-A bar with any input `missing` leaves the state unchanged and emits `missing`.
-"""
-
 # AO and AC: Williams' awesome and accelerator oscillators, the spread of two
 # SMAs of the median price, and its distance from its own SMA.
 struct AOSpec
@@ -1592,7 +1319,6 @@ struct AOSpec
 end
 
 mutable struct AOKernel{F,S,G}
-    const spec::AOSpec
     const fast::F
     const slow::S
     const signal::G
@@ -1601,14 +1327,12 @@ end
 function barkernel(s::AOSpec, ::Type{T}) where {T}
     sig = s.signal == 0 ? nothing : SMAKernel(T, s.signal)
     f, sl = SMAKernel(T, s.fast), SMAKernel(T, s.slow)
-    return AOKernel{typeof(f),typeof(sl),typeof(sig)}(s, f, sl, sig)
+    return AOKernel(f, sl, sig)
 end
-CausalFrames.fresh(k::AOKernel) = AOKernel(k.spec, fresh(k.fast), fresh(k.slow),
-    freshornothing(k.signal))
 function CausalFrames.fresh!(k::AOKernel)
     fresh!(k.fast)
     fresh!(k.slow)
-    k.signal === nothing || fresh!(k.signal)
+    maybefresh!(k.signal)
     return k
 end
 
@@ -1632,7 +1356,7 @@ not swapped, so `fastperiod > slowperiod` gives `−AO`. The lookback is the
 longer period minus 1. The averages are CausalFrames `Mean`s under
 `CausalFrames.barwindow`.
 
-$S5_DOC
+$PRICEBAR_DOC
 
 $DAILY_DOC
 TA-Lib: `ta_codegen/input/ao/ao.yaml`, `ao.md`.
@@ -1653,7 +1377,7 @@ awesome oscillator (as [`AO`](@ref)) minus its own `signalperiod` SMA. The
 lookback is the longer of `fastperiod` and `slowperiod`, plus `signalperiod`,
 minus 2.
 
-$S5_DOC
+$PRICEBAR_DOC
 
 $DAILY_DOC
 TA-Lib: `ta_codegen/input/ac/ac.yaml`, `ac.md`.
@@ -1684,8 +1408,6 @@ function barkernel(s::CMOUSpec, ::Type{T}) where {T}
     w = sumswindow((:up, :dn), s.period, T)
     return CMOUKernel{T,typeof(w)}(s.period, 0, zero(T), 0, w)
 end
-CausalFrames.fresh(k::CMOUKernel{T,W}) where {T,W} =
-    CMOUKernel{T,W}(k.period, 0, zero(T), 0, fresh(k.window))
 function CausalFrames.fresh!(k::CMOUKernel{T}) where {T}
     k.n = 0
     k.prev = zero(T)
@@ -1721,7 +1443,7 @@ window. Unlike [`CMO`](@ref) the sums are plain window sums, CausalFrames
 `Sum`s under `CausalFrames.barwindow`, so there is no unstable period. The
 lookback is `period`.
 
-$S5_DOC
+$PRICEBAR_DOC
 
 $DAILY_DOC
 TA-Lib: `ta_codegen/input/cmou/cmou.yaml`, `cmou.md`.
@@ -1742,7 +1464,6 @@ end
 
 barkernel(s::ERSpec, ::Type{T}) where {T} = (e = ERKernel(T, s.period);
     ERIndicatorKernel{typeof(e)}(e))
-CausalFrames.fresh(k::ERIndicatorKernel{E}) where {E} = ERIndicatorKernel{E}(fresh(k.er))
 CausalFrames.fresh!(k::ERIndicatorKernel) = (fresh!(k.er); k)
 
 @inline function barstep!(k::ERIndicatorKernel, x::T) where {T}
@@ -1759,7 +1480,7 @@ of the `period` bar-to-bar moves `|Δx|`, in [0, 1]. A straight-line advance
 and a flat window give exactly 1. It is the ratio [`KAMA`](@ref) adapts to,
 from the same kernel. The lookback is `period`.
 
-$S5_DOC
+$PRICEBAR_DOC
 
 $DAILY_DOC
 TA-Lib: `ta_codegen/input/er/er.yaml`, `er.md`.
@@ -1789,8 +1510,6 @@ function barkernel(s::VHFSpec, ::Type{T}) where {T}
     p = CausalFrames.barwindow(Sum(:x), s.period, (x = T,))
     return VHFKernel{T,typeof(x),typeof(p)}(s.period, 0, zero(T), 0, x, p)
 end
-CausalFrames.fresh(k::VHFKernel{T,X,S}) where {T,X,S} =
-    VHFKernel{T,X,S}(k.period, 0, zero(T), 0, fresh(k.extremes), fresh(k.path))
 function CausalFrames.fresh!(k::VHFKernel{T}) where {T}
     k.n = 0
     k.prev = zero(T)
@@ -1823,7 +1542,7 @@ range (highest minus lowest) of the newest `period` values over the sum of the
 flat window. The extremes are CausalFrames `Max` and `Min` and the path a
 `Sum`, under `CausalFrames.barwindow`. The lookback is `period`.
 
-$S5_DOC
+$PRICEBAR_DOC
 
 $DAILY_DOC
 TA-Lib: `ta_codegen/input/vhf/vhf.yaml`, `vhf.md`.
@@ -1853,8 +1572,6 @@ function barkernel(s::VortexSpec, ::Type{T}) where {T}
     w = sumswindow((:tr, :vmp, :vmm), s.period, T)
     return VortexKernel{T,typeof(w)}(s.period, 0, zero(T), zero(T), zero(T), 0, w)
 end
-CausalFrames.fresh(k::VortexKernel{T,W}) where {T,W} =
-    VortexKernel{T,W}(k.period, 0, zero(T), zero(T), zero(T), 0, fresh(k.window))
 function CausalFrames.fresh!(k::VortexKernel{T}) where {T}
     k.n = 0
     k.prevh = k.prevl = k.prevc = zero(T)
@@ -1888,7 +1605,7 @@ and `:vortex_minusvi`: the sums over the last `period` bars of
 the true range, or both 0 when that is zero. The sums are CausalFrames `Sum`s
 under `CausalFrames.barwindow`. The lookback is `period`.
 
-$S5_DOC
+$PRICEBAR_DOC
 
 $DAILY_DOC
 TA-Lib: `ta_codegen/input/vortex/vortex.yaml`, `vortex.md`.
@@ -1913,11 +1630,9 @@ end
 
 function barkernel(s::DPOSpec, ::Type{T}) where {T}
     m = SMAKernel(T, s.period)
-    f = CausalFrames.barwindow(First(:x), s.period ÷ 2 + 2, (x = T,))
+    f = lagged(s.period ÷ 2 + 2, T)
     return DPOKernel{typeof(m),typeof(f)}(m, f)
 end
-CausalFrames.fresh(k::DPOKernel{S,F}) where {S,F} =
-    DPOKernel{S,F}(fresh(k.sma), fresh(k.lagged))
 CausalFrames.fresh!(k::DPOKernel) = (fresh!(k.sma); fresh!(k.lagged); k)
 
 @inline function barstep!(k::DPOKernel, x::T) where {T}
@@ -1938,7 +1653,7 @@ lookback is the larger of `period − 1` and `period ÷ 2 + 1`. The SMA is a
 CausalFrames `Mean` and the lagged value a `First`, under
 `CausalFrames.barwindow`.
 
-$S5_DOC
+$PRICEBAR_DOC
 
 $DAILY_DOC
 TA-Lib: `ta_codegen/input/dpo/dpo.yaml`, `dpo.md`.
@@ -1962,13 +1677,11 @@ mutable struct CoppockKernel{F1,F2,W}
 end
 
 function barkernel(s::CoppockSpec, ::Type{T}) where {T}
-    f1 = CausalFrames.barwindow(First(:x), s.roc1 + 1, (x = T,))
-    f2 = CausalFrames.barwindow(First(:x), s.roc2 + 1, (x = T,))
+    f1 = lagged(s.roc1 + 1, T)
+    f2 = lagged(s.roc2 + 1, T)
     w = WMAKernel(T, s.wma)
     return CoppockKernel{typeof(f1),typeof(f2),typeof(w)}(f1, f2, w)
 end
-CausalFrames.fresh(k::CoppockKernel{F1,F2,W}) where {F1,F2,W} =
-    CoppockKernel{F1,F2,W}(fresh(k.lag1), fresh(k.lag2), fresh(k.wma))
 CausalFrames.fresh!(k::CoppockKernel) = (fresh!(k.lag1); fresh!(k.lag2); fresh!(k.wma); k)
 
 @inline function barstep!(k::CoppockKernel, x::T) where {T}
@@ -1993,7 +1706,7 @@ the longer ROC period plus `wmaperiod − 1`. The lagged values are CausalFrames
 TA-Lib's defaults are his month counts: on daily bars they span weeks, not
 the year and more he intended.
 
-$S5_DOC
+$PRICEBAR_DOC
 TA-Lib: `ta_codegen/input/coppock/coppock.yaml`, `coppock.md`.
 """
 function Coppock(column::ColumnSpec; wmaperiod::Integer = 10, roc1period::Integer = 11,
@@ -2019,7 +1732,6 @@ end
 
 barkernel(s::ERISpec, ::Type{T}) where {T} =
     (e = EMAKernel(T, s.period); ERIKernel{typeof(e)}(s.unstable, e))
-CausalFrames.fresh(k::ERIKernel{E}) where {E} = ERIKernel{E}(k.unstable, fresh(k.ema))
 CausalFrames.fresh!(k::ERIKernel) = (fresh!(k.ema); k)
 
 @inline function barstep!(k::ERIKernel, h::T, l::T, c::T) where {T}
@@ -2037,7 +1749,7 @@ the high and the low less the `period`-bar EMA of the close. The lookback is
 `period − 1` plus `unstable`, EMA's unstable period, which TA-Lib's ERI
 inherits; it delays the first output without changing the values.
 
-$S5_DOC
+$PRICEBAR_DOC
 
 $DAILY_DOC
 TA-Lib: `ta_codegen/input/eri/eri.yaml`, `eri.md`.
@@ -2065,8 +1777,6 @@ function BlauKernel(::Type{T}, first::Integer, second::Integer, unstable::Int) w
     e1, e2 = EMAKernel(T, first), EMAKernel(T, second)
     return BlauKernel{typeof(e1)}(unstable, e1, fresh(e1), e2, fresh(e2))
 end
-CausalFrames.fresh(k::BlauKernel{E}) where {E} =
-    BlauKernel{E}(k.unstable, fresh(k.num1), fresh(k.den1), fresh(k.num2), fresh(k.den2))
 function CausalFrames.fresh!(k::BlauKernel)
     fresh!(k.num1)
     fresh!(k.den1)
@@ -2104,8 +1814,6 @@ barkernel(s::TSISpec, ::Type{T}) where {T} =
         b = BlauKernel(T, s.first, s.second, s.unstable);
         TSIKernel{T,typeof(b)}(0, zero(T), b)
     )
-CausalFrames.fresh(k::TSIKernel{T,B}) where {T,B} =
-    TSIKernel{T,B}(0, zero(T), fresh(k.blau))
 CausalFrames.fresh!(k::TSIKernel{T}) where {T} =
     (k.n = 0; k.prev = zero(T); fresh!(k.blau); k)
 
@@ -2133,7 +1841,7 @@ passes it before it feeds the next, so it changes the values, not only the
 first bar. The lookback is `1 + (firstperiod − 1) + (secondperiod − 1)` plus
 twice `unstable`.
 
-$S5_DOC
+$PRICEBAR_DOC
 
 $DAILY_DOC
 TA-Lib: `ta_codegen/input/tsi/tsi.yaml`, `tsi.md`.
@@ -2167,8 +1875,6 @@ function barkernel(s::SMISpec, ::Type{T}) where {T}
     e = EMAKernel(T, s.signal)
     return SMIKernel{typeof(x),typeof(b),typeof(e)}(s.unstable, x, b, e)
 end
-CausalFrames.fresh(k::SMIKernel{X,B,E}) where {X,B,E} =
-    SMIKernel{X,B,E}(k.unstable, fresh(k.extremes), fresh(k.blau), fresh(k.signal))
 CausalFrames.fresh!(k::SMIKernel) =
     (fresh!(k.extremes); fresh!(k.blau); fresh!(k.signal); k)
 
@@ -2201,7 +1907,7 @@ are CausalFrames `Max` and `Min` under `CausalFrames.barwindow`. `unstable` is
 EMA's unstable period, which TA-Lib's SMI inherits: each of the three EMA
 stages passes it before it feeds the next.
 
-$S5_DOC
+$PRICEBAR_DOC
 
 $DAILY_DOC
 TA-Lib: `ta_codegen/input/smi/smi.yaml`, `smi.md`.
@@ -2242,11 +1948,9 @@ function KDJ(; high::ColumnSpec = :high, low::ColumnSpec = :low,
     checkmatype("KDJ", "slowkmatype", slowkmatype)
     checkmatype("KDJ", "slowdmatype", slowdmatype)
     checkunstable(unstable)
-    Is = (colname(high), colname(low), colname(close))
-    s = StochSummarizer{:kdj,slowkmatype,slowdmatype,Is,
-        outnames(nothing, name, (:k, :d, :j))}(0, Int(fastkperiod), Int(slowkperiod),
-        Int(slowdperiod), Int(unstable))
-    return withterms(s, high, low, close)
+    s = StochSpec{:kdj,slowkmatype,slowdmatype}(0, fastkperiod, slowkperiod, slowdperiod,
+        unstable)
+    return barindicator(s, outnames(nothing, name, (:k, :d, :j)), high, low, close)
 end
 
 # Fractal: Williams' swing pivots. The pivot `right` bars back must strictly
@@ -2259,14 +1963,6 @@ struct FractalSpec
 end
 
 barouttype(::FractalSpec, ::Type) = Int
-
-# An internal dependent emitting the first values of columns `Cs` as one tuple.
-struct Firsts{Cs} <: GroupSummarizer end
-
-CausalFrames.dependencies(::Firsts{Cs}) where {Cs} = map(First, Cs)
-CausalFrames.emptyvalue(::Firsts) = (; firsts = missing)
-CausalFrames.fresh(::Firsts{Cs}, ::NamedTuple) where {Cs} =
-    derivedvalue(:firsts, map(c -> Symbol(c, :_first), Cs), tuple)
 
 mutable struct FractalKernel{L,R,D}
     const spec::FractalSpec
@@ -2283,8 +1979,6 @@ function barkernel(s::FractalSpec, ::Type{T}) where {T}
         (h = T, l = T, lh = T, ll = T))
     return FractalKernel{typeof(l),typeof(r),typeof(d)}(s, 0, l, r, d)
 end
-CausalFrames.fresh(k::FractalKernel{L,R,D}) where {L,R,D} =
-    FractalKernel{L,R,D}(k.spec, 0, fresh(k.leftside), fresh(k.rightside), fresh(k.delayed))
 function CausalFrames.fresh!(k::FractalKernel)
     k.n = 0
     fresh!(k.leftside)
@@ -2321,7 +2015,7 @@ of its window is not one. The verdict is written on the confirmation bar,
 delayed pivot a `First`, under `CausalFrames.barwindow`; a NaN in a window
 gives 0.
 
-$S5_DOC
+$PRICEBAR_DOC
 TA-Lib: `ta_codegen/input/fractal/fractal.yaml`, `fractal.md`.
 """
 function Fractal(; high::ColumnSpec = :high, low::ColumnSpec = :low,
@@ -2344,8 +2038,6 @@ end
 
 barkernel(::WADSpec, ::Type{T}) where {T} =
     (s = seedsum(T); WADKernel{T,typeof(s)}(0, zero(T), s))
-CausalFrames.fresh(k::WADKernel{T,S}) where {T,S} =
-    WADKernel{T,S}(0, zero(T), fresh(k.total))
 CausalFrames.fresh!(k::WADKernel{T}) where {T} =
     (k.n = 0; k.prev = zero(T); fresh!(k.total); k)
 
@@ -2373,7 +2065,7 @@ CausalFrames compensated `Sum`, and the lookback is 0.
 WAD is path-dependent: it is anchored at the first bar it sees, so no `warmup`
 makes it split-invariant, and a key restarts it.
 
-$S5_DOC
+$PRICEBAR_DOC
 TA-Lib: `ta_codegen/input/wad/wad.yaml`, `wad.md`.
 """
 WAD(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,

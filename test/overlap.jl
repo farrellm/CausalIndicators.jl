@@ -1,7 +1,7 @@
 # S1 overlap studies: the recursive moving averages, MAVP, and the structured
 # WMA, VWMA, MidPoint and MidPrice, against TA-Lib's goldens and tables.
 
-using CausalIndicators: MovingAverageState, MAVPState, UNSTABLE_MATYPES
+using CausalIndicators: MAVPState, UNSTABLE_MATYPES
 
 # TA_MAType's integer order, as the goldens' optInMAType.
 const MATYPE_CODES = Dict(0 => :sma, 1 => :ema, 2 => :wma, 3 => :dema, 4 => :tema,

@@ -54,55 +54,26 @@ CausalFrames.fresh(::ADR, ::NamedTuple) = derivedvalue(:adr, (:adr_range_mean,),
 # ---------------------------------------------------------------------------
 # ATR and NATR
 
-struct ATRSummarizer{K,H,L,C,N} <: Summarizer
+struct ATRSpec{K}
     period::Int
     unstable::Int
 end
 
-mutable struct ATRState{K,H,L,C,N,A,T} <: SummarizerState
-    const kernel::A
+mutable struct ATRIndicator{K,A}
+    const atr::A
     const unstable::Int
-    out::Union{Missing,T}
 end
 
-CausalFrames.emptyvalue(::ATRSummarizer{K,H,L,C,N}) where {K,H,L,C,N} =
-    NamedTuple{(N,)}((missing,))
+barkernel(s::ATRSpec{K}, ::Type{T}) where {K,T} =
+    (a = ATRKernel(T, s.period); ATRIndicator{K,typeof(a)}(a, s.unstable))
+CausalFrames.fresh!(k::ATRIndicator) = (fresh!(k.atr); k)
 
-# The element type of a price-bar indicator over input columns `cols`.
-pricetype(intypes, cols) =
-    floattype(promote_type(map(c -> nonmissingtype(intypes[c]), cols)...))
-
-function CausalFrames.fresh(
-    s::ATRSummarizer{K,H,L,C,N},
-    intypes::NamedTuple,
-) where {K,H,L,C,N}
-    T = pricetype(intypes, (H, L, C))
-    k = ATRKernel(T, s.period)
-    return ATRState{K,H,L,C,N,typeof(k),T}(k, s.unstable, missing)
+@inline function barstep!(k::ATRIndicator{K}, h::T, l::T, c::T) where {K,T}
+    a = k.atr
+    step!(a, h, l, c)
+    nseen(a) > lookback(a) + k.unstable || return nothing
+    return (atrvalue(Val(K), a.wilder.period, a.wilder.prev, c),)
 end
-CausalFrames.fresh(st::ATRState{K,H,L,C,N,A,T}) where {K,H,L,C,N,A,T} =
-    ATRState{K,H,L,C,N,A,T}(fresh(st.kernel), st.unstable, missing)
-function CausalFrames.fresh!(st::ATRState)
-    fresh!(st.kernel)
-    st.out = missing
-    return st
-end
-
-@inline function CausalFrames.update!(
-    st::ATRState{K,H,L,C,N,A,T},
-    row,
-) where {K,H,L,C,N,A,T}
-    h, l, c = row[H], row[L], row[C]
-    st.out = missing
-    anymissing(h, l, c) && return nothing
-    k = st.kernel
-    step!(k, h, l, c)
-    nseen(k) > lookback(k) + st.unstable || return nothing
-    st.out = atrvalue(Val(K), k.wilder.period, k.wilder.prev, convert(T, c))
-    return nothing
-end
-@inline CausalFrames.value(st::ATRState{K,H,L,C,N,A,T}) where {K,H,L,C,N,A,T} =
-    NamedTuple{(N,),Tuple{Union{Missing,T}}}((st.out,))
 
 atrvalue(::Val{:atr}, p, atr, c) = atr
 # ta_NATR.c: `atr/close·100`, 0 at a zero close, and the bare ATR at period 1.
@@ -111,15 +82,8 @@ atrvalue(::Val{:natr}, p, atr, c) = p <= 1 ? atr : c != 0 ? (atr / c) * 100 : ze
 function atrsummarizer(fn, K, high, low, close, period, unstable, name)
     checkrange(fn, "period", period, 1, 100_000)
     checkunstable(unstable)
-    s = ATRSummarizer{K,colname(high),colname(low),colname(close),name}(Int(period),
-        Int(unstable))
-    return withterms(s, high, low, close)
+    return barindicator(ATRSpec{K}(period, unstable), (name,), high, low, close)
 end
-
-const PRICEBAR_DOC = """
-$PLAIN_DOC
-A bar with any input `missing` leaves the state unchanged and emits `missing`.
-"""
 
 """
     ATR(; high = :high, low = :low, close = :close, period = 14, unstable = 0,
@@ -159,52 +123,32 @@ NATR(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :cl
 # ---------------------------------------------------------------------------
 # CVI
 
-struct CVISummarizer{H,L,N} <: Summarizer
+struct CVISpec
     period::Int
     rocperiod::Int
     unstable::Int
 end
 
-mutable struct CVIState{H,L,N,E,W,T} <: SummarizerState
+mutable struct CVIKernel{E,W}
     const ema::E
     const lag::W
     const unstable::Int
-    out::Union{Missing,T}
 end
 
-CausalFrames.emptyvalue(::CVISummarizer{H,L,N}) where {H,L,N} = NamedTuple{(N,)}((missing,))
-
-function CausalFrames.fresh(s::CVISummarizer{H,L,N}, intypes::NamedTuple) where {H,L,N}
-    T = pricetype(intypes, (H, L))
-    e = EMAKernel(T, s.period)
-    w = CausalFrames.barwindow(First(:x), s.rocperiod + 1, (x = T,))
-    return CVIState{H,L,N,typeof(e),typeof(w),T}(e, w, s.unstable, missing)
-end
-CausalFrames.fresh(st::CVIState{H,L,N,E,W,T}) where {H,L,N,E,W,T} =
-    CVIState{H,L,N,E,W,T}(fresh(st.ema), fresh(st.lag), st.unstable, missing)
-function CausalFrames.fresh!(st::CVIState)
-    fresh!(st.ema)
-    fresh!(st.lag)
-    st.out = missing
-    return st
-end
+barkernel(s::CVISpec, ::Type{T}) where {T} =
+    CVIKernel(EMAKernel(T, s.period), lagged(s.rocperiod + 1, T), s.unstable)
+CausalFrames.fresh!(k::CVIKernel) = (fresh!(k.ema); fresh!(k.lag); k)
 
 # ta_CVI.c: the rate of change, in percent, of the EMA of the range from
 # `rocperiod` bars back, 0 where that EMA is exactly 0.
-@inline function CausalFrames.update!(st::CVIState{H,L,N,E,W,T}, row) where {H,L,N,E,W,T}
-    h, l = row[H], row[L]
-    st.out = missing
-    anymissing(h, l) && return nothing
-    e = step!(st.ema, convert(T, h) - convert(T, l))
-    emitted(st.ema, st.unstable) || return nothing
-    update!(st.lag, (x = e::T,))
-    old = value(st.lag).x_first
+@inline function barstep!(k::CVIKernel, h::T, l::T) where {T}
+    e = step!(k.ema, h - l)
+    emitted(k.ema, k.unstable) || return nothing
+    update!(k.lag, (x = e::T,))
+    old = value(k.lag).x_first
     ismissing(old) && return nothing
-    st.out = old != 0 ? 100 * ((e::T - old) / old) : zero(T)
-    return nothing
+    return (old != 0 ? 100 * ((e::T - old) / old) : zero(T),)
 end
-@inline CausalFrames.value(st::CVIState{H,L,N,E,W,T}) where {H,L,N,E,W,T} =
-    NamedTuple{(N,),Tuple{Union{Missing,T}}}((st.out,))
 
 """
     CVI(; high = :high, low = :low, period = 10, rocperiod = 10, unstable = 0,
@@ -226,70 +170,45 @@ function CVI(; high::ColumnSpec = :high, low::ColumnSpec = :low, period::Integer
     checkrange("CVI", "period", period, 2, 100_000)
     checkrange("CVI", "rocperiod", rocperiod, 1, 100_000)
     checkunstable(unstable)
-    s = CVISummarizer{colname(high),colname(low),name}(Int(period), Int(rocperiod),
-        Int(unstable))
-    return withterms(s, high, low)
+    return barindicator(CVISpec(period, rocperiod, unstable), (name,), high, low)
 end
 
 # ---------------------------------------------------------------------------
 # MassIndex
 
-struct MassIndexSummarizer{H,L,N} <: Summarizer
+struct MassIndexSpec
     fastperiod::Int
     slowperiod::Int
     unstable::Int
 end
 
-mutable struct MassIndexState{H,L,N,E,W,T} <: SummarizerState
+mutable struct MassIndexKernel{E,W}
     const e1::E
     const e2::E
     const window::W
     const unstable::Int
-    out::Union{Missing,T}
 end
 
-CausalFrames.emptyvalue(::MassIndexSummarizer{H,L,N}) where {H,L,N} =
-    NamedTuple{(N,)}((missing,))
-
-function CausalFrames.fresh(
-    s::MassIndexSummarizer{H,L,N},
-    intypes::NamedTuple,
-) where {H,L,N}
-    T = pricetype(intypes, (H, L))
+function barkernel(s::MassIndexSpec, ::Type{T}) where {T}
     e = EMAKernel(T, s.fastperiod)
     w = CausalFrames.barwindow(Sum(:x), s.slowperiod, (x = T,))
-    return MassIndexState{H,L,N,typeof(e),typeof(w),T}(e, fresh(e), w, s.unstable, missing)
+    return MassIndexKernel(e, fresh(e), w, s.unstable)
 end
-CausalFrames.fresh(st::MassIndexState{H,L,N,E,W,T}) where {H,L,N,E,W,T} =
-    MassIndexState{H,L,N,E,W,T}(fresh(st.e1), fresh(st.e2), fresh(st.window), st.unstable,
-        missing)
-function CausalFrames.fresh!(st::MassIndexState)
-    fresh!(st.e1)
-    fresh!(st.e2)
-    fresh!(st.window)
-    st.out = missing
-    return st
-end
+CausalFrames.fresh!(k::MassIndexKernel) = (fresh!(k.e1); fresh!(k.e2); fresh!(k.window); k)
 
 # ta_MASSI.c: the EMA of the range over the EMA of that EMA, each stage passing
 # its unstable bars before feeding the next as ta_DEMA.c's do, summed over
 # `slowperiod` bars. A second EMA of exactly 0 gives the ratio 1.
-@inline function CausalFrames.update!(st::MassIndexState{H,L,N,E,W,T},
-    row) where {H,L,N,E,W,T}
-    h, l = row[H], row[L]
-    st.out = missing
-    anymissing(h, l) && return nothing
-    v1 = step!(st.e1, convert(T, h) - convert(T, l))
-    emitted(st.e1, st.unstable) || return nothing
-    v2 = step!(st.e2, v1::T)
-    emitted(st.e2, st.unstable) || return nothing
+@inline function barstep!(k::MassIndexKernel, h::T, l::T) where {T}
+    v1 = step!(k.e1, h - l)
+    emitted(k.e1, k.unstable) || return nothing
+    v2 = step!(k.e2, v1::T)
+    emitted(k.e2, k.unstable) || return nothing
     ratio = v2::T == 0 ? one(T) : v1::T / v2::T
-    update!(st.window, (x = ratio,))
-    st.out = value(st.window).x_sum
-    return nothing
+    update!(k.window, (x = ratio,))
+    s = value(k.window).x_sum
+    return ismissing(s) ? nothing : (s,)
 end
-@inline CausalFrames.value(st::MassIndexState{H,L,N,E,W,T}) where {H,L,N,E,W,T} =
-    NamedTuple{(N,),Tuple{Union{Missing,T}}}((st.out,))
 
 """
     MassIndex(; high = :high, low = :low, fastperiod = 9, slowperiod = 25,
@@ -314,77 +233,60 @@ function MassIndex(; high::ColumnSpec = :high, low::ColumnSpec = :low,
     checkrange("MassIndex", "fastperiod", fastperiod, 2, 100_000)
     checkrange("MassIndex", "slowperiod", slowperiod, 2, 100_000)
     checkunstable(unstable)
-    s = MassIndexSummarizer{colname(high),colname(low),name}(Int(fastperiod),
-        Int(slowperiod), Int(unstable))
-    return withterms(s, high, low)
+    return barindicator(MassIndexSpec(fastperiod, slowperiod, unstable), (name,), high,
+        low)
 end
 
 # ---------------------------------------------------------------------------
 # RVI
 
-struct RVISummarizer{C,N} <: Summarizer
+struct RVISpec
     period::Int
     sdperiod::Int
     unstable::Int
 end
 
-mutable struct RVIState{C,N,S,W,T} <: SummarizerState
+mutable struct RVIKernel{S,W,T}
     const std::S
     const up::W
     const dn::W
     const unstable::Int
     started::Bool
     prevx::T
-    out::Union{Missing,T}
 end
 
-CausalFrames.emptyvalue(::RVISummarizer{C,N}) where {C,N} = NamedTuple{(N,)}((missing,))
-
-function CausalFrames.fresh(s::RVISummarizer{C,N}, intypes::NamedTuple) where {C,N}
-    T = floattype(intypes[C])
+function barkernel(s::RVISpec, ::Type{T}) where {T}
     sd = CausalFrames.barwindow(Std(:x; corrected = false), s.sdperiod, (x = T,))
     w = WilderKernel(T, s.period)
-    return RVIState{C,N,typeof(sd),typeof(w),T}(sd, w, fresh(w), s.unstable, false,
-        zero(T), missing)
+    return RVIKernel(sd, w, fresh(w), s.unstable, false, zero(T))
 end
-CausalFrames.fresh(st::RVIState{C,N,S,W,T}) where {C,N,S,W,T} =
-    RVIState{C,N,S,W,T}(fresh(st.std), fresh(st.up), fresh(st.dn), st.unstable, false,
-        zero(T), missing)
-function CausalFrames.fresh!(st::RVIState{C,N,S,W,T}) where {C,N,S,W,T}
-    fresh!(st.std)
-    fresh!(st.up)
-    fresh!(st.dn)
-    st.started = false
-    st.prevx = zero(T)
-    st.out = missing
-    return st
+function CausalFrames.fresh!(k::RVIKernel{S,W,T}) where {S,W,T}
+    fresh!(k.std)
+    fresh!(k.up)
+    fresh!(k.dn)
+    k.started = false
+    k.prevx = zero(T)
+    return k
 end
 
 # ta_RVI.c: the window's population standard deviation goes to the up leg on a
 # rising bar and to the down leg on a falling one (a flat bar feeds 0 to both),
 # each leg Wilder-smoothed; the index is the up leg's share, 50 when both are 0.
-@inline function CausalFrames.update!(st::RVIState{C,N,S,W,T}, row) where {C,N,S,W,T}
-    x = row[C]
-    st.out = missing
-    ismissing(x) && return nothing
-    v = convert(T, x)
-    d = v - st.prevx
-    started = st.started
-    st.started = true
-    st.prevx = v
-    update!(st.std, (x = v,))
-    sigma = value(st.std).x_std
+@inline function barstep!(k::RVIKernel{S,W,T}, x::T) where {S,W,T}
+    d = x - k.prevx
+    started = k.started
+    k.started = true
+    k.prevx = x
+    update!(k.std, (x = x,))
+    sigma = value(k.std).x_std
     (ismissing(sigma) || !started) && return nothing
-    step!(st.up, d > 0 ? sigma : zero(T))
-    step!(st.dn, d < 0 ? sigma : zero(T))
-    nseen(st.up) > lookback(st.up) + st.unstable || return nothing
-    up, dn = st.up.prev, st.dn.prev
+    step!(k.up, d > 0 ? sigma : zero(T))
+    step!(k.dn, d < 0 ? sigma : zero(T))
+    nseen(k.up) > lookback(k.up) + k.unstable || return nothing
+    up, dn = k.up.prev, k.dn.prev
     total = up + dn
-    st.out = total == 0 ? T(50) : 100 * (up / total)
-    return nothing
+    return (total == 0 ? T(50) : 100 * (up / total),)
 end
-@inline CausalFrames.value(st::RVIState{C,N,S,W,T}) where {C,N,S,W,T} =
-    NamedTuple{(N,),Tuple{Union{Missing,T}}}((st.out,))
 
 """
     RVI(column::ColumnSpec; period = 14, stddevperiod = 10, unstable = 0, name = :rvi)
@@ -408,7 +310,6 @@ function RVI(column::ColumnSpec; period::Integer = 14, stddevperiod::Integer = 1
     checkrange("RVI", "period", period, 1, 100_000)
     checkrange("RVI", "stddevperiod", stddevperiod, 2, 100_000)
     checkunstable(unstable)
-    C = colname(column)
-    s = RVISummarizer{C,outname(C, name)}(Int(period), Int(stddevperiod), Int(unstable))
-    return withterms(s, column)
+    return barindicator(RVISpec(period, stddevperiod, unstable),
+        (outname(colname(column), name),), column)
 end
