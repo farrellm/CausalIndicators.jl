@@ -33,7 +33,6 @@ function DMKernel(::Type{T}, period::Integer) where {T}
     return DMKernel{T,typeof(w)}(p, 0, z, z, z, z, z, z, w, fresh(w), fresh(w))
 end
 
-CausalFrames.fresh(k::DMKernel{T}) where {T} = DMKernel(T, k.period)
 function CausalFrames.fresh!(k::DMKernel{T}) where {T}
     k.n = 0
     k.prevhigh = k.prevlow = k.prevclose = zero(T)

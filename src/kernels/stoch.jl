@@ -46,7 +46,6 @@ function FastKKernel(::Type{T}, period::Integer, form::Symbol = :hlc) where {T}
     return FastKKernel{T,form,typeof(w)}(p, 0, w)
 end
 
-CausalFrames.fresh(k::FastKKernel{T,F}) where {T,F} = FastKKernel(T, k.period, F)
 function CausalFrames.fresh!(k::FastKKernel)
     k.n = 0
     fresh!(k.window)

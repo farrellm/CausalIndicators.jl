@@ -20,7 +20,6 @@ function ATRKernel(::Type{T}, period::Integer) where {T}
     return ATRKernel{T,typeof(w)}(0, zero(T), w)
 end
 
-CausalFrames.fresh(k::ATRKernel{T}) where {T} = ATRKernel(T, k.wilder.period)
 function CausalFrames.fresh!(k::ATRKernel{T}) where {T}
     k.n = 0
     k.prevclose = zero(T)

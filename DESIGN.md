@@ -651,8 +651,14 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
   - `nseen(k)` counts the bars folded, so an indicator emits from
     `nseen(k) > lookback(k) + unstable`. (`MAKernel` already includes
     `unstable` in its `lookback`.)
-  - `fresh(k)` and `fresh!(k)` extend the CausalFrames functions. A kernel
-    only ever built by `barkernel` needs `fresh!` alone.
+  - `fresh!(k)` extends the CausalFrames function, and every kernel defines
+    it. A kernel defines `fresh(k)` only when something copies it fresh: the
+    MA family (`MAKernel` refreshes its inner average, and `MAVP` its
+    `MAKernel`s), and the
+    `WilderKernel` and `EMAKernel` that other kernels' constructors duplicate.
+    A state built by `barkernel` rebuilds its kernel instead, so the other
+    kernels (`GainLossKernel`, `ATRKernel`, `DMKernel`, `FastKKernel`,
+    `ERKernel`, `HilbertKernel` and the top-level ones) define `fresh!` alone.
   - Kernels compute in `floattype(T)`: `Float64`, or a wider float input type.
 - **State layout.** States compose kernels as concrete fields, with no `Any` and
   no abstract field types.

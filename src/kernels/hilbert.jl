@@ -64,8 +64,6 @@ function HilbertKernel(::Type{T}, start::Integer; nsmooth::Integer = 7) where {T
         Int(nsmooth), s, w, d, q, 0, false, z, z, z, z, z, z, z, z, z)
 end
 
-CausalFrames.fresh(k::HilbertKernel{T}) where {T} =
-    HilbertKernel(T, k.start; nsmooth = k.nsmooth)
 function CausalFrames.fresh!(k::HilbertKernel{T}) where {T}
     fresh!(k.smoother)
     refill!(k.smooth, k.nsmooth, T)

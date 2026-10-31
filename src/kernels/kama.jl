@@ -25,7 +25,6 @@ function ERKernel(::Type{T}, period::Integer) where {T}
     return ERKernel{T,typeof(s),typeof(f)}(p, 0, zero(T), 0, s, f)
 end
 
-CausalFrames.fresh(e::ERKernel{T}) where {T} = ERKernel(T, e.period)
 function CausalFrames.fresh!(e::ERKernel{T}) where {T}
     e.n = 0
     e.prevx = zero(T)
