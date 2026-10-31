@@ -84,8 +84,6 @@ CausalFrames.fresh(::Firsts{Cs}, ::NamedTuple) where {Cs} =
 # ---------------------------------------------------------------------------
 # Kernel parts that may be absent
 
-maybefresh(::Nothing) = nothing
-maybefresh(k) = fresh(k)
 maybefresh!(::Nothing) = nothing
 maybefresh!(k) = fresh!(k)
 
@@ -134,7 +132,8 @@ const SKIP_DOC = """
 A `missing` input bar leaves the state unchanged and emits `missing`.
 """
 
-# A plain indicator over several input columns.
+# A plain `BarIndicator`, which skips a bar with any input `missing` (also used
+# by the S5 single-series indicators).
 const PRICEBAR_DOC = """
 $PLAIN_DOC
 A bar with any input `missing` leaves the state unchanged and emits `missing`.

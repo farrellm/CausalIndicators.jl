@@ -255,16 +255,16 @@ struct GainLossSpec{K}
     unstable::Int
 end
 
-mutable struct GainLossOscillator{K,G}
+mutable struct GainLossOscillatorKernel{K,G}
     const gainloss::G
     const unstable::Int
 end
 
 barkernel(s::GainLossSpec{K}, ::Type{T}) where {K,T} =
-    (g = GainLossKernel(T, s.period); GainLossOscillator{K,typeof(g)}(g, s.unstable))
-CausalFrames.fresh!(o::GainLossOscillator) = (fresh!(o.gainloss); o)
+    (g = GainLossKernel(T, s.period); GainLossOscillatorKernel{K,typeof(g)}(g, s.unstable))
+CausalFrames.fresh!(o::GainLossOscillatorKernel) = (fresh!(o.gainloss); o)
 
-@inline function barstep!(o::GainLossOscillator{K}, x) where {K}
+@inline function barstep!(o::GainLossOscillatorKernel{K}, x) where {K}
     k = o.gainloss
     gl = step!(k, x)
     nseen(k) > lookback(k) + o.unstable || return nothing
@@ -484,7 +484,7 @@ struct PriceOscillatorSpec{K,M}
     unstable::Int
 end
 
-mutable struct PriceOscillator{K,F,S}
+mutable struct PriceOscillatorKernel{K,F,S}
     const fast::F
     const slow::S
 end
@@ -492,13 +492,13 @@ end
 function barkernel(s::PriceOscillatorSpec{K,M}, ::Type{T}) where {K,M,T}
     f = MAKernel(T, M, s.fastperiod; s.unstable)
     sl = MAKernel(T, M, s.slowperiod; s.unstable)
-    return PriceOscillator{K,typeof(f),typeof(sl)}(f, sl)
+    return PriceOscillatorKernel{K,typeof(f),typeof(sl)}(f, sl)
 end
-CausalFrames.fresh!(k::PriceOscillator) = (fresh!(k.fast); fresh!(k.slow); k)
+CausalFrames.fresh!(k::PriceOscillatorKernel) = (fresh!(k.fast); fresh!(k.slow); k)
 
 # Both averages start at the first bar, as ta_APO.c's two TA_MA calls do over a
 # whole series; the output starts with the slow one.
-@inline function barstep!(k::PriceOscillator{K}, x) where {K}
+@inline function barstep!(k::PriceOscillatorKernel{K}, x) where {K}
     vf = step!(k.fast, x)
     vs = step!(k.slow, x)
     return ismissing(vf) || ismissing(vs) ? nothing : (oscillatorvalue(Val(K), vf, vs),)

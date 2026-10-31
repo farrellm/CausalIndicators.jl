@@ -59,16 +59,16 @@ struct ATRSpec{K}
     unstable::Int
 end
 
-mutable struct ATRIndicator{K,A}
+mutable struct ATRIndicatorKernel{K,A}
     const atr::A
     const unstable::Int
 end
 
 barkernel(s::ATRSpec{K}, ::Type{T}) where {K,T} =
-    (a = ATRKernel(T, s.period); ATRIndicator{K,typeof(a)}(a, s.unstable))
-CausalFrames.fresh!(k::ATRIndicator) = (fresh!(k.atr); k)
+    (a = ATRKernel(T, s.period); ATRIndicatorKernel{K,typeof(a)}(a, s.unstable))
+CausalFrames.fresh!(k::ATRIndicatorKernel) = (fresh!(k.atr); k)
 
-@inline function barstep!(k::ATRIndicator{K}, h::T, l::T, c::T) where {K,T}
+@inline function barstep!(k::ATRIndicatorKernel{K}, h::T, l::T, c::T) where {K,T}
     a = k.atr
     step!(a, h, l, c)
     nseen(a) > lookback(a) + k.unstable || return nothing

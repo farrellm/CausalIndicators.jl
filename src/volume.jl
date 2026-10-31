@@ -185,7 +185,7 @@ rvolvalue(n, s, v) = v / ((s - v) / (n - 1))
 
 # `K` is `:obv`, `:pvt`, `:nvi` or `:pvi`. Each reads a price and the volume,
 # and keeps the previous bar's price and volume.
-struct VolumeTotal{K} end
+struct VolumeTotalSpec{K} end
 
 mutable struct VolumeTotalKernel{K,S,T}
     const total::S
@@ -198,7 +198,7 @@ end
 # NVI and PVI start at 1000 (ta_NVI.c, ta_PVI.c).
 startindex(::Val{K}, ::Type{T}) where {K,T} = K === :nvi || K === :pvi ? T(1000) : zero(T)
 
-barkernel(::VolumeTotal{K}, ::Type{T}) where {K,T} =
+barkernel(::VolumeTotalSpec{K}, ::Type{T}) where {K,T} =
     (
         s = seedsum(T);
         VolumeTotalKernel{K,typeof(s),T}(s, 0, zero(T), zero(T),
@@ -255,7 +255,7 @@ makes it split-invariant, and a key restarts it. It is a plain summarizer (no
 with any input `missing` leaves the state unchanged and emits `missing`.
 """
 
-volumetotal(K, N, specs...) = barindicator(VolumeTotal{K}(), (N,), specs...)
+volumetotal(K, N, specs...) = barindicator(VolumeTotalSpec{K}(), (N,), specs...)
 
 """
     OBV(column::ColumnSpec; volume = :volume, name = :obv) -> Summarizer
