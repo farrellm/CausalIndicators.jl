@@ -180,15 +180,14 @@ CausalFrames.fresh(::PercentRank100{C}, ::NamedTuple) where {C} =
 # Beta
 
 # The window moments Beta reads, as one tuple from an internal dependent: the
-# population covariance of the returns `:x` and `:y`, the variance of `:x` and
-# its mean.
+# population covariance of the returns `:x` and `:y` and the variance of `:x`.
 struct BetaMoments <: GroupSummarizer end
 
 CausalFrames.dependencies(::BetaMoments) =
-    (Covariance(:x, :y; corrected = false), Variance(:x; corrected = false), Mean(:x))
+    (Covariance(:x, :y; corrected = false), Variance(:x; corrected = false))
 CausalFrames.emptyvalue(::BetaMoments) = (; betamoments = missing)
 CausalFrames.fresh(::BetaMoments, ::NamedTuple) =
-    derivedvalue(:betamoments, (:x_y_covariance, :x_variance, :x_mean), tuple)
+    derivedvalue(:betamoments, (:x_y_covariance, :x_variance), tuple)
 
 struct BetaSummarizer{A,B,N} <: Summarizer
     period::Int
@@ -241,9 +240,13 @@ end
 @inline CausalFrames.value(st::BetaState{A,B,N,W,T}) where {A,B,N,W,T} =
     NamedTuple{(N,),Tuple{Union{Missing,T}}}((st.out,))
 
-# ta_BETA.c: `cov/var`, or 0 where the variance is not above 1e-14 of the
-# returns' second moment.
-betavalue(cov, var, mean) = var > 1e-14 * (var + mean * mean) ? cov / var : zero(cov)
+# ta_BETA.c: `cov/var`, or 0 where `n·S_xx − S_x²` is not above 1e-14 of
+# `n·S_xx`. beta.c's sums run over returns measured from a shift it re-anchors
+# at the window mean (#242), where `S_x` is 0 and the test is `var > 1e-14·var`.
+# CausalFrames' co-moments are measured from a shift too, and a flat window's
+# variance is exactly 0, so the test is `var > 0`. A NaN variance gives 0, as
+# in beta.c.
+betavalue(cov, var) = var > 0 ? cov / var : zero(cov)
 
 """
     Beta(x::ColumnSpec, y::ColumnSpec; period = 5, name = :beta) -> Summarizer
