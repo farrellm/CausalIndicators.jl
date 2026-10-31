@@ -610,13 +610,17 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
       unstable period).
     - Every kernel copies its input at period 1 (TA-Lib's
       `period1_identity`).
-  - The S5 plain indicators share one summarizer, `BarIndicator` (in
-    `src/barindicator.jl`): it reads the input columns, skips a bar with any
-    `missing`, and steps a per-indicator kernel built from an immutable spec,
-    which returns the outputs or `nothing` during the lookback. Their windows
-    go through two internal dependents under `barwindow`: `Sums` (the window
-    sums of several columns, also behind MFI and ULTOSC) and `Extremes` (the
-    highest high and lowest low).
+  - Every plain indicator but `MAVP` is one summarizer, `BarIndicator` (in
+    `src/barindicator.jl`). It reads the input columns, skips a bar with any
+    `missing`, and steps a per-indicator kernel built from an immutable spec
+    by `barkernel(spec, T)`. The kernel's `barstep!` returns the outputs, or
+    `nothing` during the lookback. A fresh state rebuilds its kernel from the
+    spec, so these top-level kernels define `fresh!` but not `fresh`. Their
+    windows go through internal dependents under `barwindow` (in
+    `src/shared.jl`): `Sums` (the window sums of several columns), `Extremes`
+    (the highest high and lowest low) and `Firsts` (several delayed values).
+    `MAVP` keeps its own state, because a `missing` period must still step
+    its averages.
   - `CandleKernel` and its `CandleAverage`s (S7, `src/kernels/candle.jl`):
     the bars and thresholds a candlestick pattern reads back.
     - TA-Lib compares a candle part with `factor` times the average of the
@@ -647,7 +651,8 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
   - `nseen(k)` counts the bars folded, so an indicator emits from
     `nseen(k) > lookback(k) + unstable`. (`MAKernel` already includes
     `unstable` in its `lookback`.)
-  - `fresh(k)` and `fresh!(k)` extend the CausalFrames functions.
+  - `fresh(k)` and `fresh!(k)` extend the CausalFrames functions. A kernel
+    only ever built by `barkernel` needs `fresh!` alone.
   - Kernels compute in `floattype(T)`: `Float64`, or a wider float input type.
 - **State layout.** States compose kernels as concrete fields, with no `Any` and
   no abstract field types.
@@ -660,8 +665,8 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
   window-agnostic SMA is `Mean`, under a `Bars` window.
   - The named recursive MAs (`EMA`, `DEMA`, `TEMA`, `TRIMA`, `KAMA`, `T3`,
     `HMA`, `ZLEMA`, `RMA`) are constructor functions too, over the same
-    `MovingAverage{M,C,N}` summarizer: one implementation, with the type, the
-    column and the output name as type parameters.
+    `BarIndicator` with an `MASpec{M}`: one implementation, with the type as a
+    type parameter.
   - TA-Lib's `TA_MAType_DISABLED` and `TA_MAType_DEFAULT` have no `matype`
     symbol.
   - **`MAVP`** keeps one `MAKernel` per period in `minperiod:maxperiod` and
@@ -702,7 +707,8 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
 |---|---|
 | `src/CausalIndicators.jl` | module, includes, exports |
 | `src/kernels/*.jl` | `EMAKernel`, `WilderKernel`, `SMAKernel`, `MAKernel`, `ERKernel`, `GainLossKernel`, `FastKKernel`, `ATRKernel`, `DMKernel`, `HilbertKernel`, `MAMAKernel`, `CandleKernel` (with `CandleSettings`) |
-| `src/barindicator.jl` | `BarIndicator`, the plain summarizer shared by the S5 indicators |
+| `src/shared.jl` | the dependent states, the internal window dependents, argument checks, output names, docstring paragraphs |
+| `src/barindicator.jl` | `BarIndicator`, the plain summarizer behind every plain indicator but `MAVP` |
 | `src/overlap.jl` | moving averages and bands |
 | `src/momentum.jl` | momentum indicators |
 | `src/volatility.jl` | volatility indicators |

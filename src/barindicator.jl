@@ -1,40 +1,48 @@
-# The plain summarizer shared by the S5 indicators: it reads the input columns
+# The plain summarizer every plain indicator is: it reads the input columns
 # `Is`, skips a bar with any of them `missing`, and steps a per-indicator kernel
 # over the rest. The kernel is built from an immutable spec `P` by
-# `barkernel(spec, T)` and stepped by `barstep!(k, inputs...)`, which returns a
-# tuple with one value per output name in `Ns`, or `nothing` during the
-# lookback. `barouttype(spec, T)` is the outputs' element type (`T` unless the
-# indicator emits `Int`), and `O` the tuple type the state keeps.
+# `barkernel(spec, T)` and stepped by `barstep!(k, inputs...)` with the inputs
+# converted to `T`. It returns a tuple with one value per output name in `Ns`,
+# or `nothing` during the lookback.
+#
+# A fresh state rebuilds its kernel from the spec, so a kernel needs only
+# `fresh!`, not `fresh`.
+#
+# `barouttype(spec, T)` is the outputs' element type: `T` unless the indicator
+# emits `Int`. An indicator whose outputs differ in type instead defines
+# `barouttypes(spec, T, n)`, the tuple type `barstep!` returns.
 struct BarIndicator{Is,Ns,P} <: Summarizer
     spec::P
 end
 
-mutable struct BarIndicatorState{Is,Ns,K,E,T,O} <: SummarizerState
+mutable struct BarIndicatorState{Is,Ns,P,K,T,O,V} <: SummarizerState
+    const spec::P
     const kernel::K
     out::Union{Nothing,O}
 end
 
 barouttype(spec, ::Type{T}) where {T} = T
+barouttypes(spec, ::Type{T}, n) where {T} = NTuple{n,barouttype(spec, T)}
 
-CausalFrames.emptyvalue(::BarIndicator{Is,Ns}) where {Is,Ns} =
-    NamedTuple{Ns}(map(_ -> missing, Ns))
+CausalFrames.emptyvalue(::BarIndicator{Is,Ns}) where {Is,Ns} = missings(Ns)
 
-function CausalFrames.fresh(s::BarIndicator{Is,Ns}, intypes::NamedTuple) where {Is,Ns}
+function CausalFrames.fresh(s::BarIndicator{Is,Ns,P}, intypes::NamedTuple) where {Is,Ns,P}
     T = pricetype(intypes, Is)
     k = barkernel(s.spec, T)
-    E = barouttype(s.spec, T)
-    return BarIndicatorState{Is,Ns,typeof(k),E,T,NTuple{length(Ns),E}}(k, nothing)
+    O = barouttypes(s.spec, T, length(Ns))
+    V = Tuple{map(E -> Union{Missing,E}, fieldtypes(O))...}
+    return BarIndicatorState{Is,Ns,P,typeof(k),T,O,V}(s.spec, k, nothing)
 end
-CausalFrames.fresh(st::BarIndicatorState{Is,Ns,K,E,T,O}) where {Is,Ns,K,E,T,O} =
-    BarIndicatorState{Is,Ns,K,E,T,O}(fresh(st.kernel), nothing)
+CausalFrames.fresh(st::BarIndicatorState{Is,Ns,P,K,T,O,V}) where {Is,Ns,P,K,T,O,V} =
+    BarIndicatorState{Is,Ns,P,K,T,O,V}(st.spec, barkernel(st.spec, T), nothing)
 function CausalFrames.fresh!(st::BarIndicatorState)
     fresh!(st.kernel)
     st.out = nothing
     return st
 end
 
-@inline function CausalFrames.update!(st::BarIndicatorState{Is,Ns,K,E,T,O},
-    row) where {Is,Ns,K,E,T,O}
+@inline function CausalFrames.update!(st::BarIndicatorState{Is,Ns,P,K,T},
+    row) where {Is,Ns,P,K,T}
     xs = map(c -> row[c], Is)
     st.out = nothing
     anymissing(xs...) && return nothing
@@ -43,9 +51,8 @@ end
 end
 
 @inline function CausalFrames.value(
-    st::BarIndicatorState{Is,Ns,K,E,T,O},
-) where {Is,Ns,K,E,T,O}
-    V = NTuple{length(Ns),Union{Missing,E}}
+    st::BarIndicatorState{Is,Ns,P,K,T,O,V},
+) where {Is,Ns,P,K,T,O,V}
     out = st.out
     return NamedTuple{Ns,V}(out === nothing ? map(_ -> missing, Ns) : out::O)
 end

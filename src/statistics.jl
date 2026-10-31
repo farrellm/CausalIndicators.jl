@@ -30,7 +30,7 @@ StdDev(column::ColumnSpec; nbdev::Real = 1) =
 
 CausalFrames.dependencies(::StdDev{C}) where {C} = (Std(C; corrected = false),)
 CausalFrames.emptyvalue(::StdDev{C}) where {C} =
-    NamedTuple{(Symbol(C, :_stddev),)}((missing,))
+    missings((Symbol(C, :_stddev),))
 CausalFrames.fresh(::StdDev{C,K}, ::NamedTuple) where {C,K} =
     derivedvalue(Symbol(C, :_stddev), (Symbol(C, :_std),), lifted(Scaled{K}()))
 
@@ -52,7 +52,7 @@ linearregfit(K, column) = withterms(LinearRegFit{K,colname(column)}(), column)
 CausalFrames.dependencies(::LinearRegFit{K,C}) where {K,C} =
     (Count(), Sum(C), AgeWeightedSum(C))
 CausalFrames.emptyvalue(::LinearRegFit{K,C}) where {K,C} =
-    NamedTuple{(Symbol(C, :_, K),)}((missing,))
+    missings((Symbol(C, :_, K),))
 CausalFrames.fresh(::LinearRegFit{K,C}, ::NamedTuple) where {K,C} =
     derivedvalue(Symbol(C, :_, K),
         (:count, Symbol(C, :_sum), Symbol(C, :_ageweightedsum)), lifted(regvalue(Val(K))))
@@ -169,7 +169,7 @@ PercentRank100(column::ColumnSpec) = withterms(PercentRank100{colname(column)}()
 
 CausalFrames.dependencies(::PercentRank100{C}) where {C} = (PercentRank(C),)
 CausalFrames.emptyvalue(::PercentRank100{C}) where {C} =
-    NamedTuple{(Symbol(C, :_percentrank100),)}((missing,))
+    missings((Symbol(C, :_percentrank100),))
 # ta_PERCENTRANK.c divides, then scales: `(count/period)·100`, as PercentRank's
 # `count/(n − 1)` times 100.
 CausalFrames.fresh(::PercentRank100{C}, ::NamedTuple) where {C} =
@@ -189,56 +189,40 @@ CausalFrames.emptyvalue(::BetaMoments) = (; betamoments = missing)
 CausalFrames.fresh(::BetaMoments, ::NamedTuple) =
     derivedvalue(:betamoments, (:x_y_covariance, :x_variance), tuple)
 
-struct BetaSummarizer{A,B,N} <: Summarizer
+struct BetaSpec
     period::Int
 end
 
-mutable struct BetaState{A,B,N,W,T} <: SummarizerState
+mutable struct BetaKernel{W,T}
     const window::W
     n::Int
     preva::T
     prevb::T
-    out::Union{Missing,T}
 end
 
-CausalFrames.emptyvalue(::BetaSummarizer{A,B,N}) where {A,B,N} =
-    NamedTuple{(N,)}((missing,))
-
-function CausalFrames.fresh(s::BetaSummarizer{A,B,N}, intypes::NamedTuple) where {A,B,N}
-    T = pricetype(intypes, (A, B))
-    w = CausalFrames.barwindow(BetaMoments(), s.period, (x = T, y = T))
-    return BetaState{A,B,N,typeof(w),T}(w, 0, zero(T), zero(T), missing)
-end
-CausalFrames.fresh(st::BetaState{A,B,N,W,T}) where {A,B,N,W,T} =
-    BetaState{A,B,N,W,T}(fresh(st.window), 0, zero(T), zero(T), missing)
-function CausalFrames.fresh!(st::BetaState{A,B,N,W,T}) where {A,B,N,W,T}
-    fresh!(st.window)
-    st.n = 0
-    st.preva = st.prevb = zero(T)
-    st.out = missing
-    return st
+barkernel(s::BetaSpec, ::Type{T}) where {T} =
+    BetaKernel(CausalFrames.barwindow(BetaMoments(), s.period, (x = T, y = T)), 0, zero(T),
+        zero(T))
+function CausalFrames.fresh!(k::BetaKernel{W,T}) where {W,T}
+    fresh!(k.window)
+    k.n = 0
+    k.preva = k.prevb = zero(T)
+    return k
 end
 
 # ta_BETA.c's return: 0 over a zero previous price.
 @inline barreturn(p, prev) = prev != 0 ? (p - prev) / prev : zero(p / one(prev))
 
-@inline function CausalFrames.update!(st::BetaState{A,B,N,W,T}, row) where {A,B,N,W,T}
-    a, b = row[A], row[B]
-    st.out = missing
-    anymissing(a, b) && return nothing
-    pa, pb = convert(T, a), convert(T, b)
-    n = st.n += 1
-    x, y = barreturn(pa, st.preva), barreturn(pb, st.prevb)
-    st.preva, st.prevb = pa, pb
+@inline function barstep!(k::BetaKernel, pa::T, pb::T) where {T}
+    n = k.n += 1
+    x, y = barreturn(pa, k.preva), barreturn(pb, k.prevb)
+    k.preva, k.prevb = pa, pb
     n == 1 && return nothing
-    update!(st.window, (x = x, y = y))
-    moments = value(st.window).betamoments
+    update!(k.window, (x = x, y = y))
+    moments = value(k.window).betamoments
     ismissing(moments) && return nothing
-    st.out = betavalue(moments...)
-    return nothing
+    return (betavalue(moments...),)
 end
-@inline CausalFrames.value(st::BetaState{A,B,N,W,T}) where {A,B,N,W,T} =
-    NamedTuple{(N,),Tuple{Union{Missing,T}}}((st.out,))
 
 # ta_BETA.c: `cov/var`, or 0 where `n·S_xx − S_x²` is not above 1e-14 of
 # `n·S_xx`. beta.c's sums run over returns measured from a shift it re-anchors
@@ -266,6 +250,6 @@ TA-Lib: `ta_codegen/input/beta/beta.yaml`, `beta.md`.
 """
 function Beta(x::ColumnSpec, y::ColumnSpec; period::Integer = 5, name::Symbol = :beta)
     checkrange("Beta", "period", period, 1, 100_000)
-    A, B = colname(x), colname(y)
-    return withterms(BetaSummarizer{A,B,Symbol(A, :_, B, :_, name)}(Int(period)), x, y)
+    return barindicator(BetaSpec(period), (Symbol(colname(x), :_, colname(y), :_, name),),
+        x, y)
 end

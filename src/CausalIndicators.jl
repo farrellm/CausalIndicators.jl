@@ -40,6 +40,7 @@ include("kernels/atr.jl")
 include("kernels/dm.jl")
 include("kernels/candle.jl")
 
+include("shared.jl")
 include("barindicator.jl")
 
 include("overlap.jl")
