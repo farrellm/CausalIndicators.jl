@@ -22,7 +22,6 @@ function GainLossKernel(::Type{T}, period::Integer) where {T}
     return GainLossKernel{T,typeof(w)}(w.period, 0, zero(T), w, fresh(w))
 end
 
-CausalFrames.fresh(k::GainLossKernel{T}) where {T} = GainLossKernel(T, k.period)
 function CausalFrames.fresh!(k::GainLossKernel{T}) where {T}
     k.n = 0
     k.prevx = zero(T)

@@ -96,7 +96,6 @@ mutable struct HAKernel{T}
 end
 
 barkernel(s::HASpec, ::Type{T}) where {T} = HAKernel{T}(s.unstable, 0, zero(T), zero(T))
-CausalFrames.fresh(k::HAKernel{T}) where {T} = HAKernel{T}(k.unstable, 0, zero(T), zero(T))
 CausalFrames.fresh!(k::HAKernel{T}) where {T} =
     (k.n = 0; k.open = zero(T); k.close = zero(T); k)
 

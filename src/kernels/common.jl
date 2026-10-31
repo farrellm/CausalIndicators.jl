@@ -64,6 +64,9 @@ const TA_EPSILON = 1e-14
 # TA-Lib's true range: the bar's range widened to the previous close.
 @inline truerange(h, l, cprev) = max(h - l, abs(cprev - h), abs(cprev - l))
 
+# A `First` over the last `n` bars: the value `n − 1` bars back.
+lagged(n, ::Type{T}) where {T} = CausalFrames.barwindow(First(:x), n, (x = T,))
+
 # Lag lines: a CausalFrames `WindowValues` under `barwindow`, prefilled with
 # zeros so it is full from the first bar (which also gets past `barwindow`'s
 # missing-until-full gate). `WindowValues` counts NaN rather than storing it, so

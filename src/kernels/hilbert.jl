@@ -64,8 +64,6 @@ function HilbertKernel(::Type{T}, start::Integer; nsmooth::Integer = 7) where {T
         Int(nsmooth), s, w, d, q, 0, false, z, z, z, z, z, z, z, z, z)
 end
 
-CausalFrames.fresh(k::HilbertKernel{T}) where {T} =
-    HilbertKernel(T, k.start; nsmooth = k.nsmooth)
 function CausalFrames.fresh!(k::HilbertKernel{T}) where {T}
     fresh!(k.smoother)
     refill!(k.smooth, k.nsmooth, T)
@@ -175,7 +173,6 @@ mutable struct DCPhasePart{T}
 end
 
 DCPhasePart(::Type{T}) where {T} = (z = zero(T); DCPhasePart{T}(z, z, z, z, z, z))
-CausalFrames.fresh(p::DCPhasePart{T}) where {T} = DCPhasePart(T)
 function CausalFrames.fresh!(p::DCPhasePart{T}) where {T}
     z = zero(T)
     p.dcphase = p.prevdcphase = p.sine = p.leadsine = p.prevsine = p.prevleadsine = z
@@ -237,7 +234,6 @@ function TrendlinePart(::Type{T}) where {T}
     z = zero(T)
     return TrendlinePart{T,typeof(w)}(w, z, z, z, z)
 end
-CausalFrames.fresh(p::TrendlinePart{T}) where {T} = TrendlinePart(T)
 function CausalFrames.fresh!(p::TrendlinePart{T}) where {T}
     refill!(p.raw, 50, T)
     p.itrend1 = p.itrend2 = p.itrend3 = p.trendline = zero(T)

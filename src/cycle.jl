@@ -43,18 +43,10 @@ function barkernel(s::HTSpec{F}, ::Type{T}) where {F,T}
 end
 barouttype(::HTSpec{:trendmode}, ::Type{T}) where {T} = Int
 
-partfresh(p) = fresh(p)
-partfresh(::Nothing) = nothing
-partfresh!(p) = fresh!(p)
-partfresh!(::Nothing) = nothing
-
-CausalFrames.fresh(k::HTIndicatorKernel{F,T,H,P,L}) where {F,T,H,P,L} =
-    HTIndicatorKernel{F,T,H,P,L}(fresh(k.core), partfresh(k.phase), partfresh(k.trend),
-        k.unstable, 0)
 function CausalFrames.fresh!(k::HTIndicatorKernel)
     fresh!(k.core)
-    partfresh!(k.phase)
-    partfresh!(k.trend)
+    maybefresh!(k.phase)
+    maybefresh!(k.trend)
     k.days = 0
     return k
 end
@@ -208,12 +200,7 @@ mutable struct MAMAIndicatorKernel{K}
 end
 
 barkernel(s::MAMASpec, ::Type{T}) where {T} =
-    (
-        k = MAMAKernel(T, s.fastlimit, s.slowlimit);
-        MAMAIndicatorKernel{typeof(k)}(k, s.unstable)
-    )
-CausalFrames.fresh(k::MAMAIndicatorKernel{K}) where {K} =
-    MAMAIndicatorKernel{K}(fresh(k.mama), k.unstable)
+    MAMAIndicatorKernel(MAMAKernel(T, s.fastlimit, s.slowlimit), s.unstable)
 CausalFrames.fresh!(k::MAMAIndicatorKernel) = (fresh!(k.mama); k)
 
 @inline function barstep!(k::MAMAIndicatorKernel, x::T) where {T}

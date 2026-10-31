@@ -21,11 +21,10 @@ type `T`, in [0, 1]. A flat window gives 1, as ta_ER.c and ta_KAMA.c do.
 function ERKernel(::Type{T}, period::Integer) where {T}
     p = checkperiod("ERKernel", period)
     s = CausalFrames.barwindow(Sum(:x), p, (x = T,))
-    f = CausalFrames.barwindow(First(:x), p + 1, (x = T,))
+    f = lagged(p + 1, T)
     return ERKernel{T,typeof(s),typeof(f)}(p, 0, zero(T), 0, s, f)
 end
 
-CausalFrames.fresh(e::ERKernel{T}) where {T} = ERKernel(T, e.period)
 function CausalFrames.fresh!(e::ERKernel{T}) where {T}
     e.n = 0
     e.prevx = zero(T)

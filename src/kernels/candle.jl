@@ -126,8 +126,6 @@ function CandleAverage(::Type{T}, s::CandleSetting, nbars::Integer) where {T}
     return CandleAverage{T,typeof(w),typeof(l)}(s, w, l)
 end
 
-CausalFrames.fresh(a::CandleAverage{T,W,L}) where {T,W,L} =
-    CandleAverage{T,W,L}(a.setting, fresh(a.window), fresh(a.thr))
 function fresh_avg!(a::CandleAverage{T}, nbars) where {T}
     fresh!(a.window)
     refill!(a.thr, nbars, T)
@@ -160,16 +158,11 @@ mutable struct HikkakeState{T}
     low::T
 end
 HikkakeState{T}() where {T} = HikkakeState{T}(0, 0, zero(T), zero(T))
-CausalFrames.fresh(::HikkakeState{T}) where {T} = HikkakeState{T}()
 function CausalFrames.fresh!(st::HikkakeState{T}) where {T}
     st.count = st.result = 0
     st.high = st.low = zero(T)
     return st
 end
-hikkakefresh(::Nothing) = nothing
-hikkakefresh(st) = fresh(st)
-hikkakefresh!(::Nothing) = nothing
-hikkakefresh!(st) = fresh!(st)
 
 """
     CandleKernel{P,T}
@@ -205,10 +198,6 @@ function CandleKernel{P}(::Type{T}, settings::CandleSettings, penetration,
         Int(nbars), T(penetration), avgs, o, h, l, c, hikkake, 0, NEVER)
 end
 
-CausalFrames.fresh(k::CandleKernel{P,T,A,L,H}) where {P,T,A,L,H} =
-    CandleKernel{P,T,A,L,H}(k.lookback, k.nbars, k.penetration, map(fresh, k.avgs),
-        fresh(k.open), fresh(k.high), fresh(k.low), fresh(k.close),
-        hikkakefresh(k.hikkake), 0, NEVER)
 function CausalFrames.fresh!(k::CandleKernel{P,T}) where {P,T}
     n = k.nbars
     foreach(a -> fresh_avg!(a, n), values(k.avgs))
@@ -216,7 +205,7 @@ function CausalFrames.fresh!(k::CandleKernel{P,T}) where {P,T}
     refill!(k.high, n, T)
     refill!(k.low, n, T)
     refill!(k.close, n, T)
-    hikkakefresh!(k.hikkake)
+    maybefresh!(k.hikkake)
     k.n = 0
     k.lastbad = NEVER
     return k
