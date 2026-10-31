@@ -216,6 +216,15 @@ mavpperiods(n) = [2.0 + (i % 29) for i in 0:(n-1)]
         @test ismissing(got[4]) && got[5] == 4.0
     end
 
+    @testset "VWMA zero volume" begin
+        # A one-row window copies the input even at zero volume (TA-Lib #184);
+        # a wider window of zero volume is NaN, as vwma.md specifies.
+        t = (close = [10.0, 11.0, 12.0], volume = [0.0, 0.0, 5.0])
+        @test only(foldseries(VWMA(:close), t; window = Bars(1))) == t.close
+        got = only(foldseries(VWMA(:close), t; window = Bars(2)))
+        @test ismissing(got[1]) && isnan(got[2]) && got[3] == 12.0
+    end
+
     @testset "constructors" begin
         @test only(keys(CausalFrames.emptyvalue(EMA(:close)))) == :close_ema
         @test only(keys(CausalFrames.emptyvalue(EMA(:close; name = :ema7)))) == :close_ema7

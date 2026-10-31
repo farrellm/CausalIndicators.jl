@@ -278,7 +278,7 @@ g. **`CausalFrames.barwindow(s, n, intypes)`, a count-window state** (#81),
    Coppock, SMI, Fractal, TRIMA, the Stoch family's %K,
    `MAKernel`'s `:sma` and `:wma`, `BollingerBands(; matype)` and RVI (a
    `Std`), CVI and ADXR (a `First` of their own earlier values), MassIndex (a
-   `Sum`), Beta (`Covariance`, `Variance` and `Mean` of the returns), the
+   `Sum`), Beta (`Covariance` and `Variance` of the returns), the
    Hilbert family and MAMA (`WindowValues` as lag lines, and the `WMA`
    smoother) and the candlesticks' `CandleKernel` (a `Mean` per setting, and
    `WindowValues` as lag lines).
@@ -826,21 +826,24 @@ the goldens check every bar.
     stay exact, because a flat series routes nothing to RVI's legs and gives
     MassIndex an exact ratio of 1.
   - **VWMA under `Bars(1)`.** TA-Lib's VWMA copies its input at period 1
-    (#184). `VWMA` is `Σ(P·V)/ΣV` under any window, and on two-decimal prices
-    with six-digit volumes (P·V)/V does not always give back P. The reference
-    series happens to round-trip, so its goldens match. test_period_boundary.c's
-    hostile series hold the copy `@test_broken`.
+    (#184), because on two-decimal prices with six-digit volumes (P·V)/V does
+    not always give back P, and a zero-volume bar would give `NaN`. `VWMA`
+    reads `Count` and `Last` too, and gives the newest value wherever its
+    window holds one row, so test_period_boundary.c's hostile series pass.
   - **A large value leaving a window.** TA-Lib re-seeds its sums when a
     leaving term dwarfs them. CausalFrames' windowed sums and co-moments refold
     from the window's rows when that happens (CausalFrames.jl#123, fixing #97),
     so pandas GH#52407's `Variance`, `Correlation` after a 3e37 value and all 48
     of test_beta.c's outlier-transit rungs hold their bounds once the value has
     left.
-  - **BETA's no-variance guard.** `betavalue` zeroes the slope where the
-    returns' variance is under 1e-14 of `var + mean²`. The pinned beta.c
-    measures from a shifted origin instead (#242), so returns of ~1e-8 that
-    barely vary (Wilkinson BIG and LITTLE) still give a slope. Here they give
-    0, and test_beta.c's W.IV.B legs for them are `@test_broken`.
+  - **BETA's no-variance guard.** beta.c tests `n·S_xx − S_x²` against
+    1e-14 of `n·S_xx`, over returns measured from a shift it re-anchors at the
+    window mean (#242). There `S_x` is 0, and the test is `var > 1e-14·var`.
+    CausalFrames' co-moments are measured from a shift too, and a flat
+    window's variance is exactly 0, so `betavalue` states the guard on
+    `Variance` alone, as `var > 0`. Returns of ~1e-8 that barely vary
+    (Wilkinson BIG and LITTLE) give a slope of 1, as in TA-Lib. Returns that
+    are constant up to rounding give the noise slope TA-Lib gives.
   - The index forms (`MAXINDEX`, `MININDEX`, `MINMAXINDEX`) skip rows whose
     window holds a tied extreme, where TA-Lib's path-dependent tie-break and
     the upstream most-recent rule may differ (see (d)). Their extracted table
@@ -896,7 +899,8 @@ README rows together, and updates this document where reality differs.
   - `barwindow` (#81)
 - **S0′, scaffolding:**
   - the CausalFrames dependency. It is unregistered, so this uses `[sources]`
-    on Julia ≥ 1.11 plus a CI `Pkg.develop(url = …)` step on 1.10.
+    on Julia ≥ 1.11 plus a CI `Pkg.develop(url = …)` step on 1.10. It stays
+    unregistered (decided 2026-10-30), so both stay.
   - the core kernels: `EMAKernel`, `WilderKernel`, `SMAKernel`, and
     `MAKernel` with `:sma`, `:ema` and `:rma`. The other MA types land with
     their stages, and the candlesticks' `CandleKernel` landed in S7.
@@ -930,6 +934,9 @@ README rows together, and updates this document where reality differs.
 - **S7:** the 61 candlestick patterns and `CandleSettings`, in the `Candles`
   submodule over one `CandleKernel`. It needed no upstream addition.
   **Complete.**
+- **S8:** the 0.8.1 loose ends. VWMA copies its input under a one-row window
+  (#18), BETA's no-variance guard is stated on `Variance` (#19), and
+  CausalFrames stays unregistered. **Complete.**
 
 A stage PR may find that an indicator can claim a stronger tier, or needs
 another upstream addition. It then amends the name table and "Upstream
@@ -937,8 +944,7 @@ prerequisites" in the same PR.
 
 ## Open questions
 
-- **Registering CausalFrames**, which would replace the `[sources]` and CI
-  workaround with a plain `[compat]` entry.
+None. Registering CausalFrames was decided against (see S0′).
 
 ## Name table
 
@@ -985,7 +991,7 @@ All 182 in-scope TA-Lib functions. The table is generated from the pinned YAML.
 | `TEMA` | `TEMA` | S1 | new state | plain | real | period=30, unstable=0 | (one column) |
 | `TRIMA` | `TRIMA` | S1 | new state (nested `Mean` windows) | plain | real | period=30 | (one column) |
 | `TYPPRICE` | `TypPrice` | S1 | dependent: `Last` | Group | high, low, close | any window (bar-local) | (one column) |
-| `VWMA` | `VWMA` | S1 | dependent: `DotProduct`, `Sum` | Group | real, volume | window: Bars(30) | (one column) |
+| `VWMA` | `VWMA` | S1 | dependent: `Count`, `DotProduct`, `Sum`, `Last` | Group | real, volume | window: Bars(30) | (one column) |
 | `WCLPRICE` | `WclPrice` | S1 | dependent: `Last` | Group | high, low, close | any window (bar-local) | (one column) |
 | `WMA` | `WMA` | S1 | dependent (upstream): `AgeWeightedSum`, `Sum`, `Count` | Group | real | window: Bars(30) | (one column) |
 | `ZLEMA` | `ZLEMA` | S1 | new state | plain | real | period=30, unstable=0 | (one column) |
@@ -1038,7 +1044,7 @@ All 182 in-scope TA-Lib functions. The table is generated from the pinned YAML.
 | `VAR` | `Variance(:x; corrected=false)` | S3 | CausalFrames only: `Variance(corrected=false)` | Group | real | window: Bars(5) (TA-Lib ignores nbdev) | (one column) |
 | `AD` | `AD` | S4 | dependent (upstream): row-term `Sum` (no window) | Group | high, low, close, volume | no window (`addsummarycolumns`) | (one column) |
 | `ADOSC` | `ADOSC` | S4 | new state (A/D `Sum`, two first-value-seeded `EMAKernel`s) | plain | high, low, close, volume | fastperiod=3, slowperiod=10, unstable=0 | (one column) |
-| `BETA` | `Beta` | S4 | new state (returns need the previous bar; `Covariance`, `Variance`, `Mean` under `barwindow`) | plain | real0, real1 | period=5 | (one column) |
+| `BETA` | `Beta` | S4 | new state (returns need the previous bar; `Covariance`, `Variance` under `barwindow`) | plain | real0, real1 | period=5 | (one column) |
 | `CMF` | `CMF` | S4 | dependent (upstream): row-term `Sum` (shared with `AD`), `Sum` | Group | high, low, close, volume | window: Bars(20) | (one column) |
 | `CORREL` | `Correlation(:a, :b)` | S4 | CausalFrames only: `Correlation` | Group | real0, real1 | window: Bars(30) | (one column) |
 | `EFI` | `EFI` | S4 | new state (`EMAKernel` of the force) | plain | close, volume | period=13, unstable=0 | (one column) |

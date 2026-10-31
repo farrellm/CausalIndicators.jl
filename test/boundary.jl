@@ -97,16 +97,10 @@ end
             for s in (Mean(:close), WMA(:close))
                 @test isequal(only(foldseries(s, data; window = Bars(1))), data.close)
             end
-            # VWMA under Bars(1) is (P·V)/V, which loses P on the round-trip
-            # series: the defect TA-Lib #184 fixed with a period-1 copy. The
-            # dependent cannot see its window's size, so the copy needs a
-            # change of design, not a test edit.
-            vwma = only(foldseries(VWMA(:close), data; window = Bars(1)))
-            if what == "reference"
-                @test isequal(vwma, data.close)
-            else
-                @test_broken isequal(vwma, data.close)
-            end
+            # VWMA under Bars(1) copies its input (TA-Lib #184), where (P·V)/V
+            # would lose P on the round-trip series.
+            @test isequal(only(foldseries(VWMA(:close), data; window = Bars(1))),
+                data.close)
         end
     end
 

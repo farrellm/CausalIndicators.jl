@@ -20,9 +20,7 @@ These files have no file-scope tables at all:
       5 and 20, a series against itself, the flat index (flat and varying
       other series), the zero previous price and price-scale invariance (S4).
       The Wilkinson, NIST Norris and outlier-transit legs are in
-      `test/reference.jl`. Wilkinson BIG and LITTLE (W.IV.B) are
-      `@test_broken`: `betavalue` keeps the pre-#242 guard, which zeroes a
-      slope on returns of ~1e-8.
+      `test/reference.jl`, Wilkinson BIG and LITTLE (W.IV.B) among them.
 - [x] `test_cmou.c`: the Tulip/pandas oracle at 1e-12, the all-up, all-down,
       flat and hand-computed windows, and the empty window over the spiked
       LCG corpus (`lcgsym`), exactly 0 at all 18,096 flat bars (S5)
@@ -75,8 +73,7 @@ These files have checks outside their extracted tables:
       the rest: the period-1 lookbacks, every moving average copying its input
       at period 1 on the reference and both hostile series, the MACD family at
       signal period 1 (with the hostile grid), the period-1 pins and the
-      LINEARREG ramp at period 1025. VWMA's period-1 copy on the round-trip and
-      Sterbenz series is `@test_broken`: under `Bars(1)` it is (P·V)/V. CORREL(1)
+      LINEARREG ramp at period 1025, VWMA's period-1 copy among them. CORREL(1)
       gives `NaN` where TA-Lib gives 0, as for every flat window. The in-place,
       `doRangeTest` and stream-surface legs have no counterpart in a fold.
 - [x] `test_rolling_extremum.c`: the block-scan oracle for MIN, MAX, MINMAX,

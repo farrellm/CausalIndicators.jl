@@ -86,11 +86,12 @@ wmavalue(n, s, a) = (n * s - a) / (n * (n + 1) / 2)
     VWMA(column::ColumnSpec; volume = :volume) -> Summarizer
 
 TA-Lib's `VWMA`, the volume-weighted moving average, in `:{column}_vwma`. It is
-`Σ(column·volume) / Σvolume` over the window, a dependent over `DotProduct`
-and `Sum` (Group tier). A window whose volume is all zero gives `NaN`, as
-vwma.md specifies. Under `Bars(1)` a zero-volume bar also gives `NaN`, where
-TA-Lib's period 1 copies the input. TA-Lib's `VWMA(period = p)` is `VWMA(:x)`
-under `Bars(p)`.
+`Σ(column·volume) / Σvolume` over the window, a dependent over `Count`,
+`DotProduct`, `Sum` and `Last` (Group tier). A window whose volume is all zero
+gives `NaN`, as vwma.md specifies. A window holding one row gives that row's
+`column`, as TA-Lib's period 1 does (TA-Lib #184): (P·V)/V need not round-trip
+to P, and a zero-volume bar would give `NaN`. TA-Lib's `VWMA(period = p)` is
+`VWMA(:x)` under `Bars(p)`.
 
 TA-Lib: `ta_codegen/input/vwma/vwma.yaml`, `vwma.md`.
 """
@@ -104,10 +105,13 @@ canonicaldot(a, b) = isless(b, a) ? (b, a) : (a, b)
 dotname(a, b) = Symbol(canonicaldot(a, b)[1], :_, canonicaldot(a, b)[2], :_dotproduct)
 
 CausalFrames.dependencies(::VWMA{C,V}) where {C,V} =
-    (DotProduct(canonicaldot(C, V)...), Sum(V))
+    (Count(), DotProduct(canonicaldot(C, V)...), Sum(V), Last(C))
 CausalFrames.emptyvalue(::VWMA{C}) where {C} = NamedTuple{(Symbol(C, :_vwma),)}((missing,))
 CausalFrames.fresh(::VWMA{C,V}, ::NamedTuple) where {C,V} =
-    derivedvalue(Symbol(C, :_vwma), (dotname(C, V), Symbol(V, :_sum)), /)
+    derivedvalue(Symbol(C, :_vwma),
+        (:count, dotname(C, V), Symbol(V, :_sum), lastname(C)), vwmavalue)
+
+vwmavalue(n, pv, v, p) = n == 1 ? float(p) : pv / v
 
 """
     MidPoint(column::ColumnSpec) -> Summarizer

@@ -243,14 +243,10 @@ corr(x, y, p) = windowed(Correlation(:x, :y), (; x, y), p)
     @testset "test_beta.c" begin
         beta(x, y, p) = foldseries(Beta(:x, :y; period = p), (; x, y)).x_y_beta
         ret(v, i) = v[i-1] != 0 ? (v[i] - v[i-1]) / v[i-1] : 0.0
-        # (B1) Wilkinson W.IV.B: a series regressed on itself is exactly 1. BIG
-        # and LITTLE have returns of ~1e-8 that barely vary, which `betavalue`'s
-        # guard (variance against variance + mean²) reads as no variance and
-        # zeroes. The pinned beta.c measures its guard from a shifted origin
-        # instead (#242), so TA-Lib gives 1.
+        # (B1) Wilkinson W.IV.B: a series regressed on itself is exactly 1,
+        # including BIG and LITTLE, whose returns of ~1e-8 barely vary (#242).
         for w in ("x", "round", "huge", "tiny", "big", "little")
-            @test all(v -> abs(v - 1) <= 1e-12, skipmissing(beta(wilk(w), wilk(w), 8))) broken =
-                w in ("big", "little")
+            @test all(v -> abs(v - 1) <= 1e-12, skipmissing(beta(wilk(w), wilk(w), 8)))
         end
         # (B2) W.IV.D: an index with no variance gives exactly 0.
         @test all(==(0), skipmissing(beta(wilk("zero"), wilk("x"), 8)))
