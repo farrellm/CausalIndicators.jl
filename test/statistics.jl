@@ -125,7 +125,7 @@ tavar(x, p) = only(foldseries(Variance(:x; corrected = false), (; x); window = B
         checkgoldens("PERCENTILE"; accepts = WINDOW, outputs = (:outReal,)) do p, data
             s = Quantile(:close, get(p, :optInPercentile, 50.0) / 100;
                 interpolation = :nearestrank)
-            (only(foldseries(s, data; window = Bars(get(p, :optInTimePeriod, 30)))),)
+            (only(foldseries(s, data; window = Bars(get(p, :optInTimePeriod, 100)))),)
         end
         # A window where either series is flat has no correlation: TA-Lib gives
         # 0 and CausalFrames NaN (DESIGN.md, "Testing"). Those bars are checked
@@ -208,6 +208,59 @@ tavar(x, p) = only(foldseries(Variance(:x; corrected = false), (; x); window = B
             @test isequal(lo, only(foldseries(Min(:close), (; close); window = Bars(n))))
             @test isequal(hi, only(foldseries(Max(:close), (; close); window = Bars(n))))
         end
+        # test_percentile_wide: periods 2 to 2049 (pctlWideN) at the percentiles
+        # pctlWideP, over pctlBuildWide's tick walk, ±0/±1 noise, rising and
+        # falling trend cycles and random trends, against the sorted window. A
+        # -0.0 and a +0.0 tie, so values are compared as numbers.
+        widen, widep = a["pctlWideN"], a["pctlWideP"]
+        function widecorpus(which, nb, n)
+            seed, v, slope, left = UInt32(377), 100.0, 0.0, 0
+            pm = (0.0, -0.0, 1.0, -1.0)
+            map(0:(nb-1)) do i
+                seed = (seed * 0x41c64e6d + 0x00003039) & 0x7fffffff
+                if which == 0
+                    v += 0.25 * (Int((seed >> 8) % 5) - 2)
+                elseif which == 1
+                    return pm[(seed>>8)&3+1]
+                elseif which in (2, 3)
+                    leg = i % 150
+                    v +=
+                        leg < 70 ? 0.25 :
+                        leg < 110 ? 0.25 * (Int((seed >> 8) % 3) - 1) :
+                        leg < 135 ? -0.25 : 0.0
+                    return which == 2 ? v : -v
+                else
+                    if left == 0
+                        left = 2 + Int((seed >> 8) % n)
+                        slope = 0.25 * (Int((seed >> 6) % 3) - 1)
+                    end
+                    left -= 1
+                    v += slope + 0.25 * (Int((seed >> 12) % 3) - 1)
+                end
+                v
+            end
+        end
+        nwide = 0
+        for which in (0, 1, 2, 3, 7), n in widen
+            x = widecorpus(which, 2049 + 400, n)
+            got = [
+                only(
+                    foldseries(Quantile(:x, p / 100; interpolation = :nearestrank),
+                        (; x); window = Bars(n)),
+                ) for p in widep
+            ]
+            w = sort(x[1:(n-1)])
+            for i in n:length(x)
+                insert!(w, searchsortedlast(w, x[i]) + 1, x[i])
+                for (j, p) in enumerate(widep)
+                    k = max(1, cld(Int(p) * n, 100))
+                    nwide += 1
+                    got[j][i] == w[k] || (@test got[j][i] == w[k]; break)
+                end
+                deleteat!(w, searchsortedfirst(w, x[i-n+1]))
+            end
+        end
+        @test nwide == 5 * 5 * sum(n -> 2449 - n + 1, widen)
     end
 
     @testset "test_percentrank.c" begin

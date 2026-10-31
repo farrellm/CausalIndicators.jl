@@ -454,6 +454,50 @@ end
         end
     end
 
+    @testset "test_po.c dead slow window after fractional values (#454)" begin
+        # Zero on bars 8–27 (0-based), fractional elsewhere; fast 3, slow 5.
+        x = [8 <= i < 28 ? 0.0 : 1002.69 + 1.3 * (i % 3) for i in 0:59]
+        for (ctor, col) in ((PPO, :x), (PVO, :volume)),
+            m in (:sma, :wma, :trima, :hma, :ema)
+
+            s =
+                ctor === PPO ? PPO(:x; fastperiod = 3, slowperiod = 5, matype = m) :
+                PVO(; fastperiod = 3, slowperiod = 5, matype = m)
+            got = only(foldseries(s, NamedTuple{(col,)}((x,))))
+            f = only(foldseries(MA(:x; period = 3, matype = m), (; x)))
+            sl = only(foldseries(MA(:x; period = 5, matype = m), (; x)))
+            lb = findfirst(!ismissing, sl) - 1
+            for i in (lb+1):60
+                dead = m !== :ema && i - 1 - lb >= 8 && i - 1 < 28
+                want = dead || abs(sl[i]) < 1e-14 ? 0.0 : ((f[i] - sl[i]) / sl[i]) * 100
+                # A dead window is exactly 0; elsewhere the ratio of the averages.
+                @test dead ? got[i] === 0.0 : isapprox(got[i], want; atol = 1e-12)
+            end
+        end
+    end
+
+    @testset "test_rsi.c flat start (#480)" begin
+        # A series that has not moved since its first bar gives RSI 50 and CMO
+        # 0, exactly; a one-sided series 100 or 0, held after a single move.
+        for shape in 0:4, p in (2, 14, 30), u in (0, 5)
+            x = map(0:199) do i
+                shape == 3 ? (10013 + 37i) / 100 :
+                shape == 4 ? (40013 - 37i) / 100 :
+                shape == 1 && i >= 120 ? 101.37 : shape == 2 && i >= 120 ? 98.89 : 100.13
+            end
+            rsi = only(foldseries(RSI(:x; period = p, unstable = u), (; x)))
+            cmo = only(foldseries(CMO(:x; period = p, unstable = u), (; x)))
+            @test findfirst(!ismissing, rsi) - 1 == p + u
+            for i in (p+u+1):200
+                moved = shape in (1, 2) && i - 1 >= 120
+                want =
+                    shape == 3 || (shape == 1 && moved) ? 100.0 :
+                    shape == 4 || (shape == 2 && moved) ? 0.0 : 50.0
+                @test rsi[i] === want && cmo[i] === 2want - 100
+            end
+        end
+    end
+
     @testset "constructors" begin
         @test keys(CausalFrames.emptyvalue(RSI(:close))) == (:close_rsi,)
         @test keys(CausalFrames.emptyvalue(RSI(:close; name = :rsi7))) == (:close_rsi7,)

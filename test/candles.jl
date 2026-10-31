@@ -113,8 +113,10 @@ end
             ok || @info "MC/DC record failed" r.name
             @test ok
         end
-        # Every pattern's builder ran (Hikkake's twice: its predicate gate too).
-        @test length(recs) == 63
+        # Every pattern's builder ran (Hikkake's twice: its predicate gate too),
+        # and test_candle_value_set's sweep over three seeded random series,
+        # which calls each pattern through the abstract interface.
+        @test length(recs) == 61 + 2 + 61 * 3
         @test Set(r.name for r in recs) == Set(ta for (_, ta, _) in CANDLE_FNS)
     end
 

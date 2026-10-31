@@ -2,7 +2,7 @@
 # typedefs, `#define` constants and initialized arrays. It is not a C parser. It
 # knows exactly the shapes the pinned test files use and fails loudly otherwise.
 
-const TALIB_COMMIT = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+const TALIB_COMMIT = "62021c1d14ef5499505af5547384cab509adf3fc"
 
 function checkpin(root::AbstractString)
     head = strip(read(`git -C $root rev-parse HEAD`, String))

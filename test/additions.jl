@@ -425,6 +425,12 @@ tablearray(t, name) = Float64.(t["arrays"][name]["values"])
         c = [isodd(i) ? hi : lo for i in 1:64]
         one_ = foldseries(ERI(; period = 1), (high = c .+ 1, low = c .- 1, close = c))
         @test all(==(1.0), one_.eri_bullpower) && all(==(-1.0), one_.eri_bearpower)
+        # Bar 33 all -0.0: the copy keeps the close's sign, so each power is
+        # high − close and low − close bit for bit.
+        h, l, c0 = c .+ 1.5, c .- 1.5, copy(c)
+        h[34] = l[34] = c0[34] = -0.0
+        one_ = foldseries(ERI(; period = 1), (high = h, low = l, close = c0))
+        @test isequal(one_.eri_bullpower, h .- c0) && isequal(one_.eri_bearpower, l .- c0)
         for u in loadtable("test_eri")["arrays"]["eriUnstGrid"]["values"]
             got = foldseries(ERI(; unstable = u), ref).eri_bullpower
             @test findfirst(!ismissing, got) == 13 + u

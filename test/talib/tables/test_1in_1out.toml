@@ -1,10 +1,167 @@
-# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_1in_1out.c. Do not edit.
-commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 62021c1:src/tools/ta_regtest/ta_test_func/test_1in_1out.c. Do not edit.
+commit = "62021c1d14ef5499505af5547384cab509adf3fc"
 source = "src/tools/ta_regtest/ta_test_func/test_1in_1out.c"
+
+[structs.ElemLaneIn]
+fields = ["value", "isFloat"]
+types = ["double", "int"]
+
+[structs.ElemRow]
+fields = ["name", "func", "double", "divisor"]
+types = ["char *", "ElemFunc", "double ( * reference ) (", "double"]
 
 [structs.TA_Test]
 fields = ["doRangeTestFlag", "theFunction", "unstablePeriod", "startIdx", "endIdx", "expectedRetCode", "oneOfTheExpectedOutRealIndex0", "oneOfTheExpectedOutReal0", "expectedBegIdx", "expectedNbElement"]
 types = ["TA_Integer", "TA_TestId", "TA_Integer", "TA_Integer", "TA_Integer", "TA_RetCode", "TA_Integer", "TA_Real", "TA_Integer", "TA_Integer"]
+
+[tables.elemLaneIn]
+type = "ElemLaneIn"
+
+    [[tables.elemLaneIn.rows]]
+    isFloat = 1
+    value = 0.5
+    [[tables.elemLaneIn.rows]]
+    isFloat = 0
+    value = nan
+    [[tables.elemLaneIn.rows]]
+    isFloat = 0
+    value = 0.37
+    [[tables.elemLaneIn.rows]]
+    isFloat = 1
+    value = +inf
+    [[tables.elemLaneIn.rows]]
+    isFloat = 1
+    value = 0.25
+    [[tables.elemLaneIn.rows]]
+    isFloat = 1
+    value = -inf
+    [[tables.elemLaneIn.rows]]
+    isFloat = 0
+    value = 0.81
+    [[tables.elemLaneIn.rows]]
+    isFloat = 1
+    value = 0.0
+    [[tables.elemLaneIn.rows]]
+    isFloat = 1
+    value = 0.75
+    [[tables.elemLaneIn.rows]]
+    isFloat = 1
+    value = -0.0
+    [[tables.elemLaneIn.rows]]
+    isFloat = 0
+    value = 0.12
+    [[tables.elemLaneIn.rows]]
+    isFloat = 0
+    value = "DBL_MIN / 8.0"
+    [[tables.elemLaneIn.rows]]
+    isFloat = 1
+    value = 0.125
+    [[tables.elemLaneIn.rows]]
+    isFloat = 0
+    value = 1.0e300
+    [[tables.elemLaneIn.rows]]
+    isFloat = 0
+    value = 0.63
+    [[tables.elemLaneIn.rows]]
+    isFloat = 1
+    value = -1.0
+    [[tables.elemLaneIn.rows]]
+    isFloat = 1
+    value = 0.625
+    [[tables.elemLaneIn.rows]]
+    isFloat = 1
+    value = 2.0
+    [[tables.elemLaneIn.rows]]
+    isFloat = 0
+    value = 0.94
+    [[tables.elemLaneIn.rows]]
+    isFloat = 1
+    value = -0.0
+    [[tables.elemLaneIn.rows]]
+    isFloat = 0
+    value = 1.0e300
+    [[tables.elemLaneIn.rows]]
+    isFloat = 1
+    value = -0.0
+    [[tables.elemLaneIn.rows]]
+    isFloat = 0
+    value = nan
+    [[tables.elemLaneIn.rows]]
+    isFloat = 1
+    value = 0.0
+    [[tables.elemLaneIn.rows]]
+    isFloat = 1
+    value = +inf
+    [[tables.elemLaneIn.rows]]
+    isFloat = 1
+    value = -1.0
+    [[tables.elemLaneIn.rows]]
+    isFloat = 0
+    value = 1.0e300
+
+[tables.elemRows]
+type = "ElemRow"
+
+    [[tables.elemRows.rows]]
+    divisor = 250.0
+    double = "acos"
+    func = "TA_ACOS"
+    name = "ACOS"
+    [[tables.elemRows.rows]]
+    divisor = 250.0
+    double = "asin"
+    func = "TA_ASIN"
+    name = "ASIN"
+    [[tables.elemRows.rows]]
+    divisor = 40.0
+    double = "atan"
+    func = "TA_ATAN"
+    name = "ATAN"
+    [[tables.elemRows.rows]]
+    divisor = 40.0
+    double = "cos"
+    func = "TA_COS"
+    name = "COS"
+    [[tables.elemRows.rows]]
+    divisor = 40.0
+    double = "cosh"
+    func = "TA_COSH"
+    name = "COSH"
+    [[tables.elemRows.rows]]
+    divisor = 40.0
+    double = "exp"
+    func = "TA_EXP"
+    name = "EXP"
+    [[tables.elemRows.rows]]
+    divisor = 40.0
+    double = "log"
+    func = "TA_LN"
+    name = "LN"
+    [[tables.elemRows.rows]]
+    divisor = 40.0
+    double = "log10"
+    func = "TA_LOG10"
+    name = "LOG10"
+    [[tables.elemRows.rows]]
+    divisor = 40.0
+    double = "sin"
+    func = "TA_SIN"
+    name = "SIN"
+    [[tables.elemRows.rows]]
+    divisor = 40.0
+    double = "sinh"
+    func = "TA_SINH"
+    name = "SINH"
+    [[tables.elemRows.rows]]
+    divisor = 40.0
+    double = "tan"
+    func = "TA_TAN"
+    name = "TAN"
+    [[tables.elemRows.rows]]
+    divisor = 40.0
+    double = "tanh"
+    func = "TA_TANH"
+    name = "TANH"
 
 [tables.tableTest]
 type = "TA_Test"

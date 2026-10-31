@@ -91,6 +91,34 @@ function xorshiftunit(seed, n)
     end
 end
 
+# ta_test_ref_peg_ema (#434): an EMA(10) of a price pegged at 1.0001 in 1e-4
+# ticks, 60 bars off the peg and then 480 on it, twice; and `walk`, an unpegged
+# cent walk to pair it with. The EMA converges onto the peg, so its windows
+# end up exactly constant after values that were not.
+function pegema()
+    state = UInt32(7919)
+    step!() = (state = (state * 0x41c64e6d + 0x00003039) & 0x7fffffff;
+        Int((state >> 8) % 5) - 2)
+    price = Float64[]
+    for _ in 1:2
+        ticks = 10001
+        for _ in 1:60
+            ticks += step!()
+            push!(price, ticks / 10000.0)
+        end
+        append!(price, fill(10001.0 / 10000.0, 480))
+    end
+    k = 2.0 / 11.0
+    peg = copy(price)
+    for i in 2:length(peg)
+        peg[i] = peg[i-1] + k * (price[i] - peg[i-1])
+    end
+    state = UInt32(7919) ⊻ 0x5a5a5a5a
+    ticks = 4437
+    walk = map(_ -> (ticks += step!(); ticks / 100.0), 1:length(peg))
+    return peg, walk
+end
+
 relerr(got, want) = abs(want) > 1e-12 ? abs(got - want) / abs(want) : abs(got - want)
 
 windowed(s, cols, p) = only(foldseries(s, cols; window = Bars(p)))
@@ -238,6 +266,20 @@ corr(x, y, p) = windowed(Correlation(:x, :y), (; x, y), p)
         s = ldexp(1.0, -283)
         small, unit = corr(xs .* s, ys .* s, 4), corr(xs, ys, 4)
         @test all(i -> isapprox(small[i], unit[i]; atol = 1e-15), 4:6)
+        # (#434) The peg history, both argument orders, within 1e-8 of the
+        # oracle. Where the peg's window is constant TA-Lib gives 0 and
+        # Correlation NaN (DESIGN.md, "Testing").
+        peg, walk = pegema()
+        for p in (14, 20, 50, 200), (x, y) in ((peg, walk), (walk, peg))
+            r = corr(x, y, p)
+            ok = all(p:length(x)) do i
+                wx, wy = x[(i-p+1):i], y[(i-p+1):i]
+                isconstant(wx) || isconstant(wy) ? isnan(r[i]) :
+                abs(r[i] - refcorr(wx, wy)) <= 1e-8
+            end
+            ok || @info "CORREL #434 peg" p
+            @test ok
+        end
     end
 
     @testset "test_beta.c" begin
@@ -397,6 +439,27 @@ corr(x, y, p) = windowed(Correlation(:x, :y), (; x, y), p)
                 abs(s[i] - want) / want <= 1e-11 + 1e-6 * ke^2
             end
             ok || @info "STDDEV #243" base p d
+            @test ok
+        end
+        # (#434) The peg history: an EMA settling onto a peg, so windows of
+        # nearly equal values give way to exactly constant ones. TA-Lib holds
+        # VAR to 1e-7 and STDDEV to 5e-8 of the oracle; the constant windows to
+        # var.c's floor (DESIGN.md, "Testing").
+        peg, _ = pegema()
+        for p in (14, 20, 50, 200)
+            v, d = var(peg, p), sd(peg, p)
+            @test count(i -> isconstant(peg[(i-p+1):i]), p:length(peg)) > 0
+            ok = all(p:length(peg)) do i
+                w = peg[(i-p+1):i]
+                want = refvar(w)
+                varok(v[i], want, w; base = 1e-7) &&
+                    (
+                        want == 0 ? d[i]^2 <= 1e-12 * sum(abs2, w) / p :
+                        abs(d[i] - refstd(w)) / refstd(w) <=
+                        5e-8 + 50 * abs(refmean(w)) / sqrt(want) * eps()
+                    )
+            end
+            ok || @info "VAR/STDDEV #434 peg" p
             @test ok
         end
     end

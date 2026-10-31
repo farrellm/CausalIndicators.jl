@@ -1,0 +1,3489 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 62021c1:src/tools/ta_regtest/ta_test_func/test_cg.c. Do not edit.
+commit = "62021c1d14ef5499505af5547384cab509adf3fc"
+source = "src/tools/ta_regtest/ta_test_func/test_cg.c"
+
+[arrays.cgE112]
+type = "double"
+values = [1.0, 1.0, 2.0]
+
+[arrays.cgExPeriods]
+type = "int"
+values = [2, 3, 10, 14, 57, 1000]
+
+[arrays.cgExactDen]
+type = "double"
+values = [1.125899906842624e15, -1.125899906842623e15]
+
+[arrays.cgImpNew10]
+type = "double"
+values = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]
+
+[arrays.cgImpNew2]
+type = "double"
+values = [0.0, 1.0]
+
+[arrays.cgImpOld10]
+type = "double"
+values = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+[arrays.cgImpOld2]
+type = "double"
+values = [1.0, 0.0]
+
+[arrays.cgLocalPeriods]
+type = "int"
+values = [2, 10, 57]
+
+[arrays.cgNearFlat]
+type = "double"
+values = [100.0, 100.0, 100.0, 101.0]
+
+[arrays.cgNegSum]
+type = "double"
+values = [-1.0, -1.0, -2.0]
+
+[arrays.cgZeroNum]
+type = "double"
+values = [1.0, -2.0]
+
+[arrays.cgZeroSum]
+type = "double"
+values = [2.0, -1.0, -1.0]
+
+[structs.CgEdge]
+fields = ["name", "series", "n", "want", "rel"]
+types = ["char *", "int", "int", "double", "double"]
+
+[structs.CgGolden]
+fields = ["tag", "series", "startIdx", "endIdx", "n", "beg", "nb", "pandasAbs", "tsAbs", "pineAbs", "rows", "nbRows"]
+types = ["char *", "int", "int", "int", "int", "int", "int", "double", "double", "double", "CgRow *", "int"]
+
+[structs.CgRow]
+fields = ["bar", "exact", "pandas", "ts", "pine", "tol"]
+types = ["int", "double", "double", "double", "double", "double"]
+
+[tables.cgEdges]
+type = "CgEdge"
+
+    [[tables.cgEdges.rows]]
+    n = 3
+    name = "[1,1,2]"
+    rel = 0.0
+    series = "CG_E112"
+    want = -1.75
+    [[tables.cgEdges.rows]]
+    n = 2
+    name = "impulse newest"
+    rel = 0.0
+    series = "CG_IMPNEW2"
+    want = -1.0
+    [[tables.cgEdges.rows]]
+    n = 2
+    name = "impulse oldest"
+    rel = 0.0
+    series = "CG_IMPOLD2"
+    want = -2.0
+    [[tables.cgEdges.rows]]
+    n = 10
+    name = "impulse newest"
+    rel = 0.0
+    series = "CG_IMPNEW10"
+    want = -1.0
+    [[tables.cgEdges.rows]]
+    n = 10
+    name = "impulse oldest"
+    rel = 0.0
+    series = "CG_IMPOLD10"
+    want = -10.0
+    [[tables.cgEdges.rows]]
+    n = 2
+    name = "flat 7"
+    rel = 0.0
+    series = "CG_FLAT7"
+    want = -1.5
+    [[tables.cgEdges.rows]]
+    n = 10
+    name = "flat 7"
+    rel = 0.0
+    series = "CG_FLAT7"
+    want = -5.5
+    [[tables.cgEdges.rows]]
+    n = 2
+    name = "flat 2^-60"
+    rel = 0.0
+    series = "CG_FLAT2M60"
+    want = -1.5
+    [[tables.cgEdges.rows]]
+    n = 10
+    name = "flat 2^-60"
+    rel = 0.0
+    series = "CG_FLAT2M60"
+    want = -5.5
+    [[tables.cgEdges.rows]]
+    n = 2
+    name = "all +0.0"
+    rel = 0.0
+    series = "CG_ZERO"
+    want = -1.5
+    [[tables.cgEdges.rows]]
+    n = 10
+    name = "all +0.0"
+    rel = 0.0
+    series = "CG_ZERO"
+    want = -5.5
+    [[tables.cgEdges.rows]]
+    n = 2
+    name = "all -0.0"
+    rel = 0.0
+    series = "CG_NEGZERO"
+    want = -1.5
+    [[tables.cgEdges.rows]]
+    n = 10
+    name = "all -0.0"
+    rel = 0.0
+    series = "CG_NEGZERO"
+    want = -5.5
+    [[tables.cgEdges.rows]]
+    n = 3
+    name = "[2,-1,-1]"
+    rel = 0.0
+    series = "CG_ZEROSUM"
+    want = -2.0
+    [[tables.cgEdges.rows]]
+    n = 3
+    name = "[-1,-1,-2]"
+    rel = 0.0
+    series = "CG_NEGSUM"
+    want = -1.75
+    [[tables.cgEdges.rows]]
+    n = 4
+    name = "[100,100,100,101]"
+    rel = 0.0
+    series = "CG_NEARFLAT"
+    want = -2.4962593516209477
+    [[tables.cgEdges.rows]]
+    n = 2
+    name = "[2^-60,2^-59]"
+    rel = 0.0
+    series = "CG_TINY"
+    want = -1.3333333333333333
+    [[tables.cgEdges.rows]]
+    n = 2
+    name = "[1,-2]"
+    rel = 0.0
+    series = "CG_ZERONUM"
+    want = 0.0
+    [[tables.cgEdges.rows]]
+    n = 2
+    name = "[2^50,1-2^50]"
+    rel = 0.0
+    series = "CG_EXACTDEN"
+    want = -1.125899906842625e15
+    [[tables.cgEdges.rows]]
+    n = 10
+    name = "flat 0.1"
+    rel = 1.0e-12
+    series = "CG_FLAT01"
+    want = -5.5
+    [[tables.cgEdges.rows]]
+    n = 1000
+    name = "flat 0.1"
+    rel = 1.0e-12
+    series = "CG_FLAT01"
+    want = -500.5
+    [[tables.cgEdges.rows]]
+    n = 10
+    name = "flat 123.45"
+    rel = 1.0e-12
+    series = "CG_FLAT12345"
+    want = -5.5
+    [[tables.cgEdges.rows]]
+    n = 1000
+    name = "flat 123.45"
+    rel = 1.0e-12
+    series = "CG_FLAT12345"
+    want = -500.5
+
+[tables.cgGoldens]
+type = "CgGolden"
+
+    [[tables.cgGoldens.rows]]
+    values = ["close-n2", "CG_CLOSE", 0, 251, 2, 1, 251, 2.7e-16, 3.5e-16, 7.6e-14, "CG_ROWS ( cg_close_n2 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["close-n5", "CG_CLOSE", 0, 251, 5, 4, 248, 9.8e-16, 7.4e-16, 4.2e-14, "CG_ROWS ( cg_close_n5 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["close-n10", "CG_CLOSE", 0, 251, 10, 9, 243, 1.9e-15, 2.4e-15, 2.4e-14, "CG_ROWS ( cg_close_n10 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["close-n14", "CG_CLOSE", 0, 251, 14, 13, 239, 3.4e-15, 2.8e-15, 2.8e-14, "CG_ROWS ( cg_close_n14 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["close-n20", "CG_CLOSE", 0, 251, 20, 19, 233, 5.4e-15, 4.3e-15, 4.3e-14, "CG_ROWS ( cg_close_n20 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["close-n50", "CG_CLOSE", 0, 251, 50, 49, 203, 1.6e-14, 1.5e-14, 4.1e-14, "CG_ROWS ( cg_close_n50 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["close-n100", "CG_CLOSE", 0, 251, 100, 99, 153, 5.0e-14, 4.4e-14, 3.4e-14, "CG_ROWS ( cg_close_n100 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["close-n252", "CG_CLOSE", 0, 251, 252, 251, 1, 1.3e-14, 7.3e-14, 1.7e-15, "CG_ROWS ( cg_close_n252 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["med-n2", "CG_MED", 0, 251, 2, 1, 251, 3.7e-16, 3.7e-16, 6.3e-14, "CG_ROWS ( cg_med_n2 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["med-n5", "CG_MED", 0, 251, 5, 4, 248, 1.1e-15, 9.8e-16, 3.0e-14, "CG_ROWS ( cg_med_n5 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["med-n10", "CG_MED", 0, 251, 10, 9, 243, 2.8e-15, 1.9e-15, 5.0e-14, "CG_ROWS ( cg_med_n10 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["med-n14", "CG_MED", 0, 251, 14, 13, 239, 3.0e-15, 2.7e-15, 3.8e-14, "CG_ROWS ( cg_med_n14 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["med-n20", "CG_MED", 0, 251, 20, 19, 233, 5.2e-15, 4.6e-15, 2.0e-14, "CG_ROWS ( cg_med_n20 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["med-n50", "CG_MED", 0, 251, 50, 49, 203, 1.9e-14, 2.0e-14, 6.3e-14, "CG_ROWS ( cg_med_n50 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["close-n10-s5", "CG_CLOSE", 5, 251, 10, 9, 243, 1.9e-15, 2.4e-15, 2.4e-14, "CG_ROWS ( cg_close_n10_s5 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["close-n10-s9", "CG_CLOSE", 9, 251, 10, 9, 243, 1.9e-15, 2.4e-15, 2.4e-14, "CG_ROWS ( cg_close_n10_s9 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["close-n10-s100", "CG_CLOSE", 100, 251, 10, 100, 152, 1.9e-15, 2.4e-15, 1.8e-14, "CG_ROWS ( cg_close_n10_s100 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["close-n10-s251", "CG_CLOSE", 251, 251, 10, 251, 1, 6.9e-16, 6.9e-16, 1.1e-15, "CG_ROWS ( cg_close_n10_s251 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["close-n50-s100-e150", "CG_CLOSE", 100, 150, 50, 100, 51, 1.1e-14, 1.2e-14, 3.0e-14, "CG_ROWS ( cg_close_n50_s100_e150 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["med-n10-s200", "CG_MED", 200, 251, 10, 200, 52, 2.0e-15, 1.6e-15, 1.1e-14, "CG_ROWS ( cg_med_n10_s200 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["negclose-n10", "CG_NEGCLOSE", 0, 251, 10, 9, 243, 1.9e-15, nan, 2.4e-14, "CG_ROWS ( cg_negclose_n10 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["mom1-n2", "CG_MOM1", 0, 250, 2, 1, 250, 2.0e-15, 2.0e-15, 2.0e-15, "CG_ROWS ( cg_mom1_n2 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["mom1-n10", "CG_MOM1", 0, 250, 10, 9, 242, 5.4e-14, 5.4e-14, 5.4e-14, "CG_ROWS ( cg_mom1_n10 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["mom1-n50", "CG_MOM1", 0, 250, 50, 49, 202, 3.3e-13, 5.8e-14, 2.5e-12, "CG_ROWS ( cg_mom1_n50 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["tick100-n10", "CG_TICK100", 0, 299, 10, 9, 291, 1.8e-15, 1.7e-15, 6.8e-14, "CG_ROWS ( cg_tick100_n10 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["tick100-n50", "CG_TICK100", 0, 299, 50, 49, 251, 1.2e-14, 3.4e-14, 2.0e-13, "CG_ROWS ( cg_tick100_n50 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["stepflat-n10", "CG_STEPFLAT", 0, 79, 10, 9, 71, 1.9e-15, 1.9e-15, 1.1e-14, "CG_ROWS ( cg_stepflat_n10 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["spike-n1000", "CG_SPIKE", 999, 1099, 1000, 999, 101, 1.2e-12, 1.5e-12, 1.8e-13, "CG_ROWS ( cg_spike_n1000 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["long-n1000", "CG_LONG", 99999, 100149, 1000, 99999, 151, 1.4e-12, 1.1e-12, 5.0e-13, "CG_ROWS ( cg_long_n1000 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["long-n10000", "CG_LONG", 99999, 100149, 10000, 99999, 151, 4.6e-11, 3.3e-11, nan, "CG_ROWS ( cg_long_n10000 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["long-n100000", "CG_LONG", 99999, 100149, 100000, 99999, 151, 8.2e-10, 6.4e-10, nan, "CG_ROWS ( cg_long_n100000 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["flat7-n2", "CG_FLAT7", 0, 59, 2, 1, 59, 0.0, 0.0, 0.0, "CG_ROWS ( cg_flat7_n2 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["flat7-n10", "CG_FLAT7", 0, 59, 10, 9, 51, 0.0, 0.0, 0.0, "CG_ROWS ( cg_flat7_n10 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["flat2m60-n2", "CG_FLAT2M60", 0, 59, 2, 1, 59, 0.0, 0.0, 0.0, "CG_ROWS ( cg_flat2m60_n2 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["flat2m60-n10", "CG_FLAT2M60", 0, 59, 10, 9, 51, 0.0, 0.0, 0.0, "CG_ROWS ( cg_flat2m60_n10 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["flat01-n10", "CG_FLAT01", 0, 59, 10, 9, 51, 0.0, 1.8e-15, 8.9e-16, "CG_ROWS ( cg_flat01_n10 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["flat01-n1000", "CG_FLAT01", 0, 1009, 1000, 999, 11, 0.0, 7.1e-12, 7.1e-12, "CG_ROWS ( cg_flat01_n1000 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["flat01-n100000", "CG_FLAT01", 0, 100001, 100000, 99999, 3, 0.0, 9.5e-8, nan, "CG_ROWS ( cg_flat01_n100000 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["flat12345-n10", "CG_FLAT12345", 0, 59, 10, 9, 51, 0.0, 8.9e-16, 8.9e-16, "CG_ROWS ( cg_flat12345_n10 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["flat12345-n1000", "CG_FLAT12345", 0, 1009, 1000, 999, 11, 0.0, 8.1e-12, 8.1e-12, "CG_ROWS ( cg_flat12345_n1000 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["flat12345-n100000", "CG_FLAT12345", 0, 100001, 100000, 99999, 3, 0.0, 6.1e-8, nan, "CG_ROWS ( cg_flat12345_n100000 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["zero-n2", "CG_ZERO", 0, 59, 2, 1, 59, nan, nan, nan, "CG_ROWS ( cg_zero_n2 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["zero-n10", "CG_ZERO", 0, 59, 10, 9, 51, nan, nan, nan, "CG_ROWS ( cg_zero_n10 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["negzero-n2", "CG_NEGZERO", 0, 59, 2, 1, 59, nan, nan, nan, "CG_ROWS ( cg_negzero_n2 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["negzero-n10", "CG_NEGZERO", 0, 59, 10, 9, 51, nan, nan, nan, "CG_ROWS ( cg_negzero_n10 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["alt-n2", "CG_ALT", 0, 59, 2, 1, 59, nan, nan, nan, "CG_ROWS ( cg_alt_n2 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["alt-n3", "CG_ALT", 0, 59, 3, 2, 58, 0.0, 0.0, 0.0, "CG_ROWS ( cg_alt_n3 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["alt-n10", "CG_ALT", 0, 59, 10, 9, 51, nan, nan, nan, "CG_ROWS ( cg_alt_n10 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["eps-n10", "CG_EPS", 0, 199, 10, 9, 191, 3.0e-16, 6.0e-16, 3.0e-16, "CG_ROWS ( cg_eps_n10 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["edge-e112-n3", "CG_E112", 0, 2, 3, 2, 1, 0.0, 0.0, 0.0, "CG_ROWS ( cg_edge_e112_n3 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["edge-impnew2-n2", "CG_IMPNEW2", 0, 1, 2, 1, 1, 0.0, 0.0, 0.0, "CG_ROWS ( cg_edge_impnew2_n2 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["edge-impold2-n2", "CG_IMPOLD2", 0, 1, 2, 1, 1, 0.0, 0.0, 0.0, "CG_ROWS ( cg_edge_impold2_n2 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["edge-impnew10-n10", "CG_IMPNEW10", 0, 9, 10, 9, 1, 0.0, 0.0, 0.0, "CG_ROWS ( cg_edge_impnew10_n10 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["edge-impold10-n10", "CG_IMPOLD10", 0, 9, 10, 9, 1, 0.0, 0.0, 0.0, "CG_ROWS ( cg_edge_impold10_n10 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["edge-zerosum-n3", "CG_ZEROSUM", 0, 2, 3, 2, 1, nan, nan, nan, "CG_ROWS ( cg_edge_zerosum_n3 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["edge-negsum-n3", "CG_NEGSUM", 0, 2, 3, 2, 1, 0.0, nan, 0.0, "CG_ROWS ( cg_edge_negsum_n3 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["edge-nearflat-n4", "CG_NEARFLAT", 0, 3, 4, 3, 1, 6.7e-17, 6.7e-17, 6.7e-17, "CG_ROWS ( cg_edge_nearflat_n4 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["edge-tiny-n2", "CG_TINY", 0, 1, 2, 1, 1, 7.5e-17, 7.5e-17, 7.5e-17, "CG_ROWS ( cg_edge_tiny_n2 )"]
+    [[tables.cgGoldens.rows]]
+    values = ["edge-zeronum-n2", "CG_ZERONUM", 0, 1, 2, 1, 1, 0.0, nan, 0.0, "CG_ROWS ( cg_edge_zeronum_n2 )"]
+
+[tables.cg_alt_n10]
+type = "CgRow"
+
+    [[tables.cg_alt_n10.rows]]
+    bar = 9
+    exact = -5.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+    [[tables.cg_alt_n10.rows]]
+    bar = 10
+    exact = -5.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+    [[tables.cg_alt_n10.rows]]
+    bar = 11
+    exact = -5.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+    [[tables.cg_alt_n10.rows]]
+    bar = 59
+    exact = -5.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+
+[tables.cg_alt_n2]
+type = "CgRow"
+
+    [[tables.cg_alt_n2.rows]]
+    bar = 1
+    exact = -1.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+    [[tables.cg_alt_n2.rows]]
+    bar = 2
+    exact = -1.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+    [[tables.cg_alt_n2.rows]]
+    bar = 3
+    exact = -1.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+    [[tables.cg_alt_n2.rows]]
+    bar = 59
+    exact = -1.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+
+[tables.cg_alt_n3]
+type = "CgRow"
+
+    [[tables.cg_alt_n3.rows]]
+    bar = 2
+    exact = -2.0
+    pandas = -2.0
+    pine = -2.0
+    tol = 0.0
+    ts = 2.0
+    [[tables.cg_alt_n3.rows]]
+    bar = 3
+    exact = -2.0
+    pandas = -2.0
+    pine = -2.0
+    tol = 0.0
+    ts = nan
+    [[tables.cg_alt_n3.rows]]
+    bar = 4
+    exact = -2.0
+    pandas = -2.0
+    pine = -2.0
+    tol = 0.0
+    ts = 2.0
+    [[tables.cg_alt_n3.rows]]
+    bar = 59
+    exact = -2.0
+    pandas = -2.0
+    pine = -2.0
+    tol = 0.0
+    ts = nan
+
+[tables.cg_close_n10]
+type = "CgRow"
+
+    [[tables.cg_close_n10.rows]]
+    bar = 9
+    exact = -5.520243924677261
+    pandas = -5.520243924677262
+    pine = -5.520243924677261
+    tol = 5.6e-12
+    ts = 5.479756075322739
+    [[tables.cg_close_n10.rows]]
+    bar = 10
+    exact = -5.516346810690804
+    pandas = -5.516346810690802
+    pine = -5.516346810690804
+    tol = 5.6e-12
+    ts = 5.483653189309197
+    [[tables.cg_close_n10.rows]]
+    bar = 11
+    exact = -5.492640913857438
+    pandas = -5.492640913857439
+    pine = -5.492640913857439
+    tol = 5.6e-12
+    ts = 5.507359086142561
+    [[tables.cg_close_n10.rows]]
+    bar = 33
+    exact = -5.452461117259859
+    pandas = -5.452461117259861
+    pine = -5.452461117259849
+    tol = 5.5e-12
+    ts = 5.54753888274014
+    [[tables.cg_close_n10.rows]]
+    bar = 51
+    exact = -5.506059360629152
+    pandas = -5.506059360629152
+    pine = -5.50605936062914
+    tol = 5.6e-12
+    ts = 5.493940639370849
+    [[tables.cg_close_n10.rows]]
+    bar = 80
+    exact = -5.261610752349451
+    pandas = -5.261610752349451
+    pine = -5.261610752349441
+    tol = 5.3e-12
+    ts = 5.738389247650549
+    [[tables.cg_close_n10.rows]]
+    bar = 100
+    exact = -5.542842780914082
+    pandas = -5.542842780914082
+    pine = -5.542842780914076
+    tol = 5.6e-12
+    ts = 5.457157219085918
+    [[tables.cg_close_n10.rows]]
+    bar = 196
+    exact = -5.609634250511221
+    pandas = -5.609634250511222
+    pine = -5.609634250511208
+    tol = 5.7e-12
+    ts = 5.390365749488781
+    [[tables.cg_close_n10.rows]]
+    bar = 200
+    exact = -5.6034261667389105
+    pandas = -5.60342616673891
+    pine = -5.603426166738897
+    tol = 5.7e-12
+    ts = 5.3965738332610895
+    [[tables.cg_close_n10.rows]]
+    bar = 206
+    exact = -5.666341074454301
+    pandas = -5.6663410744543015
+    pine = -5.666341074454284
+    tol = 5.8e-12
+    ts = 5.333658925545699
+    [[tables.cg_close_n10.rows]]
+    bar = 246
+    exact = -5.501632907676501
+    pandas = -5.501632907676502
+    pine = -5.501632907676477
+    tol = 5.6e-12
+    ts = 5.4983670923235
+    [[tables.cg_close_n10.rows]]
+    bar = 251
+    exact = -5.509788107632525
+    pandas = -5.5097881076325255
+    pine = -5.509788107632502
+    tol = 5.6e-12
+    ts = 5.490211892367476
+
+[tables.cg_close_n100]
+type = "CgRow"
+
+    [[tables.cg_close_n100.rows]]
+    bar = 99
+    exact = -48.51488193317869
+    pandas = -48.514881933178685
+    pine = -48.51488193317871
+    tol = 5.2e-11
+    ts = 52.48511806682132
+    [[tables.cg_close_n100.rows]]
+    bar = 100
+    exact = -48.420442714467114
+    pandas = -48.4204427144671
+    pine = -48.42044271446712
+    tol = 5.2e-11
+    ts = 52.57955728553291
+    [[tables.cg_close_n100.rows]]
+    bar = 101
+    exact = -48.31063681915739
+    pandas = -48.31063681915739
+    pine = -48.310636819157395
+    tol = 5.2e-11
+    ts = 52.689363180842626
+    [[tables.cg_close_n100.rows]]
+    bar = 135
+    exact = -46.105068463985006
+    pandas = -46.105068463985006
+    pine = -46.105068463985
+    tol = 5.0e-11
+    ts = 54.89493153601502
+    [[tables.cg_close_n100.rows]]
+    bar = 170
+    exact = -48.51682202845927
+    pandas = -48.51682202845927
+    pine = -48.51682202845924
+    tol = 5.2e-11
+    ts = 52.4831779715407
+    [[tables.cg_close_n100.rows]]
+    bar = 180
+    exact = -49.236044629818316
+    pandas = -49.23604462981831
+    pine = -49.236044629818316
+    tol = 5.3e-11
+    ts = 51.76395537018164
+    [[tables.cg_close_n100.rows]]
+    bar = 200
+    exact = -50.726812117030775
+    pandas = -50.72681211703078
+    pine = -50.726812117030775
+    tol = 5.5e-11
+    ts = 50.27318788296922
+    [[tables.cg_close_n100.rows]]
+    bar = 223
+    exact = -53.4096408508158
+    pandas = -53.409640850815805
+    pine = -53.40964085081582
+    tol = 5.7e-11
+    ts = 47.590359149184174
+    [[tables.cg_close_n100.rows]]
+    bar = 237
+    exact = -52.851141505463474
+    pandas = -52.851141505463524
+    pine = -52.85114150546346
+    tol = 5.7e-11
+    ts = 48.14885849453651
+    [[tables.cg_close_n100.rows]]
+    bar = 245
+    exact = -52.65749572195252
+    pandas = -52.657495721952486
+    pine = -52.65749572195251
+    tol = 5.7e-11
+    ts = 48.34250427804744
+    [[tables.cg_close_n100.rows]]
+    bar = 251
+    exact = -52.560366124588995
+    pandas = -52.560366124589
+    pine = -52.560366124588995
+    tol = 5.7e-11
+    ts = 48.439633875410976
+
+[tables.cg_close_n10_s100]
+type = "CgRow"
+
+    [[tables.cg_close_n10_s100.rows]]
+    bar = 100
+    exact = -5.542842780914082
+    pandas = -5.542842780914082
+    pine = -5.542842780914082
+    tol = 5.6e-12
+    ts = 5.457157219085918
+    [[tables.cg_close_n10_s100.rows]]
+    bar = 101
+    exact = -5.52905836669784
+    pandas = -5.52905836669784
+    pine = -5.52905836669784
+    tol = 5.6e-12
+    ts = 5.47094163330216
+    [[tables.cg_close_n10_s100.rows]]
+    bar = 102
+    exact = -5.531864073208689
+    pandas = -5.5318640732086894
+    pine = -5.5318640732086894
+    tol = 5.6e-12
+    ts = 5.4681359267913106
+    [[tables.cg_close_n10_s100.rows]]
+    bar = 196
+    exact = -5.609634250511221
+    pandas = -5.609634250511222
+    pine = -5.609634250511214
+    tol = 5.7e-12
+    ts = 5.390365749488781
+    [[tables.cg_close_n10_s100.rows]]
+    bar = 200
+    exact = -5.6034261667389105
+    pandas = -5.6034261667389105
+    pine = -5.603426166738903
+    tol = 5.7e-12
+    ts = 5.3965738332610895
+    [[tables.cg_close_n10_s100.rows]]
+    bar = 206
+    exact = -5.666341074454301
+    pandas = -5.6663410744543015
+    pine = -5.666341074454291
+    tol = 5.8e-12
+    ts = 5.333658925545699
+    [[tables.cg_close_n10_s100.rows]]
+    bar = 221
+    exact = -5.470388540657891
+    pandas = -5.470388540657891
+    pine = -5.470388540657877
+    tol = 5.6e-12
+    ts = 5.52961145934211
+    [[tables.cg_close_n10_s100.rows]]
+    bar = 235
+    exact = -5.365517685005652
+    pandas = -5.365517685005652
+    pine = -5.365517685005638
+    tol = 5.5e-12
+    ts = 5.634482314994348
+    [[tables.cg_close_n10_s100.rows]]
+    bar = 245
+    exact = -5.5176054729958075
+    pandas = -5.517605472995806
+    pine = -5.5176054729957915
+    tol = 5.6e-12
+    ts = 5.4823945270041925
+    [[tables.cg_close_n10_s100.rows]]
+    bar = 247
+    exact = -5.498611149308325
+    pandas = -5.498611149308324
+    pine = -5.498611149308307
+    tol = 5.6e-12
+    ts = 5.501388850691676
+    [[tables.cg_close_n10_s100.rows]]
+    bar = 251
+    exact = -5.509788107632525
+    pandas = -5.5097881076325255
+    pine = -5.509788107632509
+    tol = 5.6e-12
+    ts = 5.490211892367476
+
+[tables.cg_close_n10_s251]
+type = "CgRow"
+
+    [[tables.cg_close_n10_s251.rows]]
+    bar = 251
+    exact = -5.509788107632525
+    pandas = -5.509788107632524
+    pine = -5.5097881076325255
+    tol = 5.6e-12
+    ts = 5.490211892367476
+
+[tables.cg_close_n10_s5]
+type = "CgRow"
+
+    [[tables.cg_close_n10_s5.rows]]
+    bar = 9
+    exact = -5.520243924677261
+    pandas = -5.520243924677262
+    pine = -5.520243924677261
+    tol = 5.6e-12
+    ts = 5.479756075322739
+    [[tables.cg_close_n10_s5.rows]]
+    bar = 10
+    exact = -5.516346810690804
+    pandas = -5.516346810690802
+    pine = -5.516346810690804
+    tol = 5.6e-12
+    ts = 5.483653189309197
+    [[tables.cg_close_n10_s5.rows]]
+    bar = 11
+    exact = -5.492640913857438
+    pandas = -5.492640913857439
+    pine = -5.492640913857439
+    tol = 5.6e-12
+    ts = 5.507359086142561
+    [[tables.cg_close_n10_s5.rows]]
+    bar = 33
+    exact = -5.452461117259859
+    pandas = -5.452461117259861
+    pine = -5.452461117259849
+    tol = 5.5e-12
+    ts = 5.54753888274014
+    [[tables.cg_close_n10_s5.rows]]
+    bar = 51
+    exact = -5.506059360629152
+    pandas = -5.506059360629152
+    pine = -5.50605936062914
+    tol = 5.6e-12
+    ts = 5.493940639370849
+    [[tables.cg_close_n10_s5.rows]]
+    bar = 80
+    exact = -5.261610752349451
+    pandas = -5.261610752349451
+    pine = -5.261610752349441
+    tol = 5.3e-12
+    ts = 5.738389247650549
+    [[tables.cg_close_n10_s5.rows]]
+    bar = 100
+    exact = -5.542842780914082
+    pandas = -5.542842780914082
+    pine = -5.542842780914076
+    tol = 5.6e-12
+    ts = 5.457157219085918
+    [[tables.cg_close_n10_s5.rows]]
+    bar = 196
+    exact = -5.609634250511221
+    pandas = -5.609634250511222
+    pine = -5.609634250511208
+    tol = 5.7e-12
+    ts = 5.390365749488781
+    [[tables.cg_close_n10_s5.rows]]
+    bar = 200
+    exact = -5.6034261667389105
+    pandas = -5.60342616673891
+    pine = -5.603426166738897
+    tol = 5.7e-12
+    ts = 5.3965738332610895
+    [[tables.cg_close_n10_s5.rows]]
+    bar = 206
+    exact = -5.666341074454301
+    pandas = -5.6663410744543015
+    pine = -5.666341074454284
+    tol = 5.8e-12
+    ts = 5.333658925545699
+    [[tables.cg_close_n10_s5.rows]]
+    bar = 246
+    exact = -5.501632907676501
+    pandas = -5.501632907676502
+    pine = -5.501632907676477
+    tol = 5.6e-12
+    ts = 5.4983670923235
+    [[tables.cg_close_n10_s5.rows]]
+    bar = 251
+    exact = -5.509788107632525
+    pandas = -5.5097881076325255
+    pine = -5.509788107632502
+    tol = 5.6e-12
+    ts = 5.490211892367476
+
+[tables.cg_close_n10_s9]
+type = "CgRow"
+
+    [[tables.cg_close_n10_s9.rows]]
+    bar = 9
+    exact = -5.520243924677261
+    pandas = -5.520243924677262
+    pine = -5.520243924677261
+    tol = 5.6e-12
+    ts = 5.479756075322739
+    [[tables.cg_close_n10_s9.rows]]
+    bar = 10
+    exact = -5.516346810690804
+    pandas = -5.516346810690802
+    pine = -5.516346810690804
+    tol = 5.6e-12
+    ts = 5.483653189309197
+    [[tables.cg_close_n10_s9.rows]]
+    bar = 11
+    exact = -5.492640913857438
+    pandas = -5.492640913857439
+    pine = -5.492640913857439
+    tol = 5.6e-12
+    ts = 5.507359086142561
+    [[tables.cg_close_n10_s9.rows]]
+    bar = 33
+    exact = -5.452461117259859
+    pandas = -5.452461117259861
+    pine = -5.452461117259849
+    tol = 5.5e-12
+    ts = 5.54753888274014
+    [[tables.cg_close_n10_s9.rows]]
+    bar = 51
+    exact = -5.506059360629152
+    pandas = -5.506059360629152
+    pine = -5.50605936062914
+    tol = 5.6e-12
+    ts = 5.493940639370849
+    [[tables.cg_close_n10_s9.rows]]
+    bar = 80
+    exact = -5.261610752349451
+    pandas = -5.261610752349451
+    pine = -5.261610752349441
+    tol = 5.3e-12
+    ts = 5.738389247650549
+    [[tables.cg_close_n10_s9.rows]]
+    bar = 100
+    exact = -5.542842780914082
+    pandas = -5.542842780914082
+    pine = -5.542842780914076
+    tol = 5.6e-12
+    ts = 5.457157219085918
+    [[tables.cg_close_n10_s9.rows]]
+    bar = 196
+    exact = -5.609634250511221
+    pandas = -5.609634250511222
+    pine = -5.609634250511208
+    tol = 5.7e-12
+    ts = 5.390365749488781
+    [[tables.cg_close_n10_s9.rows]]
+    bar = 200
+    exact = -5.6034261667389105
+    pandas = -5.60342616673891
+    pine = -5.603426166738897
+    tol = 5.7e-12
+    ts = 5.3965738332610895
+    [[tables.cg_close_n10_s9.rows]]
+    bar = 206
+    exact = -5.666341074454301
+    pandas = -5.6663410744543015
+    pine = -5.666341074454284
+    tol = 5.8e-12
+    ts = 5.333658925545699
+    [[tables.cg_close_n10_s9.rows]]
+    bar = 246
+    exact = -5.501632907676501
+    pandas = -5.501632907676502
+    pine = -5.501632907676477
+    tol = 5.6e-12
+    ts = 5.4983670923235
+    [[tables.cg_close_n10_s9.rows]]
+    bar = 251
+    exact = -5.509788107632525
+    pandas = -5.5097881076325255
+    pine = -5.509788107632502
+    tol = 5.6e-12
+    ts = 5.490211892367476
+
+[tables.cg_close_n14]
+type = "CgRow"
+
+    [[tables.cg_close_n14.rows]]
+    bar = 13
+    exact = -7.487353548882995
+    pandas = -7.487353548882995
+    pine = -7.4873535488829965
+    tol = 7.6e-12
+    ts = 7.512646451117004
+    [[tables.cg_close_n14.rows]]
+    bar = 14
+    exact = -7.5149504569834145
+    pandas = -7.514950456983414
+    pine = -7.514950456983415
+    tol = 7.6e-12
+    ts = 7.4850495430165855
+    [[tables.cg_close_n14.rows]]
+    bar = 15
+    exact = -7.5142832089850975
+    pandas = -7.514283208985097
+    pine = -7.5142832089850975
+    tol = 7.6e-12
+    ts = 7.4857167910149025
+    [[tables.cg_close_n14.rows]]
+    bar = 51
+    exact = -7.409408341416101
+    pandas = -7.409408341416101
+    pine = -7.4094083414161
+    tol = 7.5e-12
+    ts = 7.5905916585839
+    [[tables.cg_close_n14.rows]]
+    bar = 67
+    exact = -7.3597231390906
+    pandas = -7.359723139090597
+    pine = -7.359723139090597
+    tol = 7.5e-12
+    ts = 7.6402768609094
+    [[tables.cg_close_n14.rows]]
+    bar = 83
+    exact = -7.175717720526237
+    pandas = -7.175717720526237
+    pine = -7.175717720526235
+    tol = 7.3e-12
+    ts = 7.824282279473763
+    [[tables.cg_close_n14.rows]]
+    bar = 100
+    exact = -7.486693776225719
+    pandas = -7.486693776225719
+    pine = -7.486693776225716
+    tol = 7.6e-12
+    ts = 7.513306223774279
+    [[tables.cg_close_n14.rows]]
+    bar = 200
+    exact = -7.689139661708586
+    pandas = -7.6891396617085865
+    pine = -7.689139661708572
+    tol = 7.8e-12
+    ts = 7.310860338291417
+    [[tables.cg_close_n14.rows]]
+    bar = 204
+    exact = -7.780225962214617
+    pandas = -7.780225962214616
+    pine = -7.780225962214601
+    tol = 7.9e-12
+    ts = 7.219774037785383
+    [[tables.cg_close_n14.rows]]
+    bar = 228
+    exact = -7.326513477050263
+    pandas = -7.326513477050263
+    pine = -7.326513477050237
+    tol = 7.4e-12
+    ts = 7.673486522949735
+    [[tables.cg_close_n14.rows]]
+    bar = 248
+    exact = -7.549792706109817
+    pandas = -7.549792706109817
+    pine = -7.549792706109789
+    tol = 7.7e-12
+    ts = 7.450207293890183
+    [[tables.cg_close_n14.rows]]
+    bar = 251
+    exact = -7.50395083406497
+    pandas = -7.5039508340649705
+    pine = -7.503950834064942
+    tol = 7.6e-12
+    ts = 7.496049165935032
+
+[tables.cg_close_n2]
+type = "CgRow"
+
+    [[tables.cg_close_n2.rows]]
+    bar = 1
+    exact = -1.491103775863457
+    pandas = -1.491103775863457
+    pine = -1.491103775863457
+    tol = 0.0
+    ts = 1.508896224136543
+    [[tables.cg_close_n2.rows]]
+    bar = 2
+    exact = -1.501162852159205
+    pandas = -1.501162852159205
+    pine = -1.5011628521592049
+    tol = 0.0
+    ts = 1.498837147840795
+    [[tables.cg_close_n2.rows]]
+    bar = 3
+    exact = -1.4980999630548373
+    pandas = -1.4980999630548373
+    pine = -1.4980999630548373
+    tol = 1.6e-12
+    ts = 1.5019000369451627
+    [[tables.cg_close_n2.rows]]
+    bar = 33
+    exact = -1.4909746259690477
+    pandas = -1.490974625969048
+    pine = -1.4909746259690457
+    tol = 1.5e-12
+    ts = 1.5090253740309523
+    [[tables.cg_close_n2.rows]]
+    bar = 75
+    exact = -1.469130411048638
+    pandas = -1.469130411048638
+    pine = -1.4691304110486314
+    tol = 0.0
+    ts = 1.530869588951362
+    [[tables.cg_close_n2.rows]]
+    bar = 100
+    exact = -1.5045381740523225
+    pandas = -1.5045381740523225
+    pine = -1.5045381740523203
+    tol = 0.0
+    ts = 1.4954618259476775
+    [[tables.cg_close_n2.rows]]
+    bar = 200
+    exact = -1.4997197832990845
+    pandas = -1.4997197832990845
+    pine = -1.4997197832991347
+    tol = 0.0
+    ts = 1.5002802167009155
+    [[tables.cg_close_n2.rows]]
+    bar = 202
+    exact = -1.5404040404040404
+    pandas = -1.5404040404040404
+    pine = -1.5404040404040957
+    tol = 0.0
+    ts = 1.4595959595959596
+    [[tables.cg_close_n2.rows]]
+    bar = 230
+    exact = -1.4991282448663308
+    pandas = -1.4991282448663308
+    pine = -1.4991282448663994
+    tol = 1.6e-12
+    ts = 1.5008717551336688
+    [[tables.cg_close_n2.rows]]
+    bar = 251
+    exact = -1.5020312067214476
+    pandas = -1.5020312067214476
+    pine = -1.5020312067215236
+    tol = 0.0
+    ts = 1.4979687932785524
+
+[tables.cg_close_n20]
+type = "CgRow"
+
+    [[tables.cg_close_n20.rows]]
+    bar = 19
+    exact = -10.56631159100451
+    pandas = -10.566311591004512
+    pine = -10.56631159100451
+    tol = 1.1e-11
+    ts = 10.43368840899549
+    [[tables.cg_close_n20.rows]]
+    bar = 20
+    exact = -10.597429766080138
+    pandas = -10.59742976608014
+    pine = -10.597429766080136
+    tol = 1.1e-11
+    ts = 10.402570233919864
+    [[tables.cg_close_n20.rows]]
+    bar = 21
+    exact = -10.612260859916482
+    pandas = -10.612260859916484
+    pine = -10.61226085991648
+    tol = 1.1e-11
+    ts = 10.387739140083518
+    [[tables.cg_close_n20.rows]]
+    bar = 45
+    exact = -10.45508292935541
+    pandas = -10.455082929355404
+    pine = -10.455082929355406
+    tol = 1.1e-11
+    ts = 10.544917070644587
+    [[tables.cg_close_n20.rows]]
+    bar = 90
+    exact = -9.987553511582965
+    pandas = -9.987553511582965
+    pine = -9.987553511582956
+    tol = 1.1e-11
+    ts = 11.012446488417035
+    [[tables.cg_close_n20.rows]]
+    bar = 100
+    exact = -10.307028939562558
+    pandas = -10.307028939562558
+    pine = -10.307028939562558
+    tol = 1.1e-11
+    ts = 10.69297106043744
+    [[tables.cg_close_n20.rows]]
+    bar = 123
+    exact = -10.327827779839001
+    pandas = -10.327827779839003
+    pine = -10.327827779838998
+    tol = 1.1e-11
+    ts = 10.672172220161002
+    [[tables.cg_close_n20.rows]]
+    bar = 200
+    exact = -10.80911837643388
+    pandas = -10.80911837643388
+    pine = -10.809118376433855
+    tol = 1.1e-11
+    ts = 10.190881623566122
+    [[tables.cg_close_n20.rows]]
+    bar = 207
+    exact = -10.997261530827673
+    pandas = -10.997261530827673
+    pine = -10.997261530827647
+    tol = 1.2e-11
+    ts = 10.002738469172327
+    [[tables.cg_close_n20.rows]]
+    bar = 237
+    exact = -10.152502672526428
+    pandas = -10.152502672526431
+    pine = -10.152502672526388
+    tol = 1.1e-11
+    ts = 10.847497327473572
+    [[tables.cg_close_n20.rows]]
+    bar = 240
+    exact = -10.286317358991683
+    pandas = -10.286317358991683
+    pine = -10.28631735899164
+    tol = 1.1e-11
+    ts = 10.713682641008319
+    [[tables.cg_close_n20.rows]]
+    bar = 251
+    exact = -10.605598263543456
+    pandas = -10.605598263543454
+    pine = -10.605598263543415
+    tol = 1.1e-11
+    ts = 10.394401736456546
+
+[tables.cg_close_n252]
+type = "CgRow"
+
+    [[tables.cg_close_n252.rows]]
+    bar = 251
+    exact = -121.43646462697593
+    pandas = -121.43646462697595
+    pine = -121.43646462697593
+    tol = 1.5e-10
+    ts = 131.56353537302414
+
+[tables.cg_close_n5]
+type = "CgRow"
+
+    [[tables.cg_close_n5.rows]]
+    bar = 4
+    exact = -2.9896925878206426
+    pandas = -2.9896925878206426
+    pine = -2.9896925878206426
+    tol = 3.0e-12
+    ts = 3.0103074121793574
+    [[tables.cg_close_n5.rows]]
+    bar = 5
+    exact = -3.002062662633015
+    pandas = -3.0020626626330156
+    pine = -3.0020626626330156
+    tol = 3.1e-12
+    ts = 2.997937337366985
+    [[tables.cg_close_n5.rows]]
+    bar = 6
+    exact = -3.00884344341578
+    pandas = -3.0088434434157802
+    pine = -3.0088434434157802
+    tol = 3.1e-12
+    ts = 2.9911565565842198
+    [[tables.cg_close_n5.rows]]
+    bar = 77
+    exact = -2.885668668583996
+    pandas = -2.885668668583996
+    pine = -2.8856686685839823
+    tol = 2.9e-12
+    ts = 3.114331331416004
+    [[tables.cg_close_n5.rows]]
+    bar = 100
+    exact = -2.9862360852418304
+    pandas = -2.986236085241831
+    pine = -2.9862360852418197
+    tol = 3.0e-12
+    ts = 3.0137639147581696
+    [[tables.cg_close_n5.rows]]
+    bar = 111
+    exact = -3.0085193889541717
+    pandas = -3.008519388954171
+    pine = -3.0085193889541615
+    tol = 3.1e-12
+    ts = 2.9914806110458283
+    [[tables.cg_close_n5.rows]]
+    bar = 158
+    exact = -3.0069642999760404
+    pandas = -3.0069642999760404
+    pine = -3.0069642999760378
+    tol = 3.1e-12
+    ts = 2.9930357000239605
+    [[tables.cg_close_n5.rows]]
+    bar = 176
+    exact = -3.01095327999041
+    pandas = -3.0109532799904093
+    pine = -3.0109532799904137
+    tol = 3.1e-12
+    ts = 2.9890467200095894
+    [[tables.cg_close_n5.rows]]
+    bar = 200
+    exact = -2.9922853665387135
+    pandas = -2.9922853665387135
+    pine = -2.9922853665387352
+    tol = 3.1e-12
+    ts = 3.0077146334612865
+    [[tables.cg_close_n5.rows]]
+    bar = 203
+    exact = -3.083468363435166
+    pandas = -3.083468363435166
+    pine = -3.08346836343519
+    tol = 3.1e-12
+    ts = 2.916531636564834
+    [[tables.cg_close_n5.rows]]
+    bar = 251
+    exact = -3.0088411166954034
+    pandas = -3.0088411166954034
+    pine = -3.0088411166954447
+    tol = 3.1e-12
+    ts = 2.991158883304596
+
+[tables.cg_close_n50]
+type = "CgRow"
+
+    [[tables.cg_close_n50.rows]]
+    bar = 49
+    exact = -25.838741564681595
+    pandas = -25.838741564681598
+    pine = -25.8387415646816
+    tol = 2.7e-11
+    ts = 25.161258435318405
+    [[tables.cg_close_n50.rows]]
+    bar = 50
+    exact = -25.82814351672428
+    pandas = -25.82814351672428
+    pine = -25.828143516724282
+    tol = 2.7e-11
+    ts = 25.17185648327573
+    [[tables.cg_close_n50.rows]]
+    bar = 51
+    exact = -25.79945018585109
+    pandas = -25.799450185851086
+    pine = -25.799450185851093
+    tol = 2.7e-11
+    ts = 25.200549814148914
+    [[tables.cg_close_n50.rows]]
+    bar = 63
+    exact = -25.474803818960435
+    pandas = -25.47480381896044
+    pine = -25.474803818960435
+    tol = 2.7e-11
+    ts = 25.52519618103955
+    [[tables.cg_close_n50.rows]]
+    bar = 82
+    exact = -24.87898092693061
+    pandas = -24.878980926930605
+    pine = -24.87898092693061
+    tol = 2.6e-11
+    ts = 26.121019073069384
+    [[tables.cg_close_n50.rows]]
+    bar = 100
+    exact = -23.866234163718925
+    pandas = -23.866234163718925
+    pine = -23.86623416371892
+    tol = 2.5e-11
+    ts = 27.13376583628108
+    [[tables.cg_close_n50.rows]]
+    bar = 101
+    exact = -23.850316678676435
+    pandas = -23.850316678676442
+    pine = -23.850316678676432
+    tol = 2.5e-11
+    ts = 27.149683321323568
+    [[tables.cg_close_n50.rows]]
+    bar = 139
+    exact = -24.761094666139993
+    pandas = -24.761094666139993
+    pine = -24.761094666139954
+    tol = 2.6e-11
+    ts = 26.238905333860004
+    [[tables.cg_close_n50.rows]]
+    bar = 200
+    exact = -25.99376152778911
+    pandas = -25.993761527789097
+    pine = -25.993761527789086
+    tol = 2.7e-11
+    ts = 25.00623847221089
+    [[tables.cg_close_n50.rows]]
+    bar = 219
+    exact = -27.35473726321757
+    pandas = -27.354737263217576
+    pine = -27.354737263217544
+    tol = 2.9e-11
+    ts = 23.64526273678244
+    [[tables.cg_close_n50.rows]]
+    bar = 251
+    exact = -24.587955188068833
+    pandas = -24.587955188068833
+    pine = -24.58795518806883
+    tol = 2.6e-11
+    ts = 26.412044811931167
+
+[tables.cg_close_n50_s100_e150]
+type = "CgRow"
+
+    [[tables.cg_close_n50_s100_e150.rows]]
+    bar = 100
+    exact = -23.866234163718925
+    pandas = -23.866234163718925
+    pine = -23.866234163718918
+    tol = 2.5e-11
+    ts = 27.13376583628108
+    [[tables.cg_close_n50_s100_e150.rows]]
+    bar = 101
+    exact = -23.850316678676435
+    pandas = -23.85031667867644
+    pine = -23.850316678676432
+    tol = 2.5e-11
+    ts = 27.149683321323568
+    [[tables.cg_close_n50_s100_e150.rows]]
+    bar = 102
+    exact = -23.88255454558087
+    pandas = -23.882554545580874
+    pine = -23.882554545580863
+    tol = 2.5e-11
+    ts = 27.117445454419133
+    [[tables.cg_close_n50_s100_e150.rows]]
+    bar = 122
+    exact = -24.554977333723862
+    pandas = -24.55497733372385
+    pine = -24.554977333723862
+    tol = 2.6e-11
+    ts = 26.44502266627614
+    [[tables.cg_close_n50_s100_e150.rows]]
+    bar = 132
+    exact = -24.601357604905456
+    pandas = -24.60135760490545
+    pine = -24.601357604905438
+    tol = 2.6e-11
+    ts = 26.398642395094534
+    [[tables.cg_close_n50_s100_e150.rows]]
+    bar = 138
+    exact = -24.725961233075505
+    pandas = -24.72596123307551
+    pine = -24.725961233075477
+    tol = 2.6e-11
+    ts = 26.274038766924487
+    [[tables.cg_close_n50_s100_e150.rows]]
+    bar = 150
+    exact = -25.077384042052284
+    pandas = -25.07738404205228
+    pine = -25.077384042052277
+    tol = 2.6e-11
+    ts = 25.922615957947723
+
+[tables.cg_edge_e112_n3]
+type = "CgRow"
+
+    [[tables.cg_edge_e112_n3.rows]]
+    bar = 2
+    exact = -1.75
+    pandas = -1.75
+    pine = -1.75
+    tol = 0.0
+    ts = 2.25
+
+[tables.cg_edge_impnew10_n10]
+type = "CgRow"
+
+    [[tables.cg_edge_impnew10_n10.rows]]
+    bar = 9
+    exact = -1.0
+    pandas = -1.0
+    pine = -1.0
+    tol = 0.0
+    ts = 10.0
+
+[tables.cg_edge_impnew2_n2]
+type = "CgRow"
+
+    [[tables.cg_edge_impnew2_n2.rows]]
+    bar = 1
+    exact = -1.0
+    pandas = -1.0
+    pine = -1.0
+    tol = 0.0
+    ts = 2.0
+
+[tables.cg_edge_impold10_n10]
+type = "CgRow"
+
+    [[tables.cg_edge_impold10_n10.rows]]
+    bar = 9
+    exact = -10.0
+    pandas = -10.0
+    pine = -10.0
+    tol = 0.0
+    ts = 1.0
+
+[tables.cg_edge_impold2_n2]
+type = "CgRow"
+
+    [[tables.cg_edge_impold2_n2.rows]]
+    bar = 1
+    exact = -2.0
+    pandas = -2.0
+    pine = -2.0
+    tol = 0.0
+    ts = 1.0
+
+[tables.cg_edge_nearflat_n4]
+type = "CgRow"
+
+    [[tables.cg_edge_nearflat_n4.rows]]
+    bar = 3
+    exact = -2.4962593516209477
+    pandas = -2.4962593516209477
+    pine = -2.4962593516209477
+    tol = 0.0
+    ts = 2.5037406483790523
+
+[tables.cg_edge_negsum_n3]
+type = "CgRow"
+
+    [[tables.cg_edge_negsum_n3.rows]]
+    bar = 2
+    exact = -1.75
+    pandas = -1.75
+    pine = -1.75
+    tol = 0.0
+    ts = nan
+
+[tables.cg_edge_tiny_n2]
+type = "CgRow"
+
+    [[tables.cg_edge_tiny_n2.rows]]
+    bar = 1
+    exact = -1.3333333333333333
+    pandas = -1.3333333333333333
+    pine = -1.3333333333333333
+    tol = 0.0
+    ts = 1.6666666666666667
+
+[tables.cg_edge_zeronum_n2]
+type = "CgRow"
+
+    [[tables.cg_edge_zeronum_n2.rows]]
+    bar = 1
+    exact = 0.0
+    pandas = 0.0
+    pine = 0.0
+    tol = 0.0
+    ts = nan
+
+[tables.cg_edge_zerosum_n3]
+type = "CgRow"
+
+    [[tables.cg_edge_zerosum_n3.rows]]
+    bar = 2
+    exact = -2.0
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+
+[tables.cg_eps_n10]
+type = "CgRow"
+
+    [[tables.cg_eps_n10.rows]]
+    bar = 9
+    exact = -9.5
+    pandas = -9.5
+    pine = -9.5
+    tol = 0.0
+    ts = nan
+    [[tables.cg_eps_n10.rows]]
+    bar = 10
+    exact = -5.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+    [[tables.cg_eps_n10.rows]]
+    bar = 11
+    exact = -1.5
+    pandas = -1.5
+    pine = -1.5
+    tol = 0.0
+    ts = 9.5
+    [[tables.cg_eps_n10.rows]]
+    bar = 22
+    exact = -5.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+    [[tables.cg_eps_n10.rows]]
+    bar = 36
+    exact = -5.166666666666667
+    pandas = -5.166666666666667
+    pine = -5.166666666666667
+    tol = 0.0
+    ts = 5.833333333333333
+    [[tables.cg_eps_n10.rows]]
+    bar = 56
+    exact = -13.5
+    pandas = -13.5
+    pine = -13.5
+    tol = 0.0
+    ts = -2.5
+    [[tables.cg_eps_n10.rows]]
+    bar = 100
+    exact = -3.75
+    pandas = -3.75
+    pine = -3.75
+    tol = 0.0
+    ts = nan
+    [[tables.cg_eps_n10.rows]]
+    bar = 123
+    exact = -7.166666666666667
+    pandas = -7.166666666666667
+    pine = -7.166666666666667
+    tol = 0.0
+    ts = 3.8333333333333335
+    [[tables.cg_eps_n10.rows]]
+    bar = 196
+    exact = 3.5
+    pandas = 3.5
+    pine = 3.5
+    tol = 0.0
+    ts = nan
+    [[tables.cg_eps_n10.rows]]
+    bar = 199
+    exact = -3.75
+    pandas = -3.75
+    pine = -3.75
+    tol = 0.0
+    ts = nan
+
+[tables.cg_flat01_n10]
+type = "CgRow"
+
+    [[tables.cg_flat01_n10.rows]]
+    bar = 9
+    exact = -5.5
+    pandas = -5.5
+    pine = -5.500000000000001
+    tol = 5.6e-12
+    ts = 5.500000000000002
+    [[tables.cg_flat01_n10.rows]]
+    bar = 10
+    exact = -5.5
+    pandas = -5.5
+    pine = -5.500000000000001
+    tol = 5.6e-12
+    ts = 5.500000000000002
+    [[tables.cg_flat01_n10.rows]]
+    bar = 11
+    exact = -5.5
+    pandas = -5.5
+    pine = -5.500000000000001
+    tol = 5.6e-12
+    ts = 5.500000000000002
+    [[tables.cg_flat01_n10.rows]]
+    bar = 59
+    exact = -5.5
+    pandas = -5.5
+    pine = -5.500000000000001
+    tol = 5.6e-12
+    ts = 5.500000000000002
+
+[tables.cg_flat01_n1000]
+type = "CgRow"
+
+    [[tables.cg_flat01_n1000.rows]]
+    bar = 999
+    exact = -500.5
+    pandas = -500.5
+    pine = -500.50000000000705
+    tol = 8.4e-10
+    ts = 500.50000000000705
+    [[tables.cg_flat01_n1000.rows]]
+    bar = 1000
+    exact = -500.5
+    pandas = -500.5
+    pine = -500.50000000000705
+    tol = 8.4e-10
+    ts = 500.50000000000705
+    [[tables.cg_flat01_n1000.rows]]
+    bar = 1001
+    exact = -500.5
+    pandas = -500.5
+    pine = -500.50000000000705
+    tol = 8.4e-10
+    ts = 500.50000000000705
+    [[tables.cg_flat01_n1000.rows]]
+    bar = 1002
+    exact = -500.5
+    pandas = -500.5
+    pine = -500.50000000000705
+    tol = 8.4e-10
+    ts = 500.50000000000705
+    [[tables.cg_flat01_n1000.rows]]
+    bar = 1003
+    exact = -500.5
+    pandas = -500.5
+    pine = -500.50000000000705
+    tol = 8.4e-10
+    ts = 500.50000000000705
+    [[tables.cg_flat01_n1000.rows]]
+    bar = 1004
+    exact = -500.5
+    pandas = -500.5
+    pine = -500.50000000000705
+    tol = 8.4e-10
+    ts = 500.50000000000705
+    [[tables.cg_flat01_n1000.rows]]
+    bar = 1005
+    exact = -500.5
+    pandas = -500.5
+    pine = -500.50000000000705
+    tol = 8.4e-10
+    ts = 500.50000000000705
+    [[tables.cg_flat01_n1000.rows]]
+    bar = 1006
+    exact = -500.5
+    pandas = -500.5
+    pine = -500.50000000000705
+    tol = 8.4e-10
+    ts = 500.50000000000705
+    [[tables.cg_flat01_n1000.rows]]
+    bar = 1007
+    exact = -500.5
+    pandas = -500.5
+    pine = -500.50000000000705
+    tol = 8.4e-10
+    ts = 500.50000000000705
+    [[tables.cg_flat01_n1000.rows]]
+    bar = 1008
+    exact = -500.5
+    pandas = -500.5
+    pine = -500.50000000000705
+    tol = 8.4e-10
+    ts = 500.50000000000705
+    [[tables.cg_flat01_n1000.rows]]
+    bar = 1009
+    exact = -500.5
+    pandas = -500.5
+    pine = -500.50000000000705
+    tol = 8.4e-10
+    ts = 500.50000000000705
+
+[tables.cg_flat01_n100000]
+type = "CgRow"
+
+    [[tables.cg_flat01_n100000.rows]]
+    bar = 99999
+    exact = -50000.5
+    pandas = -50000.5
+    pine = nan
+    tol = 3.4e-6
+    ts = 50000.499999905755
+    [[tables.cg_flat01_n100000.rows]]
+    bar = 100000
+    exact = -50000.5
+    pandas = -50000.5
+    pine = nan
+    tol = 3.4e-6
+    ts = 50000.499999905755
+    [[tables.cg_flat01_n100000.rows]]
+    bar = 100001
+    exact = -50000.5
+    pandas = -50000.5
+    pine = nan
+    tol = 3.4e-6
+    ts = 50000.499999905755
+
+[tables.cg_flat12345_n10]
+type = "CgRow"
+
+    [[tables.cg_flat12345_n10.rows]]
+    bar = 9
+    exact = -5.5
+    pandas = -5.5
+    pine = -5.499999999999999
+    tol = 5.6e-12
+    ts = 5.499999999999999
+    [[tables.cg_flat12345_n10.rows]]
+    bar = 10
+    exact = -5.5
+    pandas = -5.5
+    pine = -5.499999999999999
+    tol = 5.6e-12
+    ts = 5.499999999999999
+    [[tables.cg_flat12345_n10.rows]]
+    bar = 11
+    exact = -5.5
+    pandas = -5.5
+    pine = -5.499999999999999
+    tol = 5.6e-12
+    ts = 5.499999999999999
+    [[tables.cg_flat12345_n10.rows]]
+    bar = 59
+    exact = -5.5
+    pandas = -5.5
+    pine = -5.499999999999999
+    tol = 5.6e-12
+    ts = 5.499999999999999
+
+[tables.cg_flat12345_n1000]
+type = "CgRow"
+
+    [[tables.cg_flat12345_n1000.rows]]
+    bar = 999
+    exact = -500.5
+    pandas = -500.5
+    pine = -500.5000000000081
+    tol = 8.4e-10
+    ts = 500.5000000000081
+    [[tables.cg_flat12345_n1000.rows]]
+    bar = 1000
+    exact = -500.5
+    pandas = -500.5
+    pine = -500.5000000000081
+    tol = 8.4e-10
+    ts = 500.5000000000081
+    [[tables.cg_flat12345_n1000.rows]]
+    bar = 1001
+    exact = -500.5
+    pandas = -500.5
+    pine = -500.5000000000081
+    tol = 8.4e-10
+    ts = 500.5000000000081
+    [[tables.cg_flat12345_n1000.rows]]
+    bar = 1002
+    exact = -500.5
+    pandas = -500.5
+    pine = -500.5000000000081
+    tol = 8.4e-10
+    ts = 500.5000000000081
+    [[tables.cg_flat12345_n1000.rows]]
+    bar = 1003
+    exact = -500.5
+    pandas = -500.5
+    pine = -500.5000000000081
+    tol = 8.4e-10
+    ts = 500.5000000000081
+    [[tables.cg_flat12345_n1000.rows]]
+    bar = 1004
+    exact = -500.5
+    pandas = -500.5
+    pine = -500.5000000000081
+    tol = 8.4e-10
+    ts = 500.5000000000081
+    [[tables.cg_flat12345_n1000.rows]]
+    bar = 1005
+    exact = -500.5
+    pandas = -500.5
+    pine = -500.5000000000081
+    tol = 8.4e-10
+    ts = 500.5000000000081
+    [[tables.cg_flat12345_n1000.rows]]
+    bar = 1006
+    exact = -500.5
+    pandas = -500.5
+    pine = -500.5000000000081
+    tol = 8.4e-10
+    ts = 500.5000000000081
+    [[tables.cg_flat12345_n1000.rows]]
+    bar = 1007
+    exact = -500.5
+    pandas = -500.5
+    pine = -500.5000000000081
+    tol = 8.4e-10
+    ts = 500.5000000000081
+    [[tables.cg_flat12345_n1000.rows]]
+    bar = 1008
+    exact = -500.5
+    pandas = -500.5
+    pine = -500.5000000000081
+    tol = 8.4e-10
+    ts = 500.5000000000081
+    [[tables.cg_flat12345_n1000.rows]]
+    bar = 1009
+    exact = -500.5
+    pandas = -500.5
+    pine = -500.5000000000081
+    tol = 8.4e-10
+    ts = 500.5000000000081
+
+[tables.cg_flat12345_n100000]
+type = "CgRow"
+
+    [[tables.cg_flat12345_n100000.rows]]
+    bar = 99999
+    exact = -50000.5
+    pandas = -50000.5
+    pine = nan
+    tol = 3.4e-6
+    ts = 50000.50000006053
+    [[tables.cg_flat12345_n100000.rows]]
+    bar = 100000
+    exact = -50000.5
+    pandas = -50000.5
+    pine = nan
+    tol = 3.4e-6
+    ts = 50000.50000006053
+    [[tables.cg_flat12345_n100000.rows]]
+    bar = 100001
+    exact = -50000.5
+    pandas = -50000.5
+    pine = nan
+    tol = 3.4e-6
+    ts = 50000.50000006053
+
+[tables.cg_flat2m60_n10]
+type = "CgRow"
+
+    [[tables.cg_flat2m60_n10.rows]]
+    bar = 9
+    exact = -5.5
+    pandas = -5.5
+    pine = -5.5
+    tol = 0.0
+    ts = 5.5
+    [[tables.cg_flat2m60_n10.rows]]
+    bar = 10
+    exact = -5.5
+    pandas = -5.5
+    pine = -5.5
+    tol = 0.0
+    ts = 5.5
+    [[tables.cg_flat2m60_n10.rows]]
+    bar = 11
+    exact = -5.5
+    pandas = -5.5
+    pine = -5.5
+    tol = 0.0
+    ts = 5.5
+    [[tables.cg_flat2m60_n10.rows]]
+    bar = 59
+    exact = -5.5
+    pandas = -5.5
+    pine = -5.5
+    tol = 0.0
+    ts = 5.5
+
+[tables.cg_flat2m60_n2]
+type = "CgRow"
+
+    [[tables.cg_flat2m60_n2.rows]]
+    bar = 1
+    exact = -1.5
+    pandas = -1.5
+    pine = -1.5
+    tol = 0.0
+    ts = 1.5
+    [[tables.cg_flat2m60_n2.rows]]
+    bar = 2
+    exact = -1.5
+    pandas = -1.5
+    pine = -1.5
+    tol = 0.0
+    ts = 1.5
+    [[tables.cg_flat2m60_n2.rows]]
+    bar = 3
+    exact = -1.5
+    pandas = -1.5
+    pine = -1.5
+    tol = 0.0
+    ts = 1.5
+    [[tables.cg_flat2m60_n2.rows]]
+    bar = 59
+    exact = -1.5
+    pandas = -1.5
+    pine = -1.5
+    tol = 0.0
+    ts = 1.5
+
+[tables.cg_flat7_n10]
+type = "CgRow"
+
+    [[tables.cg_flat7_n10.rows]]
+    bar = 9
+    exact = -5.5
+    pandas = -5.5
+    pine = -5.5
+    tol = 0.0
+    ts = 5.5
+    [[tables.cg_flat7_n10.rows]]
+    bar = 10
+    exact = -5.5
+    pandas = -5.5
+    pine = -5.5
+    tol = 0.0
+    ts = 5.5
+    [[tables.cg_flat7_n10.rows]]
+    bar = 11
+    exact = -5.5
+    pandas = -5.5
+    pine = -5.5
+    tol = 0.0
+    ts = 5.5
+    [[tables.cg_flat7_n10.rows]]
+    bar = 59
+    exact = -5.5
+    pandas = -5.5
+    pine = -5.5
+    tol = 0.0
+    ts = 5.5
+
+[tables.cg_flat7_n2]
+type = "CgRow"
+
+    [[tables.cg_flat7_n2.rows]]
+    bar = 1
+    exact = -1.5
+    pandas = -1.5
+    pine = -1.5
+    tol = 0.0
+    ts = 1.5
+    [[tables.cg_flat7_n2.rows]]
+    bar = 2
+    exact = -1.5
+    pandas = -1.5
+    pine = -1.5
+    tol = 0.0
+    ts = 1.5
+    [[tables.cg_flat7_n2.rows]]
+    bar = 3
+    exact = -1.5
+    pandas = -1.5
+    pine = -1.5
+    tol = 0.0
+    ts = 1.5
+    [[tables.cg_flat7_n2.rows]]
+    bar = 59
+    exact = -1.5
+    pandas = -1.5
+    pine = -1.5
+    tol = 0.0
+    ts = 1.5
+
+[tables.cg_long_n1000]
+type = "CgRow"
+
+    [[tables.cg_long_n1000.rows]]
+    bar = 99999
+    exact = -501.20151243382577
+    pandas = -501.2015124338259
+    pine = -501.2015124338254
+    tol = 8.4e-10
+    ts = 499.7984875661741
+    [[tables.cg_long_n1000.rows]]
+    bar = 100000
+    exact = -501.19573045657063
+    pandas = -501.19573045656955
+    pine = -501.1957304565704
+    tol = 8.4e-10
+    ts = 499.8042695434288
+    [[tables.cg_long_n1000.rows]]
+    bar = 100001
+    exact = -501.1480558951394
+    pandas = -501.14805589513895
+    pine = -501.14805589513907
+    tol = 8.4e-10
+    ts = 499.8519441048608
+    [[tables.cg_long_n1000.rows]]
+    bar = 100017
+    exact = -500.6303394006772
+    pandas = -500.6303394006785
+    pine = -500.6303394006769
+    tol = 8.4e-10
+    ts = 500.36966059932246
+    [[tables.cg_long_n1000.rows]]
+    bar = 100066
+    exact = -501.3417111310926
+    pandas = -501.34171113109295
+    pine = -501.34171113109244
+    tol = 8.4e-10
+    ts = 499.658288868907
+    [[tables.cg_long_n1000.rows]]
+    bar = 100089
+    exact = -501.19661060587987
+    pandas = -501.19661060587936
+    pine = -501.19661060587936
+    tol = 8.4e-10
+    ts = 499.8033893941196
+    [[tables.cg_long_n1000.rows]]
+    bar = 100133
+    exact = -500.5826471087352
+    pandas = -500.5826471087356
+    pine = -500.58264710873493
+    tol = 8.4e-10
+    ts = 500.4173528912646
+    [[tables.cg_long_n1000.rows]]
+    bar = 100138
+    exact = -500.77515655562485
+    pandas = -500.7751565556249
+    pine = -500.7751565556245
+    tol = 8.4e-10
+    ts = 500.2248434443741
+    [[tables.cg_long_n1000.rows]]
+    bar = 100146
+    exact = -500.25592700471645
+    pandas = -500.25592700471543
+    pine = -500.25592700471606
+    tol = 8.4e-10
+    ts = 500.7440729952827
+    [[tables.cg_long_n1000.rows]]
+    bar = 100149
+    exact = -500.2724758766533
+    pandas = -500.2724758766535
+    pine = -500.272475876653
+    tol = 8.4e-10
+    ts = 500.7275241233468
+
+[tables.cg_long_n10000]
+type = "CgRow"
+
+    [[tables.cg_long_n10000.rows]]
+    bar = 99999
+    exact = -5001.437971159508
+    pandas = -5001.437971159512
+    pine = nan
+    tol = 3.9e-8
+    ts = 4999.56202884048
+    [[tables.cg_long_n10000.rows]]
+    bar = 100000
+    exact = -5001.398306269507
+    pandas = -5001.398306269504
+    pine = nan
+    tol = 3.9e-8
+    ts = 4999.601693730473
+    [[tables.cg_long_n10000.rows]]
+    bar = 100001
+    exact = -5001.211783380942
+    pandas = -5001.211783380922
+    pine = nan
+    tol = 3.9e-8
+    ts = 4999.788216619026
+    [[tables.cg_long_n10000.rows]]
+    bar = 100020
+    exact = -5000.461708512257
+    pandas = -5000.461708512248
+    pine = nan
+    tol = 3.9e-8
+    ts = 5000.538291487732
+    [[tables.cg_long_n10000.rows]]
+    bar = 100054
+    exact = -5001.456454434015
+    pandas = -5001.456454434059
+    pine = nan
+    tol = 3.9e-8
+    ts = 4999.543545565972
+    [[tables.cg_long_n10000.rows]]
+    bar = 100056
+    exact = -5001.643416549805
+    pandas = -5001.643416549803
+    pine = nan
+    tol = 3.9e-8
+    ts = 4999.356583450203
+    [[tables.cg_long_n10000.rows]]
+    bar = 100148
+    exact = -5000.182739883758
+    pandas = -5000.182739883735
+    pine = nan
+    tol = 3.9e-8
+    ts = 5000.817260116253
+    [[tables.cg_long_n10000.rows]]
+    bar = 100149
+    exact = -5000.185121011689
+    pandas = -5000.185121011689
+    pine = nan
+    tol = 3.9e-8
+    ts = 5000.8148789883035
+
+[tables.cg_long_n100000]
+type = "CgRow"
+
+    [[tables.cg_long_n100000.rows]]
+    bar = 99999
+    exact = -50024.93051925636
+    pandas = -50024.93051925718
+    pine = nan
+    tol = 3.4e-6
+    ts = 49976.06948074352
+    [[tables.cg_long_n100000.rows]]
+    bar = 100000
+    exact = -50024.82343893393
+    pandas = -50024.82343893429
+    pine = nan
+    tol = 3.4e-6
+    ts = 49976.17656106591
+    [[tables.cg_long_n100000.rows]]
+    bar = 100001
+    exact = -50024.71866140327
+    pandas = -50024.718661402716
+    pine = nan
+    tol = 3.4e-6
+    ts = 49976.28133859638
+    [[tables.cg_long_n100000.rows]]
+    bar = 100023
+    exact = -50024.30851671517
+    pandas = -50024.3085167154
+    pine = nan
+    tol = 3.4e-6
+    ts = 49976.69148328546
+    [[tables.cg_long_n100000.rows]]
+    bar = 100060
+    exact = -50024.11428278277
+    pandas = -50024.11428278285
+    pine = nan
+    tol = 3.4e-6
+    ts = 49976.88571721706
+    [[tables.cg_long_n100000.rows]]
+    bar = 100073
+    exact = -50024.969941961666
+    pandas = -50024.96994196189
+    pine = nan
+    tol = 3.4e-6
+    ts = 49976.03005803895
+    [[tables.cg_long_n100000.rows]]
+    bar = 100138
+    exact = -50025.3031543533
+    pandas = -50025.30315435304
+    pine = nan
+    tol = 3.4e-6
+    ts = 49975.69684564666
+    [[tables.cg_long_n100000.rows]]
+    bar = 100149
+    exact = -50025.10776670029
+    pandas = -50025.10776670108
+    pine = nan
+    tol = 3.4e-6
+    ts = 49975.892233299535
+
+[tables.cg_med_n10]
+type = "CgRow"
+
+    [[tables.cg_med_n10.rows]]
+    bar = 9
+    exact = -5.521763395851781
+    pandas = -5.52176339585178
+    pine = -5.52176339585178
+    tol = 5.6e-12
+    ts = 5.478236604148219
+    [[tables.cg_med_n10.rows]]
+    bar = 10
+    exact = -5.522213599507613
+    pandas = -5.522213599507612
+    pine = -5.522213599507613
+    tol = 5.6e-12
+    ts = 5.477786400492387
+    [[tables.cg_med_n10.rows]]
+    bar = 11
+    exact = -5.501771789280874
+    pandas = -5.501771789280873
+    pine = -5.501771789280874
+    tol = 5.6e-12
+    ts = 5.498228210719125
+    [[tables.cg_med_n10.rows]]
+    bar = 80
+    exact = -5.261300699851626
+    pandas = -5.261300699851627
+    pine = -5.261300699851638
+    tol = 5.3e-12
+    ts = 5.738699300148374
+    [[tables.cg_med_n10.rows]]
+    bar = 100
+    exact = -5.553476275193557
+    pandas = -5.553476275193556
+    pine = -5.553476275193562
+    tol = 5.6e-12
+    ts = 5.446523724806443
+    [[tables.cg_med_n10.rows]]
+    bar = 104
+    exact = -5.522300407733789
+    pandas = -5.522300407733792
+    pine = -5.522300407733796
+    tol = 5.6e-12
+    ts = 5.47769959226621
+    [[tables.cg_med_n10.rows]]
+    bar = 113
+    exact = -5.482854948270905
+    pandas = -5.482854948270906
+    pine = -5.482854948270906
+    tol = 5.6e-12
+    ts = 5.517145051729097
+    [[tables.cg_med_n10.rows]]
+    bar = 181
+    exact = -5.566988721101876
+    pandas = -5.566988721101876
+    pine = -5.566988721101862
+    tol = 5.7e-12
+    ts = 5.433011278898123
+    [[tables.cg_med_n10.rows]]
+    bar = 200
+    exact = -5.617809118038328
+    pandas = -5.617809118038328
+    pine = -5.6178091180383065
+    tol = 5.7e-12
+    ts = 5.382190881961672
+    [[tables.cg_med_n10.rows]]
+    bar = 204
+    exact = -5.661251431525947
+    pandas = -5.661251431525945
+    pine = -5.661251431525923
+    tol = 5.7e-12
+    ts = 5.3387485684740525
+    [[tables.cg_med_n10.rows]]
+    bar = 249
+    exact = -5.480365464521016
+    pandas = -5.480365464521016
+    pine = -5.480365464520967
+    tol = 5.6e-12
+    ts = 5.519634535478985
+    [[tables.cg_med_n10.rows]]
+    bar = 251
+    exact = -5.5038003065870456
+    pandas = -5.503800306587047
+    pine = -5.503800306586997
+    tol = 5.6e-12
+    ts = 5.496199693412955
+
+[tables.cg_med_n10_s200]
+type = "CgRow"
+
+    [[tables.cg_med_n10_s200.rows]]
+    bar = 200
+    exact = -5.617809118038328
+    pandas = -5.617809118038328
+    pine = -5.617809118038327
+    tol = 5.7e-12
+    ts = 5.382190881961672
+    [[tables.cg_med_n10_s200.rows]]
+    bar = 201
+    exact = -5.575770779152994
+    pandas = -5.575770779152993
+    pine = -5.575770779152993
+    tol = 5.7e-12
+    ts = 5.424229220847005
+    [[tables.cg_med_n10_s200.rows]]
+    bar = 202
+    exact = -5.622201353763761
+    pandas = -5.622201353763762
+    pine = -5.622201353763759
+    tol = 5.7e-12
+    ts = 5.37779864623624
+    [[tables.cg_med_n10_s200.rows]]
+    bar = 204
+    exact = -5.661251431525947
+    pandas = -5.661251431525945
+    pine = -5.661251431525946
+    tol = 5.7e-12
+    ts = 5.3387485684740525
+    [[tables.cg_med_n10_s200.rows]]
+    bar = 225
+    exact = -5.387602034057211
+    pandas = -5.387602034057211
+    pine = -5.387602034057208
+    tol = 5.5e-12
+    ts = 5.612397965942789
+    [[tables.cg_med_n10_s200.rows]]
+    bar = 227
+    exact = -5.3669762921100626
+    pandas = -5.366976292110064
+    pine = -5.366976292110058
+    tol = 5.5e-12
+    ts = 5.633023707889939
+    [[tables.cg_med_n10_s200.rows]]
+    bar = 229
+    exact = -5.397159594368416
+    pandas = -5.397159594368416
+    pine = -5.3971595943684125
+    tol = 5.5e-12
+    ts = 5.602840405631586
+    [[tables.cg_med_n10_s200.rows]]
+    bar = 236
+    exact = -5.3557651600333225
+    pandas = -5.3557651600333225
+    pine = -5.355765160033318
+    tol = 5.4e-12
+    ts = 5.6442348399666775
+    [[tables.cg_med_n10_s200.rows]]
+    bar = 249
+    exact = -5.480365464521016
+    pandas = -5.480365464521016
+    pine = -5.4803654645210065
+    tol = 5.6e-12
+    ts = 5.519634535478985
+    [[tables.cg_med_n10_s200.rows]]
+    bar = 251
+    exact = -5.5038003065870456
+    pandas = -5.503800306587047
+    pine = -5.503800306587036
+    tol = 5.6e-12
+    ts = 5.496199693412955
+
+[tables.cg_med_n14]
+type = "CgRow"
+
+    [[tables.cg_med_n14.rows]]
+    bar = 13
+    exact = -7.488838562955457
+    pandas = -7.488838562955456
+    pine = -7.488838562955455
+    tol = 7.6e-12
+    ts = 7.511161437044541
+    [[tables.cg_med_n14.rows]]
+    bar = 14
+    exact = -7.52229232487329
+    pandas = -7.52229232487329
+    pine = -7.522292324873288
+    tol = 7.6e-12
+    ts = 7.477707675126709
+    [[tables.cg_med_n14.rows]]
+    bar = 15
+    exact = -7.531616112983469
+    pandas = -7.531616112983469
+    pine = -7.531616112983466
+    tol = 7.7e-12
+    ts = 7.468383887016529
+    [[tables.cg_med_n14.rows]]
+    bar = 40
+    exact = -7.544208069190552
+    pandas = -7.54420806919055
+    pine = -7.544208069190558
+    tol = 7.7e-12
+    ts = 7.45579193080945
+    [[tables.cg_med_n14.rows]]
+    bar = 83
+    exact = -7.177054568998434
+    pandas = -7.177054568998434
+    pine = -7.177054568998441
+    tol = 7.3e-12
+    ts = 7.822945431001567
+    [[tables.cg_med_n14.rows]]
+    bar = 85
+    exact = -7.218104088350511
+    pandas = -7.218104088350511
+    pine = -7.218104088350518
+    tol = 7.3e-12
+    ts = 7.781895911649486
+    [[tables.cg_med_n14.rows]]
+    bar = 100
+    exact = -7.4843421793057265
+    pandas = -7.484342179305726
+    pine = -7.484342179305734
+    tol = 7.6e-12
+    ts = 7.515657820694275
+    [[tables.cg_med_n14.rows]]
+    bar = 112
+    exact = -7.472001238917496
+    pandas = -7.472001238917499
+    pine = -7.472001238917509
+    tol = 7.6e-12
+    ts = 7.527998761082505
+    [[tables.cg_med_n14.rows]]
+    bar = 200
+    exact = -7.688134911532648
+    pandas = -7.688134911532647
+    pine = -7.6881349115326785
+    tol = 7.8e-12
+    ts = 7.311865088467353
+    [[tables.cg_med_n14.rows]]
+    bar = 204
+    exact = -7.792117835986486
+    pandas = -7.792117835986487
+    pine = -7.7921178359865175
+    tol = 7.9e-12
+    ts = 7.207882164013514
+    [[tables.cg_med_n14.rows]]
+    bar = 220
+    exact = -7.518131743756131
+    pandas = -7.51813174375613
+    pine = -7.518131743756168
+    tol = 7.6e-12
+    ts = 7.481868256243867
+    [[tables.cg_med_n14.rows]]
+    bar = 251
+    exact = -7.48916907135362
+    pandas = -7.489169071353619
+    pine = -7.489169071353651
+    tol = 7.6e-12
+    ts = 7.51083092864638
+
+[tables.cg_med_n2]
+type = "CgRow"
+
+    [[tables.cg_med_n2.rows]]
+    bar = 1
+    exact = -1.4968340331312695
+    pandas = -1.4968340331312695
+    pine = -1.4968340331312695
+    tol = 1.5e-12
+    ts = 1.5031659668687305
+    [[tables.cg_med_n2.rows]]
+    bar = 2
+    exact = -1.4943231556887815
+    pandas = -1.4943231556887817
+    pine = -1.4943231556887817
+    tol = 1.5e-12
+    ts = 1.5056768443112183
+    [[tables.cg_med_n2.rows]]
+    bar = 3
+    exact = -1.5012292441791673
+    pandas = -1.5012292441791675
+    pine = -1.5012292441791675
+    tol = 1.6e-12
+    ts = 1.4987707558208327
+    [[tables.cg_med_n2.rows]]
+    bar = 75
+    exact = -1.4626398517399959
+    pandas = -1.4626398517399959
+    pine = -1.4626398517399835
+    tol = 1.5e-12
+    ts = 1.537360148260004
+    [[tables.cg_med_n2.rows]]
+    bar = 100
+    exact = -1.4995038438471184
+    pandas = -1.4995038438471184
+    pine = -1.499503843847099
+    tol = 1.6e-12
+    ts = 1.5004961561528816
+    [[tables.cg_med_n2.rows]]
+    bar = 127
+    exact = -1.5005294807306835
+    pandas = -1.5005294807306835
+    pine = -1.50052948073066
+    tol = 1.6e-12
+    ts = 1.499470519269317
+    [[tables.cg_med_n2.rows]]
+    bar = 129
+    exact = -1.496576676871695
+    pandas = -1.4965766768716946
+    pine = -1.4965766768716713
+    tol = 1.5e-12
+    ts = 1.503423323128305
+    [[tables.cg_med_n2.rows]]
+    bar = 200
+    exact = -1.4997076912283984
+    pandas = -1.4997076912283982
+    pine = -1.4997076912283471
+    tol = 1.6e-12
+    ts = 1.5002923087716016
+    [[tables.cg_med_n2.rows]]
+    bar = 202
+    exact = -1.5473312440929214
+    pandas = -1.5473312440929214
+    pine = -1.5473312440928666
+    tol = 1.6e-12
+    ts = 1.4526687559070783
+    [[tables.cg_med_n2.rows]]
+    bar = 214
+    exact = -1.498218026498354
+    pandas = -1.4982180264983542
+    pine = -1.498218026498292
+    tol = 1.6e-12
+    ts = 1.501781973501646
+    [[tables.cg_med_n2.rows]]
+    bar = 251
+    exact = -1.5033779125878948
+    pandas = -1.5033779125878948
+    pine = -1.5033779125878537
+    tol = 1.6e-12
+    ts = 1.4966220874121052
+
+[tables.cg_med_n20]
+type = "CgRow"
+
+    [[tables.cg_med_n20.rows]]
+    bar = 19
+    exact = -10.562371879655096
+    pandas = -10.562371879655094
+    pine = -10.562371879655094
+    tol = 1.1e-11
+    ts = 10.437628120344904
+    [[tables.cg_med_n20.rows]]
+    bar = 20
+    exact = -10.586975790403853
+    pandas = -10.586975790403855
+    pine = -10.586975790403853
+    tol = 1.1e-11
+    ts = 10.413024209596147
+    [[tables.cg_med_n20.rows]]
+    bar = 21
+    exact = -10.610725440206124
+    pandas = -10.610725440206123
+    pine = -10.610725440206124
+    tol = 1.1e-11
+    ts = 10.389274559793876
+    [[tables.cg_med_n20.rows]]
+    bar = 91
+    exact = -10.011126946309009
+    pandas = -10.01112694630901
+    pine = -10.011126946308993
+    tol = 1.1e-11
+    ts = 10.98887305369099
+    [[tables.cg_med_n20.rows]]
+    bar = 100
+    exact = -10.302298082704256
+    pandas = -10.302298082704255
+    pine = -10.302298082704247
+    tol = 1.1e-11
+    ts = 10.697701917295745
+    [[tables.cg_med_n20.rows]]
+    bar = 111
+    exact = -10.516846638948664
+    pandas = -10.516846638948664
+    pine = -10.516846638948648
+    tol = 1.1e-11
+    ts = 10.483153361051336
+    [[tables.cg_med_n20.rows]]
+    bar = 114
+    exact = -10.43315987235809
+    pandas = -10.433159872358088
+    pine = -10.43315987235807
+    tol = 1.1e-11
+    ts = 10.566840127641912
+    [[tables.cg_med_n20.rows]]
+    bar = 116
+    exact = -10.372567765942001
+    pandas = -10.372567765942007
+    pine = -10.372567765941984
+    tol = 1.1e-11
+    ts = 10.627432234058
+    [[tables.cg_med_n20.rows]]
+    bar = 170
+    exact = -10.432415778148886
+    pandas = -10.432415778148886
+    pine = -10.432415778148888
+    tol = 1.1e-11
+    ts = 10.567584221851119
+    [[tables.cg_med_n20.rows]]
+    bar = 200
+    exact = -10.813356278140786
+    pandas = -10.813356278140786
+    pine = -10.813356278140791
+    tol = 1.1e-11
+    ts = 10.18664372185922
+    [[tables.cg_med_n20.rows]]
+    bar = 207
+    exact = -10.995186238662694
+    pandas = -10.99518623866269
+    pine = -10.995186238662699
+    tol = 1.2e-11
+    ts = 10.004813761337305
+    [[tables.cg_med_n20.rows]]
+    bar = 251
+    exact = -10.598572465029235
+    pandas = -10.598572465029235
+    pine = -10.598572465029239
+    tol = 1.1e-11
+    ts = 10.401427534970765
+
+[tables.cg_med_n5]
+type = "CgRow"
+
+    [[tables.cg_med_n5.rows]]
+    bar = 4
+    exact = -2.9861890949732564
+    pandas = -2.9861890949732564
+    pine = -2.986189094973256
+    tol = 3.0e-12
+    ts = 3.013810905026743
+    [[tables.cg_med_n5.rows]]
+    bar = 5
+    exact = -2.997944251055691
+    pandas = -2.997944251055691
+    pine = -2.9979442510556904
+    tol = 3.1e-12
+    ts = 3.0020557489443087
+    [[tables.cg_med_n5.rows]]
+    bar = 6
+    exact = -3.009233864562927
+    pandas = -3.009233864562927
+    pine = -3.0092338645629266
+    tol = 3.1e-12
+    ts = 2.990766135437073
+    [[tables.cg_med_n5.rows]]
+    bar = 77
+    exact = -2.880929254547007
+    pandas = -2.880929254547007
+    pine = -2.8809292545470147
+    tol = 2.9e-12
+    ts = 3.119070745452993
+    [[tables.cg_med_n5.rows]]
+    bar = 100
+    exact = -3.000680104955552
+    pandas = -3.000680104955552
+    pine = -3.0006801049555567
+    tol = 3.1e-12
+    ts = 2.9993198950444477
+    [[tables.cg_med_n5.rows]]
+    bar = 197
+    exact = -3.0381558889059272
+    pandas = -3.0381558889059272
+    pine = -3.038155888905955
+    tol = 3.1e-12
+    ts = 2.9618441110940728
+    [[tables.cg_med_n5.rows]]
+    bar = 200
+    exact = -3.0019753225111874
+    pandas = -3.0019753225111874
+    pine = -3.0019753225112145
+    tol = 3.1e-12
+    ts = 2.9980246774888126
+    [[tables.cg_med_n5.rows]]
+    bar = 204
+    exact = -3.087180419241488
+    pandas = -3.087180419241488
+    pine = -3.0871804192415166
+    tol = 3.1e-12
+    ts = 2.9128195807585118
+    [[tables.cg_med_n5.rows]]
+    bar = 206
+    exact = -2.9826375153685785
+    pandas = -2.982637515368578
+    pine = -2.982637515368608
+    tol = 3.0e-12
+    ts = 3.017362484631421
+    [[tables.cg_med_n5.rows]]
+    bar = 233
+    exact = -2.9451155853840416
+    pandas = -2.9451155853840407
+    pine = -2.945115585384052
+    tol = 3.0e-12
+    ts = 3.054884414615958
+    [[tables.cg_med_n5.rows]]
+    bar = 246
+    exact = -3.0018115444789064
+    pandas = -3.0018115444789064
+    pine = -3.0018115444789144
+    tol = 3.1e-12
+    ts = 2.9981884555210945
+    [[tables.cg_med_n5.rows]]
+    bar = 251
+    exact = -3.0043483833168554
+    pandas = -3.004348383316855
+    pine = -3.0043483833168647
+    tol = 3.1e-12
+    ts = 2.995651616683144
+
+[tables.cg_med_n50]
+type = "CgRow"
+
+    [[tables.cg_med_n50.rows]]
+    bar = 49
+    exact = -25.830404800286583
+    pandas = -25.83040480028659
+    pine = -25.83040480028659
+    tol = 2.7e-11
+    ts = 25.169595199713424
+    [[tables.cg_med_n50.rows]]
+    bar = 50
+    exact = -25.814382042608482
+    pandas = -25.814382042608493
+    pine = -25.814382042608486
+    tol = 2.7e-11
+    ts = 25.18561795739152
+    [[tables.cg_med_n50.rows]]
+    bar = 51
+    exact = -25.801317737304863
+    pandas = -25.801317737304863
+    pine = -25.801317737304863
+    tol = 2.7e-11
+    ts = 25.19868226269514
+    [[tables.cg_med_n50.rows]]
+    bar = 100
+    exact = -23.89327291662162
+    pandas = -23.89327291662162
+    pine = -23.89327291662156
+    tol = 2.5e-11
+    ts = 27.106727083378388
+    [[tables.cg_med_n50.rows]]
+    bar = 101
+    exact = -23.88358806492005
+    pandas = -23.883588064920048
+    pine = -23.883588064919987
+    tol = 2.5e-11
+    ts = 27.116411935079967
+    [[tables.cg_med_n50.rows]]
+    bar = 116
+    exact = -24.233686168951234
+    pandas = -24.233686168951223
+    pine = -24.233686168951177
+    tol = 2.6e-11
+    ts = 26.766313831048773
+    [[tables.cg_med_n50.rows]]
+    bar = 171
+    exact = -25.78189094901349
+    pandas = -25.781890949013487
+    pine = -25.78189094901348
+    tol = 2.7e-11
+    ts = 25.21810905098649
+    [[tables.cg_med_n50.rows]]
+    bar = 198
+    exact = -25.85552109482549
+    pandas = -25.855521094825473
+    pine = -25.85552109482547
+    tol = 2.7e-11
+    ts = 25.144478905174505
+    [[tables.cg_med_n50.rows]]
+    bar = 200
+    exact = -25.987769344308873
+    pandas = -25.987769344308866
+    pine = -25.987769344308848
+    tol = 2.7e-11
+    ts = 25.012230655691127
+    [[tables.cg_med_n50.rows]]
+    bar = 220
+    exact = -27.370606824525073
+    pandas = -27.37060682452507
+    pine = -27.370606824525055
+    tol = 2.9e-11
+    ts = 23.629393175474917
+    [[tables.cg_med_n50.rows]]
+    bar = 251
+    exact = -24.581792051317752
+    pandas = -24.58179205131775
+    pine = -24.581792051317752
+    tol = 2.6e-11
+    ts = 26.418207948682245
+
+[tables.cg_mom1_n10]
+type = "CgRow"
+
+    [[tables.cg_mom1_n10.rows]]
+    bar = 9
+    exact = -4.73081081081081
+    pandas = -4.73081081081081
+    pine = -4.7308108108108105
+    tol = 0.0
+    ts = 6.26918918918919
+    [[tables.cg_mom1_n10.rows]]
+    bar = 10
+    exact = 3.6283367556468056
+    pandas = 3.6283367556468056
+    pine = 3.6283367556468056
+    tol = 0.0
+    ts = 14.628336755646805
+    [[tables.cg_mom1_n10.rows]]
+    bar = 11
+    exact = 0.0751515151515157
+    pandas = 0.0751515151515157
+    pine = 0.07515151515151564
+    tol = 0.0
+    ts = 11.075151515151516
+    [[tables.cg_mom1_n10.rows]]
+    bar = 44
+    exact = -0.09161290322580382
+    pandas = -0.09161290322580382
+    pine = -0.09161290322580384
+    tol = 0.0
+    ts = 10.908387096774197
+    [[tables.cg_mom1_n10.rows]]
+    bar = 97
+    exact = -635.9473684210601
+    pandas = -635.9473684210601
+    pine = -635.9473684210601
+    tol = 0.0
+    ts = -624.9473684210601
+    [[tables.cg_mom1_n10.rows]]
+    bar = 100
+    exact = -9.954482758620692
+    pandas = -9.954482758620692
+    pine = -9.954482758620692
+    tol = 0.0
+    ts = nan
+    [[tables.cg_mom1_n10.rows]]
+    bar = 177
+    exact = 111.31999999999994
+    pandas = 111.31999999999994
+    pine = 111.31999999999994
+    tol = 0.0
+    ts = nan
+    [[tables.cg_mom1_n10.rows]]
+    bar = 200
+    exact = -7.935192780968005
+    pandas = -7.935192780968005
+    pine = -7.935192780968005
+    tol = 0.0
+    ts = nan
+    [[tables.cg_mom1_n10.rows]]
+    bar = 222
+    exact = -4.185536888239592
+    pandas = -4.185536888239592
+    pine = -4.185536888239593
+    tol = 0.0
+    ts = 6.814463111760408
+    [[tables.cg_mom1_n10.rows]]
+    bar = 241
+    exact = -0.15508021390376148
+    pandas = -0.15508021390376148
+    pine = -0.15508021390376148
+    tol = 4.1e-13
+    ts = nan
+    [[tables.cg_mom1_n10.rows]]
+    bar = 250
+    exact = -0.5909090909090625
+    pandas = -0.5909090909090625
+    pine = -0.5909090909090625
+    tol = 0.0
+    ts = nan
+
+[tables.cg_mom1_n2]
+type = "CgRow"
+
+    [[tables.cg_mom1_n2.rows]]
+    bar = 1
+    exact = -2.153043478260869
+    pandas = -2.153043478260869
+    pine = -2.1530434782608685
+    tol = 0.0
+    ts = 0.8469565217391313
+    [[tables.cg_mom1_n2.rows]]
+    bar = 2
+    exact = 0.571428571428557
+    pandas = 0.571428571428557
+    pine = 0.571428571428557
+    tol = 0.0
+    ts = 3.571428571428557
+    [[tables.cg_mom1_n2.rows]]
+    bar = 3
+    exact = 0.21008403361344577
+    pandas = 0.21008403361344577
+    pine = 0.21008403361344574
+    tol = 0.0
+    ts = nan
+    [[tables.cg_mom1_n2.rows]]
+    bar = 15
+    exact = -0.016260162601626642
+    pandas = -0.016260162601626642
+    pine = -0.01626016260162666
+    tol = 0.0
+    ts = nan
+    [[tables.cg_mom1_n2.rows]]
+    bar = 45
+    exact = 0.0
+    pandas = -0.0
+    pine = 0.0
+    tol = 0.0
+    ts = 3.0
+    [[tables.cg_mom1_n2.rows]]
+    bar = 100
+    exact = -2.0
+    pandas = -2.0
+    pine = -2.0
+    tol = 0.0
+    ts = nan
+    [[tables.cg_mom1_n2.rows]]
+    bar = 120
+    exact = -1.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+    [[tables.cg_mom1_n2.rows]]
+    bar = 125
+    exact = -1.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+    [[tables.cg_mom1_n2.rows]]
+    bar = 140
+    exact = 0.25694444444444803
+    pandas = 0.25694444444444803
+    pine = 0.256944444444448
+    tol = 0.0
+    ts = 3.256944444444448
+    [[tables.cg_mom1_n2.rows]]
+    bar = 153
+    exact = 35.49999999999858
+    pandas = 35.49999999999858
+    pine = 35.49999999999858
+    tol = 0.0
+    ts = 38.49999999999858
+    [[tables.cg_mom1_n2.rows]]
+    bar = 200
+    exact = -1.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+    [[tables.cg_mom1_n2.rows]]
+    bar = 203
+    exact = -2.024390243902437
+    pandas = -2.024390243902437
+    pine = -2.0243902439024364
+    tol = 0.0
+    ts = 0.9756097560975634
+    [[tables.cg_mom1_n2.rows]]
+    bar = 242
+    exact = -81.99999999995879
+    pandas = -81.99999999995879
+    pine = -81.99999999995879
+    tol = 0.0
+    ts = -78.99999999995879
+    [[tables.cg_mom1_n2.rows]]
+    bar = 250
+    exact = -1.2212389380530981
+    pandas = -1.2212389380530981
+    pine = -1.2212389380530984
+    tol = 0.0
+    ts = nan
+
+[tables.cg_mom1_n50]
+type = "CgRow"
+
+    [[tables.cg_mom1_n50.rows]]
+    bar = 49
+    exact = -44.99190283400813
+    pandas = -44.991902834008116
+    pine = -44.99190283400813
+    tol = 8.8e-11
+    ts = nan
+    [[tables.cg_mom1_n50.rows]]
+    bar = 50
+    exact = -47.146666666666654
+    pandas = -47.14666666666667
+    pine = -47.14666666666665
+    tol = 6.5e-11
+    ts = nan
+    [[tables.cg_mom1_n50.rows]]
+    bar = 51
+    exact = -26.84249628528975
+    pandas = -26.84249628528975
+    pine = -26.84249628528975
+    tol = 3.5e-11
+    ts = nan
+    [[tables.cg_mom1_n50.rows]]
+    bar = 68
+    exact = -595.6216216216144
+    pandas = -595.6216216216146
+    pine = -595.6216216216146
+    tol = 4.7e-9
+    ts = nan
+    [[tables.cg_mom1_n50.rows]]
+    bar = 70
+    exact = 0.15400410677616888
+    pandas = 0.15400410677615722
+    pine = 0.15400410677615728
+    tol = 1.5e-11
+    ts = nan
+    [[tables.cg_mom1_n50.rows]]
+    bar = 100
+    exact = -20.93286739010484
+    pandas = -20.932867390104832
+    pine = -20.932867390104835
+    tol = 2.4e-11
+    ts = 30.067132609895157
+    [[tables.cg_mom1_n50.rows]]
+    bar = 140
+    exact = -26.747924528301887
+    pandas = -26.747924528301894
+    pine = -26.74792452830181
+    tol = 4.0e-11
+    ts = 24.25207547169808
+    [[tables.cg_mom1_n50.rows]]
+    bar = 165
+    exact = 463.94736842105834
+    pandas = 463.9473684210587
+    pine = 463.94736842105596
+    tol = 4.5e-9
+    ts = nan
+    [[tables.cg_mom1_n50.rows]]
+    bar = 197
+    exact = -0.09334203655351415
+    pandas = -0.09334203655351415
+    pine = -0.09334203655352902
+    tol = 3.1e-12
+    ts = nan
+    [[tables.cg_mom1_n50.rows]]
+    bar = 200
+    exact = 12.078797725426476
+    pandas = 12.07879772542648
+    pine = 12.078797725426456
+    tol = 1.8e-11
+    ts = nan
+    [[tables.cg_mom1_n50.rows]]
+    bar = 202
+    exact = -0.04782928623988895
+    pandas = -0.047829286239891036
+    pine = -0.04782928623989735
+    tol = 1.8e-12
+    ts = nan
+    [[tables.cg_mom1_n50.rows]]
+    bar = 250
+    exact = 242.74712643678026
+    pandas = 242.74712643678026
+    pine = 242.74712643678066
+    tol = 8.1e-10
+    ts = 293.7471264367803
+
+[tables.cg_negclose_n10]
+type = "CgRow"
+
+    [[tables.cg_negclose_n10.rows]]
+    bar = 9
+    exact = -5.520243924677261
+    pandas = -5.520243924677262
+    pine = -5.520243924677261
+    tol = 5.6e-12
+    ts = nan
+    [[tables.cg_negclose_n10.rows]]
+    bar = 10
+    exact = -5.516346810690804
+    pandas = -5.516346810690802
+    pine = -5.516346810690804
+    tol = 5.6e-12
+    ts = nan
+    [[tables.cg_negclose_n10.rows]]
+    bar = 11
+    exact = -5.492640913857438
+    pandas = -5.492640913857439
+    pine = -5.492640913857439
+    tol = 5.6e-12
+    ts = nan
+    [[tables.cg_negclose_n10.rows]]
+    bar = 33
+    exact = -5.452461117259859
+    pandas = -5.452461117259861
+    pine = -5.452461117259849
+    tol = 5.5e-12
+    ts = nan
+    [[tables.cg_negclose_n10.rows]]
+    bar = 51
+    exact = -5.506059360629152
+    pandas = -5.506059360629152
+    pine = -5.50605936062914
+    tol = 5.6e-12
+    ts = nan
+    [[tables.cg_negclose_n10.rows]]
+    bar = 80
+    exact = -5.261610752349451
+    pandas = -5.261610752349451
+    pine = -5.261610752349441
+    tol = 5.3e-12
+    ts = nan
+    [[tables.cg_negclose_n10.rows]]
+    bar = 100
+    exact = -5.542842780914082
+    pandas = -5.542842780914082
+    pine = -5.542842780914076
+    tol = 5.6e-12
+    ts = nan
+    [[tables.cg_negclose_n10.rows]]
+    bar = 200
+    exact = -5.6034261667389105
+    pandas = -5.60342616673891
+    pine = -5.603426166738897
+    tol = 5.7e-12
+    ts = nan
+    [[tables.cg_negclose_n10.rows]]
+    bar = 206
+    exact = -5.666341074454301
+    pandas = -5.6663410744543015
+    pine = -5.666341074454284
+    tol = 5.8e-12
+    ts = nan
+    [[tables.cg_negclose_n10.rows]]
+    bar = 246
+    exact = -5.501632907676501
+    pandas = -5.501632907676502
+    pine = -5.501632907676477
+    tol = 5.6e-12
+    ts = nan
+    [[tables.cg_negclose_n10.rows]]
+    bar = 251
+    exact = -5.509788107632525
+    pandas = -5.5097881076325255
+    pine = -5.509788107632502
+    tol = 5.6e-12
+    ts = nan
+
+[tables.cg_negzero_n10]
+type = "CgRow"
+
+    [[tables.cg_negzero_n10.rows]]
+    bar = 9
+    exact = -5.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+    [[tables.cg_negzero_n10.rows]]
+    bar = 10
+    exact = -5.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+    [[tables.cg_negzero_n10.rows]]
+    bar = 11
+    exact = -5.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+    [[tables.cg_negzero_n10.rows]]
+    bar = 59
+    exact = -5.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+
+[tables.cg_negzero_n2]
+type = "CgRow"
+
+    [[tables.cg_negzero_n2.rows]]
+    bar = 1
+    exact = -1.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+    [[tables.cg_negzero_n2.rows]]
+    bar = 2
+    exact = -1.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+    [[tables.cg_negzero_n2.rows]]
+    bar = 3
+    exact = -1.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+    [[tables.cg_negzero_n2.rows]]
+    bar = 59
+    exact = -1.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+
+[tables.cg_spike_n1000]
+type = "CgRow"
+
+    [[tables.cg_spike_n1000.rows]]
+    bar = 999
+    exact = -501.452588348286
+    pandas = -501.4525883482851
+    pine = -501.45258834828616
+    tol = 8.4e-10
+    ts = 499.54741165171487
+    [[tables.cg_spike_n1000.rows]]
+    bar = 1000
+    exact = -501.35473154265617
+    pandas = -501.3547315426563
+    pine = -501.3547315426563
+    tol = 8.4e-10
+    ts = 499.6452684573448
+    [[tables.cg_spike_n1000.rows]]
+    bar = 1001
+    exact = -501.21980781059665
+    pandas = -501.21980781059665
+    pine = -501.2198078105968
+    tol = 8.4e-10
+    ts = 499.7801921894037
+    [[tables.cg_spike_n1000.rows]]
+    bar = 1047
+    exact = -500.6900583216032
+    pandas = -500.69005832160434
+    pine = -500.6900583216032
+    tol = 8.4e-10
+    ts = 500.30994167839765
+    [[tables.cg_spike_n1000.rows]]
+    bar = 1050
+    exact = -1.041478048222908
+    pandas = -1.041478048222908
+    pine = -1.0414780482229078
+    tol = 1.8e-12
+    ts = 999.9585219517771
+    [[tables.cg_spike_n1000.rows]]
+    bar = 1055
+    exact = -6.041072119718865
+    pandas = -6.041072119718865
+    pine = -6.041072119718864
+    tol = 1.1e-11
+    ts = 994.9589278802814
+    [[tables.cg_spike_n1000.rows]]
+    bar = 1081
+    exact = -32.03896231542518
+    pandas = -32.03896231542516
+    pine = -32.03896231542518
+    tol = 5.4e-11
+    ts = 968.9610376845749
+    [[tables.cg_spike_n1000.rows]]
+    bar = 1098
+    exact = -49.03754774470492
+    pandas = -49.03754774470493
+    pine = -49.03754774470495
+    tol = 8.2e-11
+    ts = 951.962452255295
+    [[tables.cg_spike_n1000.rows]]
+    bar = 1099
+    exact = -50.03746093598564
+    pandas = -50.03746093598565
+    pine = -50.03746093598567
+    tol = 8.4e-11
+    ts = 950.9625390640148
+
+[tables.cg_stepflat_n10]
+type = "CgRow"
+
+    [[tables.cg_stepflat_n10.rows]]
+    bar = 9
+    exact = -5.520243924677261
+    pandas = -5.520243924677262
+    pine = -5.520243924677261
+    tol = 5.6e-12
+    ts = 5.479756075322739
+    [[tables.cg_stepflat_n10.rows]]
+    bar = 10
+    exact = -5.516346810690804
+    pandas = -5.516346810690802
+    pine = -5.516346810690804
+    tol = 5.6e-12
+    ts = 5.483653189309197
+    [[tables.cg_stepflat_n10.rows]]
+    bar = 11
+    exact = -5.492640913857438
+    pandas = -5.492640913857439
+    pine = -5.492640913857439
+    tol = 5.6e-12
+    ts = 5.507359086142561
+    [[tables.cg_stepflat_n10.rows]]
+    bar = 17
+    exact = -5.540923558288828
+    pandas = -5.540923558288829
+    pine = -5.540923558288826
+    tol = 5.6e-12
+    ts = 5.459076441711173
+    [[tables.cg_stepflat_n10.rows]]
+    bar = 25
+    exact = -5.597907109266625
+    pandas = -5.597907109266624
+    pine = -5.59790710926662
+    tol = 5.7e-12
+    ts = 5.402092890733376
+    [[tables.cg_stepflat_n10.rows]]
+    bar = 33
+    exact = -5.452461117259859
+    pandas = -5.452461117259861
+    pine = -5.452461117259849
+    tol = 5.5e-12
+    ts = 5.54753888274014
+    [[tables.cg_stepflat_n10.rows]]
+    bar = 36
+    exact = -5.498545101842871
+    pandas = -5.49854510184287
+    pine = -5.498545101842861
+    tol = 5.6e-12
+    ts = 5.501454898157127
+    [[tables.cg_stepflat_n10.rows]]
+    bar = 38
+    exact = -5.511585813667039
+    pandas = -5.511585813667038
+    pine = -5.511585813667028
+    tol = 5.6e-12
+    ts = 5.488414186332962
+    [[tables.cg_stepflat_n10.rows]]
+    bar = 79
+    exact = -5.5
+    pandas = -5.5
+    pine = -5.49999999999999
+    tol = 0.0
+    ts = 5.5
+
+[tables.cg_tick100_n10]
+type = "CgRow"
+
+    [[tables.cg_tick100_n10.rows]]
+    bar = 9
+    exact = -5.499970001799892
+    pandas = -5.499970001799892
+    pine = -5.499970001799893
+    tol = 5.6e-12
+    ts = 5.500029998200108
+    [[tables.cg_tick100_n10.rows]]
+    bar = 10
+    exact = -5.500029998200108
+    pandas = -5.500029998200107
+    pine = -5.50002999820011
+    tol = 5.6e-12
+    ts = 5.499970001799893
+    [[tables.cg_tick100_n10.rows]]
+    bar = 11
+    exact = -5.500089994600324
+    pandas = -5.500089994600324
+    pine = -5.500089994600325
+    tol = 5.6e-12
+    ts = 5.499910005399675
+    [[tables.cg_tick100_n10.rows]]
+    bar = 16
+    exact = -5.5
+    pandas = -5.500000000000002
+    pine = -5.499999999999998
+    tol = 5.6e-12
+    ts = 5.500000000000001
+    [[tables.cg_tick100_n10.rows]]
+    bar = 44
+    exact = -5.49995000299982
+    pandas = -5.49995000299982
+    pine = -5.499950002999816
+    tol = 5.6e-12
+    ts = 5.500049997000182
+    [[tables.cg_tick100_n10.rows]]
+    bar = 100
+    exact = -5.500014999250038
+    pandas = -5.500014999250037
+    pine = -5.500014999250014
+    tol = 5.6e-12
+    ts = 5.499985000749963
+    [[tables.cg_tick100_n10.rows]]
+    bar = 190
+    exact = -5.500104992650514
+    pandas = -5.500104992650515
+    pine = -5.50010499265047
+    tol = 5.6e-12
+    ts = 5.499895007349486
+    [[tables.cg_tick100_n10.rows]]
+    bar = 192
+    exact = -5.500124993750313
+    pandas = -5.500124993750313
+    pine = -5.500124993750266
+    tol = 5.6e-12
+    ts = 5.499875006249687
+    [[tables.cg_tick100_n10.rows]]
+    bar = 200
+    exact = -5.499880004799808
+    pandas = -5.499880004799808
+    pine = -5.49988000479976
+    tol = 5.6e-12
+    ts = 5.500119995200192
+    [[tables.cg_tick100_n10.rows]]
+    bar = 292
+    exact = -5.499940002399904
+    pandas = -5.499940002399904
+    pine = -5.499940002399836
+    tol = 5.6e-12
+    ts = 5.500059997600096
+    [[tables.cg_tick100_n10.rows]]
+    bar = 299
+    exact = -5.500059997600096
+    pandas = -5.500059997600095
+    pine = -5.500059997600029
+    tol = 5.6e-12
+    ts = 5.499940002399904
+
+[tables.cg_tick100_n50]
+type = "CgRow"
+
+    [[tables.cg_tick100_n50.rows]]
+    bar = 49
+    exact = -25.49987600545576
+    pandas = -25.49987600545576
+    pine = -25.499876005455747
+    tol = 2.7e-11
+    ts = 25.50012399454423
+    [[tables.cg_tick100_n50.rows]]
+    bar = 50
+    exact = -25.499871005933727
+    pandas = -25.499871005933723
+    pine = -25.499871005933713
+    tol = 2.7e-11
+    ts = 25.500128994066255
+    [[tables.cg_tick100_n50.rows]]
+    bar = 51
+    exact = -25.499868006335696
+    pandas = -25.499868006335703
+    pine = -25.499868006335678
+    tol = 2.7e-11
+    ts = 25.50013199366429
+    [[tables.cg_tick100_n50.rows]]
+    bar = 58
+    exact = -25.499647016237255
+    pandas = -25.499647016237255
+    pine = -25.499647016237244
+    tol = 2.7e-11
+    ts = 25.500352983762728
+    [[tables.cg_tick100_n50.rows]]
+    bar = 100
+    exact = -25.500109993400397
+    pandas = -25.500109993400393
+    pine = -25.500109993400415
+    tol = 2.7e-11
+    ts = 25.49989000659959
+    [[tables.cg_tick100_n50.rows]]
+    bar = 185
+    exact = -25.499718019174697
+    pandas = -25.499718019174693
+    pine = -25.499718019174793
+    tol = 2.7e-11
+    ts = 25.50028198082527
+    [[tables.cg_tick100_n50.rows]]
+    bar = 200
+    exact = -25.500091993744427
+    pandas = -25.500091993744423
+    pine = -25.500091993744537
+    tol = 2.7e-11
+    ts = 25.499908006255552
+    [[tables.cg_tick100_n50.rows]]
+    bar = 206
+    exact = -25.500301979465398
+    pandas = -25.500301979465394
+    pine = -25.500301979465515
+    tol = 2.7e-11
+    ts = 25.499698020534588
+    [[tables.cg_tick100_n50.rows]]
+    bar = 210
+    exact = -25.50035797852129
+    pandas = -25.50035797852129
+    pine = -25.50035797852142
+    tol = 2.7e-11
+    ts = 25.499642021478692
+    [[tables.cg_tick100_n50.rows]]
+    bar = 234
+    exact = -25.49993200299187
+    pandas = -25.49993200299188
+    pine = -25.499932002992036
+    tol = 2.7e-11
+    ts = 25.500067997008117
+    [[tables.cg_tick100_n50.rows]]
+    bar = 288
+    exact = -25.5
+    pandas = -25.499999999999996
+    pine = -25.500000000000195
+    tol = 2.7e-11
+    ts = 25.499999999999986
+    [[tables.cg_tick100_n50.rows]]
+    bar = 299
+    exact = -25.499989000417983
+    pandas = -25.499989000417983
+    pine = -25.49998900041818
+    tol = 2.7e-11
+    ts = 25.500010999582
+
+[tables.cg_zero_n10]
+type = "CgRow"
+
+    [[tables.cg_zero_n10.rows]]
+    bar = 9
+    exact = -5.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+    [[tables.cg_zero_n10.rows]]
+    bar = 10
+    exact = -5.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+    [[tables.cg_zero_n10.rows]]
+    bar = 11
+    exact = -5.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+    [[tables.cg_zero_n10.rows]]
+    bar = 59
+    exact = -5.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+
+[tables.cg_zero_n2]
+type = "CgRow"
+
+    [[tables.cg_zero_n2.rows]]
+    bar = 1
+    exact = -1.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+    [[tables.cg_zero_n2.rows]]
+    bar = 2
+    exact = -1.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+    [[tables.cg_zero_n2.rows]]
+    bar = 3
+    exact = -1.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan
+    [[tables.cg_zero_n2.rows]]
+    bar = 59
+    exact = -1.5
+    pandas = nan
+    pine = nan
+    tol = 0.0
+    ts = nan

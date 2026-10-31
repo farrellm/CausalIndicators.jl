@@ -1,0 +1,288 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 62021c1:src/tools/ta_regtest/ta_test_func/test_dosc.c. Do not edit.
+commit = "62021c1d14ef5499505af5547384cab509adf3fc"
+source = "src/tools/ta_regtest/ta_test_func/test_dosc.c"
+
+[structs.DoscGolden]
+fields = ["t", "f", "s", "g", "bar", "value"]
+types = ["int", "int", "int", "int", "int", "double"]
+
+[structs.DoscRow]
+fields = ["bar", "value"]
+types = ["int", "double"]
+
+[tables.doscGolden]
+type = "DoscGolden"
+
+    [[tables.doscGolden.rows]]
+    bar = 28
+    f = 5
+    g = 9
+    s = 3
+    t = 14
+    value = -0.3249333924644036
+    [[tables.doscGolden.rows]]
+    bar = 29
+    f = 5
+    g = 9
+    s = 3
+    t = 14
+    value = 1.1294804858305274
+    [[tables.doscGolden.rows]]
+    bar = 30
+    f = 5
+    g = 9
+    s = 3
+    t = 14
+    value = 1.8411745168139122
+    [[tables.doscGolden.rows]]
+    bar = 33
+    f = 5
+    g = 9
+    s = 3
+    t = 14
+    value = 3.394707265192512
+    [[tables.doscGolden.rows]]
+    bar = 40
+    f = 5
+    g = 9
+    s = 3
+    t = 14
+    value = -2.3604690875888585
+    [[tables.doscGolden.rows]]
+    bar = 100
+    f = 5
+    g = 9
+    s = 3
+    t = 14
+    value = -6.725704010174921
+    [[tables.doscGolden.rows]]
+    bar = 180
+    f = 5
+    g = 9
+    s = 3
+    t = 14
+    value = -4.898327714812327
+    [[tables.doscGolden.rows]]
+    bar = 251
+    f = 5
+    g = 9
+    s = 3
+    t = 14
+    value = -1.305237886198697
+    [[tables.doscGolden.rows]]
+    bar = 11
+    f = 2
+    g = 3
+    s = 2
+    t = 7
+    value = 6.391110737677891
+    [[tables.doscGolden.rows]]
+    bar = 12
+    f = 2
+    g = 3
+    s = 2
+    t = 7
+    value = 4.987120291272084
+    [[tables.doscGolden.rows]]
+    bar = 13
+    f = 2
+    g = 3
+    s = 2
+    t = 7
+    value = -6.990984298447734
+    [[tables.doscGolden.rows]]
+    bar = 16
+    f = 2
+    g = 3
+    s = 2
+    t = 7
+    value = -2.9991129829473304
+    [[tables.doscGolden.rows]]
+    bar = 23
+    f = 2
+    g = 3
+    s = 2
+    t = 7
+    value = -4.6347218582406535
+    [[tables.doscGolden.rows]]
+    bar = 100
+    f = 2
+    g = 3
+    s = 2
+    t = 7
+    value = 3.494883263958323
+    [[tables.doscGolden.rows]]
+    bar = 180
+    f = 2
+    g = 3
+    s = 2
+    t = 7
+    value = -0.5742141628081757
+    [[tables.doscGolden.rows]]
+    bar = 251
+    f = 2
+    g = 3
+    s = 2
+    t = 7
+    value = -2.8784371609126103
+    [[tables.doscGolden.rows]]
+    bar = 45
+    f = 9
+    g = 13
+    s = 5
+    t = 21
+    value = 2.1398319394716623
+    [[tables.doscGolden.rows]]
+    bar = 46
+    f = 9
+    g = 13
+    s = 5
+    t = 21
+    value = 2.684972890519284
+    [[tables.doscGolden.rows]]
+    bar = 47
+    f = 9
+    g = 13
+    s = 5
+    t = 21
+    value = 2.9293385772958462
+    [[tables.doscGolden.rows]]
+    bar = 50
+    f = 9
+    g = 13
+    s = 5
+    t = 21
+    value = 3.136311750931065
+    [[tables.doscGolden.rows]]
+    bar = 57
+    f = 9
+    g = 13
+    s = 5
+    t = 21
+    value = -2.095962067160689
+    [[tables.doscGolden.rows]]
+    bar = 100
+    f = 9
+    g = 13
+    s = 5
+    t = 21
+    value = -1.8542800921709923
+    [[tables.doscGolden.rows]]
+    bar = 180
+    f = 9
+    g = 13
+    s = 5
+    t = 21
+    value = 0.7380098356867747
+    [[tables.doscGolden.rows]]
+    bar = 251
+    f = 9
+    g = 13
+    s = 5
+    t = 21
+    value = -1.167076396328979
+    [[tables.doscGolden.rows]]
+    bar = 5
+    f = 2
+    g = 2
+    s = 2
+    t = 2
+    value = -3.4694854393017387
+    [[tables.doscGolden.rows]]
+    bar = 6
+    f = 2
+    g = 2
+    s = 2
+    t = 2
+    value = -10.488256616386776
+    [[tables.doscGolden.rows]]
+    bar = 7
+    f = 2
+    g = 2
+    s = 2
+    t = 2
+    value = -4.513427438418971
+    [[tables.doscGolden.rows]]
+    bar = 10
+    f = 2
+    g = 2
+    s = 2
+    t = 2
+    value = 11.422684030342722
+    [[tables.doscGolden.rows]]
+    bar = 17
+    f = 2
+    g = 2
+    s = 2
+    t = 2
+    value = -2.5478249156729422
+    [[tables.doscGolden.rows]]
+    bar = 100
+    f = 2
+    g = 2
+    s = 2
+    t = 2
+    value = 5.5705910166985495
+    [[tables.doscGolden.rows]]
+    bar = 180
+    f = 2
+    g = 2
+    s = 2
+    t = 2
+    value = 1.1696093963642131
+    [[tables.doscGolden.rows]]
+    bar = 251
+    f = 2
+    g = 2
+    s = 2
+    t = 2
+    value = -7.242972456187502
+
+[tables.doscTransient]
+type = "DoscRow"
+
+    [[tables.doscTransient.rows]]
+    bar = 100
+    value = 7.407407407407407
+    [[tables.doscTransient.rows]]
+    bar = 101
+    value = 15.123456790123457
+    [[tables.doscTransient.rows]]
+    bar = 102
+    value = 17.400517234869938
+    [[tables.doscTransient.rows]]
+    bar = 103
+    value = 17.294263178997475
+    [[tables.doscTransient.rows]]
+    bar = 104
+    value = 15.323978160349752
+    [[tables.doscTransient.rows]]
+    bar = 105
+    value = 13.133320857460436
+    [[tables.doscTransient.rows]]
+    bar = 106
+    value = 11.276874735326397
+    [[tables.doscTransient.rows]]
+    bar = 107
+    value = 7.283203155787624
+    [[tables.doscTransient.rows]]
+    bar = 108
+    value = 2.9282261775362377
+    [[tables.doscTransient.rows]]
+    bar = 109
+    value = -1.071150851727855
+    [[tables.doscTransient.rows]]
+    bar = 110
+    value = -4.056749410676603
+    [[tables.doscTransient.rows]]
+    bar = 111
+    value = -5.653128870552866
+    [[tables.doscTransient.rows]]
+    bar = 112
+    value = -6.162049856938211
+    [[tables.doscTransient.rows]]
+    bar = 113
+    value = -5.036602710173332
+    [[tables.doscTransient.rows]]
+    bar = 114
+    value = -3.650666231268262

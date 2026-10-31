@@ -56,6 +56,21 @@ ErrorNumber server_verify(const char *funcName, TA_Integer startIdx, TA_Integer 
    (void)nbOptParams; (void)outReal; (void)outInteger;
    return TA_TEST_PASS;
 }
+ErrorNumber server_verify_lookback_value(const char *funcName, const double optParams[],
+                                         int nbOptParams)
+{
+   (void)funcName; (void)optParams; (void)nbOptParams;
+   return TA_TEST_PASS;
+}
+int server_verify_lookback_values(void) { return 0; }
+
+/* test_util.c's name filter for short tokens (test_codegen.c); the capture runs
+ * unfiltered. */
+int codegen_short_filter_token_matches(const char *name, const char *token)
+{
+   (void)name; (void)token;
+   return 0;
+}
 
 static void series(char tag, const double *x, int n)
 {

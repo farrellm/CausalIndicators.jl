@@ -1,5 +1,5 @@
-# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_ma.c. Do not edit.
-commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 62021c1:src/tools/ta_regtest/ta_test_func/test_ma.c. Do not edit.
+commit = "62021c1d14ef5499505af5547384cab509adf3fc"
 source = "src/tools/ta_regtest/ta_test_func/test_ma.c"
 
 [structs.TA_Test]

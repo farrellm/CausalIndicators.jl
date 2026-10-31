@@ -1,0 +1,382 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 62021c1:src/tools/ta_regtest/ta_test_func/test_rvir.c. Do not edit.
+commit = "62021c1d14ef5499505af5547384cab509adf3fc"
+source = "src/tools/ta_regtest/ta_test_func/test_rvir.c"
+
+[structs.RvirGolden]
+fields = ["period", "sdPeriod", "bar", "want"]
+types = ["int", "int", "int", "double"]
+
+[structs.RvirPandasGolden]
+fields = ["length", "bar", "want"]
+types = ["int", "int", "double"]
+
+[tables.rvirPandas]
+type = "RvirPandasGolden"
+
+    [[tables.rvirPandas.rows]]
+    bar = 172
+    length = 3
+    want = 93.86327425926874
+    [[tables.rvirPandas.rows]]
+    bar = 173
+    length = 3
+    want = 96.03991968689654
+    [[tables.rvirPandas.rows]]
+    bar = 200
+    length = 3
+    want = 37.33383862349664
+    [[tables.rvirPandas.rows]]
+    bar = 225
+    length = 3
+    want = 96.82594277494229
+    [[tables.rvirPandas.rows]]
+    bar = 250
+    length = 3
+    want = 39.532209962368356
+    [[tables.rvirPandas.rows]]
+    bar = 251
+    length = 3
+    want = 18.12811699752234
+    [[tables.rvirPandas.rows]]
+    bar = 176
+    length = 5
+    want = 66.1880359831941
+    [[tables.rvirPandas.rows]]
+    bar = 177
+    length = 5
+    want = 52.77410649920727
+    [[tables.rvirPandas.rows]]
+    bar = 200
+    length = 5
+    want = 38.588496220743195
+    [[tables.rvirPandas.rows]]
+    bar = 225
+    length = 5
+    want = 90.71379226795327
+    [[tables.rvirPandas.rows]]
+    bar = 250
+    length = 5
+    want = 48.12991246254327
+    [[tables.rvirPandas.rows]]
+    bar = 251
+    length = 5
+    want = 40.33511935791117
+
+[tables.rvirTradingSignals]
+type = "RvirGolden"
+
+    [[tables.rvirTradingSignals.rows]]
+    bar = 22
+    period = 14
+    sdPeriod = 10
+    want = 43.83474179003751
+    [[tables.rvirTradingSignals.rows]]
+    bar = 23
+    period = 14
+    sdPeriod = 10
+    want = 40.77374430876857
+    [[tables.rvirTradingSignals.rows]]
+    bar = 24
+    period = 14
+    sdPeriod = 10
+    want = 37.279696373902446
+    [[tables.rvirTradingSignals.rows]]
+    bar = 66
+    period = 14
+    sdPeriod = 10
+    want = 66.903540746366
+    [[tables.rvirTradingSignals.rows]]
+    bar = 81
+    period = 14
+    sdPeriod = 10
+    want = 55.03845109795637
+    [[tables.rvirTradingSignals.rows]]
+    bar = 88
+    period = 14
+    sdPeriod = 10
+    want = 66.47548865176094
+    [[tables.rvirTradingSignals.rows]]
+    bar = 130
+    period = 14
+    sdPeriod = 10
+    want = 69.53225428997276
+    [[tables.rvirTradingSignals.rows]]
+    bar = 160
+    period = 14
+    sdPeriod = 10
+    want = 54.453504657419614
+    [[tables.rvirTradingSignals.rows]]
+    bar = 176
+    period = 14
+    sdPeriod = 10
+    want = 59.71553016588912
+    [[tables.rvirTradingSignals.rows]]
+    bar = 190
+    period = 14
+    sdPeriod = 10
+    want = 43.20728355195189
+    [[tables.rvirTradingSignals.rows]]
+    bar = 191
+    period = 14
+    sdPeriod = 10
+    want = 42.114446624474176
+    [[tables.rvirTradingSignals.rows]]
+    bar = 197
+    period = 14
+    sdPeriod = 10
+    want = 30.103611556830717
+    [[tables.rvirTradingSignals.rows]]
+    bar = 220
+    period = 14
+    sdPeriod = 10
+    want = 51.853545388720846
+    [[tables.rvirTradingSignals.rows]]
+    bar = 250
+    period = 14
+    sdPeriod = 10
+    want = 53.5213919484201
+    [[tables.rvirTradingSignals.rows]]
+    bar = 251
+    period = 14
+    sdPeriod = 10
+    want = 52.84764533599167
+    [[tables.rvirTradingSignals.rows]]
+    bar = 58
+    period = 30
+    sdPeriod = 30
+    want = 56.06861586150927
+    [[tables.rvirTradingSignals.rows]]
+    bar = 59
+    period = 30
+    sdPeriod = 30
+    want = 57.23383171237502
+    [[tables.rvirTradingSignals.rows]]
+    bar = 60
+    period = 30
+    sdPeriod = 30
+    want = 57.05152888662058
+    [[tables.rvirTradingSignals.rows]]
+    bar = 66
+    period = 30
+    sdPeriod = 30
+    want = 59.83263064834614
+    [[tables.rvirTradingSignals.rows]]
+    bar = 81
+    period = 30
+    sdPeriod = 30
+    want = 54.010003772515546
+    [[tables.rvirTradingSignals.rows]]
+    bar = 88
+    period = 30
+    sdPeriod = 30
+    want = 65.39568254279567
+    [[tables.rvirTradingSignals.rows]]
+    bar = 130
+    period = 30
+    sdPeriod = 30
+    want = 60.74854339974483
+    [[tables.rvirTradingSignals.rows]]
+    bar = 160
+    period = 30
+    sdPeriod = 30
+    want = 54.00134817955622
+    [[tables.rvirTradingSignals.rows]]
+    bar = 173
+    period = 30
+    sdPeriod = 30
+    want = 58.338042240109715
+    [[tables.rvirTradingSignals.rows]]
+    bar = 176
+    period = 30
+    sdPeriod = 30
+    want = 55.622472925677386
+    [[tables.rvirTradingSignals.rows]]
+    bar = 190
+    period = 30
+    sdPeriod = 30
+    want = 47.894782786787374
+    [[tables.rvirTradingSignals.rows]]
+    bar = 191
+    period = 30
+    sdPeriod = 30
+    want = 47.132821157584125
+    [[tables.rvirTradingSignals.rows]]
+    bar = 197
+    period = 30
+    sdPeriod = 30
+    want = 39.408095166996944
+    [[tables.rvirTradingSignals.rows]]
+    bar = 220
+    period = 30
+    sdPeriod = 30
+    want = 51.103847013845694
+    [[tables.rvirTradingSignals.rows]]
+    bar = 250
+    period = 30
+    sdPeriod = 30
+    want = 53.36599186363526
+    [[tables.rvirTradingSignals.rows]]
+    bar = 251
+    period = 30
+    sdPeriod = 30
+    want = 52.17972769470994
+    [[tables.rvirTradingSignals.rows]]
+    bar = 9
+    period = 1
+    sdPeriod = 10
+    want = 100
+    [[tables.rvirTradingSignals.rows]]
+    bar = 10
+    period = 1
+    sdPeriod = 10
+    want = 100
+    [[tables.rvirTradingSignals.rows]]
+    bar = 11
+    period = 1
+    sdPeriod = 10
+    want = 100
+    [[tables.rvirTradingSignals.rows]]
+    bar = 12
+    period = 1
+    sdPeriod = 10
+    want = 0
+    [[tables.rvirTradingSignals.rows]]
+    bar = 66
+    period = 1
+    sdPeriod = 10
+    want = 75
+    [[tables.rvirTradingSignals.rows]]
+    bar = 81
+    period = 1
+    sdPeriod = 10
+    want = 75
+    [[tables.rvirTradingSignals.rows]]
+    bar = 88
+    period = 1
+    sdPeriod = 10
+    want = 75
+    [[tables.rvirTradingSignals.rows]]
+    bar = 116
+    period = 1
+    sdPeriod = 10
+    want = 100.00000000000001
+    [[tables.rvirTradingSignals.rows]]
+    bar = 130
+    period = 1
+    sdPeriod = 10
+    want = 100
+    [[tables.rvirTradingSignals.rows]]
+    bar = 160
+    period = 1
+    sdPeriod = 10
+    want = 100
+    [[tables.rvirTradingSignals.rows]]
+    bar = 176
+    period = 1
+    sdPeriod = 10
+    want = 75
+    [[tables.rvirTradingSignals.rows]]
+    bar = 190
+    period = 1
+    sdPeriod = 10
+    want = 100
+    [[tables.rvirTradingSignals.rows]]
+    bar = 191
+    period = 1
+    sdPeriod = 10
+    want = 25
+    [[tables.rvirTradingSignals.rows]]
+    bar = 220
+    period = 1
+    sdPeriod = 10
+    want = 0
+    [[tables.rvirTradingSignals.rows]]
+    bar = 250
+    period = 1
+    sdPeriod = 10
+    want = 25
+    [[tables.rvirTradingSignals.rows]]
+    bar = 251
+    period = 1
+    sdPeriod = 10
+    want = 0
+    [[tables.rvirTradingSignals.rows]]
+    bar = 2
+    period = 2
+    sdPeriod = 2
+    want = 100
+    [[tables.rvirTradingSignals.rows]]
+    bar = 3
+    period = 2
+    sdPeriod = 2
+    want = 79.70672389127319
+    [[tables.rvirTradingSignals.rows]]
+    bar = 4
+    period = 2
+    sdPeriod = 2
+    want = 59.33132323425551
+    [[tables.rvirTradingSignals.rows]]
+    bar = 66
+    period = 2
+    sdPeriod = 2
+    want = 86.8574889486315
+    [[tables.rvirTradingSignals.rows]]
+    bar = 73
+    period = 2
+    sdPeriod = 2
+    want = 0.44422411013126006
+    [[tables.rvirTradingSignals.rows]]
+    bar = 81
+    period = 2
+    sdPeriod = 2
+    want = 61.165537915375296
+    [[tables.rvirTradingSignals.rows]]
+    bar = 88
+    period = 2
+    sdPeriod = 2
+    want = 94.11601868471412
+    [[tables.rvirTradingSignals.rows]]
+    bar = 130
+    period = 2
+    sdPeriod = 2
+    want = 98.55354875822283
+    [[tables.rvirTradingSignals.rows]]
+    bar = 160
+    period = 2
+    sdPeriod = 2
+    want = 47.17630631981768
+    [[tables.rvirTradingSignals.rows]]
+    bar = 176
+    period = 2
+    sdPeriod = 2
+    want = 49.87910181801457
+    [[tables.rvirTradingSignals.rows]]
+    bar = 190
+    period = 2
+    sdPeriod = 2
+    want = 72.85692467201622
+    [[tables.rvirTradingSignals.rows]]
+    bar = 191
+    period = 2
+    sdPeriod = 2
+    want = 65.93178324323601
+    [[tables.rvirTradingSignals.rows]]
+    bar = 209
+    period = 2
+    sdPeriod = 2
+    want = 81.24198201563738
+    [[tables.rvirTradingSignals.rows]]
+    bar = 220
+    period = 2
+    sdPeriod = 2
+    want = 24.230690810514364
+    [[tables.rvirTradingSignals.rows]]
+    bar = 250
+    period = 2
+    sdPeriod = 2
+    want = 47.03563025544014
+    [[tables.rvirTradingSignals.rows]]
+    bar = 251
+    period = 2
+    sdPeriod = 2
+    want = 7.324933569786104

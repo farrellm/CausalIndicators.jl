@@ -19,15 +19,26 @@ function roundtriphostile()
 end
 
 # pbFillSterbenzHostileHistory: alternating ~3× moves, where the period-1 EMA
-# step (x − prev)·1 + prev does not give back x.
+# step (x − prev)·1 + prev does not give back x, and every 16th close a -0.0
+# behind a positive one, which that step turns into +0.0.
 function sterbenzhostile()
     i = 0:251
-    close = ifelse.(isodd.(i), 41.37, 124.11)
+    close = ifelse.(i .% 16 .== 15, -0.0, ifelse.(isodd.(i), 41.37, 124.11))
     open = ifelse.(isodd.(i), 41.53, 123.67)
     volume = Float64.(100003 .+ (i .* 104729) .% 899993)
     return (; open, high = max.(open, close) .+ 0.11, low = min.(open, close) .- 0.11,
         close, volume)
 end
+
+# pbCountNegZeroAfterPositive: the -0.0 values of `x` right after a value whose
+# sign bit is clear (`missing` counts as neither).
+negzeroafterpositive(x) =
+    count(i -> isequal(x[i], -0.0) && !ismissing(x[i-1]) && !signbit(x[i-1]), 2:length(x))
+
+# Equal by value at no tolerance, so -0.0 passes for +0.0 (pbCheckSameValues).
+valueequal(a, b) =
+    length(a) == length(b) &&
+    all(((x, y),) -> ismissing(x) ? ismissing(y) : x == y, zip(a, b))
 
 # The bars on which the naive period-1 EMA step loses its input.
 function naiveemaloss(x)
@@ -78,30 +89,56 @@ end
         @test count(i -> (rt.close[i] * rt.volume[i]) / rt.volume[i] != rt.close[i],
             1:252) >= 8
         @test naiveemaloss(sb.close) >= 32
+        @test negzeroafterpositive(sb.close) >= 8
         # Every matype with a period (MAMA's are its fast and slow limits), so a
         # new one cannot slip past; then the named constructors and the
-        # structured averages.
+        # structured averages. Each equals its input by value; the sign of a
+        # zero is held, bit for bit, only where an EMA-step copy decides it
+        # (EMA, DEMA, TEMA and ZLEMA), as test_period_boundary.c holds it.
         matypes = filter(!=(:mama), MATYPES)
         @test length(matypes) == length(MATYPES) - 1
+        bits = (:ema, :dema, :tema, :zlema)
+        same(m, got, x) = m in bits ? isequal(got, x) : valueequal(got, x)
         for (what, data) in (("reference", ref), ("round-trip-hostile", rt),
             ("Sterbenz-hostile", sb))
             for m in matypes
                 got = foldseries(MA(:close; period = 1, matype = m), data).close_ma
-                ok = isequal(got, data.close)
+                ok = same(m, got, data.close)
                 ok || @info "MA(1) is not the input" what m
                 @test ok
             end
-            for ctor in (EMA, RMA, DEMA, TEMA, TRIMA, KAMA, T3, HMA, ZLEMA)
-                @test isequal(only(foldseries(ctor(:close; period = 1), data)), data.close)
+            for (m, ctor) in ((:ema, EMA), (:rma, RMA), (:dema, DEMA), (:tema, TEMA),
+                (:trima, TRIMA), (:kama, KAMA), (:t3, T3), (:hma, HMA), (:zlema, ZLEMA))
+                @test same(m, only(foldseries(ctor(:close; period = 1), data)), data.close)
             end
             for s in (Mean(:close), WMA(:close))
-                @test isequal(only(foldseries(s, data; window = Bars(1))), data.close)
+                @test valueequal(only(foldseries(s, data; window = Bars(1))), data.close)
             end
             # VWMA under Bars(1) copies its input (TA-Lib #184), where (P·V)/V
             # would lose P on the round-trip series.
-            @test isequal(only(foldseries(VWMA(:close), data; window = Bars(1))),
+            @test valueequal(only(foldseries(VWMA(:close), data; window = Bars(1))),
                 data.close)
         end
+    end
+
+    @testset "ERI and EFI at period 1 keep the sign of a zero" begin
+        # testEriEfiStreamAtPeriodOne: EFI(1) is the raw force, -0.0 where a
+        # falling close meets zero volume; ERI(1) is high and low less the close,
+        # through an EMA(1) that copies a -0.0 close.
+        n, warm = 64, 6
+        cl = accumulate((a, i) -> a + (i % 4 == 3 ? -0.37 : 1.21), 1:(n-1); init = 50.13)
+        cl = [50.13; cl]
+        vol = [i % 4 == 3 ? 0.0 : 1000.0 + 17.0 * i for i in 0:(n-1)]
+        efi = foldseries(EFI(; period = 1), (close = cl, volume = vol)).efi
+        @test firstvalid(efi) == 1
+        @test negzeroafterpositive(efi[(warm+1):end]) > 0
+        @test isequal(efi[2:end], diff(cl) .* vol[2:end])
+        dead = [i >= warm && i % 4 == 3 for i in 0:(n-1)]
+        c2 = ifelse.(dead, -0.0, cl)
+        hi, lo = ifelse.(dead, -0.0, cl .+ 1.5), ifelse.(dead, -0.0, cl .- 1.5)
+        @test count(i -> dead[i] && c2[i-1] > 0, 2:n) > 0
+        o = foldseries(ERI(; period = 1), (high = hi, low = lo, close = c2))
+        @test isequal(o.eri_bullpower, hi .- c2) && isequal(o.eri_bearpower, lo .- c2)
     end
 
     @testset "MACD family at signal period 1" begin
@@ -142,6 +179,20 @@ end
             end
         end
         @test all(>=(1), losses)
+
+        # pbMacdNegZeroSeries: after a run of +0.0, five times the smallest
+        # subnormal and then its negation round TA-Lib's fast EMA to -0.0, which
+        # puts a -0.0 on its MACD line for the signal=1 copy to keep. The
+        # compensated EMAs here do not round to -0.0 there, so the line holds
+        # none and only the bitwise copy of the line is checked.
+        x = zeros(252)
+        x[61], x[62] = 5 * nextfloat(0.0), -5 * nextfloat(0.0)
+        for s in (MACD(:close; signalperiod = 1), MACDFix(:close; signalperiod = 1),
+            MACDExt(:close; fastmatype = :ema, slowmatype = :ema, signalperiod = 1,
+                signalmatype = :ema))
+            o = foldseries(s, (close = x,))
+            @test isequal(o[2], o[1]) && all(iszero, skipmissing(o[3]))
+        end
     end
 
     @testset "period-1 pins" begin

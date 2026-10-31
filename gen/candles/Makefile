@@ -5,11 +5,13 @@
 #     julia --project=gen gen/candles/capture.jl ~/workspace/ta-lib
 #
 # It links TA-Lib's own test_candlestick.c and test_util.c with the static
-# library, wrapping every TA_CDL* entry point.
+# library, wrapping every TA_CDL* entry point. meta_ride.c holds the
+# TA_<N>_MetaRide contract checks test_candlestick.c routes its calls through;
+# they call the wrapped entry points, so each call is still captured once.
 TALIB ?= $(HOME)/workspace/ta-lib
 REGTEST = $(TALIB)/src/tools/ta_regtest
 CFLAGS ?= -O2 -Wall -ffp-contract=off
-INCLUDES = -I$(TALIB)/src/ta_common -I$(REGTEST) -I$(TALIB)/src/ta_func -I$(TALIB)/include
+INCLUDES = -I$(TALIB)/src/ta_common -I$(TALIB)/src/ta_abstract -I$(REGTEST) -I$(TALIB)/src/ta_func -I$(TALIB)/include
 
 CDLS = 2CROWS 3BLACKCROWS 3INSIDE 3LINESTRIKE 3OUTSIDE 3STARSINSOUTH 3WHITESOLDIERS \
 	ABANDONEDBABY ADVANCEBLOCK BELTHOLD BREAKAWAY CLOSINGMARUBOZU CONCEALBABYSWALL \
@@ -22,7 +24,8 @@ CDLS = 2CROWS 3BLACKCROWS 3INSIDE 3LINESTRIKE 3OUTSIDE 3STARSINSOUTH 3WHITESOLDI
 	TAKURI TASUKIGAP THRUSTING TRISTAR UNIQUE3RIVER UPSIDEGAP2CROWS XSIDEGAP3METHODS
 WRAPS = $(foreach f,$(CDLS),-Wl,--wrap=TA_CDL$(f))
 
-capture: capture.c $(REGTEST)/ta_test_func/test_candlestick.c $(REGTEST)/test_util.c
+capture: capture.c $(REGTEST)/ta_test_func/test_candlestick.c $(REGTEST)/test_util.c \
+		$(REGTEST)/meta_ride.c
 	$(CC) $(CFLAGS) $(INCLUDES) -o $@ $^ $(WRAPS) $(TALIB)/build/libta-lib.a -lm
 
 clean:

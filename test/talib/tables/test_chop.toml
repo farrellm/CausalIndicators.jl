@@ -1,0 +1,542 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 62021c1:src/tools/ta_regtest/ta_test_func/test_chop.c. Do not edit.
+commit = "62021c1d14ef5499505af5547384cab509adf3fc"
+source = "src/tools/ta_regtest/ta_test_func/test_chop.c"
+
+[arrays.chopPubClose]
+type = "double"
+values = [57.67, 57.39, 57.77, 57.85, 57.7, 57.9, 58.25, 58.51, 58.57, 58.33, 57.87, 57.68, 57.6, 57.93, 57.14, 57.2, 58.34, 58.35, 58.26, 58.21, 58.79, 58.73, 58.05, 57.88]
+
+[arrays.chopPubExact]
+type = "double"
+values = [52.58762570583259, 50.527582890361494, 54.64310700976775, 54.48467199914937, 53.19276329522038, 51.5705565719565, 49.948334091088554, 48.86261833849981, 51.08424815280752, 50.82018911786761]
+
+[arrays.chopPubHigh]
+type = "double"
+values = [57.76, 57.48, 57.87, 57.96, 57.98, 57.94, 58.35, 58.55, 58.73, 58.36, 58.0, 57.73, 57.83, 57.97, 57.98, 57.31, 58.42, 58.61, 58.31, 58.25, 58.89, 58.9, 58.6, 58.24]
+
+[arrays.chopPubLow]
+type = "double"
+values = [57.54, 57.27, 57.53, 57.44, 57.52, 57.33, 58.06, 58.05, 58.42, 58.08, 57.76, 57.6, 57.58, 57.7, 57.09, 57.03, 57.48, 58.12, 58.13, 57.94, 58.12, 58.56, 58.01, 57.8]
+
+[arrays.chopPubPrinted]
+type = "double"
+values = [52.59, 50.53, 54.64, 54.48, 53.19, 51.57, 49.95, 48.86, 51.08, 50.82]
+
+[structs.ChopBar]
+fields = ["bar", "high", "low", "close"]
+types = ["int", "double", "double", "double"]
+
+[structs.ChopGolden]
+fields = ["bar", "want"]
+types = ["int", "double[2]"]
+
+[structs.ChopVariant]
+fields = ["name", "fn", "int", "trueBox"]
+types = ["char *", "ChopFunc", "int ( * lookback ) (", "int"]
+
+[tables.chopSkender]
+type = "ChopBar"
+
+    [[tables.chopSkender.rows]]
+    bar = 0
+    close = 212.8
+    high = 213.35
+    low = 211.52
+    [[tables.chopSkender.rows]]
+    bar = 1
+    close = 214.06
+    high = 214.22
+    low = 213.15
+    [[tables.chopSkender.rows]]
+    bar = 2
+    close = 213.89
+    high = 214.06
+    low = 213.02
+    [[tables.chopSkender.rows]]
+    bar = 3
+    close = 214.66
+    high = 215.17
+    low = 213.42
+    [[tables.chopSkender.rows]]
+    bar = 4
+    close = 213.95
+    high = 214.53
+    low = 213.91
+    [[tables.chopSkender.rows]]
+    bar = 5
+    close = 213.95
+    high = 214.89
+    low = 213.52
+    [[tables.chopSkender.rows]]
+    bar = 6
+    close = 214.55
+    high = 214.55
+    low = 213.13
+    [[tables.chopSkender.rows]]
+    bar = 7
+    close = 214.02
+    high = 214.22
+    low = 212.53
+    [[tables.chopSkender.rows]]
+    bar = 8
+    close = 214.51
+    high = 214.84
+    low = 214.17
+    [[tables.chopSkender.rows]]
+    bar = 9
+    close = 213.75
+    high = 214.25
+    low = 213.33
+    [[tables.chopSkender.rows]]
+    bar = 10
+    close = 214.22
+    high = 214.27
+    low = 213.42
+    [[tables.chopSkender.rows]]
+    bar = 11
+    close = 213.43
+    high = 214.46
+    low = 212.96
+    [[tables.chopSkender.rows]]
+    bar = 12
+    close = 214.21
+    high = 214.75
+    low = 213.49
+    [[tables.chopSkender.rows]]
+    bar = 13
+    close = 213.66
+    high = 214.28
+    low = 212.83
+    [[tables.chopSkender.rows]]
+    bar = 14
+    close = 215.03
+    high = 215.48
+    low = 213.77
+    [[tables.chopSkender.rows]]
+    bar = 15
+    close = 216.89
+    high = 216.89
+    low = 215.89
+    [[tables.chopSkender.rows]]
+    bar = 16
+    close = 216.66
+    high = 217.02
+    low = 216.36
+    [[tables.chopSkender.rows]]
+    bar = 17
+    close = 216.32
+    high = 216.91
+    low = 216.12
+    [[tables.chopSkender.rows]]
+    bar = 18
+    close = 214.98
+    high = 215.59
+    low = 213.9
+    [[tables.chopSkender.rows]]
+    bar = 19
+    close = 214.96
+    high = 215.03
+    low = 213.82
+    [[tables.chopSkender.rows]]
+    bar = 20
+    close = 215.05
+    high = 215.96
+    low = 214.4
+    [[tables.chopSkender.rows]]
+    bar = 21
+    close = 215.19
+    high = 215.5
+    low = 214.29
+    [[tables.chopSkender.rows]]
+    bar = 22
+    close = 216.67
+    high = 216.87
+    low = 215.84
+    [[tables.chopSkender.rows]]
+    bar = 23
+    close = 216.28
+    high = 216.66
+    low = 215.92
+    [[tables.chopSkender.rows]]
+    bar = 24
+    close = 216.29
+    high = 216.97
+    low = 216.09
+    [[tables.chopSkender.rows]]
+    bar = 25
+    close = 216.58
+    high = 216.72
+    low = 215.7
+    [[tables.chopSkender.rows]]
+    bar = 26
+    close = 217.86
+    high = 218.19
+    low = 216.84
+    [[tables.chopSkender.rows]]
+    bar = 27
+    close = 218.72
+    high = 218.97
+    low = 217.88
+    [[tables.chopSkender.rows]]
+    bar = 86
+    close = 227.41
+    high = 227.65
+    low = 226.94
+    [[tables.chopSkender.rows]]
+    bar = 87
+    close = 227.2
+    high = 227.91
+    low = 226.82
+    [[tables.chopSkender.rows]]
+    bar = 88
+    close = 227.61
+    high = 227.61
+    low = 226.92
+    [[tables.chopSkender.rows]]
+    bar = 89
+    close = 227.14
+    high = 227.32
+    low = 225.95
+    [[tables.chopSkender.rows]]
+    bar = 90
+    close = 226.76
+    high = 227.19
+    low = 226.47
+    [[tables.chopSkender.rows]]
+    bar = 91
+    close = 228.01
+    high = 228.15
+    low = 227.21
+    [[tables.chopSkender.rows]]
+    bar = 92
+    close = 227.8
+    high = 228.36
+    low = 227.38
+    [[tables.chopSkender.rows]]
+    bar = 93
+    close = 223.76
+    high = 226.44
+    low = 223.7
+    [[tables.chopSkender.rows]]
+    bar = 94
+    close = 224.66
+    high = 225.59
+    low = 223.39
+    [[tables.chopSkender.rows]]
+    bar = 95
+    close = 226.12
+    high = 226.86
+    low = 225.14
+    [[tables.chopSkender.rows]]
+    bar = 96
+    close = 227.27
+    high = 227.45
+    low = 226.61
+    [[tables.chopSkender.rows]]
+    bar = 97
+    close = 227.78
+    high = 227.96
+    low = 227.26
+    [[tables.chopSkender.rows]]
+    bar = 98
+    close = 228.31
+    high = 228.42
+    low = 227.66
+    [[tables.chopSkender.rows]]
+    bar = 99
+    close = 229.4
+    high = 229.7
+    low = 228.64
+    [[tables.chopSkender.rows]]
+    bar = 100
+    close = 229.35
+    high = 229.53
+    low = 229.1
+    [[tables.chopSkender.rows]]
+    bar = 227
+    close = 249.36
+    high = 249.86
+    low = 249.14
+    [[tables.chopSkender.rows]]
+    bar = 228
+    close = 251.89
+    high = 251.92
+    low = 249.77
+    [[tables.chopSkender.rows]]
+    bar = 229
+    close = 251.74
+    high = 252.62
+    low = 251.25
+    [[tables.chopSkender.rows]]
+    bar = 230
+    close = 253.94
+    high = 254.94
+    low = 252.66
+    [[tables.chopSkender.rows]]
+    bar = 231
+    close = 253.41
+    high = 254.23
+    low = 249.87
+    [[tables.chopSkender.rows]]
+    bar = 232
+    close = 253.11
+    high = 255.65
+    low = 253.05
+    [[tables.chopSkender.rows]]
+    bar = 233
+    close = 252.2
+    high = 254.07
+    low = 252.05
+    [[tables.chopSkender.rows]]
+    bar = 234
+    close = 252.24
+    high = 252.71
+    low = 251.74
+    [[tables.chopSkender.rows]]
+    bar = 235
+    close = 253.04
+    high = 253.38
+    low = 251.96
+    [[tables.chopSkender.rows]]
+    bar = 236
+    close = 254.42
+    high = 254.43
+    low = 253
+    [[tables.chopSkender.rows]]
+    bar = 237
+    close = 255.19
+    high = 255.25
+    low = 254.39
+    [[tables.chopSkender.rows]]
+    bar = 238
+    close = 255.64
+    high = 256.15
+    low = 255.22
+    [[tables.chopSkender.rows]]
+    bar = 239
+    close = 255.61
+    high = 256.38
+    low = 255.51
+    [[tables.chopSkender.rows]]
+    bar = 240
+    close = 254.56
+    high = 256.06
+    low = 254.51
+    [[tables.chopSkender.rows]]
+    bar = 241
+    close = 256.68
+    high = 257.19
+    low = 255.6
+    [[tables.chopSkender.rows]]
+    bar = 242
+    close = 258.31
+    high = 258.7
+    low = 258.1
+    [[tables.chopSkender.rows]]
+    bar = 243
+    close = 257.32
+    high = 258.63
+    low = 257.24
+    [[tables.chopSkender.rows]]
+    bar = 244
+    close = 257.18
+    high = 258.44
+    low = 256.86
+    [[tables.chopSkender.rows]]
+    bar = 245
+    close = 257.71
+    high = 258.49
+    low = 257.44
+    [[tables.chopSkender.rows]]
+    bar = 246
+    close = 257.65
+    high = 257.77
+    low = 257.06
+    [[tables.chopSkender.rows]]
+    bar = 247
+    close = 257.34
+    high = 257.58
+    low = 257.04
+    [[tables.chopSkender.rows]]
+    bar = 248
+    close = 257.46
+    high = 257.86
+    low = 257.16
+    [[tables.chopSkender.rows]]
+    bar = 249
+    close = 257.99
+    high = 258.04
+    low = 257.59
+    [[tables.chopSkender.rows]]
+    bar = 250
+    close = 257.02
+    high = 258.65
+    low = 256.81
+    [[tables.chopSkender.rows]]
+    bar = 483
+    close = 272.52
+    high = 273.59
+    low = 270.77
+    [[tables.chopSkender.rows]]
+    bar = 484
+    close = 263.69
+    high = 272.08
+    low = 263.35
+    [[tables.chopSkender.rows]]
+    bar = 485
+    close = 263.29
+    high = 263.41
+    low = 256.07
+    [[tables.chopSkender.rows]]
+    bar = 486
+    close = 257.17
+    high = 264.63
+    low = 256.25
+    [[tables.chopSkender.rows]]
+    bar = 487
+    close = 257.66
+    high = 258.72
+    low = 252.34
+    [[tables.chopSkender.rows]]
+    bar = 488
+    close = 257.72
+    high = 261.37
+    low = 256.11
+    [[tables.chopSkender.rows]]
+    bar = 489
+    close = 259.01
+    high = 262.47
+    low = 258.93
+    [[tables.chopSkender.rows]]
+    bar = 490
+    close = 258.93
+    high = 260.99
+    low = 257.71
+    [[tables.chopSkender.rows]]
+    bar = 491
+    close = 254.15
+    high = 257.62
+    low = 253.54
+    [[tables.chopSkender.rows]]
+    bar = 492
+    close = 249.16
+    high = 254.32
+    low = 247.37
+    [[tables.chopSkender.rows]]
+    bar = 493
+    close = 248.89
+    high = 251.69
+    low = 247.13
+    [[tables.chopSkender.rows]]
+    bar = 494
+    close = 245.16
+    high = 253.1
+    low = 243.3
+    [[tables.chopSkender.rows]]
+    bar = 495
+    close = 241.17
+    high = 245.51
+    low = 238.71
+    [[tables.chopSkender.rows]]
+    bar = 496
+    close = 236.23
+    high = 245.07
+    low = 235.52
+    [[tables.chopSkender.rows]]
+    bar = 497
+    close = 229.99
+    high = 236.36
+    low = 229.92
+    [[tables.chopSkender.rows]]
+    bar = 498
+    close = 241.61
+    high = 241.61
+    low = 229.42
+    [[tables.chopSkender.rows]]
+    bar = 499
+    close = 243.46
+    high = 243.68
+    low = 234.52
+    [[tables.chopSkender.rows]]
+    bar = 500
+    close = 243.15
+    high = 246.73
+    low = 241.87
+    [[tables.chopSkender.rows]]
+    bar = 501
+    close = 245.28
+    high = 245.54
+    low = 242.87
+
+[tables.chopSkenderGold]
+type = "ChopGolden"
+
+    [[tables.chopSkenderGold.rows]]
+    bar = 14
+    want = [69.99669727537056, 69.99669727537056]
+    [[tables.chopSkenderGold.rows]]
+    bar = 15
+    want = [56.074214139237874, 56.074214139237874]
+    [[tables.chopSkenderGold.rows]]
+    bar = 27
+    want = [48.25310513371683, 47.45989729273672]
+    [[tables.chopSkenderGold.rows]]
+    bar = 100
+    want = [43.02417433799121, 43.02417433799121]
+    [[tables.chopSkenderGold.rows]]
+    bar = 241
+    want = [48.662180087036774, 46.62420038042452]
+    [[tables.chopSkenderGold.rows]]
+    bar = 250
+    want = [53.33453739702018, 53.33453739702018]
+    [[tables.chopSkenderGold.rows]]
+    bar = 497
+    want = [30.515720874698143, 30.122309601448865]
+    [[tables.chopSkenderGold.rows]]
+    bar = 501
+    want = [38.65260907128509, 38.65260907128509]
+
+[tables.chopSynGold]
+type = "ChopGolden"
+
+    [[tables.chopSynGold.rows]]
+    bar = 14
+    want = [46.777333236499395, 43.81179212997314]
+    [[tables.chopSynGold.rows]]
+    bar = 15
+    want = [53.320776005622555, 50.34525800988452]
+    [[tables.chopSynGold.rows]]
+    bar = 50
+    want = [24.41891896967171, 24.41891896967171]
+    [[tables.chopSynGold.rows]]
+    bar = 100
+    want = [40.1855490876114, 36.82992839622377]
+    [[tables.chopSynGold.rows]]
+    bar = 250
+    want = [34.61927575398301, 34.083484363106905]
+    [[tables.chopSynGold.rows]]
+    bar = 500
+    want = [39.11660458444966, 39.11660458444966]
+    [[tables.chopSynGold.rows]]
+    bar = 800
+    want = [26.376634374504057, 26.376634374504057]
+    [[tables.chopSynGold.rows]]
+    bar = 1000
+    want = [35.80159835584787, 35.80159835584787]
+    [[tables.chopSynGold.rows]]
+    bar = 1199
+    want = [36.9231984900254, 33.67828050077823]
+
+[tables.chopVariants]
+type = "ChopVariant"
+
+    [[tables.chopVariants.rows]]
+    fn = "TA_CHOP"
+    int = "TA_CHOP_Lookback"
+    name = "CHOP"
+    trueBox = 0
+    [[tables.chopVariants.rows]]
+    fn = "TA_CHOPTR"
+    int = "TA_CHOPTR_Lookback"
+    name = "CHOPTR"
+    trueBox = 1

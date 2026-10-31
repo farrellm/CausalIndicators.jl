@@ -271,10 +271,11 @@ CausalFrames.fresh!(o::GainLossOscillatorKernel) = (fresh!(o.gainloss); o)
     return (gainlossvalue(Val(K), gl),)
 end
 
-# ta_RSI.c and ta_CMO.c: 0 where the smoothed moves sum to zero.
+# Where the smoothed moves sum to zero (no gain against no loss), ta_RSI.c gives
+# the neutral 50 since TA-Lib 0.8.3 (#480), and ta_CMO.c its counterpart 0.
 function gainlossvalue(::Val{:rsi}, (g, l))
     s = g + l
-    return s > 0 ? 100 * (g / s) : zero(s)
+    return s > 0 ? 100 * (g / s) : oftype(s, 50)
 end
 function gainlossvalue(::Val{:cmo}, (g, l))
     s = g + l
@@ -292,8 +293,8 @@ end
     RSI(column::ColumnSpec; period = 14, unstable = 0, name = :rsi)
 
 TA-Lib's `RSI`, Wilder's relative strength index, in `:{column}_rsi`: with `g`
-and `l` the Wilder-smoothed gains and losses, `100·g/(g + l)`, or 0 where both
-are zero. The averages are seeded with the mean of the first `period` moves.
+and `l` the Wilder-smoothed gains and losses, `100·g/(g + l)`, or the neutral
+50 where both are zero (a series unchanged since its first bar). The averages are seeded with the mean of the first `period` moves.
 The lookback is `period`, and `unstable` is TA-Lib's unstable period.
 
 $PLAIN_DOC$SKIP_DOC
@@ -309,8 +310,8 @@ RSI(column::ColumnSpec; period::Integer = 14, unstable::Integer = 0, name::Symbo
 
 TA-Lib's `CMO`, Chande's momentum oscillator, in `:{column}_cmo`:
 `100·(g − l)/(g + l)` over Wilder-smoothed gains and losses, as for
-[`RSI`](@ref). The lookback is `period`, and `unstable` is TA-Lib's unstable
-period.
+[`RSI`](@ref), or 0 where both are zero. The lookback is `period`, and
+`unstable` is TA-Lib's unstable period.
 
 $PLAIN_DOC$SKIP_DOC
 
@@ -484,24 +485,39 @@ struct PriceOscillatorSpec{K,M}
     unstable::Int
 end
 
+# `deadafter` is the slow average's lookback for the windowed MA types (SMA,
+# WMA, TRIMA, HMA) under PPO, and -1 otherwise; `zerorun` counts the trailing
+# bars that are exactly zero.
 mutable struct PriceOscillatorKernel{K,F,S}
     const fast::F
     const slow::S
+    const deadafter::Int
+    zerorun::Int
 end
+
+const WINDOWED_MATYPES = (:sma, :wma, :trima, :hma)
 
 function barkernel(s::PriceOscillatorSpec{K,M}, ::Type{T}) where {K,M,T}
     f = MAKernel(T, M, s.fastperiod; s.unstable)
     sl = MAKernel(T, M, s.slowperiod; s.unstable)
-    return PriceOscillatorKernel{K,typeof(f),typeof(sl)}(f, sl)
+    dead = K === :ppo && M in WINDOWED_MATYPES ? malookback(Val(M), s.slowperiod, 0) : -1
+    return PriceOscillatorKernel{K,typeof(f),typeof(sl)}(f, sl, dead, 0)
 end
-CausalFrames.fresh!(k::PriceOscillatorKernel) = (fresh!(k.fast); fresh!(k.slow); k)
+CausalFrames.fresh!(k::PriceOscillatorKernel) =
+    (fresh!(k.fast); fresh!(k.slow); k.zerorun = 0; k)
 
 # Both averages start at the first bar, as ta_APO.c's two TA_MA calls do over a
-# whole series; the output starts with the slow one.
+# whole series; the output starts with the slow one. A windowed slow average
+# over bars that are all exactly zero is exactly zero, but its sums can keep
+# residue there, so PPO gives its documented 0 once the run of zero bars covers
+# the slow window, as ta_PPO.c does since TA-Lib 0.8.3 (#454).
 @inline function barstep!(k::PriceOscillatorKernel{K}, x) where {K}
     vf = step!(k.fast, x)
     vs = step!(k.slow, x)
-    return ismissing(vf) || ismissing(vs) ? nothing : (oscillatorvalue(Val(K), vf, vs),)
+    k.zerorun = abs(x) <= 0 ? k.zerorun + 1 : 0
+    (ismissing(vf) || ismissing(vs)) && return nothing
+    k.deadafter >= 0 && k.zerorun > k.deadafter && return (zero(vs),)
+    return (oscillatorvalue(Val(K), vf, vs),)
 end
 
 oscillatorvalue(::Val{:apo}, f, s) = f - s
@@ -522,7 +538,9 @@ end
 const PO_DOC = """
 The averages are `matype` moving averages as for [`MA`](@ref), both started at
 the first bar. TA-Lib swaps the periods if
-`slowperiod < fastperiod`. `unstable` is the unstable period of `matype`, if it
+`slowperiod < fastperiod`. Under `:sma`, `:wma`, `:trima` or `:hma`, PPO and PVO
+give 0 once the slow window holds only bars that are exactly zero, where the
+average's sums may keep a residue of earlier values. `unstable` is the unstable period of `matype`, if it
 has one.
 """
 
@@ -1648,8 +1666,9 @@ end
 
 TA-Lib's `DPO`, the detrended price oscillator, in `:{column}_dpo`: the value
 `period ÷ 2 + 1` bars back minus the `period`-bar SMA, written at the bar whose
-average produced it (charting packages usually draw it shifted back). The
-lookback is the larger of `period − 1` and `period ÷ 2 + 1`. The SMA is a
+average produced it. Charting packages usually draw it `period ÷ 2 + 1` bars
+back, the display shift TA-Lib 0.8.3 reports (`TA_DPO_DisplayShift`); the values
+are not shifted. The lookback is the larger of `period − 1` and `period ÷ 2 + 1`. The SMA is a
 CausalFrames `Mean` and the lagged value a `First`, under
 `CausalFrames.barwindow`.
 
@@ -2010,7 +2029,8 @@ strictly above (a low strictly below) those of the `leftbars` bars before it
 and the `rightbars` bars after it, and 0 elsewhere. A pivot tied with any bar
 of its window is not one. The verdict is written on the confirmation bar,
 `rightbars` after the pivot, so the output is causal; shift it back with
-`Acausal.lead` to plot it on the pivot. The lookback is
+`Acausal.lead` to plot it on the pivot (TA-Lib 0.8.3's display shift,
+`−rightbars`). The lookback is
 `leftbars + rightbars`. The extremes are CausalFrames `Max` and `Min`, and the
 delayed pivot a `First`, under `CausalFrames.barwindow`; a NaN in a window
 gives 0.

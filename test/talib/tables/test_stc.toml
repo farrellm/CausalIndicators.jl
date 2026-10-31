@@ -1,0 +1,82 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 62021c1:src/tools/ta_regtest/ta_test_func/test_stc.c. Do not edit.
+commit = "62021c1d14ef5499505af5547384cab509adf3fc"
+source = "src/tools/ta_regtest/ta_test_func/test_stc.c"
+
+[arrays.stcStartAbs]
+type = "int"
+values = [150, 333, 800]
+
+[arrays.stcStartOff]
+type = "int"
+values = [0, 1, 7]
+
+[arrays.stcUnst]
+type = "int"
+values = [0, 5, "TA_UNSTABLE_AUTO_PREC_4", "TA_UNSTABLE_AUTO_PREC_8"]
+
+[structs.StcGolden]
+fields = ["bar", "want"]
+types = ["int", "double"]
+
+[structs.StcTuple]
+fields = ["fast", "slow", "cycle"]
+types = ["int", "int", "int"]
+
+[tables.stcEarly]
+type = "StcGolden"
+
+    [[tables.stcEarly.rows]]
+    bar = 73
+    want = 1.969848703069687
+    [[tables.stcEarly.rows]]
+    bar = 77
+    want = 80.34171989997208
+    [[tables.stcEarly.rows]]
+    bar = 86
+    want = 17.89909687775242
+
+[tables.stcLean]
+type = "StcGolden"
+
+    [[tables.stcLean.rows]]
+    bar = 411
+    want = 4.700918621972339
+    [[tables.stcLean.rows]]
+    bar = 545
+    want = 32.474069289844074
+    [[tables.stcLean.rows]]
+    bar = 570
+    want = 17.104962402333424
+    [[tables.stcLean.rows]]
+    bar = 692
+    want = 63.56417075360968
+    [[tables.stcLean.rows]]
+    bar = 1065
+    want = 70.51638442893523
+    [[tables.stcLean.rows]]
+    bar = 1168
+    want = 89.38805758203083
+
+[tables.stcTuples]
+type = "StcTuple"
+
+    [[tables.stcTuples.rows]]
+    cycle = 10
+    fast = 23
+    slow = 50
+    [[tables.stcTuples.rows]]
+    cycle = 2
+    fast = 2
+    slow = 3
+    [[tables.stcTuples.rows]]
+    cycle = 40
+    fast = 12
+    slow = 26
+    [[tables.stcTuples.rows]]
+    cycle = 3
+    fast = 5
+    slow = 13
+    [[tables.stcTuples.rows]]
+    cycle = 10
+    fast = 2
+    slow = 26

@@ -317,8 +317,8 @@ TA-Lib: `ta_codegen/input/mavp/mavp.yaml`, `mavp.md`.
 function MAVP(column::ColumnSpec, periods::ColumnSpec; minperiod::Integer = 2,
     maxperiod::Integer = 30, matype::Symbol = :sma, unstable::Integer = 0,
     name::Symbol = :mavp)
-    checkrange("MAVP", "minperiod", minperiod, 1, 100_000)
-    checkrange("MAVP", "maxperiod", maxperiod, 1, 100_000)
+    checkrange("MAVP", "minperiod", minperiod, 1, 10_000)
+    checkrange("MAVP", "maxperiod", maxperiod, 1, 10_000)
     minperiod <= maxperiod || throw(
         ArgumentError("MAVP minperiod ($minperiod) must not exceed maxperiod ($maxperiod)"))
     checkmatype("MAVP", "matype", matype)

@@ -1,6 +1,6 @@
 # TA-Lib regression tests
 
-`tables/*.toml` are extracted from TA-Lib 0.8.1 (commit `2aa8eb0`)
+`tables/*.toml` are extracted from TA-Lib 0.8.3 (commit `62021c1`)
 `src/tools/ta_regtest/ta_test_func/test_*.c` by `gen/extract_talib_tests.jl`;
 `../data/*.csv` by `gen/extract_talib_data.jl`; `../golden/*.csv.gz` by
 `gen/golden/generate.jl`; `candles/mcdc.txt.gz` by `gen/candles/capture.jl`.
@@ -178,6 +178,53 @@ These files have checks outside their extracted tables:
 - [x] `test_per_hlc.c` WAD: its table rows and the book and Tulip vectors (S5)
 - [x] `test_1in_1out.c`, `test_1in_2out.c` and `test_ma.c`'s MAMA/FAMA rows:
       the tables, on the median price as the C tests feed them (S6)
+
+The legs TA-Lib 0.8.3 added to the files above (S9):
+
+- [x] `test_rsi.c` flat start (#480): RSI exactly 50 and CMO exactly 0 on a
+      series that has not moved, exactly 100 or 0 one-sided and held after one
+      move, at three periods and two unstable periods
+- [x] `test_po.c` dead slow window (#454): PPO and PVO exactly 0 once the
+      slow window holds only zero bars after fractional values, under SMA, WMA,
+      TRIMA and HMA, and the plain ratio under EMA. The fusion legs (#459)
+      prove TA-Lib's one-pass MAs equal its two-call path, which has no
+      counterpart.
+- [x] `test_cmf.c`, `test_rvol.c`, `test_composite1.c` dead volume window
+      (#446): CMF 0, RVOL NaN then Inf, VWMA NaN on a window that goes dead
+      after fractional volume, and every later bar equal, bit for bit, to a
+      run seeded on the zeros
+- [x] `test_minmax.c` index forms (#503): the table rows and a tied series
+      against a window scan, newest tie first
+- [x] `test_period_boundary.c` signed zeros: the Sterbenz-hostile series'
+      -0.0 bars, held by value for every MA at period 1 and by bit for EMA,
+      DEMA, TEMA and ZLEMA; EFI(1) and ERI(1) over -0.0 bars; and the MACD
+      family's signal=1 line on the subnormal series, bit for bit. That series
+      puts no -0.0 on this package's MACD line (its compensated EMAs do not
+      round to -0.0 there), so it cannot see the copy keep a sign. `test_eri.c` and
+      `test_zlema.c` add their own -0.0 bars at period 1.
+- [x] `test_kc.c`: the lookback is the longer of the EMA and ATR paths under
+      an unstable period. Its cells with EMA's and ATR's unstable periods set
+      apart have no counterpart, since `unstable` is one value.
+- [x] `test_percentile.c` wide periods (#435): periods 2 to 2049 at five
+      percentiles over five of its corpora, against the sorted window by value
+      (a -0.0 and a +0.0 tie). Its ring-buffer coverage corpora test TA-Lib's
+      own structure.
+- [x] `test_stddev.c` and `test_correl.c` peg history (#434): VAR, STDDEV and
+      CORREL over an EMA settling onto a peg (`ta_test_ref_peg_ema`), against
+      the exact oracle, in `test/reference.jl`. `test_rvi.c`'s and
+      `test_bbands.c`'s peg legs check TA-Lib's private copies of var.c's step
+      against its own STDDEV; RVI and BollingerBands read `Variance` and hold
+      no copies, so those have no counterpart.
+- [x] `test_per_cv.c`: NVI and PVI rows at 1e-12 relative
+- [x] `test_adx.c`: the period-1 rows under an unstable period (table rows)
+- [x] `test_candlestick.c` value set: its sweep of every pattern over three
+      seeded random series is captured with the builders, and replayed from
+      `candles/mcdc.txt.gz`
+- Not ported, having no counterpart: the display-shift legs of `test_dpo.c`
+  and `test_fractal.c` (#489; the docstrings state the offset), `test_mavp.c`'s
+  stream bank (#445), `test_composite2.c`'s FMA EMA reference, `test_eri.c`'s
+  single-precision call, `test_percentrank.c`'s 10000 cap (a `Bars` window
+  takes any period) and the C stream, server and in-place legs throughout.
 
 Not ported, being out of scope:
 

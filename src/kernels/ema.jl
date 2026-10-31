@@ -98,7 +98,9 @@ function step!(d::DEMAKernel{T}, x::Real) where {T}
     emitted(d.e1, d.unstable) || return missing
     v2 = step!(d.e2, v1::T)
     emitted(d.e2, d.unstable) || return missing
-    return d.out = 2 * (v1::T) - v2::T
+    # At period 1 every stage copies its input, and so does ta_DEMA.c's period-1
+    # arm, sign of a zero included; 2·x − x would turn a -0.0 into +0.0.
+    return d.out = isone(d.e1.period) ? v1::T : 2 * (v1::T) - v2::T
 end
 
 # TA-Lib's TEMA (ta_TEMA.c): `EMA3 + (3·EMA1 − 3·EMA2)`, three chained stages
@@ -147,7 +149,8 @@ function step!(t::TEMAKernel{T}, x::Real) where {T}
     emitted(t.e2, t.unstable) || return missing
     v3 = step!(t.e3, v2::T)
     emitted(t.e3, t.unstable) || return missing
-    return t.out = v3::T + (3 * (v1::T) - 3 * (v2::T))
+    # The period-1 copy, as DEMA's.
+    return t.out = isone(t.e1.period) ? v1::T : v3::T + (3 * (v1::T) - 3 * (v2::T))
 end
 
 # Tillson's T3 (ta_T3.c): six chained EMAs with `k = 2 / (period + 1)`, each

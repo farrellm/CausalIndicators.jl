@@ -1,0 +1,107 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 62021c1:src/tools/ta_regtest/ta_test_func/test_alma.c. Do not edit.
+commit = "62021c1d14ef5499505af5547384cab509adf3fc"
+source = "src/tools/ta_regtest/ta_test_func/test_alma.c"
+
+[arrays.almaGridN]
+type = "int"
+values = [1, 2, 3, 7, 8, 9, 10, 15, 16, 17, 21, 51, 101, 200]
+
+[arrays.almaGridOffset]
+type = "double"
+values = [0.0, 0.29, 0.5, 0.58, 0.85, 1.0]
+
+[arrays.almaGridSigma]
+type = "double"
+values = [0.01, 1.0, 6.0, 6.5, 50.0, 3.0e37]
+
+[arrays.almaGridStart]
+type = "int"
+values = [0, 1, 8, 9, 17, 250, 1191, 1199]
+
+[arrays.almaSpyAlma]
+type = "double"
+values = [153.0103125, 153.7129632, 154.3261091, 154.8567064, 155.2769595, 155.5872882, 155.8547348, 156.0149609, 155.9837527, 155.702711, 155.4071973, 155.1334738, 155.0737871, 155.0664572, 155.2145257, 155.4710268, 155.826227, 156.1015857, 156.3111052, 156.2779321, 156.1359503, 155.8736587, 155.7274243, 155.8114836, 156.3056075, 157.1093269, 157.9327267, 158.0937167, 157.7905353, 157.0635226, 156.2478143, 155.6254658, 155.3414542, 155.6297745, 156.3075108, 157.1057808, 157.7226669, 158.2017231, 158.6251992, 158.8730608, 159.0659722, 159.3901716, 159.9773159, 160.803581, 161.6660303, 162.3282367, 162.7933684, 163.0869453, 163.4751077, 164.09043, 164.7491986, 165.4150535, 165.9539775, 166.4178948, 166.6412687, 166.5371323, 166.1764273, 165.8875152, 165.7073031, 165.6811555, 165.4210407, 165.0254396, 164.5209698, 163.8395316]
+
+[arrays.almaSpyClose]
+type = "double"
+values = [151.89, 149, 150.02, 151.91, 151.61, 152.11, 152.92, 154.29, 154.5, 154.78, 155.44, 156.03, 155.68, 155.9, 156.73, 155.83, 154.97, 154.61, 155.69, 154.36, 155.6, 154.95, 156.19, 156.19, 156.67, 156.05, 156.82, 155.23, 155.86, 155.16, 156.21, 156.75, 158.67, 159.19, 158.8, 155.12, 157.41, 155.11, 154.14, 155.48, 156.17, 157.78, 157.88, 158.52, 158.24, 159.3, 159.68, 158.28, 159.75, 161.37, 161.78, 162.6, 163.34, 162.88, 163.41, 163.54, 165.23, 166.12, 165.34, 166.94, 166.93, 167.17, 165.93, 165.45, 165.31, 166.3, 165.22, 165.83, 163.45, 164.35, 163.56, 161.27]
+
+[structs.AlmaGolden]
+fields = ["n", "sigma", "offset", "bar", "want"]
+types = ["int", "double", "double", "int", "double"]
+
+[tables.almaGolden]
+type = "AlmaGolden"
+
+    [[tables.almaGolden.rows]]
+    bar = 8
+    n = 9
+    offset = 0.85
+    sigma = 6.0
+    want = 93.04932439780416
+    [[tables.almaGolden.rows]]
+    bar = 9
+    n = 9
+    offset = 0.85
+    sigma = 6.0
+    want = 92.40007047550111
+    [[tables.almaGolden.rows]]
+    bar = 50
+    n = 9
+    offset = 0.85
+    sigma = 6.0
+    want = 90.25702926708885
+    [[tables.almaGolden.rows]]
+    bar = 251
+    n = 9
+    offset = 0.85
+    sigma = 6.0
+    want = 109.06030240999497
+    [[tables.almaGolden.rows]]
+    bar = 20
+    n = 21
+    offset = 0.85
+    sigma = 6.0
+    want = 91.04456380553225
+    [[tables.almaGolden.rows]]
+    bar = 251
+    n = 21
+    offset = 0.85
+    sigma = 6.0
+    want = 109.04462188666197
+    [[tables.almaGolden.rows]]
+    bar = 9
+    n = 10
+    offset = 0.5
+    sigma = 3.0
+    want = 93.54429903985032
+    [[tables.almaGolden.rows]]
+    bar = 251
+    n = 10
+    offset = 0.5
+    sigma = 3.0
+    want = 109.15588767703132
+    [[tables.almaGolden.rows]]
+    bar = 29
+    n = 30
+    offset = 1.0
+    sigma = 6.0
+    want = 85.71094944817195
+    [[tables.almaGolden.rows]]
+    bar = 251
+    n = 30
+    offset = 0.0
+    sigma = 10.0
+    want = 103.70854631713051
+    [[tables.almaGolden.rows]]
+    bar = 50
+    n = 51
+    offset = 0.58
+    sigma = 6.0
+    want = 86.95196310602567
+    [[tables.almaGolden.rows]]
+    bar = 251
+    n = 51
+    offset = 0.58
+    sigma = 6.0
+    want = 105.42604265746272

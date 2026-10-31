@@ -1,0 +1,106 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 62021c1:src/tools/ta_regtest/ta_test_func/test_ibs.c. Do not edit.
+commit = "62021c1d14ef5499505af5547384cab509adf3fc"
+source = "src/tools/ta_regtest/ta_test_func/test_ibs.c"
+
+[structs.IbsBar]
+fields = ["high", "low", "close", "want", "wantNaN"]
+types = ["double", "double", "double", "double", "int"]
+
+[structs.IbsRow]
+fields = ["bar", "bits"]
+types = ["int", "unsigned long long"]
+
+[tables.ibsHand]
+type = "IbsBar"
+
+    [[tables.ibsHand.rows]]
+    close = 100.0
+    high = 100.0
+    low = 100.0
+    want = 0.5
+    wantNaN = 0
+    [[tables.ibsHand.rows]]
+    close = 0.0
+    high = 0.0
+    low = 0.0
+    want = 0.5
+    wantNaN = 0
+    [[tables.ibsHand.rows]]
+    close = 101.0
+    high = 100.0
+    low = 100.0
+    want = 0.5
+    wantNaN = 0
+    [[tables.ibsHand.rows]]
+    close = 100.5
+    high = 99.0
+    low = 101.0
+    want = 0.5
+    wantNaN = 0
+    [[tables.ibsHand.rows]]
+    close = 100.0
+    high = 100.00000000000001
+    low = 100.0
+    want = 0.0
+    wantNaN = 0
+    [[tables.ibsHand.rows]]
+    close = 100.00000000000001
+    high = 100.00000000000001
+    low = 100.0
+    want = 1.0
+    wantNaN = 0
+    [[tables.ibsHand.rows]]
+    close = 102.0
+    high = 101.0
+    low = 99.0
+    want = 1.5
+    wantNaN = 0
+    [[tables.ibsHand.rows]]
+    close = -2.5
+    high = -1.0
+    low = -3.0
+    want = 0.25
+    wantNaN = 0
+    [[tables.ibsHand.rows]]
+    close = 100.0
+    high = 0.0
+    low = 99.0
+    want = 0.0
+    wantNaN = 1
+
+[tables.ibsSrefRow]
+type = "IbsRow"
+
+    [[tables.ibsSrefRow.rows]]
+    bar = 0
+    bits = 4599075939470750515
+    [[tables.ibsSrefRow.rows]]
+    bar = 1
+    bits = 4606863918119156694
+    [[tables.ibsSrefRow.rows]]
+    bar = 2
+    bits = 4588638185040256542
+    [[tables.ibsSrefRow.rows]]
+    bar = 26
+    bits = 4607182418800017408
+    [[tables.ibsSrefRow.rows]]
+    bar = 47
+    bits = 0
+    [[tables.ibsSrefRow.rows]]
+    bar = 50
+    bits = 4584304132692975616
+    [[tables.ibsSrefRow.rows]]
+    bar = 100
+    bits = 4605338592129046889
+    [[tables.ibsSrefRow.rows]]
+    bar = 101
+    bits = 4604543590893355010
+    [[tables.ibsSrefRow.rows]]
+    bar = 150
+    bits = 4599477465220660631
+    [[tables.ibsSrefRow.rows]]
+    bar = 200
+    bits = 4603120348547879330
+    [[tables.ibsSrefRow.rows]]
+    bar = 251
+    bits = 4601490369270979710

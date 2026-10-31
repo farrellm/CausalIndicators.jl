@@ -1,0 +1,6587 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 62021c1:src/tools/ta_regtest/ta_test_func/test_percentb.c. Do not edit.
+commit = "62021c1d14ef5499505af5547384cab509adf3fc"
+source = "src/tools/ta_regtest/ta_test_func/test_percentb.c"
+
+[arrays.pctbDiffSeries]
+type = "int"
+values = ["PCTB_CORPUS", "PCTB_NEGCORPUS", "PCTB_WALK", "PCTB_NEGWALK", "PCTB_ALT", "PCTB_FLATPOS", "PCTB_FLATNEG", "PCTB_ZERO", "PCTB_EPS", "PCTB_PEG", "PCTB_TICK100", "PCTB_BIG1E8", "PCTB_FINE100", "PCTB_STEPFLAT", "PCTB_SUBULP"]
+
+[arrays.pctbHd]
+type = "double"
+values = [60.25, 60.0, 60.4063, 59.125, 57.625, 58.625, 57.625, 55.875, 55.5, 54.25, 55.5313, 58.25, 56.875, 58.0313, 58.0, 58.4063, 60.5, 61.5, 60.5313, 59.75]
+
+[arrays.pctbK]
+type = "double"
+values = [[2.0, 2.0], [2.5, 2.5], [0.1, 0.1], [2.5, 1.5], [1.0, 3.0], [2.0, 1.0], [0.1, 0.2], [-1.0, 2.0], [-2.0, 2.0], [0.0, 0.0], [-1.5, 1.5], [-0.2, 0.2], [-2.0, -2.0]]
+
+[arrays.pctbKBranch]
+type = "int"
+values = [0, 3]
+
+[arrays.pctbPeriods]
+type = "int"
+values = [2, 5, 20, 33, 34, 50, 200]
+
+[structs.PctbGolden]
+fields = ["tag", "series", "startIdx", "endIdx", "n", "kUp", "kDn", "maType", "unstEma", "beg", "nb", "rows", "nbRows"]
+types = ["char *", "int", "int", "int", "int", "double", "double", "TA_MAType", "unsigned int", "int", "int", "PctbRow *", "int"]
+
+[structs.PctbRow]
+fields = ["bar", "kind", "q", "M", "sigma", "own", "ts", "ta4j", "lean"]
+types = ["int", "int", "double", "double", "double", "double", "double", "double", "double"]
+
+[tables.pctbGoldens]
+type = "PctbGolden"
+
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n2", "PCTB_CORPUS", 0, 251, 2, 2.0, 2.0, "TA_MAType_SMA", 0, 1, 251, "PCTB_ROWS ( pctb_sma_n2 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n2-k13", "PCTB_CORPUS", 0, 251, 2, 1.0, 3.0, "TA_MAType_SMA", 0, 1, 251, "PCTB_ROWS ( pctb_sma_n2_k13 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n2-k25-15", "PCTB_CORPUS", 0, 251, 2, 2.5, 1.5, "TA_MAType_SMA", 0, 1, 251, "PCTB_ROWS ( pctb_sma_n2_k25_15 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n5", "PCTB_CORPUS", 0, 251, 5, 2.0, 2.0, "TA_MAType_SMA", 0, 4, 248, "PCTB_ROWS ( pctb_sma_n5 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n5-k13", "PCTB_CORPUS", 0, 251, 5, 1.0, 3.0, "TA_MAType_SMA", 0, 4, 248, "PCTB_ROWS ( pctb_sma_n5_k13 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n5-k25-15", "PCTB_CORPUS", 0, 251, 5, 2.5, 1.5, "TA_MAType_SMA", 0, 4, 248, "PCTB_ROWS ( pctb_sma_n5_k25_15 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n20", "PCTB_CORPUS", 0, 251, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 233, "PCTB_ROWS ( pctb_sma_n20 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n20-k13", "PCTB_CORPUS", 0, 251, 20, 1.0, 3.0, "TA_MAType_SMA", 0, 19, 233, "PCTB_ROWS ( pctb_sma_n20_k13 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n20-k25-15", "PCTB_CORPUS", 0, 251, 20, 2.5, 1.5, "TA_MAType_SMA", 0, 19, 233, "PCTB_ROWS ( pctb_sma_n20_k25_15 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n50", "PCTB_CORPUS", 0, 251, 50, 2.0, 2.0, "TA_MAType_SMA", 0, 49, 203, "PCTB_ROWS ( pctb_sma_n50 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n50-k13", "PCTB_CORPUS", 0, 251, 50, 1.0, 3.0, "TA_MAType_SMA", 0, 49, 203, "PCTB_ROWS ( pctb_sma_n50_k13 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n50-k25-15", "PCTB_CORPUS", 0, 251, 50, 2.5, 1.5, "TA_MAType_SMA", 0, 49, 203, "PCTB_ROWS ( pctb_sma_n50_k25_15 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n200", "PCTB_CORPUS", 0, 251, 200, 2.0, 2.0, "TA_MAType_SMA", 0, 199, 53, "PCTB_ROWS ( pctb_sma_n200 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n200-k13", "PCTB_CORPUS", 0, 251, 200, 1.0, 3.0, "TA_MAType_SMA", 0, 199, 53, "PCTB_ROWS ( pctb_sma_n200_k13 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n200-k25-15", "PCTB_CORPUS", 0, 251, 200, 2.5, 1.5, "TA_MAType_SMA", 0, 199, 53, "PCTB_ROWS ( pctb_sma_n200_k25_15 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n2-k1", "PCTB_CORPUS", 0, 251, 2, 1.0, 1.0, "TA_MAType_SMA", 0, 1, 251, "PCTB_ROWS ( pctb_sma_n2_k1 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n5-k1", "PCTB_CORPUS", 0, 251, 5, 1.0, 1.0, "TA_MAType_SMA", 0, 4, 248, "PCTB_ROWS ( pctb_sma_n5_k1 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n5-k25", "PCTB_CORPUS", 0, 251, 5, 2.5, 2.5, "TA_MAType_SMA", 0, 4, 248, "PCTB_ROWS ( pctb_sma_n5_k25 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n20-k1", "PCTB_CORPUS", 0, 251, 20, 1.0, 1.0, "TA_MAType_SMA", 0, 19, 233, "PCTB_ROWS ( pctb_sma_n20_k1 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n20-k25", "PCTB_CORPUS", 0, 251, 20, 2.5, 2.5, "TA_MAType_SMA", 0, 19, 233, "PCTB_ROWS ( pctb_sma_n20_k25 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n50-k1", "PCTB_CORPUS", 0, 251, 50, 1.0, 1.0, "TA_MAType_SMA", 0, 49, 203, "PCTB_ROWS ( pctb_sma_n50_k1 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n50-k25", "PCTB_CORPUS", 0, 251, 50, 2.5, 2.5, "TA_MAType_SMA", 0, 49, 203, "PCTB_ROWS ( pctb_sma_n50_k25 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n5-k0", "PCTB_CORPUS", 0, 251, 5, 0.0, 0.0, "TA_MAType_SMA", 0, 4, 248, "PCTB_ROWS ( pctb_sma_n5_k0 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n50-k0", "PCTB_CORPUS", 0, 251, 50, 0.0, 0.0, "TA_MAType_SMA", 0, 49, 203, "PCTB_ROWS ( pctb_sma_n50_k0 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n20-k01-02", "PCTB_CORPUS", 0, 251, 20, 0.1, 0.2, "TA_MAType_SMA", 0, 19, 233, "PCTB_ROWS ( pctb_sma_n20_k01_02 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n20-km1-2", "PCTB_CORPUS", 0, 251, 20, -1.0, 2.0, "TA_MAType_SMA", 0, 19, 233, "PCTB_ROWS ( pctb_sma_n20_km1_2 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n20-km2-m2", "PCTB_CORPUS", 0, 251, 20, -2.0, -2.0, "TA_MAType_SMA", 0, 19, 233, "PCTB_ROWS ( pctb_sma_n20_km2_m2 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n20-km2-2", "PCTB_CORPUS", 0, 251, 20, -2.0, 2.0, "TA_MAType_SMA", 0, 19, 233, "PCTB_ROWS ( pctb_sma_n20_km2_2 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n20-k0", "PCTB_CORPUS", 0, 251, 20, 0.0, 0.0, "TA_MAType_SMA", 0, 19, 233, "PCTB_ROWS ( pctb_sma_n20_k0 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n20-kmax", "PCTB_CORPUS", 0, 251, 20, "TA_REAL_MAX", "TA_REAL_MAX", "TA_MAType_SMA", 0, 19, 233, "PCTB_ROWS ( pctb_sma_n20_kmax )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n20-kmin", "PCTB_CORPUS", 0, 251, 20, "TA_REAL_MIN", "TA_REAL_MIN", "TA_MAType_SMA", 0, 19, 233, "PCTB_ROWS ( pctb_sma_n20_kmin )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n20-s100", "PCTB_CORPUS", 100, 251, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 100, 152, "PCTB_ROWS ( pctb_sma_n20_s100 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["sma-n20-s251", "PCTB_CORPUS", 251, 251, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 251, 1, "PCTB_ROWS ( pctb_sma_n20_s251 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["ema-n5", "PCTB_CORPUS", 0, 251, 5, 2.0, 2.0, "TA_MAType_EMA", 0, 4, 248, "PCTB_ROWS ( pctb_ema_n5 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["ema-n20", "PCTB_CORPUS", 0, 251, 20, 2.0, 2.0, "TA_MAType_EMA", 0, 19, 233, "PCTB_ROWS ( pctb_ema_n20 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["ema-n20-s19-u0", "PCTB_CORPUS", 19, 251, 20, 2.0, 2.0, "TA_MAType_EMA", 0, 19, 233, "PCTB_ROWS ( pctb_ema_n20_s19_u0 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["ema-n20-s20-u0", "PCTB_CORPUS", 20, 251, 20, 2.0, 2.0, "TA_MAType_EMA", 0, 20, 232, "PCTB_ROWS ( pctb_ema_n20_s20_u0 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["ema-n20-s100-u0", "PCTB_CORPUS", 100, 251, 20, 2.0, 2.0, "TA_MAType_EMA", 0, 100, 152, "PCTB_ROWS ( pctb_ema_n20_s100_u0 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["ema-n20-s251-u0", "PCTB_CORPUS", 251, 251, 20, 2.0, 2.0, "TA_MAType_EMA", 0, 251, 1, "PCTB_ROWS ( pctb_ema_n20_s251_u0 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["ema-n20-s0-u15", "PCTB_CORPUS", 0, 251, 20, 2.0, 2.0, "TA_MAType_EMA", 15, 34, 218, "PCTB_ROWS ( pctb_ema_n20_s0_u15 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["ema-n20-s100-u15", "PCTB_CORPUS", 100, 251, 20, 2.0, 2.0, "TA_MAType_EMA", 15, 100, 152, "PCTB_ROWS ( pctb_ema_n20_s100_u15 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["ema-n20-s0-u100", "PCTB_CORPUS", 0, 251, 20, 2.0, 2.0, "TA_MAType_EMA", 100, 119, 133, "PCTB_ROWS ( pctb_ema_n20_s0_u100 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["ema-n20-k25-15", "PCTB_CORPUS", 0, 251, 20, 2.5, 1.5, "TA_MAType_EMA", 0, 19, 233, "PCTB_ROWS ( pctb_ema_n20_k25_15 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["wma-n20", "PCTB_CORPUS", 0, 251, 20, 2.0, 2.0, "TA_MAType_WMA", 0, 19, 233, "PCTB_ROWS ( pctb_wma_n20 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["dema-n20", "PCTB_CORPUS", 0, 251, 20, 2.0, 2.0, "TA_MAType_DEMA", 0, 38, 214, "PCTB_ROWS ( pctb_dema_n20 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["tick100-n20", "PCTB_TICK100", 0, 299, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 281, "PCTB_ROWS ( pctb_tick100_n20 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["tick100-n20-k13", "PCTB_TICK100", 0, 299, 20, 1.0, 3.0, "TA_MAType_SMA", 0, 19, 281, "PCTB_ROWS ( pctb_tick100_n20_k13 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["big1e8-n20", "PCTB_BIG1E8", 0, 299, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 281, "PCTB_ROWS ( pctb_big1e8_n20 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["big1e8-n20-k13", "PCTB_BIG1E8", 0, 299, 20, 1.0, 3.0, "TA_MAType_SMA", 0, 19, 281, "PCTB_ROWS ( pctb_big1e8_n20_k13 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["fine100-n20", "PCTB_FINE100", 0, 299, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 281, "PCTB_ROWS ( pctb_fine100_n20 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["fine100-n20-k13", "PCTB_FINE100", 0, 299, 20, 1.0, 3.0, "TA_MAType_SMA", 0, 19, 281, "PCTB_ROWS ( pctb_fine100_n20_k13 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["peg-n20", "PCTB_PEG", 0, 1079, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 1061, "PCTB_ROWS ( pctb_peg_n20 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["flatpos-n20", "PCTB_FLATPOS", 0, 59, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 41, "PCTB_ROWS ( pctb_flatpos_n20 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["flatpos-n20-k25-15", "PCTB_FLATPOS", 0, 59, 20, 2.5, 1.5, "TA_MAType_SMA", 0, 19, 41, "PCTB_ROWS ( pctb_flatpos_n20_k25_15 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["flatneg-n20", "PCTB_FLATNEG", 0, 59, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 41, "PCTB_ROWS ( pctb_flatneg_n20 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["flatneg-ema-n20", "PCTB_FLATNEG", 0, 59, 20, 2.0, 2.0, "TA_MAType_EMA", 0, 19, 41, "PCTB_ROWS ( pctb_flatneg_ema_n20 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["zero-n20", "PCTB_ZERO", 0, 59, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 41, "PCTB_ROWS ( pctb_zero_n20 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["stepflat-n20", "PCTB_STEPFLAT", 0, 79, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 61, "PCTB_ROWS ( pctb_stepflat_n20 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["alt-n20", "PCTB_ALT", 0, 59, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 41, "PCTB_ROWS ( pctb_alt_n20 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["alt-n5", "PCTB_ALT", 0, 59, 5, 2.0, 2.0, "TA_MAType_SMA", 0, 4, 56, "PCTB_ROWS ( pctb_alt_n5 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["eps-n20", "PCTB_EPS", 0, 199, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 181, "PCTB_ROWS ( pctb_eps_n20 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["neg-n20", "PCTB_NEGCORPUS", 0, 251, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 233, "PCTB_ROWS ( pctb_neg_n20 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["subulp-n20", "PCTB_SUBULP", 0, 99, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 81, "PCTB_ROWS ( pctb_subulp_n20 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["subulp-ema-n20", "PCTB_SUBULP", 0, 99, 20, 2.0, 2.0, "TA_MAType_EMA", 0, 19, 81, "PCTB_ROWS ( pctb_subulp_ema_n20 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["long-sma-n100000", "PCTB_LONG", 0, 100499, 100000, 2.0, 2.0, "TA_MAType_SMA", 0, 99999, 501, "PCTB_ROWS ( pctb_long_sma_n100000 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["long-ema-n100000", "PCTB_LONG", 0, 100499, 100000, 2.0, 2.0, "TA_MAType_EMA", 0, 99999, 501, "PCTB_ROWS ( pctb_long_ema_n100000 )"]
+    [[tables.pctbGoldens.rows]]
+    values = ["bollinger-hd", "PCTB_HD", 0, 19, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 1, "PCTB_ROWS ( pctb_bollinger_hd )"]
+
+[tables.pctb_alt_n20]
+type = "PctbRow"
+
+    [[tables.pctb_alt_n20.rows]]
+    M = 0.0
+    bar = 19
+    kind = 0
+    lean = 0.25
+    own = 1.4e-15
+    q = 0.25
+    sigma = 1.0
+    ta4j = 0.25
+    ts = 0.25
+    [[tables.pctb_alt_n20.rows]]
+    M = 0.0
+    bar = 20
+    kind = 0
+    lean = 0.75
+    own = 1.8e-15
+    q = 0.75
+    sigma = 1.0
+    ta4j = 0.75
+    ts = 0.75
+    [[tables.pctb_alt_n20.rows]]
+    M = 0.0
+    bar = 21
+    kind = 0
+    lean = 0.25
+    own = 1.4e-15
+    q = 0.25
+    sigma = 1.0
+    ta4j = 0.25
+    ts = 0.25
+    [[tables.pctb_alt_n20.rows]]
+    M = 0.0
+    bar = 59
+    kind = 0
+    lean = 0.25
+    own = 1.4e-15
+    q = 0.25
+    sigma = 1.0
+    ta4j = 0.25
+    ts = 0.25
+
+[tables.pctb_alt_n5]
+type = "PctbRow"
+
+    [[tables.pctb_alt_n5.rows]]
+    M = 0.2
+    bar = 4
+    kind = 0
+    lean = 0.7041241452319316
+    own = 1.8e-15
+    q = 0.7041241452319315
+    sigma = 0.9797958971132712
+    ta4j = 0.7041241452319315
+    ts = 0.7041241452319315
+    [[tables.pctb_alt_n5.rows]]
+    M = -0.2
+    bar = 5
+    kind = 0
+    lean = 0.29587585476806844
+    own = 1.4e-15
+    q = 0.2958758547680685
+    sigma = 0.9797958971132712
+    ta4j = 0.2958758547680685
+    ts = 0.2958758547680685
+    [[tables.pctb_alt_n5.rows]]
+    M = 0.2
+    bar = 6
+    kind = 0
+    lean = 0.7041241452319316
+    own = 1.8e-15
+    q = 0.7041241452319315
+    sigma = 0.9797958971132712
+    ta4j = 0.7041241452319315
+    ts = 0.7041241452319315
+    [[tables.pctb_alt_n5.rows]]
+    M = -0.2
+    bar = 59
+    kind = 0
+    lean = 0.29587585476806844
+    own = 1.4e-15
+    q = 0.2958758547680685
+    sigma = 0.9797958971132712
+    ta4j = 0.2958758547680685
+    ts = 0.2958758547680685
+
+[tables.pctb_big1e8_n20]
+type = "PctbRow"
+
+    [[tables.pctb_big1e8_n20.rows]]
+    M = 1.0000000001e8
+    bar = 19
+    kind = 0
+    lean = 0.5
+    own = 1.1e-5
+    q = 0.5000001558401065
+    sigma = 0.008366598519932624
+    ta4j = 0.5000004452573855
+    ts = 0.5000004452573855
+    [[tables.pctb_big1e8_n20.rows]]
+    M = 1.000000000105e8
+    bar = 20
+    kind = 0
+    lean = 0.48446575584997
+    own = 1.1e-5
+    q = 0.4844659059980768
+    sigma = 0.008046736629001072
+    ta4j = 0.48446641944787805
+    ts = 0.48446595649134505
+    [[tables.pctb_big1e8_n20.rows]]
+    M = 1.0000000001e8
+    bar = 21
+    kind = 0
+    lean = 0.20119284766640175
+    own = 9.1e-6
+    q = 0.2011927808778094
+    sigma = 0.008366598519932624
+    ta4j = 0.20119311169014362
+    ts = 0.20119311169014362
+    [[tables.pctb_big1e8_n20.rows]]
+    M = 1.000000000135e8
+    bar = 67
+    kind = 0
+    lean = 0.1043079923116293
+    own = 8.4e-6
+    q = 0.10430793827937365
+    sigma = 0.00852935881665421
+    ta4j = 0.10430812261801499
+    ts = 0.10430768585706911
+    [[tables.pctb_big1e8_n20.rows]]
+    M = 1.000000000095e8
+    bar = 100
+    kind = 0
+    lean = 0.51553424415003
+    own = 1.2e-5
+    q = 0.5155343942981278
+    sigma = 0.00804673695307066
+    ta4j = 0.515534506465188
+    ts = 0.515534506465188
+    [[tables.pctb_big1e8_n20.rows]]
+    M = 1.000000000065e8
+    bar = 133
+    kind = 0
+    lean = 0.9646891638045217
+    own = 1.6e-5
+    q = 0.9646889936417258
+    sigma = 0.007262919264656499
+    ta4j = 0.9646891249911521
+    ts = 0.9646891249911521
+    [[tables.pctb_big1e8_n20.rows]]
+    M = 1.000000000105e8
+    bar = 200
+    kind = 0
+    lean = 0.7746995926839642
+    own = 1.2e-5
+    q = 0.7746995422466862
+    sigma = 0.008645806321520193
+    ta4j = 0.7747001085813757
+    ts = 0.7747001085813757
+    [[tables.pctb_big1e8_n20.rows]]
+    M = 1.00000000013e8
+    bar = 213
+    kind = 0
+    lean = 0.04490897269089682
+    own = 9.7e-6
+    q = 0.044908788580885206
+    sigma = 0.007141425686777652
+    ta4j = 0.04490947370178173
+    ts = 0.04490947370178173
+    [[tables.pctb_big1e8_n20.rows]]
+    M = 1.00000000014e8
+    bar = 243
+    kind = 0
+    lean = 0.3837523612561808
+    own = 9.8e-6
+    q = 0.3837525514498336
+    sigma = 0.008602323126013053
+    ta4j = 0.38375293612244754
+    ts = 0.38375293612244754
+    [[tables.pctb_big1e8_n20.rows]]
+    M = 1.000000000095e8
+    bar = 281
+    kind = 0
+    lean = 0.8924034236947661
+    own = 1.6e-5
+    q = 0.8924032525855183
+    sigma = 0.006689542990868598
+    ta4j = 0.8924035618223433
+    ts = 0.8924035618223433
+    [[tables.pctb_big1e8_n20.rows]]
+    M = 1.000000000065e8
+    bar = 299
+    kind = 0
+    lean = 0.27626077298300805
+    own = 1.1e-5
+    q = 0.27626072193420703
+    sigma = 0.007262919264656499
+    ta4j = 0.27626119060783966
+    ts = 0.27626119060783966
+
+[tables.pctb_big1e8_n20_k13]
+type = "PctbRow"
+
+    [[tables.pctb_big1e8_n20_k13.rows]]
+    M = 1.0000000001e8
+    bar = 19
+    kind = 0
+    lean = nan
+    own = 1.2e-5
+    q = 0.7500001558401065
+    sigma = 0.008366598519932624
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_big1e8_n20_k13.rows]]
+    M = 1.000000000105e8
+    bar = 20
+    kind = 0
+    lean = nan
+    own = 1.3e-5
+    q = 0.7344659059980768
+    sigma = 0.008046736629001072
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_big1e8_n20_k13.rows]]
+    M = 1.0000000001e8
+    bar = 21
+    kind = 0
+    lean = nan
+    own = 1.1e-5
+    q = 0.4511927808778094
+    sigma = 0.008366598519932624
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_big1e8_n20_k13.rows]]
+    M = 1.000000000095e8
+    bar = 100
+    kind = 0
+    lean = nan
+    own = 1.3e-5
+    q = 0.7655343942981278
+    sigma = 0.00804673695307066
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_big1e8_n20_k13.rows]]
+    M = 1.000000000065e8
+    bar = 133
+    kind = 0
+    lean = nan
+    own = 1.7e-5
+    q = 1.2146889936417258
+    sigma = 0.007262919264656499
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_big1e8_n20_k13.rows]]
+    M = 1.000000000105e8
+    bar = 200
+    kind = 0
+    lean = nan
+    own = 1.3e-5
+    q = 1.0246995422466862
+    sigma = 0.008645806321520193
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_big1e8_n20_k13.rows]]
+    M = 1.0000000001449999e8
+    bar = 211
+    kind = 0
+    lean = nan
+    own = 1.7e-5
+    q = 0.955544606951681
+    sigma = 0.006689540930402894
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_big1e8_n20_k13.rows]]
+    M = 1.00000000013e8
+    bar = 213
+    kind = 0
+    lean = nan
+    own = 1.2e-5
+    q = 0.2949087885808852
+    sigma = 0.007141425686777652
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_big1e8_n20_k13.rows]]
+    M = 1.000000000095e8
+    bar = 281
+    kind = 0
+    lean = nan
+    own = 1.8e-5
+    q = 1.1424032525855183
+    sigma = 0.006689542990868598
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_big1e8_n20_k13.rows]]
+    M = 1.000000000065e8
+    bar = 299
+    kind = 0
+    lean = nan
+    own = 1.3e-5
+    q = 0.526260721934207
+    sigma = 0.007262919264656499
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_bollinger_hd]
+type = "PctbRow"
+
+    [[tables.pctb_bollinger_hd.rows]]
+    M = 58.332825
+    bar = 19
+    kind = 0
+    lean = 0.6830033620662347
+    own = 3.0e-14
+    q = 0.6830033620662345
+    sigma = 1.9359958527525312
+    ta4j = 0.6830033620662347
+    ts = 0.6830033620662347
+
+[tables.pctb_dema_n20]
+type = "PctbRow"
+
+    [[tables.pctb_dema_n20.rows]]
+    M = 85.15301836986664
+    bar = 38
+    kind = 0
+    lean = 0.3905995450764126
+    own = 3.3e-14
+    q = 0.3905995450764122
+    sigma = 2.2006726812499853
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_dema_n20.rows]]
+    M = 84.75285262387835
+    bar = 39
+    kind = 0
+    lean = 0.39447008679533957
+    own = 3.5e-14
+    q = 0.39447008679533985
+    sigma = 2.0796298348504236
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_dema_n20.rows]]
+    M = 84.32661397354437
+    bar = 40
+    kind = 0
+    lean = 0.38467594723001536
+    own = 3.5e-14
+    q = 0.3846759472300153
+    sigma = 2.062913049549108
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_dema_n20.rows]]
+    M = 112.59593942581688
+    bar = 90
+    kind = 0
+    lean = 0.758721780487121
+    own = 1.2e-14
+    q = 0.7587217804871205
+    sigma = 10.053328864112624
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_dema_n20.rows]]
+    M = 118.43187527084889
+    bar = 100
+    kind = 0
+    lean = 0.3910231766118517
+    own = 1.8e-14
+    q = 0.39102317661185176
+    sigma = 5.578881810004582
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_dema_n20.rows]]
+    M = 129.22464614277567
+    bar = 126
+    kind = 0
+    lean = 0.5822014281078539
+    own = 2.3e-14
+    q = 0.5822014281078539
+    sigma = 5.399400892691706
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_dema_n20.rows]]
+    M = 134.03222748007008
+    bar = 138
+    kind = 0
+    lean = 0.022775939113383614
+    own = 1.7e-14
+    q = 0.02277593911338335
+    sigma = 5.323614373712655
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_dema_n20.rows]]
+    M = 123.7830689434548
+    bar = 167
+    kind = 0
+    lean = 0.9114178333642831
+    own = 6.4e-14
+    q = 0.9114178333642838
+    sigma = 2.106697118714506
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_dema_n20.rows]]
+    M = 108.56226860880227
+    bar = 200
+    kind = 0
+    lean = 0.44571104111836995
+    own = 1.5e-14
+    q = 0.44571104111837
+    sigma = 6.6416295251993684
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_dema_n20.rows]]
+    M = 93.6008214622191
+    bar = 223
+    kind = 0
+    lean = 1.4351363927344636
+    own = 4.5e-14
+    q = 1.4351363927344647
+    sigma = 2.7640830305907955
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_dema_n20.rows]]
+    M = 110.03546603295653
+    bar = 251
+    kind = 0
+    lean = 0.32044203891355394
+    own = 3.0e-14
+    q = 0.3204420389135541
+    sigma = 3.0149958540601682
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_ema_n20]
+type = "PctbRow"
+
+    [[tables.pctb_ema_n20.rows]]
+    M = 92.891
+    bar = 19
+    kind = 0
+    lean = 0.20901483689438516
+    own = 2.7e-14
+    q = 0.20901483689438513
+    sigma = 2.5911974066056795
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20.rows]]
+    M = 92.46090476190476
+    bar = 20
+    kind = 0
+    lean = 0.12978469917824634
+    own = 2.4e-14
+    q = 0.12978469917824667
+    sigma = 2.7591409328811025
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20.rows]]
+    M = 92.00034240362812
+    bar = 21
+    kind = 0
+    lean = 0.12641223795402817
+    own = 2.3e-14
+    q = 0.12641223795402834
+    sigma = 2.9279213936682114
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20.rows]]
+    M = 91.44167452755194
+    bar = 77
+    kind = 0
+    lean = 1.1675160093887718
+    own = 2.3e-14
+    q = 1.167516009388771
+    sigma = 5.055431361417144
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20.rows]]
+    M = 104.62783525629985
+    bar = 90
+    kind = 0
+    lean = 0.9568676950697229
+    own = 1.2e-14
+    q = 0.9568676950697218
+    sigma = 10.053328864112624
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20.rows]]
+    M = 111.77720463169035
+    bar = 100
+    kind = 0
+    lean = 0.6892312613943952
+    own = 2.0e-14
+    q = 0.6892312613943952
+    sigma = 5.578881810004582
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20.rows]]
+    M = 128.24828755174929
+    bar = 143
+    kind = 0
+    lean = 0.3530074571670838
+    own = 2.2e-14
+    q = 0.35300745716708387
+    sigma = 4.895295190282194
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20.rows]]
+    M = 124.16469247770411
+    bar = 167
+    kind = 0
+    lean = 0.8661308850342144
+    own = 6.3e-14
+    q = 0.8661308850342151
+    sigma = 2.106697118714506
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20.rows]]
+    M = 114.98160229488369
+    bar = 200
+    kind = 0
+    lean = 0.20407855989800594
+    own = 1.3e-14
+    q = 0.204078559898006
+    sigma = 6.6416295251993684
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20.rows]]
+    M = 112.00988305771658
+    bar = 202
+    kind = 0
+    lean = -0.13234818868996326
+    own = 9.3e-15
+    q = -0.1323481886899633
+    sigma = 8.30629526323258
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20.rows]]
+    M = 108.52646097903106
+    bar = 251
+    kind = 0
+    lean = 0.44556700814803585
+    own = 3.2e-14
+    q = 0.44556700814803607
+    sigma = 3.0149958540601682
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_ema_n20_k25_15]
+type = "PctbRow"
+
+    [[tables.pctb_ema_n20_k25_15.rows]]
+    M = 92.891
+    bar = 19
+    kind = 0
+    lean = nan
+    own = 2.6e-14
+    q = 0.08401483689438514
+    sigma = 2.5911974066056795
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_k25_15.rows]]
+    M = 92.46090476190476
+    bar = 20
+    kind = 0
+    lean = nan
+    own = 2.3e-14
+    q = 0.004784699178246681
+    sigma = 2.7591409328811025
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_k25_15.rows]]
+    M = 92.00034240362812
+    bar = 21
+    kind = 0
+    lean = nan
+    own = 2.1e-14
+    q = 0.0014122379540283372
+    sigma = 2.9279213936682114
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_k25_15.rows]]
+    M = 91.44167452755194
+    bar = 77
+    kind = 0
+    lean = nan
+    own = 2.2e-14
+    q = 1.042516009388771
+    sigma = 5.055431361417144
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_k25_15.rows]]
+    M = 111.77720463169035
+    bar = 100
+    kind = 0
+    lean = nan
+    own = 1.9e-14
+    q = 0.5642312613943952
+    sigma = 5.578881810004582
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_k25_15.rows]]
+    M = 124.16469247770411
+    bar = 167
+    kind = 0
+    lean = nan
+    own = 6.0e-14
+    q = 0.7411308850342151
+    sigma = 2.106697118714506
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_k25_15.rows]]
+    M = 114.98160229488369
+    bar = 200
+    kind = 0
+    lean = nan
+    own = 1.3e-14
+    q = 0.07907855989800601
+    sigma = 6.6416295251993684
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_k25_15.rows]]
+    M = 112.00988305771658
+    bar = 202
+    kind = 0
+    lean = nan
+    own = 1.1e-14
+    q = -0.2573481886899633
+    sigma = 8.30629526323258
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_k25_15.rows]]
+    M = 106.08800258104742
+    bar = 206
+    kind = 0
+    lean = nan
+    own = 7.4e-15
+    q = 0.04357280951752797
+    sigma = 9.87245687506408
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_k25_15.rows]]
+    M = 108.52646097903106
+    bar = 251
+    kind = 0
+    lean = nan
+    own = 3.0e-14
+    q = 0.32056700814803607
+    sigma = 3.0149958540601682
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_ema_n20_s0_u100]
+type = "PctbRow"
+
+    [[tables.pctb_ema_n20_s0_u100.rows]]
+    M = 118.44331940414776
+    bar = 119
+    kind = 0
+    lean = 0.7793172975392896
+    own = 3.3e-14
+    q = 0.7793172975392895
+    sigma = 3.684591530956993
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s0_u100.rows]]
+    M = 118.88871755613368
+    bar = 120
+    kind = 0
+    lean = 0.7762079195281336
+    own = 3.2e-14
+    q = 0.7762079195281341
+    sigma = 3.8297982649220574
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s0_u100.rows]]
+    M = 119.23836350316857
+    bar = 121
+    kind = 0
+    lean = 0.7125439708754568
+    own = 3.1e-14
+    q = 0.712543970875457
+    sigma = 3.906999200153489
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s0_u100.rows]]
+    M = 128.24828755174929
+    bar = 143
+    kind = 0
+    lean = 0.3530074571670838
+    own = 2.2e-14
+    q = 0.35300745716708387
+    sigma = 4.895295190282194
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s0_u100.rows]]
+    M = 124.16469247770411
+    bar = 167
+    kind = 0
+    lean = 0.8661308850342144
+    own = 6.3e-14
+    q = 0.8661308850342151
+    sigma = 2.106697118714506
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s0_u100.rows]]
+    M = 125.44844462850367
+    bar = 170
+    kind = 0
+    lean = 1.0528737843935934
+    own = 4.9e-14
+    q = 1.052873784393592
+    sigma = 2.9625004641349855
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s0_u100.rows]]
+    M = 114.98160229488369
+    bar = 200
+    kind = 0
+    lean = 0.20407855989800594
+    own = 1.3e-14
+    q = 0.204078559898006
+    sigma = 6.6416295251993684
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s0_u100.rows]]
+    M = 112.00988305771658
+    bar = 202
+    kind = 0
+    lean = -0.13234818868996326
+    own = 9.3e-15
+    q = -0.1323481886899633
+    sigma = 8.30629526323258
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s0_u100.rows]]
+    M = 98.76249321119055
+    bar = 224
+    kind = 0
+    lean = 1.084947166708535
+    own = 3.0e-14
+    q = 1.084947166708535
+    sigma = 3.8924484582329413
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s0_u100.rows]]
+    M = 108.52646097903106
+    bar = 251
+    kind = 0
+    lean = 0.44556700814803585
+    own = 3.2e-14
+    q = 0.44556700814803607
+    sigma = 3.0149958540601682
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_ema_n20_s0_u15]
+type = "PctbRow"
+
+    [[tables.pctb_ema_n20_s0_u15.rows]]
+    M = 87.86621533624172
+    bar = 34
+    kind = 0
+    lean = 0.5528378321703694
+    own = 2.9e-14
+    q = 0.5528378321703693
+    sigma = 2.8567819635912013
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s0_u15.rows]]
+    M = 87.77181387564727
+    bar = 35
+    kind = 0
+    lean = 0.4119550551360819
+    own = 3.0e-14
+    q = 0.41195505513608194
+    sigma = 2.546466117485171
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s0_u15.rows]]
+    M = 87.68068874463324
+    bar = 36
+    kind = 0
+    lean = 0.4131581393852135
+    own = 3.0e-14
+    q = 0.41315813938521345
+    sigma = 2.492141285621664
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s0_u15.rows]]
+    M = 91.44167452755194
+    bar = 77
+    kind = 0
+    lean = 1.1675160093887718
+    own = 2.3e-14
+    q = 1.167516009388771
+    sigma = 5.055431361417144
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s0_u15.rows]]
+    M = 104.62783525629985
+    bar = 90
+    kind = 0
+    lean = 0.9568676950697229
+    own = 1.2e-14
+    q = 0.9568676950697218
+    sigma = 10.053328864112624
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s0_u15.rows]]
+    M = 111.77720463169035
+    bar = 100
+    kind = 0
+    lean = 0.6892312613943952
+    own = 2.0e-14
+    q = 0.6892312613943952
+    sigma = 5.578881810004582
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s0_u15.rows]]
+    M = 128.24828755174929
+    bar = 143
+    kind = 0
+    lean = 0.3530074571670838
+    own = 2.2e-14
+    q = 0.35300745716708387
+    sigma = 4.895295190282194
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s0_u15.rows]]
+    M = 124.16469247770411
+    bar = 167
+    kind = 0
+    lean = 0.8661308850342144
+    own = 6.3e-14
+    q = 0.8661308850342151
+    sigma = 2.106697118714506
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s0_u15.rows]]
+    M = 114.98160229488369
+    bar = 200
+    kind = 0
+    lean = 0.20407855989800594
+    own = 1.3e-14
+    q = 0.204078559898006
+    sigma = 6.6416295251993684
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s0_u15.rows]]
+    M = 112.00988305771658
+    bar = 202
+    kind = 0
+    lean = -0.13234818868996326
+    own = 9.3e-15
+    q = -0.1323481886899633
+    sigma = 8.30629526323258
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s0_u15.rows]]
+    M = 108.52646097903106
+    bar = 251
+    kind = 0
+    lean = 0.44556700814803585
+    own = 3.2e-14
+    q = 0.44556700814803607
+    sigma = 3.0149958540601682
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_ema_n20_s100_u0]
+type = "PctbRow"
+
+    [[tables.pctb_ema_n20_s100_u0.rows]]
+    M = 112.7695
+    bar = 100
+    kind = 0
+    lean = 0.6447646728331277
+    own = 2.0e-14
+    q = 0.6447646728331277
+    sigma = 5.578881810004582
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s100_u0.rows]]
+    M = 113.07716666666667
+    bar = 101
+    kind = 0
+    lean = 0.6381416685305342
+    own = 2.1e-14
+    q = 0.6381416685305341
+    sigma = 5.289557749708382
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s100_u0.rows]]
+    M = 112.97457936507936
+    bar = 102
+    kind = 0
+    lean = 0.45163743885039825
+    own = 2.0e-14
+    q = 0.45163743885039825
+    sigma = 5.037881275893667
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s100_u0.rows]]
+    M = 129.93332559183324
+    bar = 138
+    kind = 0
+    lean = 0.21526273476093663
+    own = 1.9e-14
+    q = 0.21526273476093657
+    sigma = 5.323614373712655
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s100_u0.rows]]
+    M = 124.16590709505537
+    bar = 167
+    kind = 0
+    lean = 0.8659867474004183
+    own = 6.3e-14
+    q = 0.865986747400419
+    sigma = 2.106697118714506
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s100_u0.rows]]
+    M = 125.44934421390614
+    bar = 170
+    kind = 0
+    lean = 1.052797870025531
+    own = 4.9e-14
+    q = 1.0527978700255298
+    sigma = 2.9625004641349855
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s100_u0.rows]]
+    M = 114.98164697060633
+    bar = 200
+    kind = 0
+    lean = 0.2040768782428309
+    own = 1.3e-14
+    q = 0.20407687824283097
+    sigma = 6.6416295251993684
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s100_u0.rows]]
+    M = 112.00991962899974
+    bar = 202
+    kind = 0
+    lean = -0.13234928939978652
+    own = 9.3e-15
+    q = -0.13234928939978655
+    sigma = 8.30629526323258
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s100_u0.rows]]
+    M = 98.76249725597083
+    bar = 224
+    kind = 0
+    lean = 1.0849469069247302
+    own = 3.0e-14
+    q = 1.0849469069247302
+    sigma = 3.8924484582329413
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s100_u0.rows]]
+    M = 108.52646125025073
+    bar = 251
+    kind = 0
+    lean = 0.4455669856588107
+    own = 3.2e-14
+    q = 0.4455669856588109
+    sigma = 3.0149958540601682
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_ema_n20_s100_u15]
+type = "PctbRow"
+
+    [[tables.pctb_ema_n20_s100_u15.rows]]
+    M = 111.28553613932247
+    bar = 100
+    kind = 0
+    lean = 0.7112638348164636
+    own = 2.0e-14
+    q = 0.7112638348164635
+    sigma = 5.578881810004582
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s100_u15.rows]]
+    M = 111.73453269748224
+    bar = 101
+    kind = 0
+    lean = 0.701598484426837
+    own = 2.1e-14
+    q = 0.7015984844268369
+    sigma = 5.289557749708382
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s100_u15.rows]]
+    M = 111.75981529772203
+    bar = 102
+    kind = 0
+    lean = 0.5119189342267383
+    own = 2.0e-14
+    q = 0.5119189342267384
+    sigma = 5.037881275893667
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s100_u15.rows]]
+    M = 128.80445400936145
+    bar = 140
+    kind = 0
+    lean = 0.21948231007354677
+    own = 1.9e-14
+    q = 0.21948231007354688
+    sigma = 5.172983930962862
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s100_u15.rows]]
+    M = 124.16409065177508
+    bar = 167
+    kind = 0
+    lean = 0.8662023032181194
+    own = 6.3e-14
+    q = 0.8662023032181202
+    sigma = 2.106697118714506
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s100_u15.rows]]
+    M = 125.44799889650419
+    bar = 170
+    kind = 0
+    lean = 1.0529113989024244
+    own = 4.9e-14
+    q = 1.052911398902423
+    sigma = 2.9625004641349855
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s100_u15.rows]]
+    M = 114.98158015868724
+    bar = 200
+    kind = 0
+    lean = 0.204079393134652
+    own = 1.3e-14
+    q = 0.20407939313465207
+    sigma = 6.6416295251993684
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s100_u15.rows]]
+    M = 112.00986493715668
+    bar = 202
+    kind = 0
+    lean = -0.13234764330362306
+    own = 9.3e-15
+    q = -0.13234764330362309
+    sigma = 8.30629526323258
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s100_u15.rows]]
+    M = 98.76249120705842
+    bar = 224
+    kind = 0
+    lean = 1.0849472954277812
+    own = 3.0e-14
+    q = 1.0849472954277812
+    sigma = 3.8924484582329413
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s100_u15.rows]]
+    M = 108.52646084464548
+    bar = 251
+    kind = 0
+    lean = 0.44556701929113274
+    own = 3.2e-14
+    q = 0.44556701929113296
+    sigma = 3.0149958540601682
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_ema_n20_s19_u0]
+type = "PctbRow"
+
+    [[tables.pctb_ema_n20_s19_u0.rows]]
+    M = 92.891
+    bar = 19
+    kind = 0
+    lean = 0.20901483689438516
+    own = 2.7e-14
+    q = 0.20901483689438513
+    sigma = 2.5911974066056795
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s19_u0.rows]]
+    M = 92.46090476190476
+    bar = 20
+    kind = 0
+    lean = 0.12978469917824634
+    own = 2.4e-14
+    q = 0.12978469917824667
+    sigma = 2.7591409328811025
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s19_u0.rows]]
+    M = 92.00034240362812
+    bar = 21
+    kind = 0
+    lean = 0.12641223795402817
+    own = 2.3e-14
+    q = 0.12641223795402834
+    sigma = 2.9279213936682114
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s19_u0.rows]]
+    M = 91.44167452755194
+    bar = 77
+    kind = 0
+    lean = 1.1675160093887718
+    own = 2.3e-14
+    q = 1.167516009388771
+    sigma = 5.055431361417144
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s19_u0.rows]]
+    M = 104.62783525629985
+    bar = 90
+    kind = 0
+    lean = 0.9568676950697229
+    own = 1.2e-14
+    q = 0.9568676950697218
+    sigma = 10.053328864112624
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s19_u0.rows]]
+    M = 111.77720463169035
+    bar = 100
+    kind = 0
+    lean = 0.6892312613943952
+    own = 2.0e-14
+    q = 0.6892312613943952
+    sigma = 5.578881810004582
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s19_u0.rows]]
+    M = 128.24828755174929
+    bar = 143
+    kind = 0
+    lean = 0.3530074571670838
+    own = 2.2e-14
+    q = 0.35300745716708387
+    sigma = 4.895295190282194
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s19_u0.rows]]
+    M = 124.16469247770411
+    bar = 167
+    kind = 0
+    lean = 0.8661308850342144
+    own = 6.3e-14
+    q = 0.8661308850342151
+    sigma = 2.106697118714506
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s19_u0.rows]]
+    M = 114.98160229488369
+    bar = 200
+    kind = 0
+    lean = 0.20407855989800594
+    own = 1.3e-14
+    q = 0.204078559898006
+    sigma = 6.6416295251993684
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s19_u0.rows]]
+    M = 112.00988305771658
+    bar = 202
+    kind = 0
+    lean = -0.13234818868996326
+    own = 9.3e-15
+    q = -0.1323481886899633
+    sigma = 8.30629526323258
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s19_u0.rows]]
+    M = 108.52646097903106
+    bar = 251
+    kind = 0
+    lean = 0.44556700814803585
+    own = 3.2e-14
+    q = 0.44556700814803607
+    sigma = 3.0149958540601682
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_ema_n20_s20_u0]
+type = "PctbRow"
+
+    [[tables.pctb_ema_n20_s20_u0.rows]]
+    M = 92.73475
+    bar = 20
+    kind = 0
+    lean = 0.10497215382837104
+    own = 2.4e-14
+    q = 0.10497215382837141
+    sigma = 2.7591409328811025
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s20_u0.rows]]
+    M = 92.24810714285714
+    bar = 21
+    kind = 0
+    lean = 0.10525689377668535
+    own = 2.3e-14
+    q = 0.10525689377668553
+    sigma = 2.9279213936682114
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s20_u0.rows]]
+    M = 91.53685884353742
+    bar = 22
+    kind = 0
+    lean = -0.00869336619454916
+    own = 1.9e-14
+    q = -0.008693366194549449
+    sigma = 3.3206934140326774
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s20_u0.rows]]
+    M = 91.4425864557562
+    bar = 77
+    kind = 0
+    lean = 1.1674709129301777
+    own = 2.3e-14
+    q = 1.167470912930177
+    sigma = 5.055431361417144
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s20_u0.rows]]
+    M = 104.62808351622989
+    bar = 90
+    kind = 0
+    lean = 0.9568615214944473
+    own = 1.2e-14
+    q = 0.9568615214944463
+    sigma = 10.053328864112624
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s20_u0.rows]]
+    M = 111.777295885224
+    bar = 100
+    kind = 0
+    lean = 0.6892271721549754
+    own = 2.0e-14
+    q = 0.6892271721549754
+    sigma = 5.578881810004582
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s20_u0.rows]]
+    M = 129.91119950257226
+    bar = 138
+    kind = 0
+    lean = 0.2163017886681012
+    own = 1.9e-14
+    q = 0.21630178866810112
+    sigma = 5.323614373712655
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s20_u0.rows]]
+    M = 124.16469258940283
+    bar = 167
+    kind = 0
+    lean = 0.8661308717790196
+    own = 6.3e-14
+    q = 0.8661308717790204
+    sigma = 2.106697118714506
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s20_u0.rows]]
+    M = 114.98160229899216
+    bar = 200
+    kind = 0
+    lean = 0.20407855974335748
+    own = 1.3e-14
+    q = 0.20407855974335753
+    sigma = 6.6416295251993684
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s20_u0.rows]]
+    M = 112.00988306107975
+    bar = 202
+    kind = 0
+    lean = -0.13234818879118682
+    own = 9.3e-15
+    q = -0.13234818879118684
+    sigma = 8.30629526323258
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n20_s20_u0.rows]]
+    M = 108.526460979056
+    bar = 251
+    kind = 0
+    lean = 0.44556700814596767
+    own = 3.2e-14
+    q = 0.4455670081459679
+    sigma = 3.0149958540601682
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_ema_n20_s251_u0]
+type = "PctbRow"
+
+    [[tables.pctb_ema_n20_s251_u0.rows]]
+    M = 110.57000000000001
+    bar = 251
+    kind = 0
+    lean = 0.2761190951254525
+    own = 2.9e-14
+    q = 0.27611909512545263
+    sigma = 3.0149958540601682
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_ema_n5]
+type = "PctbRow"
+
+    [[tables.pctb_ema_n5.rows]]
+    M = 93.913
+    bar = 4
+    kind = 0
+    lean = 0.47413751814102456
+    own = 6.5e-14
+    q = 0.4741375181410249
+    sigma = 1.285646141051261
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n5.rows]]
+    M = 94.15033333333334
+    bar = 5
+    kind = 0
+    lean = 0.7659217459871246
+    own = 2.2e-13
+    q = 0.765921745987125
+    sigma = 0.44624656861425743
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n5.rows]]
+    M = 93.61022222222222
+    bar = 6
+    kind = 0
+    lean = 0.19448735083653307
+    own = 8.0e-14
+    q = 0.19448735083653318
+    sigma = 0.8839423058096035
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n5.rows]]
+    M = 89.39161585607958
+    bar = 62
+    kind = 0
+    lean = 1.0026808582654168
+    own = 7.8e-14
+    q = 1.0026808582654183
+    sigma = 1.2823166535610457
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n5.rows]]
+    M = 115.38594683335327
+    bar = 100
+    kind = 0
+    lean = 0.5557555006344332
+    own = 3.9e-14
+    q = 0.5557555006344332
+    sigma = 2.7533299838559127
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n5.rows]]
+    M = 122.56839565145356
+    bar = 121
+    kind = 0
+    lean = 0.4933732490742506
+    own = 3.5e-13
+    q = 0.49337324907425073
+    sigma = 0.31673332631726736
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n5.rows]]
+    M = 135.76424350322014
+    bar = 135
+    kind = 0
+    lean = 0.24234341489033248
+    own = 9.6e-14
+    q = 0.24234341489033184
+    sigma = 1.1005380502281603
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n5.rows]]
+    M = 107.98165187893095
+    bar = 200
+    kind = 0
+    lean = 0.26916976720385644
+    own = 9.1e-14
+    q = 0.26916976720385716
+    sigma = 0.9332095155965786
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n5.rows]]
+    M = 107.65443458595396
+    bar = 201
+    kind = 0
+    lean = 0.017661846918880435
+    own = 2.2e-13
+    q = 0.017661846918881063
+    sigma = 0.33919905660246324
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_ema_n5.rows]]
+    M = 108.69074495185036
+    bar = 251
+    kind = 0
+    lean = 0.2127673912925133
+    own = 1.2e-13
+    q = 0.21276739129251382
+    sigma = 0.7143556537187892
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_eps_n20]
+type = "PctbRow"
+
+    [[tables.pctb_eps_n20.rows]]
+    M = 4.4408920985006264e-17
+    bar = 19
+    kind = 0
+    lean = nan
+    own = 1.8e-15
+    q = 0.7041241452319315
+    sigma = 2.1755839288168293e-16
+    ta4j = 0.7041241452319315
+    ts = 0.7041241452319315
+    [[tables.pctb_eps_n20.rows]]
+    M = 4.4408920985006264e-17
+    bar = 20
+    kind = 0
+    lean = nan
+    own = 1.8e-15
+    q = 0.7041241452319315
+    sigma = 2.1755839288168293e-16
+    ta4j = 0.7041241452319315
+    ts = 0.7041241452319315
+    [[tables.pctb_eps_n20.rows]]
+    M = 6.661338147750939e-17
+    bar = 21
+    kind = 0
+    lean = nan
+    own = 1.8e-15
+    q = 0.6834498464263357
+    sigma = 2.1181705310112557e-16
+    ta4j = 0.6834498464263357
+    ts = 0.6834498464263357
+    [[tables.pctb_eps_n20.rows]]
+    M = 6.661338147750939e-17
+    bar = 27
+    kind = 0
+    lean = nan
+    own = 1.3e-15
+    q = 0.15930742806537657
+    sigma = 2.1181705310112557e-16
+    ta4j = 0.1593074280653766
+    ts = 0.1593074280653766
+    [[tables.pctb_eps_n20.rows]]
+    M = 0.0
+    bar = 49
+    kind = 0
+    lean = nan
+    own = 1.8e-15
+    q = 0.75
+    sigma = 2.220446049250313e-16
+    ta4j = 0.75
+    ts = 0.75
+    [[tables.pctb_eps_n20.rows]]
+    M = 2.2204460492503132e-17
+    bar = 50
+    kind = 0
+    lean = nan
+    own = 1.8e-15
+    q = 0.7261335084333227
+    sigma = 2.2093159237770887e-16
+    ta4j = 0.7261335084333228
+    ts = 0.7261335084333228
+    [[tables.pctb_eps_n20.rows]]
+    M = -6.661338147750939e-17
+    bar = 100
+    kind = 0
+    lean = nan
+    own = 1.5e-15
+    q = 0.3165501535736643
+    sigma = 2.1181705310112557e-16
+    ta4j = 0.3165501535736643
+    ts = 0.3165501535736643
+    [[tables.pctb_eps_n20.rows]]
+    M = -1.3322676295501878e-16
+    bar = 156
+    kind = 0
+    lean = nan
+    own = 2.1e-15
+    q = 1.0
+    sigma = 1.7763568394002506e-16
+    ta4j = 1.0
+    ts = 1.0
+    [[tables.pctb_eps_n20.rows]]
+    M = 0.0
+    bar = 199
+    kind = 0
+    lean = nan
+    own = 1.4e-15
+    q = 0.25
+    sigma = 2.220446049250313e-16
+    ta4j = 0.25
+    ts = 0.25
+
+[tables.pctb_fine100_n20]
+type = "PctbRow"
+
+    [[tables.pctb_fine100_n20.rows]]
+    M = 100.0000000105
+    bar = 19
+    kind = 0
+    lean = 0.7746995926839642
+    own = 1.2e-5
+    q = 0.7746996407846498
+    sigma = 8.645809050982588e-9
+    ta4j = 0.7746996397896431
+    ts = 0.7746996397896431
+    [[tables.pctb_fine100_n20.rows]]
+    M = 100.000000011
+    bar = 20
+    kind = 0
+    lean = 0.7531447777083553
+    own = 1.2e-5
+    q = 0.7531448131258152
+    sigma = 8.888195312613152e-9
+    ta4j = 0.753144930618066
+    ts = 0.753144930618066
+    [[tables.pctb_fine100_n20.rows]]
+    M = 100.000000011
+    bar = 21
+    kind = 0
+    lean = 0.19060082724534347
+    own = 8.5e-6
+    q = 0.19060087278210977
+    sigma = 8.888195312613152e-9
+    ta4j = 0.1906008624176794
+    ts = 0.1906008624176794
+    [[tables.pctb_fine100_n20.rows]]
+    M = 100.0000000115
+    bar = 33
+    kind = 0
+    lean = 0.45877627175530156
+    own = 9.6e-6
+    q = 0.45877610656817436
+    sigma = 9.096703627742357e-9
+    ta4j = 0.45877709535738026
+    ts = 0.458776314258108
+    [[tables.pctb_fine100_n20.rows]]
+    M = 100.000000011
+    bar = 100
+    kind = 0
+    lean = 0.7708681694429805
+    own = 1.3e-5
+    q = 0.7708682252294494
+    sigma = 8.30662480682973e-9
+    ta4j = 0.7708690103280088
+    ts = 0.7708681549355291
+    [[tables.pctb_fine100_n20.rows]]
+    M = 100.0000000085
+    bar = 138
+    kind = 0
+    lean = 0.17499437701670414
+    own = 1.2e-5
+    q = 0.17499448187678443
+    sigma = 6.53834805974402e-9
+    ta4j = 0.17499464785028326
+    ts = 0.17499573458119022
+    [[tables.pctb_fine100_n20.rows]]
+    M = 100.00000001149999
+    bar = 200
+    kind = 0
+    lean = 0.7491394122482334
+    own = 1.2e-5
+    q = 0.7491394551891946
+    sigma = 8.529362072734684e-9
+    ta4j = 0.74914049555107
+    ts = 0.7491392459686388
+    [[tables.pctb_fine100_n20.rows]]
+    M = 100.000000014
+    bar = 247
+    kind = 0
+    lean = 0.7041241452319317
+    own = 1.4e-5
+    q = 0.7041241855204956
+    sigma = 7.348470996676663e-9
+    ta4j = 0.7041263579271034
+    ts = 0.7041244240745307
+    [[tables.pctb_fine100_n20.rows]]
+    M = 100.000000012
+    bar = 250
+    kind = 0
+    lean = 0.09910813713136328
+    own = 9.5e-6
+    q = 0.0991082727746183
+    sigma = 7.48331615232303e-9
+    ta4j = 0.09910955645884903
+    ts = 0.09910860695624597
+    [[tables.pctb_fine100_n20.rows]]
+    M = 100.00000001149999
+    bar = 253
+    kind = 0
+    lean = 0.1370632182187632
+    own = 9.2e-6
+    q = 0.1370633182804289
+    sigma = 7.92149088522027e-9
+    ta4j = 0.13706450458402064
+    ts = 0.1370636076031685
+    [[tables.pctb_fine100_n20.rows]]
+    M = 100.000000008
+    bar = 289
+    kind = 0
+    lean = 0.9423258684646912
+    own = 1.6e-5
+    q = 0.9423260677436384
+    sigma = 6.782329496660508e-9
+    ta4j = 0.9423259453887157
+    ts = 0.9423264692078179
+    [[tables.pctb_fine100_n20.rows]]
+    M = 100.00000000749999
+    bar = 294
+    kind = 0
+    lean = 0.9475717962746456
+    own = 1.6e-5
+    q = 0.9475719841503837
+    sigma = 6.982119454720473e-9
+    ta4j = 0.9475716585626971
+    ts = 0.947572167392937
+    [[tables.pctb_fine100_n20.rows]]
+    M = 100.0000000095
+    bar = 299
+    kind = 0
+    lean = 0.8036153392822761
+    own = 1.2e-5
+    q = 0.8036153942544904
+    sigma = 8.64580884552385e-9
+    ta4j = 0.8036159104002419
+    ts = 0.8036154994826548
+
+[tables.pctb_fine100_n20_k13]
+type = "PctbRow"
+
+    [[tables.pctb_fine100_n20_k13.rows]]
+    M = 100.0000000105
+    bar = 19
+    kind = 0
+    lean = nan
+    own = 1.3e-5
+    q = 1.0246996407846498
+    sigma = 8.645809050982588e-9
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_fine100_n20_k13.rows]]
+    M = 100.000000011
+    bar = 20
+    kind = 0
+    lean = nan
+    own = 1.3e-5
+    q = 1.0031448131258152
+    sigma = 8.888195312613152e-9
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_fine100_n20_k13.rows]]
+    M = 100.000000011
+    bar = 21
+    kind = 0
+    lean = nan
+    own = 9.7e-6
+    q = 0.4406008727821098
+    sigma = 8.888195312613152e-9
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_fine100_n20_k13.rows]]
+    M = 100.000000011
+    bar = 100
+    kind = 0
+    lean = nan
+    own = 1.4e-5
+    q = 1.0208682252294494
+    sigma = 8.30662480682973e-9
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_fine100_n20_k13.rows]]
+    M = 100.00000001149999
+    bar = 200
+    kind = 0
+    lean = nan
+    own = 1.4e-5
+    q = 0.9991394551891946
+    sigma = 8.529362072734684e-9
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_fine100_n20_k13.rows]]
+    M = 100.000000012
+    bar = 250
+    kind = 0
+    lean = nan
+    own = 1.1e-5
+    q = 0.3491082727746183
+    sigma = 7.48331615232303e-9
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_fine100_n20_k13.rows]]
+    M = 100.00000000899999
+    bar = 287
+    kind = 0
+    lean = nan
+    own = 1.3e-5
+    q = 0.42857153214912636
+    sigma = 7.0000000716529545e-9
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_fine100_n20_k13.rows]]
+    M = 100.000000008
+    bar = 289
+    kind = 0
+    lean = nan
+    own = 1.8e-5
+    q = 1.1923260677436385
+    sigma = 6.782329496660508e-9
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_fine100_n20_k13.rows]]
+    M = 100.00000000749999
+    bar = 294
+    kind = 0
+    lean = nan
+    own = 1.8e-5
+    q = 1.1975719841503836
+    sigma = 6.982119454720473e-9
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_fine100_n20_k13.rows]]
+    M = 100.0000000095
+    bar = 299
+    kind = 0
+    lean = nan
+    own = 1.4e-5
+    q = 1.0536153942544904
+    sigma = 8.64580884552385e-9
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_flatneg_ema_n20]
+type = "PctbRow"
+
+    [[tables.pctb_flatneg_ema_n20.rows]]
+    M = -5.0
+    bar = 19
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_flatneg_ema_n20.rows]]
+    M = -5.0
+    bar = 20
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_flatneg_ema_n20.rows]]
+    M = -5.0
+    bar = 21
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_flatneg_ema_n20.rows]]
+    M = -5.0
+    bar = 59
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_flatneg_n20]
+type = "PctbRow"
+
+    [[tables.pctb_flatneg_n20.rows]]
+    M = -5.0
+    bar = 19
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_flatneg_n20.rows]]
+    M = -5.0
+    bar = 20
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_flatneg_n20.rows]]
+    M = -5.0
+    bar = 21
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_flatneg_n20.rows]]
+    M = -5.0
+    bar = 59
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = 0.5
+
+[tables.pctb_flatpos_n20]
+type = "PctbRow"
+
+    [[tables.pctb_flatpos_n20.rows]]
+    M = 5.0
+    bar = 19
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_flatpos_n20.rows]]
+    M = 5.0
+    bar = 20
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_flatpos_n20.rows]]
+    M = 5.0
+    bar = 21
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_flatpos_n20.rows]]
+    M = 5.0
+    bar = 59
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = 0.5
+
+[tables.pctb_flatpos_n20_k25_15]
+type = "PctbRow"
+
+    [[tables.pctb_flatpos_n20_k25_15.rows]]
+    M = 5.0
+    bar = 19
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_flatpos_n20_k25_15.rows]]
+    M = 5.0
+    bar = 20
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_flatpos_n20_k25_15.rows]]
+    M = 5.0
+    bar = 21
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_flatpos_n20_k25_15.rows]]
+    M = 5.0
+    bar = 59
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_long_ema_n100000]
+type = "PctbRow"
+
+    [[tables.pctb_long_ema_n100000.rows]]
+    M = 100.00235505943299
+    bar = 99999
+    kind = 0
+    lean = 0.2604285887074669
+    own = 6.6e-15
+    q = 0.2604285887074669
+    sigma = 11.555512259078105
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_long_ema_n100000.rows]]
+    M = 100.00269494085018
+    bar = 100000
+    kind = 0
+    lean = 0.8676584018766248
+    own = 9.5e-15
+    q = 0.8676584018766232
+    sigma = 11.555496101772844
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_long_ema_n100000.rows]]
+    M = 100.00292611947614
+    bar = 100001
+    kind = 0
+    lean = 0.7500720634843967
+    own = 8.9e-15
+    q = 0.750072063484396
+    sigma = 11.555484795449328
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_long_ema_n100000.rows]]
+    M = 100.0034084819428
+    bar = 100095
+    kind = 0
+    lean = 0.07107361469553104
+    own = 5.7e-15
+    q = 0.07107361469553215
+    sigma = 11.555764801948829
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_long_ema_n100000.rows]]
+    M = 100.00153113608246
+    bar = 100278
+    kind = 0
+    lean = 0.9295539686605158
+    own = 9.8e-15
+    q = 0.9295539686605176
+    sigma = 11.55615886744615
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_long_ema_n100000.rows]]
+    M = 100.00262396494831
+    bar = 100336
+    kind = 0
+    lean = 0.06777043660557223
+    own = 5.7e-15
+    q = 0.06777043660557343
+    sigma = 11.55631372767403
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_long_ema_n100000.rows]]
+    M = 100.00272414641601
+    bar = 100477
+    kind = 0
+    lean = 0.9321262529570766
+    own = 9.8e-15
+    q = 0.9321262529570774
+    sigma = 11.555410058228178
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_long_ema_n100000.rows]]
+    M = 100.00394581497623
+    bar = 100499
+    kind = 0
+    lean = 0.8632040014073695
+    own = 9.5e-15
+    q = 0.8632040014073686
+    sigma = 11.555230880296529
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_long_sma_n100000]
+type = "PctbRow"
+
+    [[tables.pctb_long_sma_n100000.rows]]
+    M = 100.00235505943299
+    bar = 99999
+    kind = 0
+    lean = 0.2604285887074669
+    own = 6.6e-15
+    q = 0.2604285887074669
+    sigma = 11.555512259078105
+    ta4j = 0.260428588707466
+    ts = 0.260428588707466
+    [[tables.pctb_long_sma_n100000.rows]]
+    M = 100.00270559339523
+    bar = 100000
+    kind = 0
+    lean = 0.8676581714117237
+    own = 9.5e-15
+    q = 0.8676581714117222
+    sigma = 11.555496101772844
+    ta4j = 0.8676581714117197
+    ts = 0.8676581714117197
+    [[tables.pctb_long_sma_n100000.rows]]
+    M = 100.00269479494095
+    bar = 100001
+    kind = 0
+    lean = 0.7500770681323906
+    own = 8.9e-15
+    q = 0.75007706813239
+    sigma = 11.555484795449328
+    ta4j = 0.7500770681323888
+    ts = 0.7500770681323888
+    [[tables.pctb_long_sma_n100000.rows]]
+    M = 100.00205549933911
+    bar = 100057
+    kind = 0
+    lean = 0.14692671720293587
+    own = 6.1e-15
+    q = 0.14692671720293649
+    sigma = 11.555061910439923
+    ta4j = 0.14692671720293232
+    ts = 0.14692671720293232
+    [[tables.pctb_long_sma_n100000.rows]]
+    M = 100.00002269001007
+    bar = 100276
+    kind = 0
+    lean = 0.13557700929526537
+    own = 6.0e-15
+    q = 0.13557700929526695
+    sigma = 11.55617727142655
+    ta4j = 0.13557700929526514
+    ts = 0.13557700929526514
+    [[tables.pctb_long_sma_n100000.rows]]
+    M = 100.00112377867698
+    bar = 100336
+    kind = 0
+    lean = 0.06780289042922819
+    own = 5.7e-15
+    q = 0.06780289042922939
+    sigma = 11.55631372767403
+    ta4j = 0.06780289042923154
+    ts = 0.06780289042923154
+    [[tables.pctb_long_sma_n100000.rows]]
+    M = 99.99961610331535
+    bar = 100362
+    kind = 0
+    lean = 0.09953022152788218
+    own = 5.8e-15
+    q = 0.099530221527881
+    sigma = 11.55628831218397
+    ta4j = 0.09953022152787981
+    ts = 0.09953022152787981
+    [[tables.pctb_long_sma_n100000.rows]]
+    M = 99.99926680858135
+    bar = 100477
+    kind = 0
+    lean = 0.9322010520731885
+    own = 9.8e-15
+    q = 0.9322010520731893
+    sigma = 11.555410058228178
+    ta4j = 0.9322010520731887
+    ts = 0.9322010520731887
+    [[tables.pctb_long_sma_n100000.rows]]
+    M = 99.99910873622895
+    bar = 100499
+    kind = 0
+    lean = 0.8633086526860284
+    own = 9.5e-15
+    q = 0.8633086526860275
+    sigma = 11.555230880296529
+    ta4j = 0.8633086526860311
+    ts = 0.8633086526860311
+
+[tables.pctb_neg_n20]
+type = "PctbRow"
+
+    [[tables.pctb_neg_n20.rows]]
+    M = -92.891
+    bar = 19
+    kind = 0
+    lean = 0.7909851631056148
+    own = 3.7e-14
+    q = 0.7909851631056148
+    sigma = 2.5911974066056795
+    ta4j = 0.790985163105614
+    ts = 0.790985163105614
+    [[tables.pctb_neg_n20.rows]]
+    M = -92.73475
+    bar = 20
+    kind = 0
+    lean = 0.895027846171629
+    own = 3.6e-14
+    q = 0.8950278461716286
+    sigma = 2.7591409328811025
+    ta4j = 0.8950278461716278
+    ts = 0.8950278461716278
+    [[tables.pctb_neg_n20.rows]]
+    M = -92.37525
+    bar = 21
+    kind = 0
+    lean = 0.905599174406857
+    own = 3.4e-14
+    q = 0.9055991744068568
+    sigma = 2.9279213936682114
+    ta4j = 0.9055991744068559
+    ts = 0.9055991744068571
+    [[tables.pctb_neg_n20.rows]]
+    M = -86.89625
+    bar = 45
+    kind = 0
+    lean = 0.0735439406386792
+    own = 2.8e-14
+    q = 0.07354394063867861
+    sigma = 2.2591717923832175
+    ta4j = 0.07354394063868032
+    ts = 0.07354394063868189
+    [[tables.pctb_neg_n20.rows]]
+    M = -102.1975
+    bar = 90
+    kind = 0
+    lean = -0.01730377771333907
+    own = 7.4e-15
+    q = -0.0173037777133379
+    sigma = 10.053328864112624
+    ta4j = -0.01730377771333746
+    ts = -0.017303777713337815
+    [[tables.pctb_neg_n20.rows]]
+    M = -112.7695
+    bar = 100
+    kind = 0
+    lean = 0.35523532716687234
+    own = 1.7e-14
+    q = 0.3552353271668724
+    sigma = 5.578881810004582
+    ta4j = 0.3552353271668721
+    ts = 0.3552353271668734
+    [[tables.pctb_neg_n20.rows]]
+    M = -119.9395
+    bar = 123
+    kind = 0
+    lean = -0.05476556356396914
+    own = 2.1e-14
+    q = -0.05476556356396865
+    sigma = 4.195691212422573
+    ta4j = -0.054765563563969756
+    ts = -0.054765563563969756
+    [[tables.pctb_neg_n20.rows]]
+    M = -122.8615
+    bar = 165
+    kind = 0
+    lean = 0.4645850134632203
+    own = 4.7e-14
+    q = 0.46458501346322056
+    sigma = 2.3189335372105857
+    ta4j = 0.46458501346321807
+    ts = 0.4645850134632211
+    [[tables.pctb_neg_n20.rows]]
+    M = -116.3365
+    bar = 200
+    kind = 0
+    lean = 0.8469216389227664
+    own = 1.8e-14
+    q = 0.8469216389227663
+    sigma = 6.6416295251993684
+    ta4j = 0.8469216389227651
+    ts = 0.8469216389227651
+    [[tables.pctb_neg_n20.rows]]
+    M = -113.877
+    bar = 202
+    kind = 0
+    lean = 1.188544028204245
+    own = 1.6e-14
+    q = 1.188544028204245
+    sigma = 8.30629526323258
+    ta4j = 1.1885440282042445
+    ts = 1.1885440282042445
+    [[tables.pctb_neg_n20.rows]]
+    M = -95.155
+    bar = 223
+    kind = 0
+    lean = -0.29456730340353404
+    own = 2.9e-14
+    q = -0.29456730340353504
+    sigma = 2.7640830305907955
+    ta4j = -0.2945673034035372
+    ts = -0.2945673034035346
+    [[tables.pctb_neg_n20.rows]]
+    M = -102.486
+    bar = 234
+    kind = 0
+    lean = -0.006236175228842532
+    own = 1.1e-14
+    q = -0.006236175228842313
+    sigma = 6.979943696047984
+    ta4j = -0.006236175228843899
+    ts = -0.006236175228841863
+    [[tables.pctb_neg_n20.rows]]
+    M = -110.57000000000001
+    bar = 251
+    kind = 0
+    lean = 0.7238809048745475
+    own = 3.7e-14
+    q = 0.7238809048745474
+    sigma = 3.0149958540601682
+    ta4j = 0.7238809048745444
+    ts = 0.7238809048745456
+
+[tables.pctb_peg_n20]
+type = "PctbRow"
+
+    [[tables.pctb_peg_n20.rows]]
+    M = 1.0001432662393108
+    bar = 19
+    kind = 0
+    lean = 0.7084894376698171
+    own = 9.5e-12
+    q = 0.7084894376699307
+    sigma = 0.00010391603879722283
+    ta4j = 0.7084894376705675
+    ts = 0.7084894376705675
+    [[tables.pctb_peg_n20.rows]]
+    M = 1.0001544905594362
+    bar = 20
+    kind = 0
+    lean = 0.6751988083854746
+    own = 9.7e-12
+    q = 0.6751988083854665
+    sigma = 9.988059239007554e-5
+    ta4j = 0.6751988083860735
+    ts = 0.6751988083860735
+    [[tables.pctb_peg_n20.rows]]
+    M = 1.0001654922759025
+    bar = 21
+    kind = 0
+    lean = 0.6447271263185921
+    own = 1.1e-11
+    q = 0.644727126318576
+    sigma = 9.421532577981609e-5
+    ta4j = 0.6447271263189533
+    ts = 0.6447271263189533
+    [[tables.pctb_peg_n20.rows]]
+    M = 1.0001016674829954
+    bar = 100
+    kind = 0
+    lean = 0.2784588711780479
+    own = 4.6e-10
+    q = 0.2784588711733086
+    sigma = 1.7277704957751641e-6
+    ta4j = 0.27845887118423507
+    ts = 0.27845887118423507
+    [[tables.pctb_peg_n20.rows]]
+    M = 1.0001000000080518
+    bar = 161
+    kind = 0
+    lean = 0.2784600828233713
+    own = 9.5e-5
+    q = 0.27845913283658463
+    sigma = 8.343027268612586e-12
+    ta4j = 0.27845422970976885
+    ts = 0.27845422970976885
+    [[tables.pctb_peg_n20.rows]]
+    M = 1.0001000000000004
+    bar = 214
+    kind = 2
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 4.839349969133126e-17
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_peg_n20.rows]]
+    M = 1.0001000000000004
+    bar = 215
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_peg_n20.rows]]
+    M = 1.0001000000000004
+    bar = 216
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_peg_n20.rows]]
+    M = 1.0000990909090914
+    bar = 540
+    kind = 0
+    lean = -0.5897247358851673
+    own = 2.4e-10
+    q = -0.5897247358851684
+    sigma = 3.962635403240355e-6
+    ta4j = -0.5897247358877107
+    ts = -0.5897247358596933
+    [[tables.pctb_peg_n20.rows]]
+    M = 1.0000917054845984
+    bar = 542
+    kind = 0
+    lean = -0.44483546825384573
+    own = 3.8e-11
+    q = -0.44483546825354775
+    sigma = 2.3330597759234992e-5
+    ta4j = -0.4448354682532526
+    ts = -0.4448354682508732
+    [[tables.pctb_peg_n20.rows]]
+    M = 0.9999496011062684
+    bar = 558
+    kind = 0
+    lean = 0.8579680082736052
+    own = 1.2e-11
+    q = 0.8579680082735254
+    sigma = 9.075499034518255e-5
+    ta4j = 0.8579680082708381
+    ts = 0.8579680082732847
+    [[tables.pctb_peg_n20.rows]]
+    M = 0.9999951135710057
+    bar = 563
+    kind = 0
+    lean = 1.0593371744972504
+    own = 7.4e-12
+    q = 1.059337174497188
+    sigma = 0.00015404150169739521
+    ta4j = 1.059337174496084
+    ts = 1.0593371744975255
+    [[tables.pctb_peg_n20.rows]]
+    M = 1.000100000007945
+    bar = 694
+    kind = 0
+    lean = 0.2784620589951214
+    own = 9.6e-5
+    q = 0.27845947300265866
+    sigma = 8.232075671443974e-12
+    ta4j = 0.27844311377245506
+    ts = 0.2784566003128877
+    [[tables.pctb_peg_n20.rows]]
+    M = 1.0001000000000004
+    bar = 747
+    kind = 2
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 4.839349969133126e-17
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_peg_n20.rows]]
+    M = 1.0001000000000004
+    bar = 1000
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_peg_n20.rows]]
+    M = 1.0001000000000004
+    bar = 1079
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_sma_n2]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n2.rows]]
+    M = 93.1575
+    bar = 1
+    kind = 0
+    lean = 0.75
+    own = 5.7e-14
+    q = 0.75
+    sigma = 1.6574999999999989
+    ta4j = 0.75
+    ts = 0.75
+    [[tables.pctb_sma_n2.rows]]
+    M = 94.595
+    bar = 2
+    kind = 0
+    lean = 0.25
+    own = 3.4e-13
+    q = 0.25
+    sigma = 0.21999999999999886
+    ta4j = 0.25
+    ts = 0.25
+    [[tables.pctb_sma_n2.rows]]
+    M = 94.735
+    bar = 3
+    kind = 0
+    lean = 0.75
+    own = 2.7e-13
+    q = 0.75
+    sigma = 0.35999999999999943
+    ta4j = 0.7500000000000099
+    ts = 0.75
+    [[tables.pctb_sma_n2.rows]]
+    M = 117.0625
+    bar = 100
+    kind = 0
+    lean = 0.25
+    own = 8.6e-14
+    q = 0.25
+    sigma = 1.0625
+    ta4j = 0.24999999999998998
+    ts = 0.25
+    [[tables.pctb_sma_n2.rows]]
+    M = 116.0
+    bar = 101
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_sma_n2.rows]]
+    M = 114.0
+    bar = 102
+    kind = 0
+    lean = 0.25
+    own = 4.5e-14
+    q = 0.25
+    sigma = 2.0
+    ta4j = 0.2499999999999929
+    ts = 0.25
+    [[tables.pctb_sma_n2.rows]]
+    M = 137.845
+    bar = 131
+    kind = 0
+    lean = 0.75
+    own = 4.0e-12
+    q = 0.75
+    sigma = 0.03499999999999659
+    ta4j = 0.749999999999594
+    ts = 0.75
+    [[tables.pctb_sma_n2.rows]]
+    M = 107.06
+    bar = 200
+    kind = 0
+    lean = 0.75
+    own = 1.8e-12
+    q = 0.75
+    sigma = 0.060000000000002274
+    ta4j = 0.7499999999997632
+    ts = 0.75
+    [[tables.pctb_sma_n2.rows]]
+    M = 90.905
+    bar = 213
+    kind = 0
+    lean = 0.25
+    own = 1.1e-13
+    q = 0.25
+    sigma = 0.6550000000000011
+    ta4j = 0.2499999999999783
+    ts = 0.25
+    [[tables.pctb_sma_n2.rows]]
+    M = 109.475
+    bar = 239
+    kind = 0
+    lean = 0.25
+    own = 3.8e-13
+    q = 0.25
+    sigma = 0.22500000000000142
+    ta4j = 0.24999999999994474
+    ts = 0.2500000000000079
+    [[tables.pctb_sma_n2.rows]]
+    M = 109.6
+    bar = 243
+    kind = 0
+    lean = 0.25
+    own = 2.2e-13
+    q = 0.25
+    sigma = 0.3999999999999986
+    ta4j = 0.2499999999999689
+    ts = 0.25000000000000444
+    [[tables.pctb_sma_n2.rows]]
+    M = 108.31
+    bar = 251
+    kind = 0
+    lean = 0.25
+    own = 2.0e-13
+    q = 0.25
+    sigma = 0.4399999999999977
+    ta4j = 0.2499999999999677
+    ts = 0.25
+
+[tables.pctb_sma_n20]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n20.rows]]
+    M = 92.891
+    bar = 19
+    kind = 0
+    lean = 0.20901483689438516
+    own = 2.7e-14
+    q = 0.20901483689438513
+    sigma = 2.5911974066056795
+    ta4j = 0.209014836894386
+    ts = 0.209014836894386
+    [[tables.pctb_sma_n20.rows]]
+    M = 92.73475
+    bar = 20
+    kind = 0
+    lean = 0.10497215382837104
+    own = 2.4e-14
+    q = 0.10497215382837141
+    sigma = 2.7591409328811025
+    ta4j = 0.1049721538283722
+    ts = 0.1049721538283722
+    [[tables.pctb_sma_n20.rows]]
+    M = 92.37525
+    bar = 21
+    kind = 0
+    lean = 0.09440082559314304
+    own = 2.2e-14
+    q = 0.09440082559314322
+    sigma = 2.9279213936682114
+    ta4j = 0.0944008255931441
+    ts = 0.09440082559314289
+    [[tables.pctb_sma_n20.rows]]
+    M = 86.89625
+    bar = 45
+    kind = 0
+    lean = 0.9264560593613208
+    own = 4.2e-14
+    q = 0.9264560593613214
+    sigma = 2.2591717923832175
+    ta4j = 0.9264560593613197
+    ts = 0.9264560593613181
+    [[tables.pctb_sma_n20.rows]]
+    M = 102.1975
+    bar = 90
+    kind = 0
+    lean = 1.0173037777133391
+    own = 1.2e-14
+    q = 1.0173037777133378
+    sigma = 10.053328864112624
+    ta4j = 1.0173037777133374
+    ts = 1.0173037777133378
+    [[tables.pctb_sma_n20.rows]]
+    M = 112.7695
+    bar = 100
+    kind = 0
+    lean = 0.6447646728331277
+    own = 2.0e-14
+    q = 0.6447646728331277
+    sigma = 5.578881810004582
+    ta4j = 0.6447646728331279
+    ts = 0.6447646728331267
+    [[tables.pctb_sma_n20.rows]]
+    M = 131.2025
+    bar = 139
+    kind = 0
+    lean = 0.190497856945232
+    own = 1.9e-14
+    q = 0.1904978569452321
+    sigma = 5.163534521042731
+    ta4j = 0.1904978569452325
+    ts = 0.1904978569452325
+    [[tables.pctb_sma_n20.rows]]
+    M = 123.5585
+    bar = 167
+    kind = 0
+    lean = 0.9380672436496856
+    own = 6.4e-14
+    q = 0.9380672436496865
+    sigma = 2.106697118714506
+    ta4j = 0.9380672436496885
+    ts = 0.9380672436496852
+    [[tables.pctb_sma_n20.rows]]
+    M = 116.3365
+    bar = 200
+    kind = 0
+    lean = 0.15307836107723363
+    own = 1.3e-14
+    q = 0.15307836107723372
+    sigma = 6.6416295251993684
+    ta4j = 0.15307836107723494
+    ts = 0.15307836107723494
+    [[tables.pctb_sma_n20.rows]]
+    M = 113.877
+    bar = 202
+    kind = 0
+    lean = -0.18854402820424498
+    own = 9.7e-15
+    q = -0.188544028204245
+    sigma = 8.30629526323258
+    ta4j = -0.18854402820424454
+    ts = -0.18854402820424454
+    [[tables.pctb_sma_n20.rows]]
+    M = 95.155
+    bar = 223
+    kind = 0
+    lean = 1.294567303403534
+    own = 4.4e-14
+    q = 1.294567303403535
+    sigma = 2.7640830305907955
+    ta4j = 1.2945673034035372
+    ts = 1.2945673034035345
+    [[tables.pctb_sma_n20.rows]]
+    M = 102.486
+    bar = 234
+    kind = 0
+    lean = 1.0062361752288425
+    own = 1.7e-14
+    q = 1.0062361752288422
+    sigma = 6.979943696047984
+    ta4j = 1.006236175228844
+    ts = 1.0062361752288418
+    [[tables.pctb_sma_n20.rows]]
+    M = 110.57000000000001
+    bar = 251
+    kind = 0
+    lean = 0.2761190951254525
+    own = 2.9e-14
+    q = 0.27611909512545263
+    sigma = 3.0149958540601682
+    ta4j = 0.2761190951254556
+    ts = 0.2761190951254544
+
+[tables.pctb_sma_n200]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n200.rows]]
+    M = 108.900525
+    bar = 199
+    kind = 0
+    lean = 0.4723224940794511
+    own = 5.6e-15
+    q = 0.4723224940794511
+    sigma = 17.166693103197687
+    ta4j = 0.4723224940794516
+    ts = 0.4723224940794516
+    [[tables.pctb_sma_n200.rows]]
+    M = 108.978625
+    bar = 200
+    kind = 0
+    lean = 0.47286334530794216
+    own = 5.6e-15
+    q = 0.4728633453079422
+    sigma = 17.122827233969716
+    ta4j = 0.47286334530794305
+    ts = 0.47286334530794305
+    [[tables.pctb_sma_n200.rows]]
+    M = 109.03955
+    bar = 201
+    kind = 0
+    lean = 0.470171510489566
+    own = 5.6e-15
+    q = 0.47017151048956607
+    sigma = 17.093976542849823
+    ta4j = 0.4701715104895667
+    ts = 0.4701715104895667
+    [[tables.pctb_sma_n200.rows]]
+    M = 109.0961
+    bar = 209
+    kind = 0
+    lean = 0.3189360578366667
+    own = 5.1e-15
+    q = 0.31893605783666623
+    sigma = 17.04660222859676
+    ta4j = 0.3189360578366669
+    ts = 0.3189360578366668
+    [[tables.pctb_sma_n200.rows]]
+    M = 109.0423
+    bar = 213
+    kind = 0
+    lean = 0.22508968981873076
+    own = 4.7e-15
+    q = 0.22508968981873032
+    sigma = 17.08948273675947
+    ta4j = 0.225089689818731
+    ts = 0.22508968981873034
+    [[tables.pctb_sma_n200.rows]]
+    M = 110.588525
+    bar = 234
+    kind = 0
+    lean = 0.595425125348479
+    own = 6.6e-15
+    q = 0.5954251253484789
+    sigma = 15.801590456323535
+    ta4j = 0.59542512534848
+    ts = 0.5954251253484796
+    [[tables.pctb_sma_n200.rows]]
+    M = 110.74555
+    bar = 235
+    kind = 0
+    lean = 0.6198150803644221
+    own = 6.8e-15
+    q = 0.619815080364422
+    sigma = 15.720996841724128
+    ta4j = 0.6198150803644231
+    ts = 0.6198150803644227
+    [[tables.pctb_sma_n200.rows]]
+    M = 111.787925
+    bar = 244
+    kind = 0
+    lean = 0.4718504190575557
+    own = 6.6e-15
+    q = 0.4718504190575557
+    sigma = 14.813053553179877
+    ta4j = 0.47185041905755676
+    ts = 0.47185041905755704
+    [[tables.pctb_sma_n200.rows]]
+    M = 112.063825
+    bar = 247
+    kind = 0
+    lean = 0.46032882284283205
+    own = 6.7e-15
+    q = 0.46032882284283194
+    sigma = 14.581272638023576
+    ta4j = 0.46032882284283305
+    ts = 0.4603288228428333
+    [[tables.pctb_sma_n200.rows]]
+    M = 112.44425
+    bar = 251
+    kind = 0
+    lean = 0.41969515532029855
+    own = 6.7e-15
+    q = 0.4196951553202986
+    sigma = 14.240267876254997
+    ta4j = 0.4196951553202995
+    ts = 0.4196951553202995
+
+[tables.pctb_sma_n200_k13]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n200_k13.rows]]
+    M = 108.900525
+    bar = 199
+    kind = 0
+    lean = nan
+    own = 5.5e-15
+    q = 0.7223224940794511
+    sigma = 17.166693103197687
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n200_k13.rows]]
+    M = 108.978625
+    bar = 200
+    kind = 0
+    lean = nan
+    own = 5.5e-15
+    q = 0.7228633453079423
+    sigma = 17.122827233969716
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n200_k13.rows]]
+    M = 109.03955
+    bar = 201
+    kind = 0
+    lean = nan
+    own = 5.5e-15
+    q = 0.7201715104895661
+    sigma = 17.093976542849823
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n200_k13.rows]]
+    M = 109.0423
+    bar = 213
+    kind = 0
+    lean = nan
+    own = 4.7e-15
+    q = 0.4750896898187303
+    sigma = 17.08948273675947
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n200_k13.rows]]
+    M = 109.7489
+    bar = 226
+    kind = 0
+    lean = nan
+    own = 5.7e-15
+    q = 0.6700799107879623
+    sigma = 16.419213403509925
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n200_k13.rows]]
+    M = 110.74555
+    bar = 235
+    kind = 0
+    lean = nan
+    own = 6.7e-15
+    q = 0.869815080364422
+    sigma = 15.720996841724128
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n200_k13.rows]]
+    M = 112.348975
+    bar = 250
+    kind = 0
+    lean = nan
+    own = 6.9e-15
+    q = 0.6872300515426922
+    sigma = 14.333988988567523
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n200_k13.rows]]
+    M = 112.44425
+    bar = 251
+    kind = 0
+    lean = nan
+    own = 6.8e-15
+    q = 0.6696951553202986
+    sigma = 14.240267876254997
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_sma_n200_k25_15]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n200_k25_15.rows]]
+    M = 108.900525
+    bar = 199
+    kind = 0
+    lean = nan
+    own = 5.5e-15
+    q = 0.3473224940794511
+    sigma = 17.166693103197687
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n200_k25_15.rows]]
+    M = 108.978625
+    bar = 200
+    kind = 0
+    lean = nan
+    own = 5.5e-15
+    q = 0.3478633453079422
+    sigma = 17.122827233969716
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n200_k25_15.rows]]
+    M = 109.03955
+    bar = 201
+    kind = 0
+    lean = nan
+    own = 5.5e-15
+    q = 0.34517151048956607
+    sigma = 17.093976542849823
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n200_k25_15.rows]]
+    M = 109.022675
+    bar = 202
+    kind = 0
+    lean = nan
+    own = 4.6e-15
+    q = 0.11166618479565678
+    sigma = 17.110103184065693
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n200_k25_15.rows]]
+    M = 109.0423
+    bar = 213
+    kind = 0
+    lean = nan
+    own = 4.6e-15
+    q = 0.10008968981873032
+    sigma = 17.08948273675947
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n200_k25_15.rows]]
+    M = 110.74555
+    bar = 235
+    kind = 0
+    lean = nan
+    own = 6.7e-15
+    q = 0.49481508036442196
+    sigma = 15.720996841724128
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n200_k25_15.rows]]
+    M = 112.44425
+    bar = 251
+    kind = 0
+    lean = nan
+    own = 6.6e-15
+    q = 0.2946951553202986
+    sigma = 14.240267876254997
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_sma_n20_k0]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n20_k0.rows]]
+    M = 92.891
+    bar = 19
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 2.5911974066056795
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_sma_n20_k0.rows]]
+    M = 92.73475
+    bar = 20
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 2.7591409328811025
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_sma_n20_k0.rows]]
+    M = 92.37525
+    bar = 21
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 2.9279213936682114
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_sma_n20_k0.rows]]
+    M = 112.7695
+    bar = 100
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 5.578881810004582
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_sma_n20_k0.rows]]
+    M = 116.3365
+    bar = 200
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 6.6416295251993684
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_sma_n20_k0.rows]]
+    M = 110.57000000000001
+    bar = 251
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 3.0149958540601682
+    ta4j = nan
+    ts = 0.5
+
+[tables.pctb_sma_n20_k01_02]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n20_k01_02.rows]]
+    M = 92.891
+    bar = 19
+    kind = 0
+    lean = nan
+    own = 1.0e-12
+    q = -3.2131355080748647
+    sigma = 2.5911974066056795
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k01_02.rows]]
+    M = 92.73475
+    bar = 20
+    kind = 0
+    lean = nan
+    own = 1.3e-12
+    q = -4.600371282288381
+    sigma = 2.7591409328811025
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k01_02.rows]]
+    M = 92.37525
+    bar = 21
+    kind = 0
+    lean = nan
+    own = 1.2e-12
+    q = -4.741322325424757
+    sigma = 2.9279213936682114
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k01_02.rows]]
+    M = 112.7695
+    bar = 100
+    kind = 0
+    lean = nan
+    own = 5.0e-13
+    q = 2.5968623044417014
+    sigma = 5.578881810004582
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k01_02.rows]]
+    M = 123.5585
+    bar = 167
+    kind = 0
+    lean = nan
+    own = 2.8e-12
+    q = 6.5075632486624855
+    sigma = 2.106697118714506
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k01_02.rows]]
+    M = 116.3365
+    bar = 200
+    kind = 0
+    lean = nan
+    own = 5.7e-13
+    q = -3.9589551856368836
+    sigma = 6.6416295251993684
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k01_02.rows]]
+    M = 113.877
+    bar = 202
+    kind = 0
+    lean = nan
+    own = 8.1e-13
+    q = -8.5139203760566
+    sigma = 8.30629526323258
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k01_02.rows]]
+    M = 95.155
+    bar = 223
+    kind = 0
+    lean = nan
+    own = 2.7e-12
+    q = 11.2608973787138
+    sigma = 2.7640830305907955
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k01_02.rows]]
+    M = 110.57000000000001
+    bar = 251
+    kind = 0
+    lean = nan
+    own = 8.3e-13
+    q = -2.3184120649939652
+    sigma = 3.0149958540601682
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_sma_n20_k1]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n20_k1.rows]]
+    M = 92.891
+    bar = 19
+    kind = 0
+    lean = -0.0819703262112297
+    own = 5.0e-14
+    q = -0.08197032621122971
+    sigma = 2.5911974066056795
+    ta4j = -0.08197032621122959
+    ts = -0.08197032621122959
+    [[tables.pctb_sma_n20_k1.rows]]
+    M = 92.73475
+    bar = 20
+    kind = 0
+    lean = -0.2900556923432579
+    own = 5.3e-14
+    q = -0.2900556923432572
+    sigma = 2.7591409328811025
+    ta4j = -0.2900556923432576
+    ts = -0.2900556923432576
+    [[tables.pctb_sma_n20_k1.rows]]
+    M = 92.37525
+    bar = 21
+    kind = 0
+    lean = -0.31119834881371394
+    own = 5.1e-14
+    q = -0.31119834881371355
+    sigma = 2.9279213936682114
+    ta4j = -0.3111983488137118
+    ts = -0.3111983488137142
+    [[tables.pctb_sma_n20_k1.rows]]
+    M = 86.04775
+    bar = 43
+    kind = 0
+    lean = 1.2693149103014216
+    own = 9.7e-14
+    q = 1.2693149103014223
+    sigma = 2.2047213401017367
+    ta4j = 1.2693149103014187
+    ts = 1.2693149103014154
+    [[tables.pctb_sma_n20_k1.rows]]
+    M = 102.1975
+    bar = 90
+    kind = 0
+    lean = 1.534607555426678
+    own = 2.9e-14
+    q = 1.5346075554266758
+    sigma = 10.053328864112624
+    ta4j = 1.5346075554266743
+    ts = 1.534607555426675
+    [[tables.pctb_sma_n20_k1.rows]]
+    M = 112.7695
+    bar = 100
+    kind = 0
+    lean = 0.7895293456662553
+    own = 4.2e-14
+    q = 0.7895293456662552
+    sigma = 5.578881810004582
+    ta4j = 0.7895293456662561
+    ts = 0.7895293456662529
+    [[tables.pctb_sma_n20_k1.rows]]
+    M = 123.5585
+    bar = 167
+    kind = 0
+    lean = 1.3761344872993713
+    own = 1.6e-13
+    q = 1.376134487299373
+    sigma = 2.106697118714506
+    ta4j = 1.376134487299377
+    ts = 1.3761344872993704
+    [[tables.pctb_sma_n20_k1.rows]]
+    M = 116.3365
+    bar = 200
+    kind = 0
+    lean = -0.1938432778455327
+    own = 2.6e-14
+    q = -0.1938432778455326
+    sigma = 6.6416295251993684
+    ta4j = -0.19384327784553101
+    ts = -0.19384327784553101
+    [[tables.pctb_sma_n20_k1.rows]]
+    M = 113.877
+    bar = 202
+    kind = 0
+    lean = -0.87708805640849
+    own = 2.8e-14
+    q = -0.87708805640849
+    sigma = 8.30629526323258
+    ta4j = -0.8770880564084881
+    ts = -0.8770880564084881
+    [[tables.pctb_sma_n20_k1.rows]]
+    M = 95.155
+    bar = 223
+    kind = 0
+    lean = 2.089134606807068
+    own = 1.2e-13
+    q = 2.08913460680707
+    sigma = 2.7640830305907955
+    ta4j = 2.0891346068070744
+    ts = 2.089134606807069
+    [[tables.pctb_sma_n20_k1.rows]]
+    M = 110.57000000000001
+    bar = 251
+    kind = 0
+    lean = 0.05223819025090501
+    own = 5.1e-14
+    q = 0.0522381902509052
+    sigma = 3.0149958540601682
+    ta4j = 0.052238190250912274
+    ts = 0.052238190250909915
+
+[tables.pctb_sma_n20_k13]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n20_k13.rows]]
+    M = 92.891
+    bar = 19
+    kind = 0
+    lean = nan
+    own = 3.1e-14
+    q = 0.45901483689438516
+    sigma = 2.5911974066056795
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k13.rows]]
+    M = 92.73475
+    bar = 20
+    kind = 0
+    lean = nan
+    own = 2.7e-14
+    q = 0.3549721538283714
+    sigma = 2.7591409328811025
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k13.rows]]
+    M = 92.37525
+    bar = 21
+    kind = 0
+    lean = nan
+    own = 2.5e-14
+    q = 0.3444008255931432
+    sigma = 2.9279213936682114
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k13.rows]]
+    M = 112.7695
+    bar = 100
+    kind = 0
+    lean = nan
+    own = 2.1e-14
+    q = 0.8947646728331277
+    sigma = 5.578881810004582
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k13.rows]]
+    M = 131.2025
+    bar = 139
+    kind = 0
+    lean = nan
+    own = 2.1e-14
+    q = 0.44049785694523214
+    sigma = 5.163534521042731
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k13.rows]]
+    M = 123.5585
+    bar = 167
+    kind = 0
+    lean = nan
+    own = 7.0e-14
+    q = 1.1880672436496864
+    sigma = 2.106697118714506
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k13.rows]]
+    M = 116.3365
+    bar = 200
+    kind = 0
+    lean = nan
+    own = 1.4e-14
+    q = 0.4030783610772337
+    sigma = 6.6416295251993684
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k13.rows]]
+    M = 113.877
+    bar = 202
+    kind = 0
+    lean = nan
+    own = 8.5e-15
+    q = 0.061455971795755
+    sigma = 8.30629526323258
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k13.rows]]
+    M = 95.155
+    bar = 223
+    kind = 0
+    lean = nan
+    own = 4.7e-14
+    q = 1.544567303403535
+    sigma = 2.7640830305907955
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k13.rows]]
+    M = 110.57000000000001
+    bar = 251
+    kind = 0
+    lean = nan
+    own = 3.3e-14
+    q = 0.5261190951254526
+    sigma = 3.0149958540601682
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_sma_n20_k25]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n20_k25.rows]]
+    M = 92.891
+    bar = 19
+    kind = 0
+    lean = 0.2672118695155081
+    own = 2.3e-14
+    q = 0.2672118695155081
+    sigma = 2.5911974066056795
+    ta4j = 0.2672118695155089
+    ts = 0.2672118695155089
+    [[tables.pctb_sma_n20_k25.rows]]
+    M = 92.73475
+    bar = 20
+    kind = 0
+    lean = 0.18397772306269683
+    own = 2.0e-14
+    q = 0.18397772306269713
+    sigma = 2.7591409328811025
+    ta4j = 0.1839777230626979
+    ts = 0.1839777230626979
+    [[tables.pctb_sma_n20_k25.rows]]
+    M = 92.37525
+    bar = 21
+    kind = 0
+    lean = 0.17552066047451442
+    own = 1.9e-14
+    q = 0.1755206604745146
+    sigma = 2.9279213936682114
+    ta4j = 0.17552066047451464
+    ts = 0.17552066047451367
+    [[tables.pctb_sma_n20_k25.rows]]
+    M = 102.1975
+    bar = 90
+    kind = 0
+    lean = 0.9138430221706713
+    own = 9.1e-15
+    q = 0.9138430221706704
+    sigma = 10.053328864112624
+    ta4j = 0.91384302217067
+    ts = 0.91384302217067
+    [[tables.pctb_sma_n20_k25.rows]]
+    M = 112.7695
+    bar = 100
+    kind = 0
+    lean = 0.6158117382665022
+    own = 1.6e-14
+    q = 0.6158117382665022
+    sigma = 5.578881810004582
+    ta4j = 0.6158117382665023
+    ts = 0.6158117382665013
+    [[tables.pctb_sma_n20_k25.rows]]
+    M = 131.2025
+    bar = 139
+    kind = 0
+    lean = 0.2523982855561856
+    own = 1.6e-14
+    q = 0.2523982855561857
+    sigma = 5.163534521042731
+    ta4j = 0.2523982855561863
+    ts = 0.2523982855561863
+    [[tables.pctb_sma_n20_k25.rows]]
+    M = 123.5585
+    bar = 167
+    kind = 0
+    lean = 0.8504537949197485
+    own = 5.0e-14
+    q = 0.8504537949197492
+    sigma = 2.106697118714506
+    ta4j = 0.8504537949197502
+    ts = 0.8504537949197475
+    [[tables.pctb_sma_n20_k25.rows]]
+    M = 116.3365
+    bar = 200
+    kind = 0
+    lean = 0.2224626888617869
+    own = 1.1e-14
+    q = 0.22246268886178697
+    sigma = 6.6416295251993684
+    ta4j = 0.22246268886178783
+    ts = 0.22246268886178783
+    [[tables.pctb_sma_n20_k25.rows]]
+    M = 113.877
+    bar = 202
+    kind = 0
+    lean = -0.05083522256339598
+    own = 7.1e-15
+    q = -0.050835222563396
+    sigma = 8.30629526323258
+    ta4j = -0.05083522256339558
+    ts = -0.05083522256339558
+    [[tables.pctb_sma_n20_k25.rows]]
+    M = 94.9675
+    bar = 220
+    kind = 0
+    lean = 0.47922826468777086
+    own = 2.0e-14
+    q = 0.4792282646877711
+    sigma = 3.3458928180681458
+    ta4j = 0.47922826468777274
+    ts = 0.47922826468777274
+    [[tables.pctb_sma_n20_k25.rows]]
+    M = 95.155
+    bar = 223
+    kind = 0
+    lean = 1.1356538427228273
+    own = 3.3e-14
+    q = 1.135653842722828
+    sigma = 2.7640830305907955
+    ta4j = 1.1356538427228298
+    ts = 1.1356538427228278
+    [[tables.pctb_sma_n20_k25.rows]]
+    M = 97.758
+    bar = 228
+    kind = 0
+    lean = 0.7458155670427681
+    own = 1.6e-14
+    q = 0.7458155670427681
+    sigma = 5.233191760293138
+    ta4j = 0.7458155670427695
+    ts = 0.7458155670427684
+    [[tables.pctb_sma_n20_k25.rows]]
+    M = 110.57000000000001
+    bar = 251
+    kind = 0
+    lean = 0.320895276100362
+    own = 2.4e-14
+    q = 0.32089527610036206
+    sigma = 3.0149958540601682
+    ta4j = 0.32089527610036456
+    ts = 0.3208952761003636
+
+[tables.pctb_sma_n20_k25_15]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n20_k25_15.rows]]
+    M = 92.891
+    bar = 19
+    kind = 0
+    lean = nan
+    own = 2.6e-14
+    q = 0.08401483689438514
+    sigma = 2.5911974066056795
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k25_15.rows]]
+    M = 92.73475
+    bar = 20
+    kind = 0
+    lean = nan
+    own = 2.3e-14
+    q = -0.020027846171628592
+    sigma = 2.7591409328811025
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k25_15.rows]]
+    M = 92.37525
+    bar = 21
+    kind = 0
+    lean = nan
+    own = 2.2e-14
+    q = -0.030599174406856774
+    sigma = 2.9279213936682114
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k25_15.rows]]
+    M = 112.7695
+    bar = 100
+    kind = 0
+    lean = nan
+    own = 1.9e-14
+    q = 0.5197646728331277
+    sigma = 5.578881810004582
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k25_15.rows]]
+    M = 131.19650000000001
+    bar = 140
+    kind = 0
+    lean = nan
+    own = 1.8e-14
+    q = -0.02112050362943823
+    sigma = 5.172983930962862
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k25_15.rows]]
+    M = 123.5585
+    bar = 167
+    kind = 0
+    lean = nan
+    own = 6.2e-14
+    q = 0.8130672436496865
+    sigma = 2.106697118714506
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k25_15.rows]]
+    M = 116.3365
+    bar = 200
+    kind = 0
+    lean = nan
+    own = 1.2e-14
+    q = 0.0280783610772337
+    sigma = 6.6416295251993684
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k25_15.rows]]
+    M = 113.877
+    bar = 202
+    kind = 0
+    lean = nan
+    own = 1.1e-14
+    q = -0.313544028204245
+    sigma = 8.30629526323258
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k25_15.rows]]
+    M = 95.155
+    bar = 223
+    kind = 0
+    lean = nan
+    own = 4.2e-14
+    q = 1.169567303403535
+    sigma = 2.7640830305907955
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_k25_15.rows]]
+    M = 110.57000000000001
+    bar = 251
+    kind = 0
+    lean = nan
+    own = 2.7e-14
+    q = 0.1511190951254526
+    sigma = 3.0149958540601682
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_sma_n20_km1_2]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n20_km1_2.rows]]
+    M = 92.891
+    bar = 19
+    kind = 0
+    lean = nan
+    own = 1.5e-13
+    q = 0.8360593475775405
+    sigma = 2.5911974066056795
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_km1_2.rows]]
+    M = 92.73475
+    bar = 20
+    kind = 0
+    lean = nan
+    own = 1.1e-13
+    q = 0.41988861531348565
+    sigma = 2.7591409328811025
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_km1_2.rows]]
+    M = 92.37525
+    bar = 21
+    kind = 0
+    lean = nan
+    own = 1.1e-13
+    q = 0.3776033023725729
+    sigma = 2.9279213936682114
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_km1_2.rows]]
+    M = 91.0225
+    bar = 77
+    kind = 0
+    lean = nan
+    own = 1.9e-13
+    q = 4.752979717263658
+    sigma = 5.055431361417144
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_km1_2.rows]]
+    M = 112.7695
+    bar = 100
+    kind = 0
+    lean = nan
+    own = 1.4e-13
+    q = 2.5790586913325106
+    sigma = 5.578881810004582
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_km1_2.rows]]
+    M = 123.5585
+    bar = 167
+    kind = 0
+    lean = nan
+    own = 5.4e-13
+    q = 3.752268974598746
+    sigma = 2.106697118714506
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_km1_2.rows]]
+    M = 116.3365
+    bar = 200
+    kind = 0
+    lean = nan
+    own = 6.1e-14
+    q = 0.6123134443089349
+    sigma = 6.6416295251993684
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_km1_2.rows]]
+    M = 113.877
+    bar = 202
+    kind = 0
+    lean = nan
+    own = 4.8e-14
+    q = -0.75417611281698
+    sigma = 8.30629526323258
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_km1_2.rows]]
+    M = 95.155
+    bar = 223
+    kind = 0
+    lean = nan
+    own = 4.0e-13
+    q = 5.17826921361414
+    sigma = 2.7640830305907955
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_km1_2.rows]]
+    M = 110.57000000000001
+    bar = 251
+    kind = 0
+    lean = nan
+    own = 1.7e-13
+    q = 1.1044763805018105
+    sigma = 3.0149958540601682
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_sma_n20_km2_2]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n20_km2_2.rows]]
+    M = 92.891
+    bar = 19
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 2.5911974066056795
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_km2_2.rows]]
+    M = 92.73475
+    bar = 20
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 2.7591409328811025
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_km2_2.rows]]
+    M = 92.37525
+    bar = 21
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 2.9279213936682114
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_km2_2.rows]]
+    M = 112.7695
+    bar = 100
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 5.578881810004582
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_km2_2.rows]]
+    M = 116.3365
+    bar = 200
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 6.6416295251993684
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n20_km2_2.rows]]
+    M = 110.57000000000001
+    bar = 251
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 3.0149958540601682
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_sma_n20_km2_m2]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n20_km2_m2.rows]]
+    M = 92.891
+    bar = 19
+    kind = 0
+    lean = 0.7909851631056148
+    own = 3.7e-14
+    q = 0.7909851631056148
+    sigma = 2.5911974066056795
+    ta4j = 0.790985163105614
+    ts = 0.790985163105614
+    [[tables.pctb_sma_n20_km2_m2.rows]]
+    M = 92.73475
+    bar = 20
+    kind = 0
+    lean = 0.895027846171629
+    own = 3.6e-14
+    q = 0.8950278461716286
+    sigma = 2.7591409328811025
+    ta4j = 0.8950278461716278
+    ts = 0.8950278461716278
+    [[tables.pctb_sma_n20_km2_m2.rows]]
+    M = 92.37525
+    bar = 21
+    kind = 0
+    lean = 0.905599174406857
+    own = 3.4e-14
+    q = 0.9055991744068568
+    sigma = 2.9279213936682114
+    ta4j = 0.9055991744068559
+    ts = 0.9055991744068571
+    [[tables.pctb_sma_n20_km2_m2.rows]]
+    M = 86.89625
+    bar = 45
+    kind = 0
+    lean = 0.0735439406386792
+    own = 2.8e-14
+    q = 0.07354394063867861
+    sigma = 2.2591717923832175
+    ta4j = 0.07354394063868032
+    ts = 0.07354394063868189
+    [[tables.pctb_sma_n20_km2_m2.rows]]
+    M = 102.1975
+    bar = 90
+    kind = 0
+    lean = -0.01730377771333907
+    own = 7.4e-15
+    q = -0.0173037777133379
+    sigma = 10.053328864112624
+    ta4j = -0.01730377771333746
+    ts = -0.017303777713337815
+    [[tables.pctb_sma_n20_km2_m2.rows]]
+    M = 112.7695
+    bar = 100
+    kind = 0
+    lean = 0.35523532716687234
+    own = 1.7e-14
+    q = 0.3552353271668724
+    sigma = 5.578881810004582
+    ta4j = 0.3552353271668721
+    ts = 0.3552353271668734
+    [[tables.pctb_sma_n20_km2_m2.rows]]
+    M = 119.9395
+    bar = 123
+    kind = 0
+    lean = -0.05476556356396914
+    own = 2.1e-14
+    q = -0.05476556356396865
+    sigma = 4.195691212422573
+    ta4j = -0.054765563563969756
+    ts = -0.054765563563969756
+    [[tables.pctb_sma_n20_km2_m2.rows]]
+    M = 122.8615
+    bar = 165
+    kind = 0
+    lean = 0.4645850134632203
+    own = 4.7e-14
+    q = 0.46458501346322056
+    sigma = 2.3189335372105857
+    ta4j = 0.46458501346321807
+    ts = 0.4645850134632211
+    [[tables.pctb_sma_n20_km2_m2.rows]]
+    M = 116.3365
+    bar = 200
+    kind = 0
+    lean = 0.8469216389227664
+    own = 1.8e-14
+    q = 0.8469216389227663
+    sigma = 6.6416295251993684
+    ta4j = 0.8469216389227651
+    ts = 0.8469216389227651
+    [[tables.pctb_sma_n20_km2_m2.rows]]
+    M = 113.877
+    bar = 202
+    kind = 0
+    lean = 1.188544028204245
+    own = 1.6e-14
+    q = 1.188544028204245
+    sigma = 8.30629526323258
+    ta4j = 1.1885440282042445
+    ts = 1.1885440282042445
+    [[tables.pctb_sma_n20_km2_m2.rows]]
+    M = 95.155
+    bar = 223
+    kind = 0
+    lean = -0.29456730340353404
+    own = 2.9e-14
+    q = -0.29456730340353504
+    sigma = 2.7640830305907955
+    ta4j = -0.2945673034035372
+    ts = -0.2945673034035346
+    [[tables.pctb_sma_n20_km2_m2.rows]]
+    M = 102.486
+    bar = 234
+    kind = 0
+    lean = -0.006236175228842532
+    own = 1.1e-14
+    q = -0.006236175228842313
+    sigma = 6.979943696047984
+    ta4j = -0.006236175228843899
+    ts = -0.006236175228841863
+    [[tables.pctb_sma_n20_km2_m2.rows]]
+    M = 110.57000000000001
+    bar = 251
+    kind = 0
+    lean = 0.7238809048745475
+    own = 3.7e-14
+    q = 0.7238809048745474
+    sigma = 3.0149958540601682
+    ta4j = 0.7238809048745444
+    ts = 0.7238809048745456
+
+[tables.pctb_sma_n20_kmax]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n20_kmax.rows]]
+    M = 92.891
+    bar = 19
+    kind = 0
+    lean = nan
+    own = 1.4e-15
+    q = 0.5
+    sigma = 2.5911974066056795
+    ta4j = 0.5
+    ts = 0.5
+    [[tables.pctb_sma_n20_kmax.rows]]
+    M = 92.73475
+    bar = 20
+    kind = 0
+    lean = nan
+    own = 1.4e-15
+    q = 0.5
+    sigma = 2.7591409328811025
+    ta4j = 0.5
+    ts = 0.5
+    [[tables.pctb_sma_n20_kmax.rows]]
+    M = 92.37525
+    bar = 21
+    kind = 0
+    lean = nan
+    own = 1.4e-15
+    q = 0.5
+    sigma = 2.9279213936682114
+    ta4j = 0.5
+    ts = 0.5
+    [[tables.pctb_sma_n20_kmax.rows]]
+    M = 90.77674999999999
+    bar = 24
+    kind = 0
+    lean = nan
+    own = 1.4e-15
+    q = 0.5
+    sigma = 4.070222744211918
+    ta4j = 0.5
+    ts = 0.5
+    [[tables.pctb_sma_n20_kmax.rows]]
+    M = 112.7695
+    bar = 100
+    kind = 0
+    lean = nan
+    own = 1.4e-15
+    q = 0.5
+    sigma = 5.578881810004582
+    ta4j = 0.5
+    ts = 0.5
+    [[tables.pctb_sma_n20_kmax.rows]]
+    M = 116.3365
+    bar = 200
+    kind = 0
+    lean = nan
+    own = 1.4e-15
+    q = 0.5
+    sigma = 6.6416295251993684
+    ta4j = 0.5
+    ts = 0.5
+    [[tables.pctb_sma_n20_kmax.rows]]
+    M = 110.57000000000001
+    bar = 251
+    kind = 0
+    lean = nan
+    own = 1.4e-15
+    q = 0.5
+    sigma = 3.0149958540601682
+    ta4j = 0.5
+    ts = 0.5
+
+[tables.pctb_sma_n20_kmin]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n20_kmin.rows]]
+    M = 92.891
+    bar = 19
+    kind = 0
+    lean = nan
+    own = 1.4e-15
+    q = 0.5
+    sigma = 2.5911974066056795
+    ta4j = 0.5
+    ts = 0.5
+    [[tables.pctb_sma_n20_kmin.rows]]
+    M = 92.73475
+    bar = 20
+    kind = 0
+    lean = nan
+    own = 1.4e-15
+    q = 0.5
+    sigma = 2.7591409328811025
+    ta4j = 0.5
+    ts = 0.5
+    [[tables.pctb_sma_n20_kmin.rows]]
+    M = 92.37525
+    bar = 21
+    kind = 0
+    lean = nan
+    own = 1.4e-15
+    q = 0.5
+    sigma = 2.9279213936682114
+    ta4j = 0.5
+    ts = 0.5
+    [[tables.pctb_sma_n20_kmin.rows]]
+    M = 90.77674999999999
+    bar = 24
+    kind = 0
+    lean = nan
+    own = 1.4e-15
+    q = 0.5
+    sigma = 4.070222744211918
+    ta4j = 0.5
+    ts = 0.5
+    [[tables.pctb_sma_n20_kmin.rows]]
+    M = 112.7695
+    bar = 100
+    kind = 0
+    lean = nan
+    own = 1.4e-15
+    q = 0.5
+    sigma = 5.578881810004582
+    ta4j = 0.5
+    ts = 0.5
+    [[tables.pctb_sma_n20_kmin.rows]]
+    M = 116.3365
+    bar = 200
+    kind = 0
+    lean = nan
+    own = 1.4e-15
+    q = 0.5
+    sigma = 6.6416295251993684
+    ta4j = 0.5
+    ts = 0.5
+    [[tables.pctb_sma_n20_kmin.rows]]
+    M = 110.57000000000001
+    bar = 251
+    kind = 0
+    lean = nan
+    own = 1.4e-15
+    q = 0.5
+    sigma = 3.0149958540601682
+    ta4j = 0.5
+    ts = 0.5
+
+[tables.pctb_sma_n20_s100]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n20_s100.rows]]
+    M = 112.7695
+    bar = 100
+    kind = 0
+    lean = 0.6447646728331277
+    own = 2.0e-14
+    q = 0.6447646728331277
+    sigma = 5.578881810004582
+    ta4j = 0.6447646728331279
+    ts = 0.6447646728331267
+    [[tables.pctb_sma_n20_s100.rows]]
+    M = 113.33975
+    bar = 101
+    kind = 0
+    lean = 0.6257312107116452
+    own = 2.1e-14
+    q = 0.6257312107116452
+    sigma = 5.289557749708382
+    ta4j = 0.6257312107116447
+    ts = 0.6257312107116447
+    [[tables.pctb_sma_n20_s100.rows]]
+    M = 113.6335
+    bar = 102
+    kind = 0
+    lean = 0.4189391377772081
+    own = 2.0e-14
+    q = 0.41893913777720804
+    sigma = 5.037881275893667
+    ta4j = 0.41893913777720815
+    ts = 0.41893913777720815
+    [[tables.pctb_sma_n20_s100.rows]]
+    M = 131.2025
+    bar = 139
+    kind = 0
+    lean = 0.190497856945232
+    own = 1.9e-14
+    q = 0.1904978569452321
+    sigma = 5.163534521042731
+    ta4j = 0.1904978569452325
+    ts = 0.1904978569452325
+    [[tables.pctb_sma_n20_s100.rows]]
+    M = 123.5585
+    bar = 167
+    kind = 0
+    lean = 0.9380672436496856
+    own = 6.4e-14
+    q = 0.9380672436496865
+    sigma = 2.106697118714506
+    ta4j = 0.9380672436496885
+    ts = 0.9380672436496852
+    [[tables.pctb_sma_n20_s100.rows]]
+    M = 124.45100000000001
+    bar = 170
+    kind = 0
+    lean = 1.1370463136960411
+    own = 5.0e-14
+    q = 1.1370463136960398
+    sigma = 2.9625004641349855
+    ta4j = 1.1370463136960423
+    ts = 1.1370463136960396
+    [[tables.pctb_sma_n20_s100.rows]]
+    M = 116.3365
+    bar = 200
+    kind = 0
+    lean = 0.15307836107723363
+    own = 1.3e-14
+    q = 0.15307836107723372
+    sigma = 6.6416295251993684
+    ta4j = 0.15307836107723494
+    ts = 0.15307836107723494
+    [[tables.pctb_sma_n20_s100.rows]]
+    M = 113.877
+    bar = 202
+    kind = 0
+    lean = -0.18854402820424498
+    own = 9.7e-15
+    q = -0.188544028204245
+    sigma = 8.30629526323258
+    ta4j = -0.18854402820424454
+    ts = -0.18854402820424454
+    [[tables.pctb_sma_n20_s100.rows]]
+    M = 94.9675
+    bar = 220
+    kind = 0
+    lean = 0.4740353308597136
+    own = 2.5e-14
+    q = 0.47403533085971383
+    sigma = 3.3458928180681458
+    ta4j = 0.47403533085971594
+    ts = 0.47403533085971594
+    [[tables.pctb_sma_n20_s100.rows]]
+    M = 95.155
+    bar = 223
+    kind = 0
+    lean = 1.294567303403534
+    own = 4.4e-14
+    q = 1.294567303403535
+    sigma = 2.7640830305907955
+    ta4j = 1.2945673034035372
+    ts = 1.2945673034035345
+    [[tables.pctb_sma_n20_s100.rows]]
+    M = 102.486
+    bar = 234
+    kind = 0
+    lean = 1.0062361752288425
+    own = 1.7e-14
+    q = 1.0062361752288422
+    sigma = 6.979943696047984
+    ta4j = 1.006236175228844
+    ts = 1.0062361752288418
+    [[tables.pctb_sma_n20_s100.rows]]
+    M = 110.57000000000001
+    bar = 251
+    kind = 0
+    lean = 0.2761190951254525
+    own = 2.9e-14
+    q = 0.27611909512545263
+    sigma = 3.0149958540601682
+    ta4j = 0.2761190951254556
+    ts = 0.2761190951254544
+
+[tables.pctb_sma_n20_s251]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n20_s251.rows]]
+    M = 110.57000000000001
+    bar = 251
+    kind = 0
+    lean = 0.2761190951254525
+    own = 2.9e-14
+    q = 0.27611909512545263
+    sigma = 3.0149958540601682
+    ta4j = 0.2761190951254556
+    ts = 0.2761190951254544
+
+[tables.pctb_sma_n2_k1]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n2_k1.rows]]
+    M = 93.1575
+    bar = 1
+    kind = 0
+    lean = 1.0
+    own = 1.3e-13
+    q = 1.0
+    sigma = 1.6574999999999989
+    ta4j = 1.0
+    ts = 1.0
+    [[tables.pctb_sma_n2_k1.rows]]
+    M = 94.595
+    bar = 2
+    kind = 0
+    lean = 0.0
+    own = 5.8e-13
+    q = 0.0
+    sigma = 0.21999999999999886
+    ta4j = 0.0
+    ts = 0.0
+    [[tables.pctb_sma_n2_k1.rows]]
+    M = 94.735
+    bar = 3
+    kind = 0
+    lean = 1.0
+    own = 5.9e-13
+    q = 1.0
+    sigma = 0.35999999999999943
+    ta4j = 1.0000000000000198
+    ts = 1.0
+    [[tables.pctb_sma_n2_k1.rows]]
+    M = 117.0625
+    bar = 100
+    kind = 0
+    lean = 0.0
+    own = 1.5e-13
+    q = 0.0
+    sigma = 1.0625
+    ta4j = -2.0062383127344007e-14
+    ts = 0.0
+    [[tables.pctb_sma_n2_k1.rows]]
+    M = 116.0
+    bar = 101
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_sma_n2_k1.rows]]
+    M = 114.0
+    bar = 102
+    kind = 0
+    lean = 0.0
+    own = 7.6e-14
+    q = 0.0
+    sigma = 2.0
+    ta4j = -1.4210854715202004e-14
+    ts = 0.0
+    [[tables.pctb_sma_n2_k1.rows]]
+    M = 137.845
+    bar = 131
+    kind = 0
+    lean = 1.0
+    own = 8.8e-12
+    q = 1.0
+    sigma = 0.03499999999999659
+    ta4j = 0.999999999999188
+    ts = 1.0
+    [[tables.pctb_sma_n2_k1.rows]]
+    M = 107.06
+    bar = 200
+    kind = 0
+    lean = 1.0
+    own = 4.0e-12
+    q = 1.0
+    sigma = 0.060000000000002274
+    ta4j = 0.9999999999995263
+    ts = 1.0
+    [[tables.pctb_sma_n2_k1.rows]]
+    M = 90.905
+    bar = 213
+    kind = 0
+    lean = 0.0
+    own = 1.9e-13
+    q = 0.0
+    sigma = 0.6550000000000011
+    ta4j = -4.339192279450986e-14
+    ts = 0.0
+    [[tables.pctb_sma_n2_k1.rows]]
+    M = 109.6
+    bar = 243
+    kind = 0
+    lean = 0.0
+    own = 3.7e-13
+    q = 0.0
+    sigma = 0.3999999999999986
+    ta4j = -5.3290705182006757e-14
+    ts = 1.7763568394002252e-14
+    [[tables.pctb_sma_n2_k1.rows]]
+    M = 108.31
+    bar = 251
+    kind = 0
+    lean = 0.0
+    own = 3.3e-13
+    q = 0.0
+    sigma = 0.4399999999999977
+    ta4j = -6.459479416000944e-14
+    ts = 0.0
+
+[tables.pctb_sma_n2_k13]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n2_k13.rows]]
+    M = 93.1575
+    bar = 1
+    kind = 0
+    lean = nan
+    own = 6.2e-14
+    q = 1.0
+    sigma = 1.6574999999999989
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n2_k13.rows]]
+    M = 94.595
+    bar = 2
+    kind = 0
+    lean = nan
+    own = 3.9e-13
+    q = 0.5
+    sigma = 0.21999999999999886
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n2_k13.rows]]
+    M = 94.735
+    bar = 3
+    kind = 0
+    lean = nan
+    own = 3.0e-13
+    q = 1.0
+    sigma = 0.35999999999999943
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n2_k13.rows]]
+    M = 117.0625
+    bar = 100
+    kind = 0
+    lean = nan
+    own = 9.7e-14
+    q = 0.5
+    sigma = 1.0625
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n2_k13.rows]]
+    M = 116.0
+    bar = 101
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n2_k13.rows]]
+    M = 114.0
+    bar = 102
+    kind = 0
+    lean = nan
+    own = 5.0e-14
+    q = 0.5
+    sigma = 2.0
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n2_k13.rows]]
+    M = 137.845
+    bar = 131
+    kind = 0
+    lean = nan
+    own = 4.4e-12
+    q = 1.0
+    sigma = 0.03499999999999659
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n2_k13.rows]]
+    M = 107.06
+    bar = 200
+    kind = 0
+    lean = nan
+    own = 2.0e-12
+    q = 1.0
+    sigma = 0.060000000000002274
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n2_k13.rows]]
+    M = 109.475
+    bar = 239
+    kind = 0
+    lean = nan
+    own = 4.4e-13
+    q = 0.5
+    sigma = 0.22500000000000142
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n2_k13.rows]]
+    M = 108.31
+    bar = 251
+    kind = 0
+    lean = nan
+    own = 2.2e-13
+    q = 0.5
+    sigma = 0.4399999999999977
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_sma_n2_k25_15]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n2_k25_15.rows]]
+    M = 93.1575
+    bar = 1
+    kind = 0
+    lean = nan
+    own = 5.4e-14
+    q = 0.625
+    sigma = 1.6574999999999989
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n2_k25_15.rows]]
+    M = 94.595
+    bar = 2
+    kind = 0
+    lean = nan
+    own = 3.2e-13
+    q = 0.125
+    sigma = 0.21999999999999886
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n2_k25_15.rows]]
+    M = 94.735
+    bar = 3
+    kind = 0
+    lean = nan
+    own = 2.5e-13
+    q = 0.625
+    sigma = 0.35999999999999943
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n2_k25_15.rows]]
+    M = 117.0625
+    bar = 100
+    kind = 0
+    lean = nan
+    own = 8.0e-14
+    q = 0.125
+    sigma = 1.0625
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n2_k25_15.rows]]
+    M = 116.0
+    bar = 101
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n2_k25_15.rows]]
+    M = 114.0
+    bar = 102
+    kind = 0
+    lean = nan
+    own = 4.2e-14
+    q = 0.125
+    sigma = 2.0
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n2_k25_15.rows]]
+    M = 137.845
+    bar = 131
+    kind = 0
+    lean = nan
+    own = 3.8e-12
+    q = 0.625
+    sigma = 0.03499999999999659
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n2_k25_15.rows]]
+    M = 130.97
+    bar = 177
+    kind = 0
+    lean = nan
+    own = 9.8e-14
+    q = 0.125
+    sigma = 0.9699999999999989
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n2_k25_15.rows]]
+    M = 107.06
+    bar = 200
+    kind = 0
+    lean = nan
+    own = 1.7e-12
+    q = 0.625
+    sigma = 0.060000000000002274
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n2_k25_15.rows]]
+    M = 108.31
+    bar = 251
+    kind = 0
+    lean = nan
+    own = 1.8e-13
+    q = 0.125
+    sigma = 0.4399999999999977
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_sma_n5]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n5.rows]]
+    M = 93.913
+    bar = 4
+    kind = 0
+    lean = 0.47413751814102456
+    own = 6.5e-14
+    q = 0.4741375181410249
+    sigma = 1.285646141051261
+    ta4j = 0.47413751814102817
+    ts = 0.47413751814102817
+    [[tables.pctb_sma_n5.rows]]
+    M = 94.538
+    bar = 5
+    kind = 0
+    lean = 0.5487398705776962
+    own = 2.0e-13
+    q = 0.5487398705776966
+    sigma = 0.44624656861425743
+    ta4j = 0.5487398705777062
+    ts = 0.5487398705777062
+    [[tables.pctb_sma_n5.rows]]
+    M = 94.081
+    bar = 6
+    kind = 0
+    lean = 0.061340149179918216
+    own = 7.4e-14
+    q = 0.06134014917991826
+    sigma = 0.8839423058096035
+    ta4j = 0.061340149179921956
+    ts = 0.061340149179921956
+    [[tables.pctb_sma_n5.rows]]
+    M = 92.838
+    bar = 10
+    kind = 0
+    lean = 0.9404038927788582
+    own = 5.5e-14
+    q = 0.9404038927788569
+    sigma = 1.8659008548151754
+    ta4j = 0.9404038927788564
+    ts = 0.9404038927788564
+    [[tables.pctb_sma_n5.rows]]
+    M = 87.326
+    bar = 75
+    kind = 0
+    lean = 0.9930796653610933
+    own = 2.0e-14
+    q = 0.9930796653610935
+    sigma = 5.031641282921508
+    ta4j = 0.9930796653610947
+    ts = 0.993079665361094
+    [[tables.pctb_sma_n5.rows]]
+    M = 114.357
+    bar = 100
+    kind = 0
+    lean = 0.6491829902003842
+    own = 4.0e-14
+    q = 0.6491829902003841
+    sigma = 2.7533299838559127
+    ta4j = 0.6491829902003827
+    ts = 0.6491829902003841
+    [[tables.pctb_sma_n5.rows]]
+    M = 122.91
+    bar = 121
+    kind = 0
+    lean = 0.2237423639078862
+    own = 3.0e-13
+    q = 0.22374236390788738
+    sigma = 0.31673332631726736
+    ta4j = 0.22374236390785998
+    ts = 0.22374236390789362
+    [[tables.pctb_sma_n5.rows]]
+    M = 133.476
+    bar = 176
+    kind = 0
+    lean = 0.187167771096821
+    own = 8.2e-14
+    q = 0.18716777109682045
+    sigma = 1.2274950101731588
+    ta4j = 0.18716777109680857
+    ts = 0.18716777109681434
+    [[tables.pctb_sma_n5.rows]]
+    M = 132.526
+    bar = 177
+    kind = 0
+    lean = 0.11540661252764711
+    own = 5.8e-14
+    q = 0.11540661252764806
+    sigma = 1.6419939098547234
+    ta4j = 0.11540661252763662
+    ts = 0.11540661252764528
+    [[tables.pctb_sma_n5.rows]]
+    M = 128.912
+    bar = 180
+    kind = 0
+    lean = 0.3092946283437111
+    own = 4.4e-14
+    q = 0.3092946283437112
+    sigma = 2.3491734716704054
+    ta4j = 0.3092946283437009
+    ts = 0.30929462834371
+    [[tables.pctb_sma_n5.rows]]
+    M = 106.81
+    bar = 200
+    kind = 0
+    lean = 0.5830467314196386
+    own = 1.1e-13
+    q = 0.5830467314196391
+    sigma = 0.9332095155965786
+    ta4j = 0.5830467314196237
+    ts = 0.5830467314196428
+    [[tables.pctb_sma_n5.rows]]
+    M = 103.998
+    bar = 202
+    kind = 0
+    lean = 0.0006218403462696088
+    own = 1.1e-14
+    q = 0.0006218403462698468
+    sigma = 6.507092745612284
+    ta4j = 0.0006218403462680316
+    ts = 0.0006218403462696695
+    [[tables.pctb_sma_n5.rows]]
+    M = 109.036
+    bar = 251
+    kind = 0
+    lean = 0.09193995528346366
+    own = 1.1e-13
+    q = 0.09193995528346428
+    sigma = 0.7143556537187892
+    ta4j = 0.09193995528345511
+    ts = 0.09193995528346008
+
+[tables.pctb_sma_n50]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n50.rows]]
+    M = 89.3268
+    bar = 49
+    kind = 0
+    lean = 0.574305803855504
+    own = 2.1e-14
+    q = 0.5743058038555041
+    sigma = 3.947201763274839
+    ta4j = 0.5743058038555046
+    ts = 0.5743058038555046
+    [[tables.pctb_sma_n50.rows]]
+    M = 89.2774
+    bar = 50
+    kind = 0
+    lean = 0.4842826128209183
+    own = 2.0e-14
+    q = 0.4842826128209184
+    sigma = 3.935132429791912
+    ta4j = 0.4842826128209193
+    ts = 0.4842826128209193
+    [[tables.pctb_sma_n50.rows]]
+    M = 89.1574
+    bar = 51
+    kind = 0
+    lean = 0.4777956826063675
+    own = 2.1e-14
+    q = 0.47779568260636734
+    sigma = 3.8551061256468673
+    ta4j = 0.47779568260636857
+    ts = 0.47779568260636857
+    [[tables.pctb_sma_n50.rows]]
+    M = 88.7236
+    bar = 53
+    kind = 0
+    lean = 0.15752586474406882
+    own = 1.7e-14
+    q = 0.1575258647440687
+    sigma = 3.8131346737297385
+    ta4j = 0.1575258647440699
+    ts = 0.157525864744069
+    [[tables.pctb_sma_n50.rows]]
+    M = 87.5212
+    bar = 63
+    kind = 0
+    lean = 0.847636533892122
+    own = 3.3e-14
+    q = 0.8476365338921222
+    sigma = 2.861321820417969
+    ta4j = 0.8476365338921263
+    ts = 0.8476365338921177
+    [[tables.pctb_sma_n50.rows]]
+    M = 87.69069999999999
+    bar = 74
+    kind = 0
+    lean = 0.3552769493114835
+    own = 2.4e-14
+    q = 0.35527694931148324
+    sigma = 3.024224530354848
+    ta4j = 0.3552769493114886
+    ts = 0.35527694931148157
+    [[tables.pctb_sma_n50.rows]]
+    M = 88.0082
+    bar = 75
+    kind = 0
+    lean = 1.2279049576103735
+    own = 3.5e-14
+    q = 1.2279049576103744
+    sigma = 3.1741094436077657
+    ta4j = 1.227904957610378
+    ts = 1.2279049576103724
+    [[tables.pctb_sma_n50.rows]]
+    M = 88.6307
+    bar = 77
+    kind = 0
+    lean = 1.4623155040068516
+    own = 2.9e-14
+    q = 1.4623155040068525
+    sigma = 4.236993982766555
+    ta4j = 1.4623155040068556
+    ts = 1.462315504006853
+    [[tables.pctb_sma_n50.rows]]
+    M = 96.1855
+    bar = 93
+    kind = 0
+    lean = 1.0312424194197485
+    own = 1.1e-14
+    q = 1.0312424194197467
+    sigma = 10.854037232753534
+    ta4j = 1.0312424194197476
+    ts = 1.031242419419747
+    [[tables.pctb_sma_n50.rows]]
+    M = 99.6525
+    bar = 100
+    kind = 0
+    lean = 0.8310127268623614
+    own = 8.7e-15
+    q = 0.8310127268623625
+    sigma = 12.346579657945759
+    ta4j = 0.8310127268623635
+    ts = 0.8310127268623624
+    [[tables.pctb_sma_n50.rows]]
+    M = 122.53
+    bar = 200
+    kind = 0
+    lean = -0.022749119800630636
+    own = 1.1e-14
+    q = -0.02274911980063091
+    sigma = 7.369691988136275
+    ta4j = -0.022749119800631386
+    ts = -0.022749119800630914
+    [[tables.pctb_sma_n50.rows]]
+    M = 121.6376
+    bar = 202
+    kind = 0
+    lean = -0.3672402486388428
+    own = 1.1e-14
+    q = -0.3672402486388429
+    sigma = 8.83192403952842
+    ta4j = -0.36724024863884314
+    ts = -0.36724024863884314
+    [[tables.pctb_sma_n50.rows]]
+    M = 102.7762
+    bar = 251
+    kind = 0
+    lean = 0.6649180196893143
+    own = 1.3e-14
+    q = 0.6649180196893143
+    sigma = 7.7217153249779935
+    ta4j = 0.6649180196893134
+    ts = 0.6649180196893147
+
+[tables.pctb_sma_n50_k0]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n50_k0.rows]]
+    M = 89.3268
+    bar = 49
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 3.947201763274839
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_sma_n50_k0.rows]]
+    M = 89.2774
+    bar = 50
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 3.935132429791912
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_sma_n50_k0.rows]]
+    M = 89.1574
+    bar = 51
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 3.8551061256468673
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_sma_n50_k0.rows]]
+    M = 99.6525
+    bar = 100
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 12.346579657945759
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_sma_n50_k0.rows]]
+    M = 122.53
+    bar = 200
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 7.369691988136275
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_sma_n50_k0.rows]]
+    M = 102.7762
+    bar = 251
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 7.7217153249779935
+    ta4j = nan
+    ts = 0.5
+
+[tables.pctb_sma_n50_k1]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n50_k1.rows]]
+    M = 89.3268
+    bar = 49
+    kind = 0
+    lean = 0.6486116077110081
+    own = 4.4e-14
+    q = 0.6486116077110082
+    sigma = 3.947201763274839
+    ta4j = 0.6486116077110095
+    ts = 0.6486116077110095
+    [[tables.pctb_sma_n50_k1.rows]]
+    M = 89.2774
+    bar = 50
+    kind = 0
+    lean = 0.4685652256418366
+    own = 4.0e-14
+    q = 0.46856522564183684
+    sigma = 3.935132429791912
+    ta4j = 0.4685652256418385
+    ts = 0.4685652256418385
+    [[tables.pctb_sma_n50_k1.rows]]
+    M = 89.1574
+    bar = 51
+    kind = 0
+    lean = 0.455591365212735
+    own = 4.1e-14
+    q = 0.45559136521273474
+    sigma = 3.8551061256468673
+    ta4j = 0.45559136521273713
+    ts = 0.45559136521273713
+    [[tables.pctb_sma_n50_k1.rows]]
+    M = 87.5212
+    bar = 63
+    kind = 0
+    lean = 1.195273067784244
+    own = 7.4e-14
+    q = 1.1952730677842445
+    sigma = 2.861321820417969
+    ta4j = 1.1952730677842527
+    ts = 1.1952730677842354
+    [[tables.pctb_sma_n50_k1.rows]]
+    M = 87.69069999999999
+    bar = 74
+    kind = 0
+    lean = 0.21055389862296697
+    own = 4.4e-14
+    q = 0.2105538986229665
+    sigma = 3.024224530354848
+    ta4j = 0.21055389862297655
+    ts = 0.21055389862296245
+    [[tables.pctb_sma_n50_k1.rows]]
+    M = 88.0082
+    bar = 75
+    kind = 0
+    lean = 1.9558099152207469
+    own = 8.7e-14
+    q = 1.955809915220749
+    sigma = 3.1741094436077657
+    ta4j = 1.9558099152207593
+    ts = 1.9558099152207482
+    [[tables.pctb_sma_n50_k1.rows]]
+    M = 88.6307
+    bar = 77
+    kind = 0
+    lean = 2.4246310080137032
+    own = 7.5e-14
+    q = 2.424631008013705
+    sigma = 4.236993982766555
+    ta4j = 2.4246310080137143
+    ts = 2.424631008013709
+    [[tables.pctb_sma_n50_k1.rows]]
+    M = 97.7112
+    bar = 96
+    kind = 0
+    lean = 1.241756561450458
+    own = 2.1e-14
+    q = 1.2417565614504549
+    sigma = 11.782032615809548
+    ta4j = 1.2417565614504573
+    ts = 1.2417565614504562
+    [[tables.pctb_sma_n50_k1.rows]]
+    M = 99.6525
+    bar = 100
+    kind = 0
+    lean = 1.1620254537247228
+    own = 2.0e-14
+    q = 1.162025453724725
+    sigma = 12.346579657945759
+    ta4j = 1.1620254537247265
+    ts = 1.1620254537247243
+    [[tables.pctb_sma_n50_k1.rows]]
+    M = 122.53
+    bar = 200
+    kind = 0
+    lean = -0.5454982396012613
+    own = 3.0e-14
+    q = -0.5454982396012619
+    sigma = 7.369691988136275
+    ta4j = -0.5454982396012638
+    ts = -0.5454982396012608
+    [[tables.pctb_sma_n50_k1.rows]]
+    M = 121.6376
+    bar = 202
+    kind = 0
+    lean = -1.2344804972776857
+    own = 3.2e-14
+    q = -1.2344804972776857
+    sigma = 8.83192403952842
+    ta4j = -1.2344804972776855
+    ts = -1.2344804972776855
+    [[tables.pctb_sma_n50_k1.rows]]
+    M = 119.8666
+    bar = 205
+    kind = 0
+    lean = -0.6188586121328894
+    own = 2.0e-14
+    q = -0.6188586121328895
+    sigma = 10.889043412531699
+    ta4j = -0.6188586121328895
+    ts = -0.6188586121328882
+    [[tables.pctb_sma_n50_k1.rows]]
+    M = 102.7762
+    bar = 251
+    kind = 0
+    lean = 0.8298360393786286
+    own = 2.8e-14
+    q = 0.8298360393786286
+    sigma = 7.7217153249779935
+    ta4j = 0.8298360393786267
+    ts = 0.8298360393786295
+
+[tables.pctb_sma_n50_k13]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n50_k13.rows]]
+    M = 89.3268
+    bar = 49
+    kind = 0
+    lean = nan
+    own = 2.3e-14
+    q = 0.8243058038555041
+    sigma = 3.947201763274839
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n50_k13.rows]]
+    M = 89.2774
+    bar = 50
+    kind = 0
+    lean = nan
+    own = 2.2e-14
+    q = 0.7342826128209184
+    sigma = 3.935132429791912
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n50_k13.rows]]
+    M = 89.1574
+    bar = 51
+    kind = 0
+    lean = nan
+    own = 2.3e-14
+    q = 0.7277956826063674
+    sigma = 3.8551061256468673
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n50_k13.rows]]
+    M = 88.0082
+    bar = 75
+    kind = 0
+    lean = nan
+    own = 3.7e-14
+    q = 1.4779049576103744
+    sigma = 3.1741094436077657
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n50_k13.rows]]
+    M = 88.6307
+    bar = 77
+    kind = 0
+    lean = nan
+    own = 3.0e-14
+    q = 1.7123155040068525
+    sigma = 4.236993982766555
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n50_k13.rows]]
+    M = 99.6525
+    bar = 100
+    kind = 0
+    lean = nan
+    own = 8.7e-15
+    q = 1.0810127268623624
+    sigma = 12.346579657945759
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n50_k13.rows]]
+    M = 122.53
+    bar = 200
+    kind = 0
+    lean = nan
+    own = 1.2e-14
+    q = 0.2272508801993691
+    sigma = 7.369691988136275
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n50_k13.rows]]
+    M = 121.6376
+    bar = 202
+    kind = 0
+    lean = nan
+    own = 8.7e-15
+    q = -0.11724024863884289
+    sigma = 8.83192403952842
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n50_k13.rows]]
+    M = 120.504
+    bar = 204
+    kind = 0
+    lean = nan
+    own = 7.3e-15
+    q = 0.10754732779594979
+    sigma = 10.364187570668527
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n50_k13.rows]]
+    M = 102.7762
+    bar = 251
+    kind = 0
+    lean = nan
+    own = 1.4e-14
+    q = 0.9149180196893143
+    sigma = 7.7217153249779935
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_sma_n50_k25]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n50_k25.rows]]
+    M = 89.3268
+    bar = 49
+    kind = 0
+    lean = 0.5594446430844032
+    own = 1.7e-14
+    q = 0.5594446430844032
+    sigma = 3.947201763274839
+    ta4j = 0.5594446430844038
+    ts = 0.5594446430844038
+    [[tables.pctb_sma_n50_k25.rows]]
+    M = 89.2774
+    bar = 50
+    kind = 0
+    lean = 0.4874260902567346
+    own = 1.7e-14
+    q = 0.4874260902567347
+    sigma = 3.935132429791912
+    ta4j = 0.48742609025673544
+    ts = 0.48742609025673544
+    [[tables.pctb_sma_n50_k25.rows]]
+    M = 89.1574
+    bar = 51
+    kind = 0
+    lean = 0.482236546085094
+    own = 1.7e-14
+    q = 0.4822365460850939
+    sigma = 3.8551061256468673
+    ta4j = 0.48223654608509486
+    ts = 0.48223654608509486
+    [[tables.pctb_sma_n50_k25.rows]]
+    M = 87.5212
+    bar = 63
+    kind = 0
+    lean = 0.7781092271136977
+    own = 2.6e-14
+    q = 0.7781092271136978
+    sigma = 2.861321820417969
+    ta4j = 0.7781092271137011
+    ts = 0.7781092271136941
+    [[tables.pctb_sma_n50_k25.rows]]
+    M = 87.69069999999999
+    bar = 74
+    kind = 0
+    lean = 0.3842215594491868
+    own = 2.0e-14
+    q = 0.3842215594491866
+    sigma = 3.024224530354848
+    ta4j = 0.38422155944919084
+    ts = 0.3842215594491852
+    [[tables.pctb_sma_n50_k25.rows]]
+    M = 88.0082
+    bar = 75
+    kind = 0
+    lean = 1.0823239660882988
+    own = 2.6e-14
+    q = 1.0823239660882995
+    sigma = 3.1741094436077657
+    ta4j = 1.0823239660883026
+    ts = 1.0823239660882982
+    [[tables.pctb_sma_n50_k25.rows]]
+    M = 88.6307
+    bar = 77
+    kind = 0
+    lean = 1.2698524032054814
+    own = 2.2e-14
+    q = 1.269852403205482
+    sigma = 4.236993982766555
+    ta4j = 1.269852403205484
+    ts = 1.269852403205482
+    [[tables.pctb_sma_n50_k25.rows]]
+    M = 97.7112
+    bar = 96
+    kind = 0
+    lean = 0.7967026245801833
+    own = 7.1e-15
+    q = 0.7967026245801819
+    sigma = 11.782032615809548
+    ta4j = 0.7967026245801829
+    ts = 0.7967026245801823
+    [[tables.pctb_sma_n50_k25.rows]]
+    M = 99.6525
+    bar = 100
+    kind = 0
+    lean = 0.7648101814898891
+    own = 6.8e-15
+    q = 0.76481018148989
+    sigma = 12.346579657945759
+    ta4j = 0.764810181489891
+    ts = 0.76481018148989
+    [[tables.pctb_sma_n50_k25.rows]]
+    M = 122.53
+    bar = 200
+    kind = 0
+    lean = 0.08180070415949549
+    own = 9.0e-15
+    q = 0.08180070415949527
+    sigma = 7.369691988136275
+    ta4j = 0.081800704159495
+    ts = 0.08180070415949536
+    [[tables.pctb_sma_n50_k25.rows]]
+    M = 121.6376
+    bar = 202
+    kind = 0
+    lean = -0.19379219891107424
+    own = 7.7e-15
+    q = -0.19379219891107433
+    sigma = 8.83192403952842
+    ta4j = -0.19379219891107458
+    ts = -0.19379219891107458
+    [[tables.pctb_sma_n50_k25.rows]]
+    M = 112.78020000000001
+    bar = 217
+    kind = 0
+    lean = 0.25994309386637854
+    own = 4.6e-15
+    q = 0.2599430938663779
+    sigma = 14.813320963241159
+    ta4j = 0.2599430938663776
+    ts = 0.2599430938663783
+    [[tables.pctb_sma_n50_k25.rows]]
+    M = 102.7762
+    bar = 251
+    kind = 0
+    lean = 0.6319344157514514
+    own = 1.1e-14
+    q = 0.6319344157514515
+    sigma = 7.7217153249779935
+    ta4j = 0.6319344157514507
+    ts = 0.6319344157514518
+
+[tables.pctb_sma_n50_k25_15]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n50_k25_15.rows]]
+    M = 89.3268
+    bar = 49
+    kind = 0
+    lean = nan
+    own = 2.0e-14
+    q = 0.4493058038555041
+    sigma = 3.947201763274839
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n50_k25_15.rows]]
+    M = 89.2774
+    bar = 50
+    kind = 0
+    lean = nan
+    own = 2.0e-14
+    q = 0.3592826128209184
+    sigma = 3.935132429791912
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n50_k25_15.rows]]
+    M = 89.1574
+    bar = 51
+    kind = 0
+    lean = nan
+    own = 2.0e-14
+    q = 0.35279568260636734
+    sigma = 3.8551061256468673
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n50_k25_15.rows]]
+    M = 88.0082
+    bar = 75
+    kind = 0
+    lean = nan
+    own = 3.4e-14
+    q = 1.1029049576103744
+    sigma = 3.1741094436077657
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n50_k25_15.rows]]
+    M = 88.6307
+    bar = 77
+    kind = 0
+    lean = nan
+    own = 2.8e-14
+    q = 1.3373155040068525
+    sigma = 4.236993982766555
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n50_k25_15.rows]]
+    M = 99.6525
+    bar = 100
+    kind = 0
+    lean = nan
+    own = 8.6e-15
+    q = 0.7060127268623625
+    sigma = 12.346579657945759
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n50_k25_15.rows]]
+    M = 122.53
+    bar = 200
+    kind = 0
+    lean = nan
+    own = 1.2e-14
+    q = -0.1477491198006309
+    sigma = 7.369691988136275
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n50_k25_15.rows]]
+    M = 121.6376
+    bar = 202
+    kind = 0
+    lean = nan
+    own = 1.2e-14
+    q = -0.4922402486388429
+    sigma = 8.83192403952842
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n50_k25_15.rows]]
+    M = 112.78020000000001
+    bar = 217
+    kind = 0
+    lean = nan
+    own = 5.3e-15
+    q = 0.07492886733297233
+    sigma = 14.813320963241159
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n50_k25_15.rows]]
+    M = 102.7762
+    bar = 251
+    kind = 0
+    lean = nan
+    own = 1.3e-14
+    q = 0.5399180196893143
+    sigma = 7.7217153249779935
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_sma_n5_k0]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n5_k0.rows]]
+    M = 93.913
+    bar = 4
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 1.285646141051261
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_sma_n5_k0.rows]]
+    M = 94.538
+    bar = 5
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.44624656861425743
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_sma_n5_k0.rows]]
+    M = 94.081
+    bar = 6
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.8839423058096035
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_sma_n5_k0.rows]]
+    M = 114.357
+    bar = 100
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 2.7533299838559127
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_sma_n5_k0.rows]]
+    M = 106.81
+    bar = 200
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.9332095155965786
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_sma_n5_k0.rows]]
+    M = 109.036
+    bar = 251
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.7143556537187892
+    ta4j = nan
+    ts = 0.5
+
+[tables.pctb_sma_n5_k1]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n5_k1.rows]]
+    M = 93.913
+    bar = 4
+    kind = 0
+    lean = 0.4482750362820491
+    own = 1.3e-13
+    q = 0.4482750362820498
+    sigma = 1.285646141051261
+    ta4j = 0.44827503628205634
+    ts = 0.44827503628205634
+    [[tables.pctb_sma_n5_k1.rows]]
+    M = 94.538
+    bar = 5
+    kind = 0
+    lean = 0.5974797411553926
+    own = 4.0e-13
+    q = 0.5974797411553933
+    sigma = 0.44624656861425743
+    ta4j = 0.5974797411554125
+    ts = 0.5974797411554125
+    [[tables.pctb_sma_n5_k1.rows]]
+    M = 94.081
+    bar = 6
+    kind = 0
+    lean = -0.37731970164016354
+    own = 1.8e-13
+    q = -0.3773197016401635
+    sigma = 0.8839423058096035
+    ta4j = -0.37731970164016315
+    ts = -0.37731970164016315
+    [[tables.pctb_sma_n5_k1.rows]]
+    M = 92.838
+    bar = 10
+    kind = 0
+    lean = 1.3808077855577163
+    own = 1.3e-13
+    q = 1.3808077855577139
+    sigma = 1.8659008548151754
+    ta4j = 1.3808077855577094
+    ts = 1.3808077855577094
+    [[tables.pctb_sma_n5_k1.rows]]
+    M = 86.245
+    bar = 38
+    kind = 0
+    lean = -0.1696305362402991
+    own = 8.3e-14
+    q = -0.16963053624029995
+    sigma = 1.534428232274159
+    ta4j = -0.16963053624029556
+    ts = -0.16963053624030017
+    [[tables.pctb_sma_n5_k1.rows]]
+    M = 87.326
+    bar = 75
+    kind = 0
+    lean = 1.4861593307221865
+    own = 4.7e-14
+    q = 1.486159330722187
+    sigma = 5.031641282921508
+    ta4j = 1.486159330722188
+    ts = 1.4861593307221865
+    [[tables.pctb_sma_n5_k1.rows]]
+    M = 114.357
+    bar = 100
+    kind = 0
+    lean = 0.7983659804007682
+    own = 8.6e-14
+    q = 0.7983659804007681
+    sigma = 2.7533299838559127
+    ta4j = 0.7983659804007647
+    ts = 0.7983659804007688
+    [[tables.pctb_sma_n5_k1.rows]]
+    M = 122.91
+    bar = 121
+    kind = 0
+    lean = -0.05251527218422759
+    own = 5.4e-13
+    q = -0.052515272184225255
+    sigma = 0.31673332631726736
+    ta4j = -0.05251527218429245
+    ts = -0.05251527218422515
+    [[tables.pctb_sma_n5_k1.rows]]
+    M = 137.326
+    bar = 133
+    kind = 0
+    lean = -0.40308578046767807
+    own = 4.2e-13
+    q = -0.4030857804676783
+    sigma = 0.5625157775565041
+    ta4j = -0.40308578046763394
+    ts = -0.40308578046763394
+    [[tables.pctb_sma_n5_k1.rows]]
+    M = 117.062
+    bar = 194
+    kind = 0
+    lean = 0.05532274707538417
+    own = 5.1e-14
+    q = 0.05532274707538342
+    sigma = 3.161843765906215
+    ta4j = 0.055322747075369993
+    ts = 0.055322747075385724
+    [[tables.pctb_sma_n5_k1.rows]]
+    M = 106.81
+    bar = 200
+    kind = 0
+    lean = 0.6660934628392771
+    own = 2.3e-13
+    q = 0.6660934628392782
+    sigma = 0.9332095155965786
+    ta4j = 0.6660934628392488
+    ts = 0.6660934628392868
+    [[tables.pctb_sma_n5_k1.rows]]
+    M = 103.998
+    bar = 202
+    kind = 0
+    lean = -0.4987563193074608
+    own = 2.8e-14
+    q = -0.4987563193074603
+    sigma = 6.507092745612284
+    ta4j = -0.49875631930746395
+    ts = -0.49875631930746067
+    [[tables.pctb_sma_n5_k1.rows]]
+    M = 109.036
+    bar = 251
+    kind = 0
+    lean = -0.3161200894330727
+    own = 2.5e-13
+    q = -0.31612008943307146
+    sigma = 0.7143556537187892
+    ta4j = -0.3161200894330979
+    ts = -0.31612008943308795
+
+[tables.pctb_sma_n5_k13]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n5_k13.rows]]
+    M = 93.913
+    bar = 4
+    kind = 0
+    lean = nan
+    own = 7.2e-14
+    q = 0.7241375181410249
+    sigma = 1.285646141051261
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n5_k13.rows]]
+    M = 94.538
+    bar = 5
+    kind = 0
+    lean = nan
+    own = 2.2e-13
+    q = 0.7987398705776966
+    sigma = 0.44624656861425743
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n5_k13.rows]]
+    M = 94.081
+    bar = 6
+    kind = 0
+    lean = nan
+    own = 8.5e-14
+    q = 0.31134014917991826
+    sigma = 0.8839423058096035
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n5_k13.rows]]
+    M = 87.326
+    bar = 75
+    kind = 0
+    lean = nan
+    own = 2.1e-14
+    q = 1.2430796653610934
+    sigma = 5.031641282921508
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n5_k13.rows]]
+    M = 114.357
+    bar = 100
+    kind = 0
+    lean = nan
+    own = 4.4e-14
+    q = 0.8991829902003841
+    sigma = 2.7533299838559127
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n5_k13.rows]]
+    M = 122.91
+    bar = 121
+    kind = 0
+    lean = nan
+    own = 3.4e-13
+    q = 0.4737423639078874
+    sigma = 0.31673332631726736
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n5_k13.rows]]
+    M = 134.538
+    bar = 136
+    kind = 0
+    lean = nan
+    own = 3.2e-14
+    q = 0.2670422810257645
+    sigma = 3.254943317478816
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n5_k13.rows]]
+    M = 106.81
+    bar = 200
+    kind = 0
+    lean = nan
+    own = 1.2e-13
+    q = 0.8330467314196391
+    sigma = 0.9332095155965786
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n5_k13.rows]]
+    M = 103.998
+    bar = 202
+    kind = 0
+    lean = nan
+    own = 1.2e-14
+    q = 0.25062184034626983
+    sigma = 6.507092745612284
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n5_k13.rows]]
+    M = 109.036
+    bar = 251
+    kind = 0
+    lean = nan
+    own = 1.3e-13
+    q = 0.34193995528346427
+    sigma = 0.7143556537187892
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_sma_n5_k25]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n5_k25.rows]]
+    M = 93.913
+    bar = 4
+    kind = 0
+    lean = 0.4793100145128196
+    own = 5.2e-14
+    q = 0.4793100145128199
+    sigma = 1.285646141051261
+    ta4j = 0.47931001451282257
+    ts = 0.47931001451282257
+    [[tables.pctb_sma_n5_k25.rows]]
+    M = 94.538
+    bar = 5
+    kind = 0
+    lean = 0.5389918964621571
+    own = 1.6e-13
+    q = 0.5389918964621573
+    sigma = 0.44624656861425743
+    ta4j = 0.5389918964621647
+    ts = 0.5389918964621647
+    [[tables.pctb_sma_n5_k25.rows]]
+    M = 94.081
+    bar = 6
+    kind = 0
+    lean = 0.14907211934393458
+    own = 6.3e-14
+    q = 0.1490721193439346
+    sigma = 0.8839423058096035
+    ta4j = 0.149072119343937
+    ts = 0.149072119343937
+    [[tables.pctb_sma_n5_k25.rows]]
+    M = 92.838
+    bar = 10
+    kind = 0
+    lean = 0.8523231142230866
+    own = 4.2e-14
+    q = 0.8523231142230856
+    sigma = 1.8659008548151754
+    ta4j = 0.8523231142230848
+    ts = 0.8523231142230848
+    [[tables.pctb_sma_n5_k25.rows]]
+    M = 87.326
+    bar = 75
+    kind = 0
+    lean = 0.8944637322888745
+    own = 1.6e-14
+    q = 0.8944637322888748
+    sigma = 5.031641282921508
+    ta4j = 0.8944637322888754
+    ts = 0.8944637322888749
+    [[tables.pctb_sma_n5_k25.rows]]
+    M = 114.357
+    bar = 100
+    kind = 0
+    lean = 0.6193463921603073
+    own = 3.2e-14
+    q = 0.6193463921603072
+    sigma = 2.7533299838559127
+    ta4j = 0.6193463921603063
+    ts = 0.6193463921603073
+    [[tables.pctb_sma_n5_k25.rows]]
+    M = 122.91
+    bar = 121
+    kind = 0
+    lean = 0.27899389112630896
+    own = 2.5e-13
+    q = 0.2789938911263099
+    sigma = 0.31673332631726736
+    ta4j = 0.278993891126287
+    ts = 0.2789938911263139
+    [[tables.pctb_sma_n5_k25.rows]]
+    M = 137.326
+    bar = 133
+    kind = 0
+    lean = 0.13876568781292878
+    own = 1.5e-13
+    q = 0.1387656878129287
+    sigma = 0.5625157775565041
+    ta4j = 0.13876568781294277
+    ts = 0.13876568781294277
+    [[tables.pctb_sma_n5_k25.rows]]
+    M = 124.73400000000001
+    bar = 156
+    kind = 0
+    lean = 0.7729253515788426
+    own = 3.7e-14
+    q = 0.7729253515788427
+    sigma = 2.7597289721999867
+    ta4j = 0.7729253515788373
+    ts = 0.7729253515788415
+    [[tables.pctb_sma_n5_k25.rows]]
+    M = 119.036
+    bar = 192
+    kind = 0
+    lean = 0.22103201385083077
+    own = 3.8e-14
+    q = 0.22103201385083102
+    sigma = 1.9113304266923594
+    ta4j = 0.22103201385082205
+    ts = 0.2210320138508295
+    [[tables.pctb_sma_n5_k25.rows]]
+    M = 106.81
+    bar = 200
+    kind = 0
+    lean = 0.5664373851357108
+    own = 8.5e-14
+    q = 0.5664373851357113
+    sigma = 0.9332095155965786
+    ta4j = 0.5664373851356993
+    ts = 0.5664373851357145
+    [[tables.pctb_sma_n5_k25.rows]]
+    M = 103.998
+    bar = 202
+    kind = 0
+    lean = 0.10049747227701569
+    own = 8.8e-15
+    q = 0.10049747227701587
+    sigma = 6.507092745612284
+    ta4j = 0.10049747227701443
+    ts = 0.10049747227701573
+    [[tables.pctb_sma_n5_k25.rows]]
+    M = 109.036
+    bar = 251
+    kind = 0
+    lean = 0.1735519642267709
+    own = 9.1e-14
+    q = 0.1735519642267714
+    sigma = 0.7143556537187892
+    ta4j = 0.17355196422676475
+    ts = 0.1735519642267661
+
+[tables.pctb_sma_n5_k25_15]
+type = "PctbRow"
+
+    [[tables.pctb_sma_n5_k25_15.rows]]
+    M = 93.913
+    bar = 4
+    kind = 0
+    lean = nan
+    own = 6.1e-14
+    q = 0.3491375181410249
+    sigma = 1.285646141051261
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n5_k25_15.rows]]
+    M = 94.538
+    bar = 5
+    kind = 0
+    lean = nan
+    own = 1.9e-13
+    q = 0.42373987057769663
+    sigma = 0.44624656861425743
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n5_k25_15.rows]]
+    M = 94.081
+    bar = 6
+    kind = 0
+    lean = nan
+    own = 7.4e-14
+    q = -0.06365985082008174
+    sigma = 0.8839423058096035
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n5_k25_15.rows]]
+    M = 88.725
+    bar = 52
+    kind = 0
+    lean = nan
+    own = 2.7e-14
+    q = -0.0930418365948826
+    sigma = 2.3742535669131883
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n5_k25_15.rows]]
+    M = 87.326
+    bar = 75
+    kind = 0
+    lean = nan
+    own = 2.0e-14
+    q = 0.8680796653610935
+    sigma = 5.031641282921508
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n5_k25_15.rows]]
+    M = 114.357
+    bar = 100
+    kind = 0
+    lean = nan
+    own = 3.8e-14
+    q = 0.5241829902003841
+    sigma = 2.7533299838559127
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n5_k25_15.rows]]
+    M = 122.91
+    bar = 121
+    kind = 0
+    lean = nan
+    own = 2.8e-13
+    q = 0.09874236390788738
+    sigma = 0.31673332631726736
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n5_k25_15.rows]]
+    M = 106.81
+    bar = 200
+    kind = 0
+    lean = nan
+    own = 1.0e-13
+    q = 0.4580467314196391
+    sigma = 0.9332095155965786
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n5_k25_15.rows]]
+    M = 103.998
+    bar = 202
+    kind = 0
+    lean = nan
+    own = 1.2e-14
+    q = -0.12437815965373016
+    sigma = 6.507092745612284
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_sma_n5_k25_15.rows]]
+    M = 109.036
+    bar = 251
+    kind = 0
+    lean = nan
+    own = 1.1e-13
+    q = -0.03306004471653572
+    sigma = 0.7143556537187892
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_stepflat_n20]
+type = "PctbRow"
+
+    [[tables.pctb_stepflat_n20.rows]]
+    M = 92.891
+    bar = 19
+    kind = 0
+    lean = 0.20901483689438516
+    own = 2.7e-14
+    q = 0.20901483689438513
+    sigma = 2.5911974066056795
+    ta4j = 0.209014836894386
+    ts = 0.209014836894386
+    [[tables.pctb_stepflat_n20.rows]]
+    M = 92.73475
+    bar = 20
+    kind = 0
+    lean = 0.10497215382837104
+    own = 2.4e-14
+    q = 0.10497215382837141
+    sigma = 2.7591409328811025
+    ta4j = 0.1049721538283722
+    ts = 0.1049721538283722
+    [[tables.pctb_stepflat_n20.rows]]
+    M = 92.37525
+    bar = 21
+    kind = 0
+    lean = 0.09440082559314304
+    own = 2.2e-14
+    q = 0.09440082559314322
+    sigma = 2.9279213936682114
+    ta4j = 0.0944008255931441
+    ts = 0.09440082559314289
+    [[tables.pctb_stepflat_n20.rows]]
+    M = 91.29075
+    bar = 23
+    kind = 0
+    lean = -0.05186498555598416
+    own = 1.7e-14
+    q = -0.051864985555983956
+    sigma = 3.7557872926325313
+    ta4j = -0.051864985555982936
+    ts = -0.051864985555983886
+    [[tables.pctb_stepflat_n20.rows]]
+    M = 87.29725
+    bar = 33
+    kind = 0
+    lean = 0.6410194116550794
+    own = 2.9e-14
+    q = 0.6410194116550794
+    sigma = 2.965460535481799
+    ta4j = 0.6410194116550801
+    ts = 0.6410194116550787
+    [[tables.pctb_stepflat_n20.rows]]
+    M = 86.1615
+    bar = 38
+    kind = 0
+    lean = 0.2760343897575694
+    own = 3.1e-14
+    q = 0.2760343897575687
+    sigma = 2.2006726812499853
+    ta4j = 0.27603438975756805
+    ts = 0.27603438975756645
+    [[tables.pctb_stepflat_n20.rows]]
+    M = 85.4475
+    bar = 43
+    kind = 0
+    lean = 0.3035216913370273
+    own = 3.5e-14
+    q = 0.30352169133702783
+    sigma = 2.0008570038860847
+    ta4j = 0.3035216913370269
+    ts = 0.3035216913370251
+    [[tables.pctb_stepflat_n20.rows]]
+    M = 83.89075
+    bar = 57
+    kind = 0
+    lean = 0.44264606653235955
+    own = 1.1e-12
+    q = 0.44264606653235955
+    sigma = 0.06865265836076512
+    ta4j = 0.442646066532367
+    ts = 0.442646066532367
+    [[tables.pctb_stepflat_n20.rows]]
+    M = 83.875
+    bar = 58
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_stepflat_n20.rows]]
+    M = 83.875
+    bar = 59
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_stepflat_n20.rows]]
+    M = 83.875
+    bar = 79
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = 0.5
+
+[tables.pctb_subulp_ema_n20]
+type = "PctbRow"
+
+    [[tables.pctb_subulp_ema_n20.rows]]
+    M = 1.0e8
+    bar = 19
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_subulp_ema_n20.rows]]
+    M = 1.0e8
+    bar = 20
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_subulp_ema_n20.rows]]
+    M = 1.0e8
+    bar = 21
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_subulp_ema_n20.rows]]
+    M = 1.0e8
+    bar = 30
+    kind = 2
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 3.2476327892695914e-9
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_subulp_ema_n20.rows]]
+    M = 1.0e8
+    bar = 31
+    kind = 2
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 3.2476327892695914e-9
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_subulp_ema_n20.rows]]
+    M = 1.0e8
+    bar = 79
+    kind = 2
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 3.2476327892695914e-9
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_subulp_ema_n20.rows]]
+    M = 1.0e8
+    bar = 99
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_subulp_n20]
+type = "PctbRow"
+
+    [[tables.pctb_subulp_n20.rows]]
+    M = 1.0e8
+    bar = 19
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_subulp_n20.rows]]
+    M = 1.0e8
+    bar = 20
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_subulp_n20.rows]]
+    M = 1.0e8
+    bar = 21
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_subulp_n20.rows]]
+    M = 1.0e8
+    bar = 30
+    kind = 2
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 3.2476327892695914e-9
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_subulp_n20.rows]]
+    M = 1.0e8
+    bar = 31
+    kind = 2
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 3.2476327892695914e-9
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_subulp_n20.rows]]
+    M = 1.0e8
+    bar = 79
+    kind = 2
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 3.2476327892695914e-9
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_subulp_n20.rows]]
+    M = 1.0e8
+    bar = 99
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = 0.5
+
+[tables.pctb_tick100_n20]
+type = "PctbRow"
+
+    [[tables.pctb_tick100_n20.rows]]
+    M = 100.0055
+    bar = 19
+    kind = 0
+    lean = 0.7261335084333227
+    own = 2.0e-11
+    q = 0.7261335084333227
+    sigma = 0.004974937185535645
+    ta4j = 0.7261335084335117
+    ts = 0.7261335084335117
+    [[tables.pctb_tick100_n20.rows]]
+    M = 100.006
+    bar = 20
+    kind = 0
+    lean = 0.7041241452319313
+    own = 2.0e-11
+    q = 0.7041241452319315
+    sigma = 0.004898979485568862
+    ta4j = 0.7041241452321472
+    ts = 0.7041241452321472
+    [[tables.pctb_tick100_n20.rows]]
+    M = 100.0055
+    bar = 21
+    kind = 0
+    lean = 0.2236146008037167
+    own = 1.6e-11
+    q = 0.22361460080371667
+    sigma = 0.004974937185535645
+    ta4j = 0.2236146008040412
+    ts = 0.2236146008040412
+    [[tables.pctb_tick100_n20.rows]]
+    M = 100.005
+    bar = 23
+    kind = 0
+    lean = 0.25
+    own = 1.6e-11
+    q = 0.25
+    sigma = 0.005000000000002558
+    ta4j = 0.2500000000010658
+    ts = 0.25000000000035527
+    [[tables.pctb_tick100_n20.rows]]
+    M = 100.0055
+    bar = 100
+    kind = 0
+    lean = 0.7261335084333227
+    own = 2.0e-11
+    q = 0.7261335084333227
+    sigma = 0.004974937185535645
+    ta4j = 0.7261335084335117
+    ts = 0.7261335084327976
+    [[tables.pctb_tick100_n20.rows]]
+    M = 100.005
+    bar = 200
+    kind = 0
+    lean = 0.75
+    own = 2.0e-11
+    q = 0.75
+    sigma = 0.005000000000002558
+    ta4j = 0.7500000000017764
+    ts = 0.7500000000003553
+    [[tables.pctb_tick100_n20.rows]]
+    M = 100.0025
+    bar = 210
+    kind = 0
+    lean = 0.9330127018922196
+    own = 2.5e-11
+    q = 0.9330127018922193
+    sigma = 0.0043301270189244085
+    ta4j = 0.933012701896502
+    ts = 0.9330127018923996
+    [[tables.pctb_tick100_n20.rows]]
+    M = 100.0025
+    bar = 211
+    kind = 0
+    lean = 0.35566243270259346
+    own = 2.0e-11
+    q = 0.35566243270259357
+    sigma = 0.0043301270189244085
+    ta4j = 0.35566243270772974
+    ts = 0.35566243270280695
+    [[tables.pctb_tick100_n20.rows]]
+    M = 100.0065
+    bar = 233
+    kind = 0
+    lean = 0.15930742806537668
+    own = 1.6e-11
+    q = 0.15930742806537657
+    sigma = 0.004769696007087168
+    ta4j = 0.15930742806547227
+    ts = 0.15930742806621712
+    [[tables.pctb_tick100_n20.rows]]
+    M = 100.00450000000001
+    bar = 299
+    kind = 0
+    lean = 0.2738664915666773
+    own = 1.6e-11
+    q = 0.2738664915666773
+    sigma = 0.004974937185535645
+    ta4j = 0.2738664915679166
+    ts = 0.2738664915672025
+
+[tables.pctb_tick100_n20_k13]
+type = "PctbRow"
+
+    [[tables.pctb_tick100_n20_k13.rows]]
+    M = 100.0055
+    bar = 19
+    kind = 0
+    lean = nan
+    own = 2.3e-11
+    q = 0.9761335084333227
+    sigma = 0.004974937185535645
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_tick100_n20_k13.rows]]
+    M = 100.006
+    bar = 20
+    kind = 0
+    lean = nan
+    own = 2.3e-11
+    q = 0.9541241452319315
+    sigma = 0.004898979485568862
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_tick100_n20_k13.rows]]
+    M = 100.0055
+    bar = 21
+    kind = 0
+    lean = nan
+    own = 1.8e-11
+    q = 0.4736146008037167
+    sigma = 0.004974937185535645
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_tick100_n20_k13.rows]]
+    M = 100.005
+    bar = 23
+    kind = 0
+    lean = nan
+    own = 1.8e-11
+    q = 0.5
+    sigma = 0.005000000000002558
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_tick100_n20_k13.rows]]
+    M = 100.0055
+    bar = 100
+    kind = 0
+    lean = nan
+    own = 2.3e-11
+    q = 0.9761335084333227
+    sigma = 0.004974937185535645
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_tick100_n20_k13.rows]]
+    M = 100.005
+    bar = 200
+    kind = 0
+    lean = nan
+    own = 2.3e-11
+    q = 1.0
+    sigma = 0.005000000000002558
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_tick100_n20_k13.rows]]
+    M = 100.0025
+    bar = 210
+    kind = 0
+    lean = nan
+    own = 2.8e-11
+    q = 1.1830127018922194
+    sigma = 0.0043301270189244085
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_tick100_n20_k13.rows]]
+    M = 100.0065
+    bar = 233
+    kind = 0
+    lean = nan
+    own = 1.8e-11
+    q = 0.40930742806537657
+    sigma = 0.004769696007087168
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_tick100_n20_k13.rows]]
+    M = 100.00450000000001
+    bar = 299
+    kind = 0
+    lean = nan
+    own = 1.9e-11
+    q = 0.5238664915666773
+    sigma = 0.004974937185535645
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_wma_n20]
+type = "PctbRow"
+
+    [[tables.pctb_wma_n20.rows]]
+    M = 92.30435714285714
+    bar = 19
+    kind = 0
+    lean = 0.265614428230744
+    own = 2.8e-14
+    q = 0.265614428230744
+    sigma = 2.5911974066056795
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_wma_n20.rows]]
+    M = 91.87426190476191
+    bar = 20
+    kind = 0
+    lean = 0.18293918379986765
+    own = 2.5e-14
+    q = 0.18293918379986793
+    sigma = 2.7591409328811025
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_wma_n20.rows]]
+    M = 91.38761904761905
+    bar = 21
+    kind = 0
+    lean = 0.17872950280052627
+    own = 2.3e-14
+    q = 0.1787295028005264
+    sigma = 2.9279213936682114
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_wma_n20.rows]]
+    M = 107.18519047619047
+    bar = 90
+    kind = 0
+    lean = 0.893272958081171
+    own = 1.2e-14
+    q = 0.8932729580811701
+    sigma = 10.053328864112624
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_wma_n20.rows]]
+    M = 114.842
+    bar = 100
+    kind = 0
+    lean = 0.5518921192201708
+    own = 1.9e-14
+    q = 0.5518921192201708
+    sigma = 5.578881810004582
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_wma_n20.rows]]
+    M = 130.55604761904763
+    bar = 141
+    kind = 0
+    lean = 0.28125666720248665
+    own = 2.1e-14
+    q = 0.28125666720248654
+    sigma = 4.921347274883169
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_wma_n20.rows]]
+    M = 123.87490476190476
+    bar = 167
+    kind = 0
+    lean = 0.900519752948005
+    own = 6.4e-14
+    q = 0.9005197529480058
+    sigma = 2.106697118714506
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_wma_n20.rows]]
+    M = 112.91157142857143
+    bar = 200
+    kind = 0
+    lean = 0.28199734693883066
+    own = 1.4e-14
+    q = 0.2819973469388307
+    sigma = 6.6416295251993684
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_wma_n20.rows]]
+    M = 109.696
+    bar = 202
+    kind = 0
+    lean = -0.06270573726041719
+    own = 8.7e-15
+    q = -0.06270573726041723
+    sigma = 8.30629526323258
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_wma_n20.rows]]
+    M = 95.658
+    bar = 223
+    kind = 0
+    lean = 1.2490730115865758
+    own = 4.3e-14
+    q = 1.249073011586577
+    sigma = 2.7640830305907955
+    ta4j = nan
+    ts = nan
+    [[tables.pctb_wma_n20.rows]]
+    M = 109.458
+    bar = 251
+    kind = 0
+    lean = 0.36832486039230317
+    own = 3.1e-14
+    q = 0.36832486039230333
+    sigma = 3.0149958540601682
+    ta4j = nan
+    ts = nan
+
+[tables.pctb_zero_n20]
+type = "PctbRow"
+
+    [[tables.pctb_zero_n20.rows]]
+    M = 0.0
+    bar = 19
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_zero_n20.rows]]
+    M = 0.0
+    bar = 20
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_zero_n20.rows]]
+    M = 0.0
+    bar = 21
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = 0.5
+    [[tables.pctb_zero_n20.rows]]
+    M = 0.0
+    bar = 59
+    kind = 1
+    lean = nan
+    own = 0.0
+    q = 0.5
+    sigma = 0.0
+    ta4j = nan
+    ts = 0.5

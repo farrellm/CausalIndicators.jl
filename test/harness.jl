@@ -15,7 +15,7 @@
 
     @testset "extracted tables" begin
         t = loadtable("test_ma")
-        @test t["commit"] == "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+        @test t["commit"] == "62021c1d14ef5499505af5547384cab509adf3fc"
         rows = t["tables"]["tableTest"]["rows"]
         @test length(rows) == 93
         @test first(t["structs"]["TA_Test"]["fields"]) == "doRangeTestFlag"
