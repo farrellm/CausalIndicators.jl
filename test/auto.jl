@@ -74,6 +74,9 @@ end
         @test_throws ArgumentError EMA(:close; unstable = :auto5)
         @test_throws ArgumentError RSI(:close; unstable = :auto)
         @test_throws ArgumentError EMA(:close; unstable = -1)
+        # Only TA-Lib's two levels.
+        @test_throws ArgumentError EMA(:close; unstable = AutoLevel(-10, 4))
+        @test EMA(:close; unstable = AutoLevel(10, 4)) == EMA(:close; unstable = :auto4)
         # Without a matype, BollingerBands takes no unstable period.
         @test_throws ArgumentError BollingerBands(:close; unstable = :auto4)
     end

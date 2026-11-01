@@ -83,7 +83,16 @@ function checkunstable(unstable::Symbol)
         ),
     )
 end
-checkunstable(a::AutoLevel) = a
+# TA-Lib defines only these two levels; its rules are not checked at others.
+function checkunstable(a::AutoLevel)
+    a === AUTO4 || a === AUTO8 ||
+        throw(
+            ArgumentError(
+                "unstable must be a non-negative count, :auto4 or :auto8, got $a",
+            ),
+        )
+    return a
+end
 
 # The count of an unstable id under `u`: a stored count as is, or under a level
 # its rule at the call's parameters, as `TA_GLOBALS_UNSTABLE` reads it.
@@ -117,7 +126,8 @@ autoha(a) = (13 * a.K + 8) ÷ 9
 # whole bars.
 autohilbert(a) = 80 + 50 * a.X
 autohttrend(a) = 120 + 20 * a.X
-# MAMA: the Hilbert core, then the slower of its limits as a pole.
+# MAMA: the Hilbert core, then the larger (faster) of its limits as a pole,
+# as ta_MAMA.c's `limit` takes it.
 automama(a, fastlimit, slowlimit) =
     autohilbert(a) + ceil(Int, 2 * a.K / max(fastlimit, slowlimit))
 # ADOSC's offset on EMA's count: what its two EMAs, seeded on one value, can

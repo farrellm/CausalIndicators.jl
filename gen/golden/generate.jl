@@ -178,7 +178,8 @@ function main(root, fns)
     for fn in fns
         extra = startswith(fn, "CDL") ? [Dict{String,Any}("cdlrow" => r) for r in 1:4] : []
         auto = autochanges(bin, fn) ? AUTOSETS : Dict{String,Any}[]
-        listed = [Dict{String,Any}(); get(sets, fn, Dict{String,Any}[]); extra; auto]
+        listed =
+            unique([Dict{String,Any}(); get(sets, fn, Dict{String,Any}[]); extra; auto])
         sweep = filter(p -> !(p in listed), sweepsets(bin, fn))
         generate(bin, fn, [listed; sweep])
     end

@@ -1796,11 +1796,10 @@ mutable struct ERIKernel{E}
     const ema::E
 end
 
-barkernel(s::ERISpec, ::Type{T}) where {T} =
-    (
-        e = EMAKernel(T, s.period);
-        ERIKernel{typeof(e)}(unstablecount(s.unstable, autoema, s.period), e)
-    )
+function barkernel(s::ERISpec, ::Type{T}) where {T}
+    e = EMAKernel(T, s.period)
+    return ERIKernel{typeof(e)}(unstablecount(s.unstable, autoema, s.period), e)
+end
 CausalFrames.fresh!(k::ERIKernel) = (fresh!(k.ema); k)
 
 @inline function barstep!(k::ERIKernel, h::T, l::T, c::T) where {T}
