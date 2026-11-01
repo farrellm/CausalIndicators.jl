@@ -62,7 +62,8 @@ mavpperiods(n) = [2.0 + (i % 29) for i in 0:(n-1)]
         checkgoldens("MAVP"; outputs = (:outReal,)) do p, data
             s = MAVP(:close, :periods; minperiod = get(p, :optInMinPeriod, 2),
                 maxperiod = get(p, :optInMaxPeriod, 30),
-                matype = matypecode(get(p, :optInMAType, 0)))
+                matype = matypecode(get(p, :optInMAType, 0)),
+                unstable = get(p, :unstable, 0))
             t = merge(data, (periods = mavpperiods(length(data.close)),))
             (foldseries(s, t).close_mavp,)
         end

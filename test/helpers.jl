@@ -91,16 +91,20 @@ function goldenmatch(got, want; rtol = 1e-9, atol = 0.0)
 end
 
 """
-    parseparams(s) -> Dict{Symbol,Int or Float64}
+    parseparams(s) -> Dict{Symbol,Any}
 
-A golden's `params` key as a Dict (`"default"` is empty).
+A golden's `params` key as a Dict (`"default"` is empty). Values are `Int` or
+`Float64`, and an Auto-Stabilization level (`unstable=auto4`) is its `unstable`
+symbol, `:auto4` or `:auto8`.
 """
 function parseparams(s)
-    d = Dict{Symbol,Real}()
+    d = Dict{Symbol,Any}()
     s == "default" && return d
     for kv in split(s, ';')
         k, v = split(kv, '=')
-        d[Symbol(k)] = something(tryparse(Int, v), parse(Float64, v))
+        d[Symbol(k)] =
+            v in ("auto4", "auto8") ? Symbol(v) :
+            something(tryparse(Int, v), parse(Float64, v))
     end
     return d
 end

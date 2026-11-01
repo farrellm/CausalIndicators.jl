@@ -252,7 +252,7 @@ end
 
 struct GainLossSpec{K}
     period::Int
-    unstable::Int
+    unstable::Unstable
 end
 
 mutable struct GainLossOscillatorKernel{K,G}
@@ -260,8 +260,11 @@ mutable struct GainLossOscillatorKernel{K,G}
     const unstable::Int
 end
 
-barkernel(s::GainLossSpec{K}, ::Type{T}) where {K,T} =
-    (g = GainLossKernel(T, s.period); GainLossOscillatorKernel{K,typeof(g)}(g, s.unstable))
+function barkernel(s::GainLossSpec{K}, ::Type{T}) where {K,T}
+    g = GainLossKernel(T, s.period)
+    u = unstablecount(s.unstable, autoratio, s.period)
+    return GainLossOscillatorKernel{K,typeof(g)}(g, u)
+end
 CausalFrames.fresh!(o::GainLossOscillatorKernel) = (fresh!(o.gainloss); o)
 
 @inline function barstep!(o::GainLossOscillatorKernel{K}, x) where {K}
@@ -284,7 +287,7 @@ end
 
 function gainlossoscillator(fn, K, column, period, unstable, name)
     checkrange(fn, "period", period, 2, 100_000)
-    checkunstable(unstable)
+    unstable = checkunstable(unstable)
     return barindicator(GainLossSpec{K}(period, unstable),
         (outname(colname(column), name),), column)
 end
@@ -301,9 +304,16 @@ and `unstable` is TA-Lib's unstable period.
 $PLAIN_DOC$SKIP_DOC
 
 $DAILY_DOC
+$AUTO_DOC
+$AUTO_FLAT_DOC
 TA-Lib: `ta_codegen/input/rsi/rsi.yaml`, `rsi.md`.
 """
-RSI(column::ColumnSpec; period::Integer = 14, unstable::Integer = 0, name::Symbol = :rsi) =
+RSI(
+    column::ColumnSpec;
+    period::Integer = 14,
+    unstable::UnstableArg = 0,
+    name::Symbol = :rsi,
+) =
     gainlossoscillator("RSI", :rsi, column, period, unstable, name)
 
 """
@@ -317,9 +327,16 @@ TA-Lib's `CMO`, Chande's momentum oscillator, in `:{column}_cmo`:
 $PLAIN_DOC$SKIP_DOC
 
 $DAILY_DOC
+$AUTO_DOC
+$AUTO_FLAT_DOC
 TA-Lib: `ta_codegen/input/cmo/cmo.yaml`, `cmo.md`.
 """
-CMO(column::ColumnSpec; period::Integer = 14, unstable::Integer = 0, name::Symbol = :cmo) =
+CMO(
+    column::ColumnSpec;
+    period::Integer = 14,
+    unstable::UnstableArg = 0,
+    name::Symbol = :cmo,
+) =
     gainlossoscillator("CMO", :cmo, column, period, unstable, name)
 
 # ---------------------------------------------------------------------------
@@ -333,7 +350,7 @@ struct MACDSpec{K,FM,SM,GM}
     fastperiod::Int
     slowperiod::Int
     signalperiod::Int
-    unstable::Int
+    unstable::Unstable
 end
 
 mutable struct MACDKernel{F,S,G}
@@ -416,10 +433,11 @@ $MACD_DOC
 $PLAIN_DOC$SKIP_DOC
 
 $DAILY_DOC
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/macd/macd.yaml`, `macd.md`.
 """
 function MACD(column::ColumnSpec; fastperiod::Integer = 12, slowperiod::Integer = 26,
-    signalperiod::Integer = 9, unstable::Integer = 0, name::Symbol = :macd)
+    signalperiod::Integer = 9, unstable::UnstableArg = 0, name::Symbol = :macd)
     checkrange("MACD", "fastperiod", fastperiod, 2, 100_000)
     checkrange("MACD", "slowperiod", slowperiod, 2, 100_000)
     checkrange("MACD", "signalperiod", signalperiod, 1, 100_000)
@@ -438,9 +456,10 @@ $MACD_DOC
 $PLAIN_DOC$SKIP_DOC
 
 $DAILY_DOC
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/macdfix/macdfix.yaml`, `macdfix.md`.
 """
-function MACDFix(column::ColumnSpec; signalperiod::Integer = 9, unstable::Integer = 0,
+function MACDFix(column::ColumnSpec; signalperiod::Integer = 9, unstable::UnstableArg = 0,
     name::Symbol = :macdfix)
     checkrange("MACDFix", "signalperiod", signalperiod, 1, 100_000)
     return macdsummarizer(:macdfix, :ema, :ema, :ema, column, 12, 26, signalperiod,
@@ -462,11 +481,12 @@ $MACD_DOC
 $PLAIN_DOC$SKIP_DOC
 
 $DAILY_DOC
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/macdext/macdext.yaml`, `macdext.md`.
 """
 function MACDExt(column::ColumnSpec; fastperiod::Integer = 12, fastmatype::Symbol = :sma,
     slowperiod::Integer = 26, slowmatype::Symbol = :sma, signalperiod::Integer = 9,
-    signalmatype::Symbol = :sma, unstable::Integer = 0, name::Symbol = :macdext)
+    signalmatype::Symbol = :sma, unstable::UnstableArg = 0, name::Symbol = :macdext)
     checkrange("MACDExt", "fastperiod", fastperiod, 2, 100_000)
     checkrange("MACDExt", "slowperiod", slowperiod, 2, 100_000)
     checkrange("MACDExt", "signalperiod", signalperiod, 1, 100_000)
@@ -483,7 +503,7 @@ end
 struct PriceOscillatorSpec{K,M}
     fastperiod::Int
     slowperiod::Int
-    unstable::Int
+    unstable::Unstable
 end
 
 # `deadafter` is the slow average's lookback for the windowed MA types (SMA,
@@ -530,7 +550,7 @@ function priceoscillator(fn, K, column, fast, slow, matype, unstable, name;
     checkrange(fn, "fastperiod", fast, 2, 100_000)
     checkrange(fn, "slowperiod", slow, 2, 100_000)
     checkmatype(fn, "matype", matype)
-    checkunstable(unstable)
+    unstable = checkunstable(unstable)
     fast, slow = minmax(fast, slow)
     N = outname(prefix ? colname(column) : nothing, name)
     return barindicator(PriceOscillatorSpec{K,matype}(fast, slow, unstable), (N,), column)
@@ -556,10 +576,11 @@ $PO_DOC
 $PLAIN_DOC$SKIP_DOC
 
 $DAILY_DOC
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/apo/apo.yaml`, `apo.md`.
 """
 APO(column::ColumnSpec; fastperiod::Integer = 12, slowperiod::Integer = 26,
-    matype::Symbol = :ema, unstable::Integer = 0, name::Symbol = :apo) =
+    matype::Symbol = :ema, unstable::UnstableArg = 0, name::Symbol = :apo) =
     priceoscillator("APO", :apo, column, fastperiod, slowperiod, matype, unstable, name)
 
 """
@@ -573,10 +594,11 @@ $PO_DOC
 $PLAIN_DOC$SKIP_DOC
 
 $DAILY_DOC
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/ppo/ppo.yaml`, `ppo.md`.
 """
 PPO(column::ColumnSpec; fastperiod::Integer = 12, slowperiod::Integer = 26,
-    matype::Symbol = :ema, unstable::Integer = 0, name::Symbol = :ppo) =
+    matype::Symbol = :ema, unstable::UnstableArg = 0, name::Symbol = :ppo) =
     priceoscillator("PPO", :ppo, column, fastperiod, slowperiod, matype, unstable, name)
 
 # ---------------------------------------------------------------------------
@@ -584,7 +606,7 @@ PPO(column::ColumnSpec; fastperiod::Integer = 12, slowperiod::Integer = 26,
 
 struct TRIXSpec
     period::Int
-    unstable::Int
+    unstable::Unstable
 end
 
 mutable struct TRIXKernel{K,T}
@@ -622,12 +644,13 @@ The lookback is `3(period − 1) + 1`. `unstable` is EMA's unstable period, whic
 each stage passes before feeding the next, as for [`TEMA`](@ref).
 
 $PLAIN_DOC$SKIP_DOC
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/trix/trix.yaml`, `trix.md`.
 """
-function TRIX(column::ColumnSpec; period::Integer = 30, unstable::Integer = 0,
+function TRIX(column::ColumnSpec; period::Integer = 30, unstable::UnstableArg = 0,
     name::Symbol = :trix)
     checkrange("TRIX", "period", period, 1, 100_000)
-    checkunstable(unstable)
+    unstable = checkunstable(unstable)
     return barindicator(TRIXSpec(period, unstable), (outname(colname(column), name),),
         column)
 end
@@ -643,7 +666,7 @@ struct StochSpec{K,KM,DM}
     fastk::Int
     slowk::Int
     d::Int
-    unstable::Int
+    unstable::Unstable
 end
 
 mutable struct StochKernel{K,G,F,S,D}
@@ -659,8 +682,9 @@ function barkernel(s::StochSpec{K,KM,DM}, ::Type{T}) where {K,KM,DM,T}
     fk = FastKKernel(T, s.fastk, K === :stochrsi ? :x : :hlc)
     sk = K === :stoch || K === :kdj ? MAKernel(T, KM, s.slowk; s.unstable) : nothing
     d = MAKernel(T, DM, s.d; s.unstable)
-    return StochKernel{K,typeof(rsi),typeof(fk),typeof(sk),typeof(d)}(rsi, fk, sk, d,
-        s.unstable)
+    # StochRSI's own gate is RSI's count; each average resolves its own.
+    u = K === :stochrsi ? unstablecount(s.unstable, autoratio, s.period) : 0
+    return StochKernel{K,typeof(rsi),typeof(fk),typeof(sk),typeof(d)}(rsi, fk, sk, d, u)
 end
 function CausalFrames.fresh!(k::StochKernel)
     maybefresh!(k.rsi)
@@ -718,18 +742,19 @@ $STOCH_DOC
 $PLAIN_DOC
 
 $DAILY_DOC
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/stoch/stoch.yaml`, `stoch.md`.
 """
 function Stoch(; high::ColumnSpec = :high, low::ColumnSpec = :low,
     close::ColumnSpec = :close, fastkperiod::Integer = 5, slowkperiod::Integer = 3,
     slowkmatype::Symbol = :sma, slowdperiod::Integer = 3, slowdmatype::Symbol = :sma,
-    unstable::Integer = 0, name::Symbol = :stoch)
+    unstable::UnstableArg = 0, name::Symbol = :stoch)
     checkrange("Stoch", "fastkperiod", fastkperiod, 1, 100_000)
     checkrange("Stoch", "slowkperiod", slowkperiod, 1, 100_000)
     checkrange("Stoch", "slowdperiod", slowdperiod, 1, 100_000)
     checkmatype("Stoch", "slowkmatype", slowkmatype)
     checkmatype("Stoch", "slowdmatype", slowdmatype)
-    checkunstable(unstable)
+    unstable = checkunstable(unstable)
     s = StochSpec{:stoch,slowkmatype,slowdmatype}(0, fastkperiod, slowkperiod,
         slowdperiod, unstable)
     return barindicator(s, outnames(nothing, name, (:slowk, :slowd)), high, low, close)
@@ -746,15 +771,16 @@ $STOCH_DOC
 $PLAIN_DOC
 
 $DAILY_DOC
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/stochf/stochf.yaml`, `stochf.md`.
 """
 function StochF(; high::ColumnSpec = :high, low::ColumnSpec = :low,
     close::ColumnSpec = :close, fastkperiod::Integer = 5, fastdperiod::Integer = 3,
-    fastdmatype::Symbol = :sma, unstable::Integer = 0, name::Symbol = :stochf)
+    fastdmatype::Symbol = :sma, unstable::UnstableArg = 0, name::Symbol = :stochf)
     checkrange("StochF", "fastkperiod", fastkperiod, 1, 100_000)
     checkrange("StochF", "fastdperiod", fastdperiod, 1, 100_000)
     checkmatype("StochF", "fastdmatype", fastdmatype)
-    checkunstable(unstable)
+    unstable = checkunstable(unstable)
     s = StochSpec{:stochf,:sma,fastdmatype}(0, fastkperiod, 0, fastdperiod, unstable)
     return barindicator(s, outnames(nothing, name, (:fastk, :fastd)), high, low, close)
 end
@@ -772,16 +798,18 @@ $STOCH_DOC
 $PLAIN_DOC
 
 $DAILY_DOC
+$AUTO_DOC
+$AUTO_FLAT_DOC
 TA-Lib: `ta_codegen/input/stochrsi/stochrsi.yaml`, `stochrsi.md`.
 """
 function StochRSI(column::ColumnSpec; period::Integer = 14, fastkperiod::Integer = 5,
-    fastdperiod::Integer = 3, fastdmatype::Symbol = :sma, unstable::Integer = 0,
+    fastdperiod::Integer = 3, fastdmatype::Symbol = :sma, unstable::UnstableArg = 0,
     name::Symbol = :stochrsi)
     checkrange("StochRSI", "period", period, 2, 100_000)
     checkrange("StochRSI", "fastkperiod", fastkperiod, 1, 100_000)
     checkrange("StochRSI", "fastdperiod", fastdperiod, 1, 100_000)
     checkmatype("StochRSI", "fastdmatype", fastdmatype)
-    checkunstable(unstable)
+    unstable = checkunstable(unstable)
     s = StochSpec{:stochrsi,:sma,fastdmatype}(period, fastkperiod, 0, fastdperiod,
         unstable)
     return barindicator(s, outnames(colname(column), name, (:fastk, :fastd)), column)
@@ -952,7 +980,7 @@ end
 # `:adxr`.
 struct DirectionalSpec{K}
     period::Int
-    unstable::Int
+    unstable::Unstable
 end
 
 mutable struct DirectionalKernel{K,D,S,A,T}
@@ -970,9 +998,15 @@ function barkernel(s::DirectionalSpec{K}, ::Type{T}) where {K,T}
     dm = DMKernel(T, s.period)
     lag = K === :adxr ? lagged(s.period, T) : nothing
     seed = seedsum(T)
-    return DirectionalKernel{K,typeof(dm),typeof(seed),typeof(lag),T}(dm, s.unstable,
+    u = unstablecount(s.unstable, directionalrule(K), s.period)
+    return DirectionalKernel{K,typeof(dm),typeof(seed),typeof(lag),T}(dm, u,
         one(T) / T(s.period), seed, lag, 0, zero(T), zero(T))
 end
+
+# Each function's own id: Wilder's rule for the smoothed DMs, the ratio rule
+# for the DIs and DX, ADX's for ADX and the ADXR that inherits it.
+directionalrule(K) =
+    K in (:plusdm, :minusdm) ? autowilder : K in (:adx, :adxr) ? autoadx : autoratio
 function CausalFrames.fresh!(k::DirectionalKernel{K,D,S,A,T}) where {K,D,S,A,T}
     fresh!(k.dm)
     fresh!(k.adxseed)
@@ -1067,7 +1101,7 @@ end
 
 function directional(fn, K, high, low, close, period, unstable, name; minperiod)
     checkrange(fn, "period", period, minperiod, 100_000)
-    checkunstable(unstable)
+    unstable = checkunstable(unstable)
     specs = close === nothing ? (high, low) : (high, low, close)
     return barindicator(DirectionalSpec{K}(period, unstable), (name,), specs...)
 end
@@ -1097,10 +1131,11 @@ $DM_DOC
 $PRICEBAR_DOC
 
 $DAILY_DOC
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/plus_dm/plus_dm.yaml`, `plus_dm.md`.
 """
 PlusDM(; high::ColumnSpec = :high, low::ColumnSpec = :low, period::Integer = 14,
-    unstable::Integer = 0, name::Symbol = :plusdm) =
+    unstable::UnstableArg = 0, name::Symbol = :plusdm) =
     directional("PlusDM", :plusdm, high, low, nothing, period, unstable, name;
         minperiod = 1)
 
@@ -1113,10 +1148,11 @@ $DM_DOC
 $PRICEBAR_DOC
 
 $DAILY_DOC
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/minus_dm/minus_dm.yaml`, `minus_dm.md`.
 """
 MinusDM(; high::ColumnSpec = :high, low::ColumnSpec = :low, period::Integer = 14,
-    unstable::Integer = 0, name::Symbol = :minusdm) =
+    unstable::UnstableArg = 0, name::Symbol = :minusdm) =
     directional("MinusDM", :minusdm, high, low, nothing, period, unstable, name;
         minperiod = 1)
 
@@ -1134,10 +1170,12 @@ $DM_DOC
 $PRICEBAR_DOC
 
 $DAILY_DOC
+$AUTO_DOC
+$AUTO_FLAT_DOC
 TA-Lib: `ta_codegen/input/plus_di/plus_di.yaml`, `plus_di.md`.
 """
 PlusDI(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
-    period::Integer = 14, unstable::Integer = 0, name::Symbol = :plusdi) =
+    period::Integer = 14, unstable::UnstableArg = 0, name::Symbol = :plusdi) =
     directional("PlusDI", :plusdi, high, low, close, period, unstable, name;
         minperiod = 1)
 
@@ -1153,10 +1191,12 @@ $DM_DOC
 $PRICEBAR_DOC
 
 $DAILY_DOC
+$AUTO_DOC
+$AUTO_FLAT_DOC
 TA-Lib: `ta_codegen/input/minus_di/minus_di.yaml`, `minus_di.md`.
 """
 MinusDI(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
-    period::Integer = 14, unstable::Integer = 0, name::Symbol = :minusdi) =
+    period::Integer = 14, unstable::UnstableArg = 0, name::Symbol = :minusdi) =
     directional("MinusDI", :minusdi, high, low, close, period, unstable, name;
         minperiod = 1)
 
@@ -1172,10 +1212,12 @@ $DI_DOC
 $PRICEBAR_DOC
 
 $DAILY_DOC
+$AUTO_DOC
+$AUTO_FLAT_DOC
 TA-Lib: `ta_codegen/input/dx/dx.yaml`, `dx.md`.
 """
 DX(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
-    period::Integer = 14, unstable::Integer = 0, name::Symbol = :dx) =
+    period::Integer = 14, unstable::UnstableArg = 0, name::Symbol = :dx) =
     directional("DX", :dx, high, low, close, period, unstable, name; minperiod = 2)
 
 const ADX_DOC = """
@@ -1195,10 +1237,12 @@ $ADX_DOC
 $PRICEBAR_DOC
 
 $DAILY_DOC
+$AUTO_DOC
+$AUTO_FLAT_DOC
 TA-Lib: `ta_codegen/input/adx/adx.yaml`, `adx.md`.
 """
 ADX(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
-    period::Integer = 14, unstable::Integer = 0, name::Symbol = :adx) =
+    period::Integer = 14, unstable::UnstableArg = 0, name::Symbol = :adx) =
     directional("ADX", :adx, high, low, close, period, unstable, name; minperiod = 2)
 
 """
@@ -1214,10 +1258,12 @@ $ADX_DOC
 $PRICEBAR_DOC
 
 $DAILY_DOC
+$AUTO_DOC
+$AUTO_FLAT_DOC
 TA-Lib: `ta_codegen/input/adxr/adxr.yaml`, `adxr.md`.
 """
 ADXR(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
-    period::Integer = 14, unstable::Integer = 0, name::Symbol = :adxr) =
+    period::Integer = 14, unstable::UnstableArg = 0, name::Symbol = :adxr) =
     directional("ADXR", :adxr, high, low, close, period, unstable, name; minperiod = 2)
 
 # ---------------------------------------------------------------------------
@@ -1742,7 +1788,7 @@ end
 # close.
 struct ERISpec
     period::Int
-    unstable::Int
+    unstable::Unstable
 end
 
 mutable struct ERIKernel{E}
@@ -1750,8 +1796,10 @@ mutable struct ERIKernel{E}
     const ema::E
 end
 
-barkernel(s::ERISpec, ::Type{T}) where {T} =
-    (e = EMAKernel(T, s.period); ERIKernel{typeof(e)}(s.unstable, e))
+function barkernel(s::ERISpec, ::Type{T}) where {T}
+    e = EMAKernel(T, s.period)
+    return ERIKernel{typeof(e)}(unstablecount(s.unstable, autoema, s.period), e)
+end
 CausalFrames.fresh!(k::ERIKernel) = (fresh!(k.ema); k)
 
 @inline function barstep!(k::ERIKernel, h::T, l::T, c::T) where {T}
@@ -1772,10 +1820,11 @@ inherits; it delays the first output without changing the values.
 $PRICEBAR_DOC
 
 $DAILY_DOC
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/eri/eri.yaml`, `eri.md`.
 """
 function ERI(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
-    period::Integer = 13, unstable::Integer = 0, name::Symbol = :eri)
+    period::Integer = 13, unstable::UnstableArg = 0, name::Symbol = :eri)
     checkrange("ERI", "period", period, 1, 100_000)
     return barindicator(ERISpec(period, checkunstable(unstable)),
         outnames(nothing, name, (:bullpower, :bearpower)), high, low, close)
@@ -1786,16 +1835,25 @@ end
 # passed its unstable period, as ta_SMI.c and ta_TSI.c chain the callee
 # lookbacks; the denominators are EMAs of non-negative terms.
 mutable struct BlauKernel{E}
-    const unstable::Int
+    const unstable1::Int
+    const unstable2::Int
     const num1::E
     const den1::E
     const num2::E
     const den2::E
 end
 
-function BlauKernel(::Type{T}, first::Integer, second::Integer, unstable::Int) where {T}
+# Each stage drops EMA's count at its own period.
+function BlauKernel(
+    ::Type{T},
+    first::Integer,
+    second::Integer,
+    unstable::Unstable,
+) where {T}
     e1, e2 = EMAKernel(T, first), EMAKernel(T, second)
-    return BlauKernel{typeof(e1)}(unstable, e1, fresh(e1), e2, fresh(e2))
+    u1, u2 =
+        unstablecount(unstable, autoema, first), unstablecount(unstable, autoema, second)
+    return BlauKernel{typeof(e1)}(u1, u2, e1, fresh(e1), e2, fresh(e2))
 end
 function CausalFrames.fresh!(k::BlauKernel)
     fresh!(k.num1)
@@ -1810,17 +1868,17 @@ end
 @inline function blaustep!(k::BlauKernel, num::T, den::T) where {T}
     n1 = step!(k.num1, num)
     d1 = step!(k.den1, den)
-    emitted(k.num1, k.unstable) || return nothing
+    emitted(k.num1, k.unstable1) || return nothing
     n2 = step!(k.num2, n1::T)
     d2 = step!(k.den2, d1::T)
-    emitted(k.num2, k.unstable) || return nothing
+    emitted(k.num2, k.unstable2) || return nothing
     return (n2::T, d2::T)
 end
 
 struct TSISpec
     first::Int
     second::Int
-    unstable::Int
+    unstable::Unstable
 end
 
 mutable struct TSIKernel{T,B}
@@ -1864,10 +1922,12 @@ twice `unstable`.
 $PRICEBAR_DOC
 
 $DAILY_DOC
+$AUTO_DOC
+$AUTO_FLAT_DOC
 TA-Lib: `ta_codegen/input/tsi/tsi.yaml`, `tsi.md`.
 """
 function TSI(column::ColumnSpec; firstperiod::Integer = 25, secondperiod::Integer = 13,
-    unstable::Integer = 0, name::Symbol = :tsi)
+    unstable::UnstableArg = 0, name::Symbol = :tsi)
     checkrange("TSI", "firstperiod", firstperiod, 2, 100_000)
     checkrange("TSI", "secondperiod", secondperiod, 2, 100_000)
     return barindicator(TSISpec(firstperiod, secondperiod, checkunstable(unstable)),
@@ -1879,7 +1939,7 @@ struct SMISpec
     fast::Int
     slow::Int
     signal::Int
-    unstable::Int
+    unstable::Unstable
 end
 
 mutable struct SMIKernel{X,B,E}
@@ -1893,7 +1953,8 @@ function barkernel(s::SMISpec, ::Type{T}) where {T}
     x = extremeswindow(s.period, T)
     b = BlauKernel(T, s.slow, s.fast, s.unstable)
     e = EMAKernel(T, s.signal)
-    return SMIKernel{typeof(x),typeof(b),typeof(e)}(s.unstable, x, b, e)
+    u = unstablecount(s.unstable, autoema, s.signal)
+    return SMIKernel{typeof(x),typeof(b),typeof(e)}(u, x, b, e)
 end
 CausalFrames.fresh!(k::SMIKernel) =
     (fresh!(k.extremes); fresh!(k.blau); fresh!(k.signal); k)
@@ -1930,11 +1991,13 @@ stages passes it before it feeds the next.
 $PRICEBAR_DOC
 
 $DAILY_DOC
+$AUTO_DOC
+$AUTO_FLAT_DOC
 TA-Lib: `ta_codegen/input/smi/smi.yaml`, `smi.md`.
 """
 function SMI(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
     period::Integer = 13, fastperiod::Integer = 2, slowperiod::Integer = 25,
-    signalperiod::Integer = 9, unstable::Integer = 0, name::Symbol = :smi)
+    signalperiod::Integer = 9, unstable::UnstableArg = 0, name::Symbol = :smi)
     checkrange("SMI", "period", period, 2, 100_000)
     checkrange("SMI", "fastperiod", fastperiod, 2, 100_000)
     checkrange("SMI", "slowperiod", slowperiod, 2, 100_000)
@@ -1956,18 +2019,19 @@ $STOCH_DOC
 $PLAIN_DOC
 
 $DAILY_DOC
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/kdj/kdj.yaml`, `kdj.md`.
 """
 function KDJ(; high::ColumnSpec = :high, low::ColumnSpec = :low,
     close::ColumnSpec = :close, fastkperiod::Integer = 9, slowkperiod::Integer = 3,
     slowkmatype::Symbol = :rma, slowdperiod::Integer = 3, slowdmatype::Symbol = :rma,
-    unstable::Integer = 0, name::Symbol = :kdj)
+    unstable::UnstableArg = 0, name::Symbol = :kdj)
     checkrange("KDJ", "fastkperiod", fastkperiod, 1, 100_000)
     checkrange("KDJ", "slowkperiod", slowkperiod, 1, 100_000)
     checkrange("KDJ", "slowdperiod", slowdperiod, 1, 100_000)
     checkmatype("KDJ", "slowkmatype", slowkmatype)
     checkmatype("KDJ", "slowdmatype", slowdmatype)
-    checkunstable(unstable)
+    unstable = checkunstable(unstable)
     s = StochSpec{:kdj,slowkmatype,slowdmatype}(0, fastkperiod, slowkperiod, slowdperiod,
         unstable)
     return barindicator(s, outnames(nothing, name, (:k, :d, :j)), high, low, close)

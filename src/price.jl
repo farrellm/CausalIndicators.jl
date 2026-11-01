@@ -85,7 +85,7 @@ CausalFrames.fresh(::WclPrice{H,L,C}, ::NamedTuple) where {H,L,C} =
 # Heikin-Ashi (S5)
 
 struct HASpec
-    unstable::Int
+    unstable::Unstable
 end
 
 mutable struct HAKernel{T}
@@ -95,7 +95,8 @@ mutable struct HAKernel{T}
     close::T
 end
 
-barkernel(s::HASpec, ::Type{T}) where {T} = HAKernel{T}(s.unstable, 0, zero(T), zero(T))
+barkernel(s::HASpec, ::Type{T}) where {T} =
+    HAKernel{T}(unstablecount(s.unstable, autoha), 0, zero(T), zero(T))
 CausalFrames.fresh!(k::HAKernel{T}) where {T} =
     (k.n = 0; k.open = zero(T); k.close = zero(T); k)
 
@@ -131,10 +132,11 @@ are anchored at the first bar seen, and the seed's weight halves each bar.
 $PLAIN_DOC
 A bar with any input `missing` leaves the state unchanged and emits `missing`.
 
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/ha/ha.yaml`, `ha.md`.
 """
 HeikinAshi(; open::ColumnSpec = :open, high::ColumnSpec = :high, low::ColumnSpec = :low,
-    close::ColumnSpec = :close, unstable::Integer = 0, name::Symbol = :ha) =
+    close::ColumnSpec = :close, unstable::UnstableArg = 0, name::Symbol = :ha) =
     barindicator(HASpec(checkunstable(unstable)),
         outnames(nothing, name, (:haopen, :hahigh, :halow, :haclose)), open, high, low,
         close)

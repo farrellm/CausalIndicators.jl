@@ -322,7 +322,7 @@ PVI(; close::ColumnSpec = :close, volume::ColumnSpec = :volume, name::Symbol = :
 struct ADOSCSpec
     fastperiod::Int
     slowperiod::Int
-    unstable::Int
+    unstable::Unstable
 end
 
 mutable struct ADOSCKernel{S,E}
@@ -336,9 +336,15 @@ end
 # with each period's factor.
 adoscema(::Type{T}, period) where {T} = EMAKernel(T, 1, 2 / (period + 1))
 
-barkernel(s::ADOSCSpec, ::Type{T}) where {T} =
-    ADOSCKernel(seedsum(T), adoscema(T, s.fastperiod), adoscema(T, s.slowperiod),
-        max(s.fastperiod, s.slowperiod) - 1 + s.unstable)
+# The lookback is EMA's at the longer period, plus under a level ADOSC's own
+# offset (ta_ADOSC.c).
+function barkernel(s::ADOSCSpec, ::Type{T}) where {T}
+    p = max(s.fastperiod, s.slowperiod)
+    lb =
+        p - 1 + unstablecount(s.unstable, autoema, p) +
+        unstableoffset(s.unstable, autoadosc, s.fastperiod, s.slowperiod)
+    return ADOSCKernel(seedsum(T), adoscema(T, s.fastperiod), adoscema(T, s.slowperiod), lb)
+end
 CausalFrames.fresh!(k::ADOSCKernel) = (fresh!(k.ad); fresh!(k.fast); fresh!(k.slow); k)
 
 @inline function barstep!(k::ADOSCKernel, h::T, l::T, c::T, v::T) where {T}
@@ -365,11 +371,12 @@ ADOSC is path-dependent, as AD is: no `warmup` makes it split-invariant.
 
 $PRICEBAR_DOC
 $DAILY_DOC
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/adosc/adosc.yaml`, `adosc.md`.
 """
 function ADOSC(; high::ColumnSpec = :high, low::ColumnSpec = :low,
     close::ColumnSpec = :close, volume::ColumnSpec = :volume, fastperiod::Integer = 3,
-    slowperiod::Integer = 10, unstable::Integer = 0, name::Symbol = :adosc)
+    slowperiod::Integer = 10, unstable::UnstableArg = 0, name::Symbol = :adosc)
     checkrange("ADOSC", "fastperiod", fastperiod, 2, 100_000)
     checkrange("ADOSC", "slowperiod", slowperiod, 2, 100_000)
     s = ADOSCSpec(fastperiod, slowperiod, checkunstable(unstable))
@@ -381,7 +388,7 @@ end
 
 struct EFISpec
     period::Int
-    unstable::Int
+    unstable::Unstable
 end
 
 mutable struct EFIKernel{E,T}
@@ -392,7 +399,12 @@ mutable struct EFIKernel{E,T}
 end
 
 barkernel(s::EFISpec, ::Type{T}) where {T} =
-    EFIKernel(EMAKernel(T, s.period), s.unstable, 0, zero(T))
+    EFIKernel(
+        EMAKernel(T, s.period),
+        unstablecount(s.unstable, autoema, s.period),
+        0,
+        zero(T),
+    )
 function CausalFrames.fresh!(k::EFIKernel{E,T}) where {E,T}
     fresh!(k.ema)
     k.n = 0
@@ -420,10 +432,11 @@ inherits.
 
 $PRICEBAR_DOC
 $DAILY_DOC
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/efi/efi.yaml`, `efi.md`.
 """
 function EFI(; close::ColumnSpec = :close, volume::ColumnSpec = :volume,
-    period::Integer = 13, unstable::Integer = 0, name::Symbol = :efi)
+    period::Integer = 13, unstable::UnstableArg = 0, name::Symbol = :efi)
     checkrange("EFI", "period", period, 1, 100_000)
     return barindicator(EFISpec(period, checkunstable(unstable)), (name,), close, volume)
 end
@@ -443,9 +456,10 @@ $PO_DOC
 $PLAIN_DOC$SKIP_DOC
 
 $DAILY_DOC
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/pvo/pvo.yaml`, `pvo.md`.
 """
 PVO(; volume::ColumnSpec = :volume, fastperiod::Integer = 12, slowperiod::Integer = 26,
-    matype::Symbol = :ema, unstable::Integer = 0, name::Symbol = :pvo) =
+    matype::Symbol = :ema, unstable::UnstableArg = 0, name::Symbol = :pvo) =
     priceoscillator("PVO", :ppo, volume, fastperiod, slowperiod, matype, unstable, name;
         prefix = false)

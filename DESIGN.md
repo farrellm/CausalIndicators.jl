@@ -395,6 +395,36 @@ given parameters.
   Setting `unstable = k` reproduces exactly the rows TA-Lib emits under
   `TA_SetUnstablePeriod(…, k)`, which is how the unstable-period test rows are
   checked.
+- **Auto-Stabilization (`unstable = :auto4` or `:auto8`).** TA-Lib 0.8.3's
+  `TA_UNSTABLE_AUTO_PREC_4` and `_8` drop leading bars until 4 (or 8)
+  significant digits no longer depend on where the data starts. The count is
+  not data-dependent. It is each id's closed form in the call's parameters,
+  the `c4`/`c8` of its `TA_GLOBALS_UNSTABLE` read: EMA(n), n > 1, drops
+  `(10n + 1) ÷ 2` bars at `:auto4` and `(19n + 1) ÷ 2` at `:auto8`, so EMA(30)
+  has a lookback of 179.
+  - A level is an `AutoLevel` (kernels/common.jl), with TA-Lib's `K` (e-folds:
+    10, 19) and `X` (digits: 4, 8). Each rule is a function of it, transcribed
+    from `ta_codegen/input/helpers/auto_stabilization.c` and each lookback:
+    `autoema`, `autowilder`, `autoratio`, `autoadx`, `autokama`, `autot3`,
+    `autoha`, `autohilbert`, `autohttrend`, `automama` and ADOSC's offset
+    `autoadosc`.
+  - It resolves at construction (`barkernel`, `MAKernel`), so the per-row path
+    is the same as under a count. Every kernel resolves its own id at its own
+    parameters, as each TA-Lib callee reads its id. So `MACD` drops EMA's
+    count at the slow and the signal periods, `KeltnerChannels` EMA's at
+    `period` and ATR's at `atrperiod`, `StochRSI` RSI's and its `fastdmatype`'s,
+    `TSI` and `SMI` each EMA stage's at its own period, and `ADXR` ADX's.
+    `matype` resolves through `MAKernel`, so `MA(; matype = :ema)` under
+    `:auto4` drops what `TA_MA` does.
+  - `ADOSC` adds its own offset on top of EMA's (`TA_GLOBALS_UNSTABLE_OFFSET`):
+    what its two EMAs, seeded on one value, can cancel. Under a count the
+    offset is 0, as in TA-Lib.
+  - A count is still one number for every id, as `TA_FUNC_UNST_ALL` sets it;
+    a level gives each id its own count.
+  - **Limits.** TA-Lib's spec states where a level is a target and not a
+    guarantee: flat or steadily trending series, and the state machines that
+    get no rule (`website/src/spec/auto-stabilization/`). The counts are
+    TA-Lib's; nothing here improves on them.
 - **Output types.** Output columns are therefore `Union{Missing, T}`. This
   matches CausalFrames' empty-summary convention, and `forwardfill` and
   `fillmissing` apply directly.
@@ -793,7 +823,14 @@ the goldens check every bar.
   - **Parameter sets.** Each function runs at its defaults over both datasets.
     It also runs at every parameter set `gen/golden/paramsets.toml` lists for
     it, over the 252-bar set only. The list holds the sets the tables use, and
-    `unstable = k` among them is `TA_SetUnstablePeriod`.
+    `unstable = k` among them is `TA_SetUnstablePeriod`. `unstable = "auto4"`
+    and `"auto8"` are the Auto-Stabilization levels.
+  - **Auto levels.** Every function whose output `TA_UNSTABLE_AUTO_PREC_8`
+    changes at its defaults also runs at both levels at its defaults, over
+    both datasets, since a level can drop more bars than the 252-bar set holds.
+    `paramsets.toml` adds levels at short periods and over the `matype`s. The
+    goldens check the lookback exactly (the `missing` rows) and the values
+    within tolerance.
   - **Boundary sweep.** Every function also runs test_period_boundary.c's
     parameter grid over the 252-bar set, derived from TA-Lib's own metadata
     (`dump_golden --meta`): each integer range at min, min+1, default±1 and a
@@ -972,6 +1009,15 @@ README rows together, and updates this document where reality differs.
   (#446) needed no change: CausalFrames' sums keep no residue there. The
   0.8.3 C-test legs for existing functions are ported (test/talib/README.md).
   The goldens' MA types 14 and 15 are skipped until S11 (`PENDING_MATYPES`).
+  **Complete.**
+- **S9′:** auto-stabilization. `unstable` accepts `:auto4` and `:auto8`, TA-Lib
+  0.8.3's `TA_UNSTABLE_AUTO_PREC_4`/`_8`, on every function that has the
+  keyword (see "Warm-up"). The 0.8.1 functions that own an id get its rule:
+  ADX, ATR, CMO, DX, EMA, HA, the six HT_*, KAMA, MAMA, ±DI, ±DM, NATR, RMA,
+  RSI, RVI and T3, and ADOSC its offset. The ones that inherit an id follow
+  their callees. `dump_golden` takes `unstable=auto4|auto8`, and the
+  regenerated goldens hold both levels for the 45 functions a level changes
+  (test/golden grew from 24 to 36 MB). It needed no upstream addition.
   **Complete.**
 
 A stage PR may find that an indicator can claim a stronger tier, or needs
