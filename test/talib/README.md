@@ -206,9 +206,10 @@ The legs TA-Lib 0.8.3 added to the files above (S9):
       an unstable period. Its cells with EMA's and ATR's unstable periods set
       apart have no counterpart, since `unstable` is one value.
 - [x] `test_percentile.c` wide periods (#435): periods 2 to 2049 at five
-      percentiles over five of its corpora, against the sorted window by value
-      (a -0.0 and a +0.0 tie). Its ring-buffer coverage corpora test TA-Lib's
-      own structure.
+      percentiles over seven of its corpora, against the sorted window by value
+      (a -0.0 and a +0.0 tie), including the falls onto ±0 ties at the window
+      minimum. Corpus 6 targets TA-Lib's merge-sorted first window and is
+      left out, since it tests TA-Lib's own structure.
 - [x] `test_stddev.c` and `test_correl.c` peg history (#434): VAR, STDDEV and
       CORREL over an EMA settling onto a peg (`ta_test_ref_peg_ema`), against
       the exact oracle, in `test/reference.jl`. `test_rvi.c`'s and

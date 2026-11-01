@@ -210,8 +210,9 @@ tavar(x, p) = only(foldseries(Variance(:x; corrected = false), (; x); window = B
         end
         # test_percentile_wide: periods 2 to 2049 (pctlWideN) at the percentiles
         # pctlWideP, over pctlBuildWide's tick walk, ±0/±1 noise, rising and
-        # falling trend cycles and random trends, against the sorted window. A
-        # -0.0 and a +0.0 tie, so values are compared as numbers.
+        # falling trend cycles, falls onto ±0 ties at the minimum and random
+        # trends, against the sorted window. A -0.0 and a +0.0 tie, so values
+        # are compared as numbers.
         widen, widep = a["pctlWideN"], a["pctlWideP"]
         function widecorpus(which, nb, n)
             seed, v, slope, left = UInt32(377), 100.0, 0.0, 0
@@ -229,6 +230,16 @@ tavar(x, p) = only(foldseries(Variance(:x; corrected = false), (; x); window = B
                         leg < 110 ? 0.25 * (Int((seed >> 8) % 3) - 1) :
                         leg < 135 ? -0.25 : 0.0
                     return which == 2 ? v : -v
+                elseif which in (4, 5)
+                    # A strict fall that bottoms out, 30 bars after the first
+                    # window, in six zeros of alternating sign, then keeps
+                    # falling: a new value tied with the window's minimum
+                    # mid-trend. Corpus 5 is its mirror.
+                    k = i - (n + 30)
+                    y =
+                        k < 0 ? 0.25 * -k :
+                        k < 6 ? (isodd(k) ? -0.0 : 0.0) : -0.25 * (k - 5)
+                    return which == 5 ? -y : y
                 else
                     if left == 0
                         left = 2 + Int((seed >> 8) % n)
@@ -241,7 +252,7 @@ tavar(x, p) = only(foldseries(Variance(:x; corrected = false), (; x); window = B
             end
         end
         nwide = 0
-        for which in (0, 1, 2, 3, 7), n in widen
+        for which in (0, 1, 2, 3, 4, 5, 7), n in widen
             x = widecorpus(which, 2049 + 400, n)
             got = [
                 only(
@@ -250,17 +261,20 @@ tavar(x, p) = only(foldseries(Variance(:x; corrected = false), (; x); window = B
                 ) for p in widep
             ]
             w = sort(x[1:(n-1)])
+            bad = false
             for i in n:length(x)
                 insert!(w, searchsortedlast(w, x[i]) + 1, x[i])
                 for (j, p) in enumerate(widep)
                     k = max(1, cld(Int(p) * n, 100))
                     nwide += 1
-                    got[j][i] == w[k] || (@test got[j][i] == w[k]; break)
+                    # One failure per corpus and period, not one per bar after it.
+                    got[j][i] == w[k] || (@test got[j][i] == w[k]; bad = true; break)
                 end
+                bad && break
                 deleteat!(w, searchsortedfirst(w, x[i-n+1]))
             end
         end
-        @test nwide == 5 * 5 * sum(n -> 2449 - n + 1, widen)
+        @test nwide == 7 * 5 * sum(n -> 2449 - n + 1, widen)
     end
 
     @testset "test_percentrank.c" begin

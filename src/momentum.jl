@@ -294,8 +294,9 @@ end
 
 TA-Lib's `RSI`, Wilder's relative strength index, in `:{column}_rsi`: with `g`
 and `l` the Wilder-smoothed gains and losses, `100·g/(g + l)`, or the neutral
-50 where both are zero (a series unchanged since its first bar). The averages are seeded with the mean of the first `period` moves.
-The lookback is `period`, and `unstable` is TA-Lib's unstable period.
+50 where both are zero (a series unchanged since its first bar). The averages
+are seeded with the mean of the first `period` moves. The lookback is `period`,
+and `unstable` is TA-Lib's unstable period.
 
 $PLAIN_DOC$SKIP_DOC
 
@@ -486,8 +487,8 @@ struct PriceOscillatorSpec{K,M}
 end
 
 # `deadafter` is the slow average's lookback for the windowed MA types (SMA,
-# WMA, TRIMA, HMA) under PPO, and -1 otherwise; `zerorun` counts the trailing
-# bars that are exactly zero.
+# WMA, TRIMA, HMA) under PPO, and -1 otherwise; `zerorun`, kept only in the
+# first case, counts the trailing bars that are exactly zero.
 mutable struct PriceOscillatorKernel{K,F,S}
     const fast::F
     const slow::S
@@ -514,7 +515,7 @@ CausalFrames.fresh!(k::PriceOscillatorKernel) =
 @inline function barstep!(k::PriceOscillatorKernel{K}, x) where {K}
     vf = step!(k.fast, x)
     vs = step!(k.slow, x)
-    k.zerorun = abs(x) <= 0 ? k.zerorun + 1 : 0
+    k.deadafter >= 0 && (k.zerorun = abs(x) <= 0 ? k.zerorun + 1 : 0)
     (ismissing(vf) || ismissing(vs)) && return nothing
     k.deadafter >= 0 && k.zerorun > k.deadafter && return (zero(vs),)
     return (oscillatorvalue(Val(K), vf, vs),)
@@ -538,10 +539,10 @@ end
 const PO_DOC = """
 The averages are `matype` moving averages as for [`MA`](@ref), both started at
 the first bar. TA-Lib swaps the periods if
-`slowperiod < fastperiod`. Under `:sma`, `:wma`, `:trima` or `:hma`, PPO and PVO
-give 0 once the slow window holds only bars that are exactly zero, where the
-average's sums may keep a residue of earlier values. `unstable` is the unstable period of `matype`, if it
-has one.
+`slowperiod < fastperiod`. Under `:sma`, `:wma`, `:trima` or `:hma`, PPO and
+PVO give 0 once the slow window holds only bars that are exactly zero, where
+the average's sums may keep a residue of earlier values. `unstable` is the
+unstable period of `matype`, if it has one.
 """
 
 """
@@ -1667,10 +1668,10 @@ end
 TA-Lib's `DPO`, the detrended price oscillator, in `:{column}_dpo`: the value
 `period ÷ 2 + 1` bars back minus the `period`-bar SMA, written at the bar whose
 average produced it. Charting packages usually draw it `period ÷ 2 + 1` bars
-back, the display shift TA-Lib 0.8.3 reports (`TA_DPO_DisplayShift`); the values
-are not shifted. The lookback is the larger of `period − 1` and `period ÷ 2 + 1`. The SMA is a
-CausalFrames `Mean` and the lagged value a `First`, under
-`CausalFrames.barwindow`.
+back, the display shift TA-Lib 0.8.3 reports (`TA_DPO_DisplayShift`); the
+values are not shifted. The lookback is the larger of `period − 1` and
+`period ÷ 2 + 1`. The SMA is a CausalFrames `Mean` and the lagged value a
+`First`, under `CausalFrames.barwindow`.
 
 $PRICEBAR_DOC
 

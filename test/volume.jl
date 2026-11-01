@@ -88,11 +88,15 @@ const PLAIN_S4 = [
             s, o = outs[r["theFunction"]]
             got = tablerun(d -> foldseries(s, d)[o], ref, r["startIdx"], r["endIdx"], 0)
             # NVI's and PVI's goldens carry every digit, and the C test holds
-            # them to 1e-12 relative, as the PVT oracle.
+            # them to 1e-12 relative, as the PVT oracle: no looser than that, nor
+            # than the default row tolerance where the literal is tighter still.
+            w = r["oneOfTheExpectedOutReal0"]
             tight = r["theFunction"] in ("TA_NVI_TEST", "TA_PVI_TEST")
             checkrow(got, r; out = "oneOfTheExpectedOutReal0",
                 index = "oneOfTheExpectedOutRealIndex0",
-                atol = tight ? 1e-12 * abs(r["oneOfTheExpectedOutReal0"]) : nothing)
+                atol = tight ?
+                       min(1e-12 * abs(w), max(10.0^-decimals(w), 1e-14 * abs(w))) :
+                       nothing)
             n += 1
         end
         @test n == 18
