@@ -1,6 +1,7 @@
 using CausalIndicators: EMAKernel, WilderKernel, SMAKernel, MAKernel, MATYPES, step!,
     current, nseen, lookback, floattype, WMAKernel, DEMAKernel, TEMAKernel, T3Kernel,
-    TRIMAKernel, KAMAKernel, HMAKernel, ZLEMAKernel
+    TRIMAKernel, KAMAKernel, HMAKernel, ZLEMAKernel, checkunstable, unstablecount,
+    autoema, autowilder
 
 # One of every S1 kernel, for the generic kernel properties.
 const S1_KERNELS =
@@ -33,6 +34,8 @@ end
 
 const KERNELS =
     Dict("EMA" => (p, T) -> EMAKernel(T, p), "RMA" => (p, T) -> WilderKernel(T, p))
+# The id's rule each kernel's golden function reads under an Auto level.
+const KERNEL_RULES = Dict("EMA" => autoema, "RMA" => autowilder)
 
 @testset "kernels" begin
     @testset "floattype" begin
@@ -47,7 +50,8 @@ const KERNELS =
         for ((ds, ps), want) in loadgolden(fn)
             p = parseparams(ps)
             period = get(p, :optInTimePeriod, 30)
-            unstable = get(p, :unstable, 0)
+            u = checkunstable(get(p, :unstable, 0))
+            unstable = unstablecount(u, KERNEL_RULES[fn], period)
             got = runkernel(mk(period, Float64), DATASETS[ds]().close; unstable)
             @test goldenmatch(got, want.outReal; rtol = 1e-9)
         end

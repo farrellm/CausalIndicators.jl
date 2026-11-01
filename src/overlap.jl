@@ -111,7 +111,7 @@ CausalFrames.fresh(::MidPrice{H,L}, ::NamedTuple) where {H,L} =
 # `ZLEMA` and `RMA`.
 struct MASpec{M}
     period::Int
-    unstable::Int
+    unstable::Unstable
     vfactor::Float64
     identity::Bool
 end
@@ -127,7 +127,7 @@ end
 function movingaverage(fn, matype, column, period, unstable, name;
     vfactor = 0.7, identity = false)
     checkrange(fn, "period", period, 1, 100_000)
-    checkunstable(unstable)
+    unstable = checkunstable(unstable)
     matype in UNSTABLE_MATYPES || unstable == 0 ||
         throw(ArgumentError("$fn has no unstable period (matype $(repr(matype)))"))
     s = MASpec{matype}(period, unstable, vfactor, identity)
@@ -159,12 +159,13 @@ applies only to the types that have one (`:ema`, `:dema`, `:tema`, `:kama`,
 period and is [`MAMA`](@ref)'s MAMA line at its default limits, lookback 32.
 
 $MA_DOC_COMMON
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/ma/ma.yaml`, `ma.md`.
 """
 function MA(column::ColumnSpec; period::Integer = 30, matype::Symbol = :sma,
-    unstable::Integer = 0, name::Symbol = :ma)
+    unstable::UnstableArg = 0, name::Symbol = :ma)
     checkmatype("MA", "matype", matype)
-    checkunstable(unstable)
+    unstable = checkunstable(unstable)
     # TA_MA ignores the unstable period of types that have none.
     u = matype in UNSTABLE_MATYPES ? unstable : 0
     return movingaverage("MA", matype, column, period, u, name; identity = true)
@@ -177,9 +178,10 @@ TA-Lib's `EMA` in `:{column}_ema`, seeded with the simple average of its first
 `period` bars.
 
 $MA_DOC_COMMON
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/ema/ema.yaml`, `ema.md`.
 """
-EMA(column::ColumnSpec; period::Integer = 30, unstable::Integer = 0,
+EMA(column::ColumnSpec; period::Integer = 30, unstable::UnstableArg = 0,
     name::Symbol = :ema) = movingaverage("EMA", :ema, column, period, unstable, name)
 
 """
@@ -189,9 +191,10 @@ TA-Lib's `RMA`, Wilder's smoothing, in `:{column}_rma`. It is seeded with the
 average of its first `period` bars and then steps `α = 1/period`.
 
 $MA_DOC_COMMON
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/rma/rma.yaml`, `rma.md`.
 """
-RMA(column::ColumnSpec; period::Integer = 30, unstable::Integer = 0,
+RMA(column::ColumnSpec; period::Integer = 30, unstable::UnstableArg = 0,
     name::Symbol = :rma) = movingaverage("RMA", :rma, column, period, unstable, name)
 
 """
@@ -202,9 +205,10 @@ unstable period, which TA-Lib's DEMA inherits. Each EMA stage passes it before
 feeding the next, so it changes the values as well as delaying them.
 
 $MA_DOC_COMMON
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/dema/dema.yaml`, `dema.md`.
 """
-DEMA(column::ColumnSpec; period::Integer = 30, unstable::Integer = 0,
+DEMA(column::ColumnSpec; period::Integer = 30, unstable::UnstableArg = 0,
     name::Symbol = :dema) = movingaverage("DEMA", :dema, column, period, unstable, name)
 
 """
@@ -214,9 +218,10 @@ TA-Lib's `TEMA`, `3·EMA − 3·EMA(EMA) + EMA(EMA(EMA))`, in `:{column}_tema`.
 `unstable` is EMA's unstable period, inherited as for [`DEMA`](@ref).
 
 $MA_DOC_COMMON
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/tema/tema.yaml`, `tema.md`.
 """
-TEMA(column::ColumnSpec; period::Integer = 30, unstable::Integer = 0,
+TEMA(column::ColumnSpec; period::Integer = 30, unstable::UnstableArg = 0,
     name::Symbol = :tema) = movingaverage("TEMA", :tema, column, period, unstable, name)
 
 """
@@ -240,9 +245,13 @@ efficiency ratio reads a CausalFrames `Sum` of `|Δx|` and a `First` over
 count windows. The lookback is `period` bars.
 
 $MA_DOC_COMMON
+$AUTO_DOC
+Under a level KAMA is sized for a market that trends or wanders; a
+range-bound one slows it by design and can need several times the count.
+
 TA-Lib: `ta_codegen/input/kama/kama.yaml`, `kama.md`.
 """
-KAMA(column::ColumnSpec; period::Integer = 30, unstable::Integer = 0,
+KAMA(column::ColumnSpec; period::Integer = 30, unstable::UnstableArg = 0,
     name::Symbol = :kama) = movingaverage("KAMA", :kama, column, period, unstable, name)
 
 """
@@ -253,10 +262,14 @@ from the volume factor `vfactor`, which must be in `[0, 1]`. The lookback is
 `6(period − 1)`.
 
 $MA_DOC_COMMON
+$AUTO_DOC
+Under a level T3 can need a fifth more than its count; a count of
+`20·period` covers it.
+
 TA-Lib: `ta_codegen/input/t3/t3.yaml`, `t3.md`.
 """
 function T3(column::ColumnSpec; period::Integer = 5, vfactor::Real = 0.7,
-    unstable::Integer = 0, name::Symbol = :t3)
+    unstable::UnstableArg = 0, name::Symbol = :t3)
     checkrange("T3", "vfactor", vfactor, 0, 1)
     return movingaverage("T3", :t3, column, period, unstable, name; vfactor)
 end
@@ -282,9 +295,10 @@ The zero-lag EMA, an EMA of `2x − x[lag]` with `lag = (period − 1) ÷ 2`, in
 ZLEMA's first output.
 
 $MA_DOC_COMMON
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/zlema/zlema.yaml`, `zlema.md`.
 """
-ZLEMA(column::ColumnSpec; period::Integer = 30, unstable::Integer = 0,
+ZLEMA(column::ColumnSpec; period::Integer = 30, unstable::UnstableArg = 0,
     name::Symbol = :zlema) = movingaverage("ZLEMA", :zlema, column, period, unstable, name)
 
 # ---------------------------------------------------------------------------
@@ -293,7 +307,7 @@ ZLEMA(column::ColumnSpec; period::Integer = 30, unstable::Integer = 0,
 struct MAVPSummarizer{M,C,P,N} <: Summarizer
     minperiod::Int
     maxperiod::Int
-    unstable::Int
+    unstable::Unstable
 end
 
 """
@@ -312,18 +326,19 @@ with TA-Lib too. The cost per bar is O(maxperiod − minperiod). The lookback is
 `MA`'s at `maxperiod`.
 
 $MA_DOC_COMMON
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/mavp/mavp.yaml`, `mavp.md`.
 """
 function MAVP(column::ColumnSpec, periods::ColumnSpec; minperiod::Integer = 2,
-    maxperiod::Integer = 30, matype::Symbol = :sma, unstable::Integer = 0,
+    maxperiod::Integer = 30, matype::Symbol = :sma, unstable::UnstableArg = 0,
     name::Symbol = :mavp)
     checkrange("MAVP", "minperiod", minperiod, 1, 10_000)
     checkrange("MAVP", "maxperiod", maxperiod, 1, 10_000)
     minperiod <= maxperiod || throw(
         ArgumentError("MAVP minperiod ($minperiod) must not exceed maxperiod ($maxperiod)"))
     checkmatype("MAVP", "matype", matype)
-    checkunstable(unstable)
-    u = matype in UNSTABLE_MATYPES ? Int(unstable) : 0
+    unstable = checkunstable(unstable)
+    u = matype in UNSTABLE_MATYPES ? unstable : 0
     C = colname(column)
     s = MAVPSummarizer{matype,C,colname(periods),outname(C, name)}(minperiod, maxperiod, u)
     return withterms(s, column, periods)
@@ -497,11 +512,12 @@ structured form cannot share a call with a corrected `Std` or `Variance` over
 the same column; put them in separate calls.
 
 $DAILY_DOC
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/bbands/bbands.yaml`, `bbands.md`.
 """
 function BollingerBands(column::ColumnSpec; nbdevup::Real = 2, nbdevdn::Real = 2,
     matype::Union{Nothing,Symbol} = nothing, period::Union{Nothing,Integer} = nothing,
-    unstable::Integer = 0, name::Symbol = :bbands)
+    unstable::UnstableArg = 0, name::Symbol = :bbands)
     C = colname(column)
     up, dn = Float64(nbdevup), Float64(nbdevdn)
     if matype === nothing
@@ -514,7 +530,7 @@ function BollingerBands(column::ColumnSpec; nbdevup::Real = 2, nbdevdn::Real = 2
     p = something(period, 20)
     checkrange("BollingerBands", "period", p, 2, 100_000)
     checkmatype("BollingerBands", "matype", matype)
-    checkunstable(unstable)
+    unstable = checkunstable(unstable)
     return barindicator(BollingerSpec{matype}(p, up, dn, unstable),
         outnames(C, name, BAND_SUFFIXES), column)
 end
@@ -534,7 +550,7 @@ struct BollingerSpec{M}
     period::Int
     nbdevup::Float64
     nbdevdn::Float64
-    unstable::Int
+    unstable::Unstable
 end
 
 mutable struct BollingerKernel{K,W,T}
@@ -566,14 +582,15 @@ struct KeltnerSpec
     period::Int
     atrperiod::Int
     nbdev::Float64
-    unstable::Int
+    unstable::Unstable
 end
 
 mutable struct KeltnerKernel{E,A,T}
     const ema::E
     const atr::A
     const nbdev::T
-    const unstable::Int
+    const emaunstable::Int
+    const atrunstable::Int
     const emaoffset::Int
     const atroffset::Int
     n::Int
@@ -582,11 +599,14 @@ end
 function barkernel(s::KeltnerSpec, ::Type{T}) where {T}
     e = EMAKernel(T, s.period)
     a = ATRKernel(T, s.atrperiod)
+    # Under a level each leg drops its own id's count at its own period.
+    ue = unstablecount(s.unstable, autoema, s.period)
+    ua = unstablecount(s.unstable, autowilder, s.atrperiod)
     # Both legs first emit on the same bar, as ta_KC.c anchors them: the one
     # with the shorter lookback starts that much later.
-    le, la = lookback(e) + s.unstable, lookback(a) + s.unstable
+    le, la = lookback(e) + ue, lookback(a) + ua
     L0 = max(le, la)
-    return KeltnerKernel(e, a, T(s.nbdev), s.unstable, L0 - le, L0 - la, 0)
+    return KeltnerKernel(e, a, T(s.nbdev), ue, ua, L0 - le, L0 - la, 0)
 end
 function CausalFrames.fresh!(k::KeltnerKernel)
     fresh!(k.ema)
@@ -600,7 +620,8 @@ end
     n > k.emaoffset && step!(k.ema, (h + l + c) / 3)
     n > k.atroffset && step!(k.atr, h, l, c)
     a = k.atr
-    (emitted(k.ema, k.unstable) && nseen(a) > lookback(a) + k.unstable) || return nothing
+    (emitted(k.ema, k.emaunstable) && nseen(a) > lookback(a) + k.atrunstable) ||
+        return nothing
     mid = k.ema.prev
     w = a.wilder.prev * k.nbdev
     return (mid + w, mid, mid - w)
@@ -616,18 +637,21 @@ TA-Lib's `KC`, Keltner's channels, in `:kc_upperband`, `:kc_middleband` and
 `atrperiod`-bar [`ATR`](@ref) above and below it. The two averages are aligned
 to emit first on the same bar, as TA-Lib aligns them, so the lookback is the
 larger of `period − 1` and `atrperiod`, plus `unstable`, the EMA and ATR
-unstable period TA-Lib's KC inherits.
+unstable period TA-Lib's KC inherits. Under a level each leg adds its own
+count, EMA's at `period` and ATR's at `atrperiod`, and the larger lookback
+wins.
 
 $PRICEBAR_DOC
 $DAILY_DOC
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/kc/kc.yaml`, `kc.md`.
 """
 function KeltnerChannels(; high::ColumnSpec = :high, low::ColumnSpec = :low,
     close::ColumnSpec = :close, period::Integer = 20, atrperiod::Integer = 10,
-    nbdev::Real = 2, unstable::Integer = 0, name::Symbol = :kc)
+    nbdev::Real = 2, unstable::UnstableArg = 0, name::Symbol = :kc)
     checkrange("KeltnerChannels", "period", period, 2, 100_000)
     checkrange("KeltnerChannels", "atrperiod", atrperiod, 1, 100_000)
-    checkunstable(unstable)
+    unstable = checkunstable(unstable)
     return barindicator(KeltnerSpec(period, atrperiod, nbdev, unstable),
         outnames(nothing, name, BAND_SUFFIXES), high, low, close)
 end
@@ -839,7 +863,7 @@ end
 struct SuperTrendSpec
     period::Int
     multiplier::Float64
-    unstable::Int
+    unstable::Unstable
 end
 
 barouttypes(::SuperTrendSpec, ::Type{T}, n) where {T} = Tuple{T,Int}
@@ -857,7 +881,8 @@ end
 
 function barkernel(s::SuperTrendSpec, ::Type{T}) where {T}
     z = zero(T)
-    return SuperTrendKernel(ATRKernel(T, s.period), T(s.multiplier), s.unstable, false,
+    u = unstablecount(s.unstable, autowilder, s.period)
+    return SuperTrendKernel(ATRKernel(T, s.period), T(s.multiplier), u, false,
         true, z, z, z)
 end
 function CausalFrames.fresh!(k::SuperTrendKernel{A,T}) where {A,T}
@@ -914,14 +939,18 @@ finite `warmup` makes it split-invariant.
 
 $PRICEBAR_DOC
 $DAILY_DOC
+$AUTO_DOC
+It is path-dependent, so a level only lengthens the lookback of its ATR
+and promises nothing about the line.
+
 TA-Lib: `ta_codegen/input/supertrend/supertrend.yaml`, `supertrend.md`.
 """
 function SuperTrend(; high::ColumnSpec = :high, low::ColumnSpec = :low,
     close::ColumnSpec = :close, period::Integer = 10, multiplier::Real = 3.0,
-    unstable::Integer = 0, name::Symbol = :supertrend)
+    unstable::UnstableArg = 0, name::Symbol = :supertrend)
     checkrange("SuperTrend", "period", period, 2, 100_000)
     checkrange("SuperTrend", "multiplier", multiplier, 0, Inf)
-    checkunstable(unstable)
+    unstable = checkunstable(unstable)
     return barindicator(SuperTrendSpec(period, multiplier, unstable),
         outnames(nothing, name, (:supertrend, :trend)), high, low, close)
 end

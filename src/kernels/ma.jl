@@ -35,17 +35,19 @@ The `matype` moving average over `period` bars, element type `T`. `matype` is on
 of [`MATYPES`](@ref).
 
 - `unstable` is TA-Lib's unstable period, for the types in
-  [`UNSTABLE_MATYPES`](@ref); the others ignore it.
+  [`UNSTABLE_MATYPES`](@ref); the others ignore it. A count or an
+  [`AutoLevel`](@ref) (or `:auto4`/`:auto8`), which resolves to the type's own
+  count at `period`.
 - `vfactor` is T3's volume factor; `TA_MA` always uses 0.7.
 - `identity = true` is `TA_MA`'s convention at period 1: a copy with lookback 0,
   whatever `unstable` is. With `false` the period-1 lookback is the type's own
   function's, which the unstable period still delays (`TA_DEMA` by twice it).
 """
-function MAKernel(::Type{T}, matype::Symbol, period::Integer; unstable::Integer = 0,
+function MAKernel(::Type{T}, matype::Symbol, period::Integer; unstable::UnstableArg = 0,
     vfactor::Real = 0.7, identity::Bool = true) where {T}
     checkmatype("MAKernel", "matype", matype)
     p = checkperiod("MAKernel", period)
-    u = identity && p == 1 ? 0 : checkunstable(unstable)
+    u = identity && p == 1 ? 0 : maunstable(Val(matype), checkunstable(unstable), p)
     inner = makernel(Val(matype), T, p, u, vfactor)
     lb = identity && p == 1 ? 0 : malookback(Val(matype), p, u)
     return MAKernel{matype,typeof(inner)}(inner, lb, 0)
@@ -66,7 +68,19 @@ makernel(::Val{:hma}, ::Type{T}, p, u, vf) where {T} = HMAKernel(T, p)
 makernel(::Val{:zlema}, ::Type{T}, p, u, vf) where {T} = ZLEMAKernel(T, p)
 makernel(::Val{:rma}, ::Type{T}, p, u, vf) where {T} = WilderKernel(T, p)
 
-# TA-Lib's `TA_<FN>_Lookback` for each type at period `p` and unstable period
+# The unstable count of each type at period `p` under `u`: its own id's
+# (`:kama`, `:mama`, `:t3`, `:rma`, `:ema`) or EMA's, which `:dema`, `:tema`
+# and `:zlema` inherit. The other types have none.
+maunstable(::Val, u, p) = 0
+maunstable(::Union{Val{:ema},Val{:dema},Val{:tema},Val{:zlema}}, u, p) =
+    unstablecount(u, autoema, p)
+maunstable(::Val{:kama}, u, p) = unstablecount(u, autokama, p)
+# TA_MA's MAMA is at the default limits.
+maunstable(::Val{:mama}, u, p) = unstablecount(u, automama, 0.5, 0.05)
+maunstable(::Val{:t3}, u, p) = unstablecount(u, autot3, p)
+maunstable(::Val{:rma}, u, p) = unstablecount(u, autowilder, p)
+
+# TA-Lib's `TA_<FN>_Lookback` for each type at period `p` and unstable count
 # `u` (ta_MA.c's dispatch, then each function's own).
 malookback(::Val{:sma}, p, u) = p - 1
 malookback(::Val{:ema}, p, u) = p - 1 + u
@@ -104,15 +118,15 @@ end
 
 An `:ema` `MAKernel` with smoothing factor `k` in place of `2 / (period + 1)`:
 MACDFix's fixed 12- and 26-bar EMAs (`k = 0.15` and `0.075`, ta_MACDFIX.c).
+Under a level its count is EMA's at `period`, as `TA_EMA_Lookback(26)` is.
 """
 function fixedemakernel(
     ::Type{T},
     period::Integer,
     k::Real;
-    unstable::Integer = 0,
+    unstable::UnstableArg = 0,
 ) where {T}
     e = EMAKernel(T, period, k)
-    return MAKernel{:ema,typeof(e)}(e,
-        malookback(Val(:ema), e.period,
-            checkunstable(unstable)), 0)
+    u = maunstable(Val(:ema), checkunstable(unstable), e.period)
+    return MAKernel{:ema,typeof(e)}(e, malookback(Val(:ema), e.period, u), 0)
 end

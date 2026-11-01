@@ -139,6 +139,23 @@ $PLAIN_DOC
 A bar with any input `missing` leaves the state unchanged and emits `missing`.
 """
 
+# For every indicator with an `unstable` keyword.
+const AUTO_DOC = """
+`unstable = :auto4` or `:auto8` is TA-Lib's Auto-Stabilization: each unstable
+period the indicator reads drops the bars TA-Lib's rule gives at these
+parameters, so that 4 (or 8) significant digits no longer depend on where the
+data starts. The count depends on the parameters, not on the data. It is
+TA-Lib's target, not a guarantee: TA-Lib's spec lists where it falls short
+(`website/src/spec/auto-stabilization/`, "Known exceptions").
+"""
+
+# The ratio outputs' exception (TA-Lib's "no level" list).
+const AUTO_FLAT_DOC = """
+No level covers a flat market: it divides one smoothed series by another, and
+when prices stop moving both shrink together and the ratio keeps its dependence
+on the start.
+"""
+
 # For the indicators whose defaults are their author's daily-chart parameters.
 const DAILY_DOC = """
 The defaults are TA-Lib's, which are the author's parameters for daily bars.

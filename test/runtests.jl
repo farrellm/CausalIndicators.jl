@@ -31,6 +31,7 @@ include("helpers.jl")
     include("cycle.jl")
     include("candles.jl")
     include("reference.jl")
+    include("auto.jl")
     include("boundary.jl")
 
     # JET can lag pre-release Julia; the checks are the same on every released

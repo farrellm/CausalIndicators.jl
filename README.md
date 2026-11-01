@@ -29,7 +29,10 @@ from `addrollingcolumns`, so TA-Lib's `period = p` is `Bars(p)`. Recursive ones
 take a `period` keyword and run under `addsummarycolumns`. Output columns are
 `missing` for TA-Lib's lookback. Functions that compare with the bar `period`
 back (the MOM/ROC family, Aroon, PercentRank100, RVOL, FOSC) take `Bars(period + 1)`. Indicators with a
-TA-Lib unstable period, their own or inherited, take an `unstable` keyword.
+TA-Lib unstable period, their own or inherited, take an `unstable` keyword: a
+count of extra warm-up bars, or `:auto4`/`:auto8`, TA-Lib 0.8.3's
+Auto-Stabilization, which drops the bars each function's rule gives for 4 or 8
+significant digits (EMA(30) under `:auto4` has a lookback of 179).
 
 Bars can be any size, daily or minute or tick, because every period and window
 counts bars, not days. The defaults, here and in the table below, are TA-Lib's,

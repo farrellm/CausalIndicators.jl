@@ -71,11 +71,12 @@ end
     DEMAKernel(T, period; unstable = 0)
 
 TA-Lib's double EMA over element type `T`, with EMA's unstable period
-`unstable` applied to both stages.
+`unstable` (a count or a level, resolved at `period`) applied to both stages.
 """
-function DEMAKernel(::Type{T}, period::Integer; unstable::Integer = 0) where {T}
+function DEMAKernel(::Type{T}, period::Integer; unstable::UnstableArg = 0) where {T}
     e = EMAKernel(T, period)
-    return DEMAKernel{T,typeof(e.seed)}(checkunstable(unstable), 0, missing, e, fresh(e))
+    u = unstablecount(checkunstable(unstable), autoema, period)
+    return DEMAKernel{T,typeof(e.seed)}(u, 0, missing, e, fresh(e))
 end
 
 CausalFrames.fresh(d::DEMAKernel{T}) where {T} =
@@ -118,11 +119,12 @@ end
     TEMAKernel(T, period; unstable = 0)
 
 TA-Lib's triple EMA over element type `T`, with EMA's unstable period
-`unstable` applied to each stage.
+`unstable` (a count or a level, resolved at `period`) applied to each stage.
 """
-function TEMAKernel(::Type{T}, period::Integer; unstable::Integer = 0) where {T}
+function TEMAKernel(::Type{T}, period::Integer; unstable::UnstableArg = 0) where {T}
     e = EMAKernel(T, period)
-    return TEMAKernel{T,typeof(e.seed)}(checkunstable(unstable), 0, missing, e,
+    u = unstablecount(checkunstable(unstable), autoema, period)
+    return TEMAKernel{T,typeof(e.seed)}(u, 0, missing, e,
         fresh(e), fresh(e))
 end
 

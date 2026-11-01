@@ -16,6 +16,12 @@
 # `params` is `default` or `name=value;...` in paramsets.toml's key order.
 # Empty output cells are TA-Lib's lookback rows.
 #
+# Every function whose output TA_UNSTABLE_AUTO_PREC_8 changes at its defaults,
+# on either dataset, owns or inherits an unstable id. It also runs at both
+# Auto-Stabilization levels, as the parameter sets `unstable=auto4` and
+# `unstable=auto8`, over both datasets: a level drops hundreds of bars, more
+# than the 252-bar set holds at some defaults.
+#
 # Every candlestick (CDL*) also runs at each non-default row of
 # test_candlestick.c's `cdlGlobalsMatrix` (rows 1-4, from the extracted table),
 # as the parameter set `cdlrow=r`, over both datasets: those rows are the
@@ -77,6 +83,23 @@ function runone(bin, data, fn, p)
     return lines[1], lines[2], lines[3:end]
 end
 
+# The extra sets that also run over the 10,000-bar set: a candlestick matrix
+# row, or an Auto level at the defaults.
+onbothsets(p) = keys(p) == Set(["cdlrow"]) || p in AUTOSETS
+
+const AUTOSETS = [Dict{String,Any}("unstable" => "auto4"),
+    Dict{String,Any}("unstable" => "auto8")]
+
+# Whether an Auto level changes `fn`'s output at its defaults.
+function autochanges(bin, fn)
+    datadir = joinpath(@__DIR__, "..", "..", "test", "data")
+    return any(DATASETS) do ds
+        data = joinpath(datadir, "$ds.csv")
+        runone(bin, data, fn, Dict{String,Any}()) !=
+        runone(bin, data, fn, AUTOSETS[2])
+    end
+end
+
 function generate(bin, fn, sets)
     datadir = joinpath(@__DIR__, "..", "..", "test", "data")
     outdir = joinpath(@__DIR__, "..", "..", "test", "golden")
@@ -85,7 +108,7 @@ function generate(bin, fn, sets)
     body = IOBuffer()
     rejected = String[]
     for ds in DATASETS, p in sets
-        ds == "gdata10000" && !isempty(p) && keys(p) != Set(["cdlrow"]) && continue
+        ds == "gdata10000" && !isempty(p) && !onbothsets(p) && continue
         r = runone(bin, joinpath(datadir, "$ds.csv"), fn, p)
         r === nothing && continue
         if r === :rejected
@@ -154,7 +177,8 @@ function main(root, fns)
     sets = TOML.parsefile(joinpath(@__DIR__, "paramsets.toml"))
     for fn in fns
         extra = startswith(fn, "CDL") ? [Dict{String,Any}("cdlrow" => r) for r in 1:4] : []
-        listed = [Dict{String,Any}(); get(sets, fn, Dict{String,Any}[]); extra]
+        auto = autochanges(bin, fn) ? AUTOSETS : Dict{String,Any}[]
+        listed = [Dict{String,Any}(); get(sets, fn, Dict{String,Any}[]); extra; auto]
         sweep = filter(p -> !(p in listed), sweepsets(bin, fn))
         generate(bin, fn, [listed; sweep])
     end

@@ -56,7 +56,7 @@ CausalFrames.fresh(::ADR, ::NamedTuple) = derivedvalue(:adr, (:adr_range_mean,),
 
 struct ATRSpec{K}
     period::Int
-    unstable::Int
+    unstable::Unstable
 end
 
 mutable struct ATRIndicatorKernel{K,A}
@@ -64,8 +64,17 @@ mutable struct ATRIndicatorKernel{K,A}
     const unstable::Int
 end
 
-barkernel(s::ATRSpec{K}, ::Type{T}) where {K,T} =
-    (a = ATRKernel(T, s.period); ATRIndicatorKernel{K,typeof(a)}(a, s.unstable))
+function barkernel(s::ATRSpec{K}, ::Type{T}) where {K,T}
+    a = ATRKernel(T, s.period)
+    return ATRIndicatorKernel{K,typeof(a)}(
+        a,
+        unstablecount(s.unstable, atrrule(K), s.period),
+    )
+end
+
+# ATR's own id has Wilder's rule; NATR's divides by the ATR, so it has the
+# ratio rule.
+atrrule(K) = K === :natr ? autoratio : autowilder
 CausalFrames.fresh!(k::ATRIndicatorKernel) = (fresh!(k.atr); k)
 
 @inline function barstep!(k::ATRIndicatorKernel{K}, h::T, l::T, c::T) where {K,T}
@@ -81,7 +90,7 @@ atrvalue(::Val{:natr}, p, atr, c) = p <= 1 ? atr : c != 0 ? (atr / c) * 100 : ze
 
 function atrsummarizer(fn, K, high, low, close, period, unstable, name)
     checkrange(fn, "period", period, 1, 100_000)
-    checkunstable(unstable)
+    unstable = checkunstable(unstable)
     return barindicator(ATRSpec{K}(period, unstable), (name,), high, low, close)
 end
 
@@ -97,10 +106,11 @@ TA-Lib's unstable period. At period 1 it is the true range.
 $PRICEBAR_DOC
 
 $DAILY_DOC
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/atr/atr.yaml`, `atr.md`.
 """
 ATR(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
-    period::Integer = 14, unstable::Integer = 0, name::Symbol = :atr) =
+    period::Integer = 14, unstable::UnstableArg = 0, name::Symbol = :atr) =
     atrsummarizer("ATR", :atr, high, low, close, period, unstable, name)
 
 """
@@ -114,10 +124,11 @@ period. At period 1 TA-Lib does not normalize, so it is the true range.
 $PRICEBAR_DOC
 
 $DAILY_DOC
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/natr/natr.yaml`, `natr.md`.
 """
 NATR(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
-    period::Integer = 14, unstable::Integer = 0, name::Symbol = :natr) =
+    period::Integer = 14, unstable::UnstableArg = 0, name::Symbol = :natr) =
     atrsummarizer("NATR", :natr, high, low, close, period, unstable, name)
 
 # ---------------------------------------------------------------------------
@@ -126,7 +137,7 @@ NATR(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :cl
 struct CVISpec
     period::Int
     rocperiod::Int
-    unstable::Int
+    unstable::Unstable
 end
 
 mutable struct CVIKernel{E,W}
@@ -136,7 +147,8 @@ mutable struct CVIKernel{E,W}
 end
 
 barkernel(s::CVISpec, ::Type{T}) where {T} =
-    CVIKernel(EMAKernel(T, s.period), lagged(s.rocperiod + 1, T), s.unstable)
+    CVIKernel(EMAKernel(T, s.period), lagged(s.rocperiod + 1, T),
+        unstablecount(s.unstable, autoema, s.period))
 CausalFrames.fresh!(k::CVIKernel) = (fresh!(k.ema); fresh!(k.lag); k)
 
 # ta_CVI.c: the rate of change, in percent, of the EMA of the range from
@@ -163,13 +175,14 @@ read from a CausalFrames `First` under `CausalFrames.barwindow`.
 $PRICEBAR_DOC
 
 $DAILY_DOC
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/cvi/cvi.yaml`, `cvi.md`.
 """
 function CVI(; high::ColumnSpec = :high, low::ColumnSpec = :low, period::Integer = 10,
-    rocperiod::Integer = 10, unstable::Integer = 0, name::Symbol = :cvi)
+    rocperiod::Integer = 10, unstable::UnstableArg = 0, name::Symbol = :cvi)
     checkrange("CVI", "period", period, 2, 100_000)
     checkrange("CVI", "rocperiod", rocperiod, 1, 100_000)
-    checkunstable(unstable)
+    unstable = checkunstable(unstable)
     return barindicator(CVISpec(period, rocperiod, unstable), (name,), high, low)
 end
 
@@ -179,7 +192,7 @@ end
 struct MassIndexSpec
     fastperiod::Int
     slowperiod::Int
-    unstable::Int
+    unstable::Unstable
 end
 
 mutable struct MassIndexKernel{E,W}
@@ -192,7 +205,7 @@ end
 function barkernel(s::MassIndexSpec, ::Type{T}) where {T}
     e = EMAKernel(T, s.fastperiod)
     w = CausalFrames.barwindow(Sum(:x), s.slowperiod, (x = T,))
-    return MassIndexKernel(e, fresh(e), w, s.unstable)
+    return MassIndexKernel(e, fresh(e), w, unstablecount(s.unstable, autoema, s.fastperiod))
 end
 CausalFrames.fresh!(k::MassIndexKernel) = (fresh!(k.e1); fresh!(k.e2); fresh!(k.window); k)
 
@@ -225,14 +238,15 @@ under `CausalFrames.barwindow`.
 $PRICEBAR_DOC
 
 $DAILY_DOC
+$AUTO_DOC
 TA-Lib: `ta_codegen/input/massi/massi.yaml`, `massi.md`.
 """
 function MassIndex(; high::ColumnSpec = :high, low::ColumnSpec = :low,
-    fastperiod::Integer = 9, slowperiod::Integer = 25, unstable::Integer = 0,
+    fastperiod::Integer = 9, slowperiod::Integer = 25, unstable::UnstableArg = 0,
     name::Symbol = :massi)
     checkrange("MassIndex", "fastperiod", fastperiod, 2, 100_000)
     checkrange("MassIndex", "slowperiod", slowperiod, 2, 100_000)
-    checkunstable(unstable)
+    unstable = checkunstable(unstable)
     return barindicator(MassIndexSpec(fastperiod, slowperiod, unstable), (name,), high,
         low)
 end
@@ -243,7 +257,7 @@ end
 struct RVISpec
     period::Int
     sdperiod::Int
-    unstable::Int
+    unstable::Unstable
 end
 
 mutable struct RVIKernel{S,W,T}
@@ -258,7 +272,8 @@ end
 function barkernel(s::RVISpec, ::Type{T}) where {T}
     sd = CausalFrames.barwindow(Std(:x; corrected = false), s.sdperiod, (x = T,))
     w = WilderKernel(T, s.period)
-    return RVIKernel(sd, w, fresh(w), s.unstable, false, zero(T))
+    u = unstablecount(s.unstable, autoratio, s.period)
+    return RVIKernel(sd, w, fresh(w), u, false, zero(T))
 end
 function CausalFrames.fresh!(k::RVIKernel{S,W,T}) where {S,W,T}
     fresh!(k.std)
@@ -303,13 +318,15 @@ standard deviation is a CausalFrames `Std(corrected = false)` under
 $PLAIN_DOC$SKIP_DOC
 
 $DAILY_DOC
+$AUTO_DOC
+$AUTO_FLAT_DOC
 TA-Lib: `ta_codegen/input/rvi/rvi.yaml`, `rvi.md`.
 """
 function RVI(column::ColumnSpec; period::Integer = 14, stddevperiod::Integer = 10,
-    unstable::Integer = 0, name::Symbol = :rvi)
+    unstable::UnstableArg = 0, name::Symbol = :rvi)
     checkrange("RVI", "period", period, 1, 100_000)
     checkrange("RVI", "stddevperiod", stddevperiod, 2, 100_000)
-    checkunstable(unstable)
+    unstable = checkunstable(unstable)
     return barindicator(RVISpec(period, stddevperiod, unstable),
         (outname(colname(column), name),), column)
 end

@@ -1,13 +1,18 @@
 # Parameter sets for the full-series goldens, per TA-Lib function. TA-Lib's
 # defaults are always generated as well; list here the sets the extracted tables
 # use, so every table point also has a golden series around it. `unstable` is
-# TA_SetUnstablePeriod(TA_FUNC_UNST_ALL, k).
+# TA_SetUnstablePeriod(TA_FUNC_UNST_ALL, k); "auto4" and "auto8" are the
+# Auto-Stabilization levels. generate.jl adds both levels at the defaults for
+# every function a level changes; the sets here hold periods short enough for
+# the 252-bar set to show output, and the matype paths.
 
 EMA = [
     {optInTimePeriod = 2},
     {optInTimePeriod = 10},
     {optInTimePeriod = 14},
     {optInTimePeriod = 10, unstable = 2},
+    {optInTimePeriod = 2, unstable = "auto8"},
+    {optInTimePeriod = 10, unstable = "auto4"},
 ]
 
 RMA = [
@@ -15,6 +20,8 @@ RMA = [
     {optInTimePeriod = 5},
     {optInTimePeriod = 14},
     {optInTimePeriod = 14, unstable = 3},
+    {optInTimePeriod = 2, unstable = "auto8"},
+    {optInTimePeriod = 5, unstable = "auto4"},
 ]
 
 # S1. MA covers each type through TA_MA's dispatch (optInMAType is TA_MAType's
@@ -36,6 +43,15 @@ MA = [
     {optInMAType = 7},
     {optInTimePeriod = 1, optInMAType = 7},
     {optInMAType = 7, unstable = 2},
+    {optInTimePeriod = 5, optInMAType = 1, unstable = "auto4"},
+    {optInTimePeriod = 5, optInMAType = 3, unstable = "auto4"},
+    {optInTimePeriod = 5, optInMAType = 4, unstable = "auto4"},
+    {optInTimePeriod = 5, optInMAType = 6, unstable = "auto4"},
+    {optInTimePeriod = 5, optInMAType = 8, unstable = "auto4"},
+    {optInTimePeriod = 5, optInMAType = 12, unstable = "auto4"},
+    {optInTimePeriod = 5, optInMAType = 13, unstable = "auto4"},
+    {optInTimePeriod = 2, optInMAType = 6, unstable = "auto8"},
+    {optInTimePeriod = 1, optInMAType = 3, unstable = "auto4"},
 ]
 
 SMA = [{optInTimePeriod = 2}]
@@ -46,28 +62,45 @@ DEMA = [
     {optInTimePeriod = 2, unstable = 1},
     {optInTimePeriod = 14, unstable = 1},
     {optInTimePeriod = 1, unstable = 2},
+    {optInTimePeriod = 1, unstable = "auto4"},
+    {optInTimePeriod = 5, unstable = "auto8"},
 ]
-TEMA = [{optInTimePeriod = 14}, {optInTimePeriod = 14, unstable = 1}]
+TEMA = [
+    {optInTimePeriod = 14},
+    {optInTimePeriod = 14, unstable = 1},
+    {optInTimePeriod = 5, unstable = "auto4"},
+]
 TRIMA = [{optInTimePeriod = 9}, {optInTimePeriod = 10}, {optInTimePeriod = 12}]
 KAMA = [
     {optInTimePeriod = 10},
     {optInTimePeriod = 14},
     {optInTimePeriod = 14, unstable = 3},
     {optInTimePeriod = 1, unstable = 2},
+    {optInTimePeriod = 1, unstable = "auto4"},
+    {optInTimePeriod = 2, unstable = "auto4"},
+    {optInTimePeriod = 4, unstable = "auto4"},
 ]
-T3 = [{optInTimePeriod = 3, optInVFactor = 0.3}, {optInTimePeriod = 5, unstable = 4}]
+T3 = [
+    {optInTimePeriod = 3, optInVFactor = 0.3},
+    {optInTimePeriod = 5, unstable = 4},
+    {optInTimePeriod = 2, unstable = "auto8"},
+    {optInTimePeriod = 5, unstable = "auto4"},
+]
 HMA = [{optInTimePeriod = 2}, {optInTimePeriod = 9}, {optInTimePeriod = 30}]
 ZLEMA = [
     {optInTimePeriod = 2},
     {optInTimePeriod = 10},
     {optInTimePeriod = 14},
     {optInTimePeriod = 10, unstable = 2},
+    {optInTimePeriod = 5, unstable = "auto4"},
 ]
 MAVP = [
     {optInMinPeriod = 2, optInMaxPeriod = 10, optInMAType = 1},
     {optInMinPeriod = 3, optInMaxPeriod = 20, optInMAType = 6},
     {optInMinPeriod = 2, optInMaxPeriod = 30, optInMAType = 3},
     {optInMinPeriod = 2, optInMaxPeriod = 10, optInMAType = 7},
+    {optInMinPeriod = 2, optInMaxPeriod = 10, optInMAType = 1, unstable = "auto4"},
+    {optInMinPeriod = 2, optInMaxPeriod = 5, optInMAType = 6, unstable = "auto4"},
 ]
 VWMA = [{optInTimePeriod = 1}, {optInTimePeriod = 14}]
 SUM = [{optInTimePeriod = 2}, {optInTimePeriod = 14}]
@@ -86,14 +119,22 @@ RSI = [
     {optInTimePeriod = 5},
     {optInTimePeriod = 14, unstable = 1},
     {optInTimePeriod = 14, unstable = 2},
+    {optInTimePeriod = 2, unstable = "auto8"},
+    {optInTimePeriod = 5, unstable = "auto4"},
 ]
-CMO = [{optInTimePeriod = 5}, {optInTimePeriod = 14, unstable = 2}]
+CMO = [
+    {optInTimePeriod = 5},
+    {optInTimePeriod = 14, unstable = 2},
+    {optInTimePeriod = 5, unstable = "auto4"},
+]
 MACD = [
     {optInFastPeriod = 26, optInSlowPeriod = 12},
     {optInFastPeriod = 5, optInSlowPeriod = 13, optInSignalPeriod = 4},
     {optInSignalPeriod = 1},
     {unstable = 2},
     {optInSignalPeriod = 1, unstable = 2},
+    {optInFastPeriod = 3, optInSlowPeriod = 6, optInSignalPeriod = 4, unstable = "auto4"},
+    {optInFastPeriod = 6, optInSlowPeriod = 3, optInSignalPeriod = 1, unstable = "auto8"},
 ]
 MACDFIX = [{optInSignalPeriod = 1}, {optInSignalPeriod = 4}, {unstable = 2}]
 MACDEXT = [
@@ -104,6 +145,8 @@ MACDEXT = [
     {optInFastMAType = 6, optInSlowMAType = 1, optInSignalMAType = 0},
     {optInFastMAType = 3, optInSlowMAType = 4, optInSignalMAType = 8, unstable = 1},
     {optInFastMAType = 7, optInSlowMAType = 1, optInSignalMAType = 7},
+    {optInFastPeriod = 3, optInFastMAType = 1, optInSlowPeriod = 6, optInSlowMAType = 3, optInSignalPeriod = 4, optInSignalMAType = 13, unstable = "auto4"},
+    {optInFastPeriod = 3, optInFastMAType = 0, optInSlowPeriod = 4, optInSlowMAType = 6, optInSignalPeriod = 3, optInSignalMAType = 8, unstable = "auto4"},
 ]
 APO = [
     {optInMAType = 0},
@@ -111,6 +154,8 @@ APO = [
     {optInMAType = 6},
     {unstable = 3},
     {optInMAType = 7},
+    {optInFastPeriod = 3, optInSlowPeriod = 6, unstable = "auto4"},
+    {optInFastPeriod = 6, optInSlowPeriod = 3, unstable = "auto8"},
 ]
 PPO = [
     {optInFastPeriod = 2, optInSlowPeriod = 3, optInMAType = 0},
@@ -118,11 +163,13 @@ PPO = [
     {optInMAType = 0},
     {optInFastPeriod = 26, optInSlowPeriod = 12},
     {optInMAType = 3, unstable = 2},
+    {optInFastPeriod = 3, optInSlowPeriod = 6, optInMAType = 4, unstable = "auto4"},
 ]
 TRIX = [
     {optInTimePeriod = 1},
     {optInTimePeriod = 5},
     {optInTimePeriod = 14, unstable = 2},
+    {optInTimePeriod = 5, unstable = "auto4"},
 ]
 STOCH = [
     {optInSlowD_Period = 4},
@@ -130,18 +177,21 @@ STOCH = [
     {optInSlowK_MAType = 1, optInSlowD_MAType = 2, unstable = 2},
     {optInFastK_Period = 1, optInSlowK_Period = 1, optInSlowD_Period = 1},
     {optInFastK_Period = 14, optInSlowK_MAType = 6, optInSlowD_MAType = 8},
+    {optInSlowK_MAType = 1, optInSlowD_MAType = 13, unstable = "auto4"},
 ]
 STOCHF = [
     {optInFastD_Period = 1},
     {optInFastD_MAType = 1, unstable = 2},
     {optInFastK_Period = 14, optInFastD_MAType = 4},
     {optInFastD_MAType = 7, unstable = 1},
+    {optInFastD_MAType = 1, unstable = "auto8"},
 ]
 STOCHRSI = [
     {optInTimePeriod = 14, optInFastK_Period = 14, optInFastD_Period = 1},
     {optInTimePeriod = 14, optInFastK_Period = 45, optInFastD_Period = 1},
     {optInTimePeriod = 11, optInFastK_Period = 13, optInFastD_Period = 16},
     {optInFastD_MAType = 1, unstable = 2},
+    {optInTimePeriod = 5, optInFastD_MAType = 1, unstable = "auto4"},
 ]
 WILLR = [{optInTimePeriod = 2}, {optInTimePeriod = 30}]
 CCI = [{optInTimePeriod = 2}, {optInTimePeriod = 5}, {optInTimePeriod = 11}]
@@ -166,15 +216,75 @@ ROCR = [{optInTimePeriod = 1}, {optInTimePeriod = 14}]
 ROCR100 = [{optInTimePeriod = 1}, {optInTimePeriod = 14}]
 
 # S3. MA types use TA_MAType's order (see MA above).
-ATR = [{optInTimePeriod = 1}, {optInTimePeriod = 2}, {optInTimePeriod = 14, unstable = 1}]
-NATR = [{optInTimePeriod = 1}, {optInTimePeriod = 5}, {optInTimePeriod = 14, unstable = 2}]
-PLUS_DM = [{optInTimePeriod = 1}, {optInTimePeriod = 2}, {optInTimePeriod = 14, unstable = 2}]
-MINUS_DM = [{optInTimePeriod = 1}, {optInTimePeriod = 2}, {optInTimePeriod = 14, unstable = 2}]
-PLUS_DI = [{optInTimePeriod = 1}, {optInTimePeriod = 2}, {optInTimePeriod = 14, unstable = 2}]
-MINUS_DI = [{optInTimePeriod = 1}, {optInTimePeriod = 2}, {optInTimePeriod = 14, unstable = 2}]
-DX = [{optInTimePeriod = 2}, {optInTimePeriod = 5}, {optInTimePeriod = 14, unstable = 2}]
-ADX = [{optInTimePeriod = 2}, {optInTimePeriod = 5}, {optInTimePeriod = 14, unstable = 2}]
-ADXR = [{optInTimePeriod = 2}, {optInTimePeriod = 5}, {optInTimePeriod = 14, unstable = 2}]
+ATR = [
+    {optInTimePeriod = 1},
+    {optInTimePeriod = 2},
+    {optInTimePeriod = 14, unstable = 1},
+    {optInTimePeriod = 1, unstable = "auto4"},
+    {optInTimePeriod = 2, unstable = "auto8"},
+    {optInTimePeriod = 5, unstable = "auto4"},
+]
+NATR = [
+    {optInTimePeriod = 1},
+    {optInTimePeriod = 5},
+    {optInTimePeriod = 14, unstable = 2},
+    {optInTimePeriod = 1, unstable = "auto4"},
+    {optInTimePeriod = 2, unstable = "auto8"},
+    {optInTimePeriod = 5, unstable = "auto4"},
+]
+PLUS_DM = [
+    {optInTimePeriod = 1},
+    {optInTimePeriod = 2},
+    {optInTimePeriod = 14, unstable = 2},
+    {optInTimePeriod = 1, unstable = "auto4"},
+    {optInTimePeriod = 2, unstable = "auto8"},
+    {optInTimePeriod = 5, unstable = "auto4"},
+]
+MINUS_DM = [
+    {optInTimePeriod = 1},
+    {optInTimePeriod = 2},
+    {optInTimePeriod = 14, unstable = 2},
+    {optInTimePeriod = 1, unstable = "auto4"},
+    {optInTimePeriod = 2, unstable = "auto8"},
+    {optInTimePeriod = 5, unstable = "auto4"},
+]
+PLUS_DI = [
+    {optInTimePeriod = 1},
+    {optInTimePeriod = 2},
+    {optInTimePeriod = 14, unstable = 2},
+    {optInTimePeriod = 1, unstable = "auto4"},
+    {optInTimePeriod = 2, unstable = "auto8"},
+    {optInTimePeriod = 5, unstable = "auto4"},
+]
+MINUS_DI = [
+    {optInTimePeriod = 1},
+    {optInTimePeriod = 2},
+    {optInTimePeriod = 14, unstable = 2},
+    {optInTimePeriod = 1, unstable = "auto4"},
+    {optInTimePeriod = 2, unstable = "auto8"},
+    {optInTimePeriod = 5, unstable = "auto4"},
+]
+DX = [
+    {optInTimePeriod = 2},
+    {optInTimePeriod = 5},
+    {optInTimePeriod = 14, unstable = 2},
+    {optInTimePeriod = 2, unstable = "auto8"},
+    {optInTimePeriod = 5, unstable = "auto4"},
+]
+ADX = [
+    {optInTimePeriod = 2},
+    {optInTimePeriod = 5},
+    {optInTimePeriod = 14, unstable = 2},
+    {optInTimePeriod = 2, unstable = "auto8"},
+    {optInTimePeriod = 5, unstable = "auto4"},
+]
+ADXR = [
+    {optInTimePeriod = 2},
+    {optInTimePeriod = 5},
+    {optInTimePeriod = 14, unstable = 2},
+    {optInTimePeriod = 2, unstable = "auto8"},
+    {optInTimePeriod = 5, unstable = "auto4"},
+]
 SAR = [
     {optInAcceleration = 0.01, optInMaximum = 0.1},
     {optInAcceleration = 0.3, optInMaximum = 0.2},
@@ -197,6 +307,8 @@ BBANDS = [
     {optInTimePeriod = 2, optInMAType = 2},
     {optInMAType = 7},
     {optInTimePeriod = 40, optInMAType = 7},
+    {optInTimePeriod = 5, optInMAType = 1, unstable = "auto4"},
+    {optInTimePeriod = 5, optInMAType = 8, unstable = "auto8"},
 ]
 STDDEV = [{optInTimePeriod = 2}, {optInNbDev = 1.5}, {optInTimePeriod = 20, optInNbDev = 2.0}]
 VAR = [{optInTimePeriod = 1}, {optInTimePeriod = 2}, {optInTimePeriod = 20}]
@@ -208,6 +320,8 @@ KC = [
     {optInTimePeriod = 4, optInATRPeriod = 4, optInNbDev = 3.0},
     {optInTimePeriod = 10, optInATRPeriod = 10, optInNbDev = 0.0},
     {optInTimePeriod = 8, optInATRPeriod = 12, unstable = 2},
+    {optInTimePeriod = 4, optInATRPeriod = 10, unstable = "auto4"},
+    {optInTimePeriod = 8, optInATRPeriod = 4, unstable = "auto8"},
 ]
 DONCHIAN = [{optInTimePeriod = 2}, {optInTimePeriod = 14}]
 SUPERTREND = [
@@ -215,23 +329,27 @@ SUPERTREND = [
     {optInTimePeriod = 10, optInMultiplier = 1.0},
     {optInTimePeriod = 2, optInMultiplier = 0.0},
     {optInTimePeriod = 5, optInMultiplier = 1.5, unstable = 2},
+    {optInTimePeriod = 5, unstable = "auto4"},
 ]
 ADR = [{optInTimePeriod = 1}, {optInTimePeriod = 2}, {optInTimePeriod = 20}]
 CVI = [
     {optInTimePeriod = 5, optInROCPeriod = 5},
     {optInTimePeriod = 2, optInROCPeriod = 1},
     {optInTimePeriod = 10, optInROCPeriod = 14, unstable = 3},
+    {optInTimePeriod = 5, optInROCPeriod = 5, unstable = "auto4"},
 ]
 MASSI = [
     {optInFastPeriod = 2, optInSlowPeriod = 2},
     {optInFastPeriod = 25, optInSlowPeriod = 3},
     {optInFastPeriod = 9, optInSlowPeriod = 25, unstable = 2},
+    {optInFastPeriod = 2, optInSlowPeriod = 2, unstable = "auto8"},
 ]
 RVI = [
     {optInTimePeriod = 1, optInStdDevPeriod = 10},
     {optInTimePeriod = 3, optInStdDevPeriod = 2},
     {optInTimePeriod = 14, optInStdDevPeriod = 30},
     {optInTimePeriod = 14, optInStdDevPeriod = 10, unstable = 4},
+    {optInTimePeriod = 3, optInStdDevPeriod = 2, unstable = "auto4"},
 ]
 
 # S4.
@@ -240,11 +358,19 @@ ADOSC = [
     {optInFastPeriod = 5, optInSlowPeriod = 2},
     {optInFastPeriod = 2, optInSlowPeriod = 5},
     {optInFastPeriod = 3, optInSlowPeriod = 10, unstable = 3},
+    {optInFastPeriod = 5, optInSlowPeriod = 2, unstable = "auto4"},
+    {optInFastPeriod = 2, optInSlowPeriod = 5, unstable = "auto8"},
 ]
 BETA = [{optInTimePeriod = 1}, {optInTimePeriod = 2}, {optInTimePeriod = 20}]
 CMF = [{optInTimePeriod = 2}, {optInTimePeriod = 14}, {optInTimePeriod = 21}]
 CORREL = [{optInTimePeriod = 2}, {optInTimePeriod = 20}]
-EFI = [{optInTimePeriod = 1}, {optInTimePeriod = 2}, {optInTimePeriod = 13, unstable = 2}]
+EFI = [
+    {optInTimePeriod = 1},
+    {optInTimePeriod = 2},
+    {optInTimePeriod = 13, unstable = 2},
+    {optInTimePeriod = 1, unstable = "auto4"},
+    {optInTimePeriod = 2, unstable = "auto8"},
+]
 LINEARREG = [{optInTimePeriod = 2}, {optInTimePeriod = 5}, {optInTimePeriod = 30}]
 LINEARREG_ANGLE = [{optInTimePeriod = 2}, {optInTimePeriod = 5}, {optInTimePeriod = 30}]
 LINEARREG_INTERCEPT = [{optInTimePeriod = 2}, {optInTimePeriod = 5}, {optInTimePeriod = 30}]
@@ -266,6 +392,7 @@ PVO = [
     {optInMAType = 6},
     {optInFastPeriod = 26, optInSlowPeriod = 12},
     {optInMAType = 1, unstable = 2},
+    {optInFastPeriod = 3, optInSlowPeriod = 6, unstable = "auto4"},
 ]
 PVT = []
 RVOL = [{optInTimePeriod = 1}, {optInTimePeriod = 5}]
@@ -288,7 +415,12 @@ COPPOCK = [
 ]
 DPO = [{optInTimePeriod = 2}, {optInTimePeriod = 3}, {optInTimePeriod = 5}, {optInTimePeriod = 10}]
 ER = [{optInTimePeriod = 2}, {optInTimePeriod = 30}]
-ERI = [{optInTimePeriod = 1}, {optInTimePeriod = 2}, {optInTimePeriod = 13, unstable = 3}]
+ERI = [
+    {optInTimePeriod = 1},
+    {optInTimePeriod = 2},
+    {optInTimePeriod = 13, unstable = 3},
+    {optInTimePeriod = 2, unstable = "auto8"},
+]
 FOSC = [{optInTimePeriod = 2}, {optInTimePeriod = 14}]
 FRACTAL = [
     {optInLeftBars = 1, optInRightBars = 1},
@@ -309,11 +441,14 @@ SMI = [
     {optInTimePeriod = 2, optInFastPeriod = 2, optInSlowPeriod = 2, optInSignalPeriod = 2},
     {optInTimePeriod = 5, optInFastPeriod = 3, optInSlowPeriod = 10, optInSignalPeriod = 4},
     {unstable = 2},
+    {optInTimePeriod = 5, optInFastPeriod = 3, optInSlowPeriod = 10, optInSignalPeriod = 4, unstable = "auto4"},
 ]
 TSI = [
     {optInFirstPeriod = 13, optInSecondPeriod = 25},
     {optInFirstPeriod = 2, optInSecondPeriod = 2},
     {unstable = 2},
+    {optInFirstPeriod = 2, optInSecondPeriod = 2, unstable = "auto8"},
+    {optInFirstPeriod = 13, optInSecondPeriod = 5, unstable = "auto4"},
 ]
 VHF = [{optInTimePeriod = 2}, {optInTimePeriod = 5}, {optInTimePeriod = 14}]
 VORTEX = [{optInTimePeriod = 1}, {optInTimePeriod = 2}, {optInTimePeriod = 21}]

@@ -12,7 +12,8 @@
  *     order, except an input named inPeriods (MAVP), which takes the synthetic
  *     series 2 + (i mod 29).
  * Optional inputs keep TA-Lib's defaults unless given. unstable=k is
- * TA_SetUnstablePeriod(TA_FUNC_UNST_ALL, k). cdl.Setting=r:a:f is
+ * TA_SetUnstablePeriod(TA_FUNC_UNST_ALL, k), and unstable=auto4 or auto8 sets
+ * TA_UNSTABLE_AUTO_PREC_4 or _8 the same way. cdl.Setting=r:a:f is
  * TA_SetCandleSettings(TA_Setting, r, a, f), Setting one of TA_CandleSettingType's
  * names (BodyLong, ..., Equal) and r a TA_RangeType (0 RealBody, 1 HighLow,
  * 2 Shadows).
@@ -215,7 +216,10 @@ int main(int argc, char **argv)
       if (!eq) die("expected name=value:", argv[a]);
       *eq = '\0';
       if (strcmp(argv[a], "unstable") == 0) {
-         check(TA_SetUnstablePeriod(TA_FUNC_UNST_ALL, atoi(eq + 1)), "TA_SetUnstablePeriod");
+         unsigned int u = strcmp(eq + 1, "auto4") == 0 ? (unsigned int)TA_UNSTABLE_AUTO_PREC_4
+                        : strcmp(eq + 1, "auto8") == 0 ? (unsigned int)TA_UNSTABLE_AUTO_PREC_8
+                        : (unsigned int)atoi(eq + 1);
+         check(TA_SetUnstablePeriod(TA_FUNC_UNST_ALL, u), "TA_SetUnstablePeriod");
          continue;
       }
       if (strncmp(argv[a], "cdl.", 4) == 0) {

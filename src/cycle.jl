@@ -20,7 +20,7 @@ measured cycle period to 6–50 bars, so on other bar sizes a cycle longer than
 # F names the function: :dcperiod, :phasor (Hilbert from bar 13, lookback 32),
 # :dcphase, :sine, :trendline, :trendmode (from bar 38, lookback 63).
 struct HTSpec{F}
-    unstable::Int
+    unstable::Unstable
 end
 
 mutable struct HTIndicatorKernel{F,T,H,P,L}
@@ -39,7 +39,8 @@ function barkernel(s::HTSpec{F}, ::Type{T}) where {F,T}
     h = HilbertKernel(T, htlookback(F) == 32 ? 12 : 37; nsmooth = htphase(F) ? 50 : 7)
     p = htphase(F) ? DCPhasePart(T) : nothing
     l = httrend(F) ? TrendlinePart(T) : nothing
-    return HTIndicatorKernel{F,T,typeof(h),typeof(p),typeof(l)}(h, p, l, s.unstable, 0)
+    u = unstablecount(s.unstable, httrend(F) ? autohttrend : autohilbert)
+    return HTIndicatorKernel{F,T,typeof(h),typeof(p),typeof(l)}(h, p, l, u, 0)
 end
 barouttype(::HTSpec{:trendmode}, ::Type{T}) where {T} = Int
 
@@ -100,9 +101,13 @@ The lookback is 32 bars.
 
 $HT_BARS_DOC
 $HT_DOC
+$AUTO_DOC
+No level covers an input that rests on one value for a whole cycle:
+when it moves again the Hilbert core starts over.
+
 TA-Lib: `ta_codegen/input/ht_dcperiod/ht_dcperiod.yaml`, `ht_dcperiod.md`.
 """
-HTDCPeriod(column::ColumnSpec; unstable::Integer = 0, name::Symbol = :htdcperiod) =
+HTDCPeriod(column::ColumnSpec; unstable::UnstableArg = 0, name::Symbol = :htdcperiod) =
     barindicator(HTSpec{:dcperiod}(checkunstable(unstable)),
         (outname(colname(column), name),), column)
 
@@ -116,9 +121,14 @@ advanced to compensate for the smoother's lag. The lookback is 63 bars.
 
 $HT_BARS_DOC
 $HT_DOC
+$AUTO_DOC
+No level covers an input that rests on one value for a whole cycle,
+where the phase is undefined: when it moves again the Hilbert core starts
+over.
+
 TA-Lib: `ta_codegen/input/ht_dcphase/ht_dcphase.yaml`, `ht_dcphase.md`.
 """
-HTDCPhase(column::ColumnSpec; unstable::Integer = 0, name::Symbol = :htdcphase) =
+HTDCPhase(column::ColumnSpec; unstable::UnstableArg = 0, name::Symbol = :htdcphase) =
     barindicator(HTSpec{:dcphase}(checkunstable(unstable)),
         (outname(colname(column), name),), column)
 
@@ -131,9 +141,13 @@ TA-Lib's `HT_PHASOR`, the Hilbert transform's phasor components, in
 
 $HT_BARS_DOC
 $HT_DOC
+$AUTO_DOC
+No level covers an input that rests on one value for a whole cycle:
+when it moves again the Hilbert core starts over.
+
 TA-Lib: `ta_codegen/input/ht_phasor/ht_phasor.yaml`, `ht_phasor.md`.
 """
-HTPhasor(column::ColumnSpec; unstable::Integer = 0, name::Symbol = :htphasor) =
+HTPhasor(column::ColumnSpec; unstable::UnstableArg = 0, name::Symbol = :htphasor) =
     barindicator(HTSpec{:phasor}(checkunstable(unstable)),
         outnames(colname(column), name, (:inphase, :quadrature)), column)
 
@@ -146,9 +160,14 @@ and `:{column}_htsine_leadsine`: the sines of the dominant cycle phase (see
 
 $HT_BARS_DOC
 $HT_DOC
+$AUTO_DOC
+No level covers an input that rests on one value for a whole cycle,
+where the phase is undefined: when it moves again the Hilbert core starts
+over.
+
 TA-Lib: `ta_codegen/input/ht_sine/ht_sine.yaml`, `ht_sine.md`.
 """
-HTSine(column::ColumnSpec; unstable::Integer = 0, name::Symbol = :htsine) =
+HTSine(column::ColumnSpec; unstable::UnstableArg = 0, name::Symbol = :htsine) =
     barindicator(HTSpec{:sine}(checkunstable(unstable)),
         outnames(colname(column), name, (:sine, :leadsine)), column)
 
@@ -162,9 +181,14 @@ lookback is 63 bars.
 
 $HT_BARS_DOC
 $HT_DOC
+$AUTO_DOC
+Under a level it agrees with a later start exactly or not at all: the
+level sets how rare a disagreement is, and no tolerance absorbs one. An input
+that rests on one value for a whole cycle starts it over.
+
 TA-Lib: `ta_codegen/input/ht_trendline/ht_trendline.yaml`, `ht_trendline.md`.
 """
-HTTrendline(column::ColumnSpec; unstable::Integer = 0, name::Symbol = :httrendline) =
+HTTrendline(column::ColumnSpec; unstable::UnstableArg = 0, name::Symbol = :httrendline) =
     barindicator(HTSpec{:trendline}(checkunstable(unstable)),
         (outname(colname(column), name),), column)
 
@@ -182,16 +206,21 @@ strays that far from the trendline, so cycle mode (0) is reported more often.
 
 $HT_BARS_DOC
 $HT_DOC
+$AUTO_DOC
+Under a level it agrees with a later start exactly or not at all: the
+level sets how rare a disagreement is, and no tolerance absorbs one. An input
+that rests on one value for a whole cycle starts it over.
+
 TA-Lib: `ta_codegen/input/ht_trendmode/ht_trendmode.yaml`, `ht_trendmode.md`.
 """
-HTTrendMode(column::ColumnSpec; unstable::Integer = 0, name::Symbol = :httrendmode) =
+HTTrendMode(column::ColumnSpec; unstable::UnstableArg = 0, name::Symbol = :httrendmode) =
     barindicator(HTSpec{:trendmode}(checkunstable(unstable)),
         (outname(colname(column), name),), column)
 
 struct MAMASpec
     fastlimit::Float64
     slowlimit::Float64
-    unstable::Int
+    unstable::Unstable
 end
 
 mutable struct MAMAIndicatorKernel{K}
@@ -200,7 +229,8 @@ mutable struct MAMAIndicatorKernel{K}
 end
 
 barkernel(s::MAMASpec, ::Type{T}) where {T} =
-    MAMAIndicatorKernel(MAMAKernel(T, s.fastlimit, s.slowlimit), s.unstable)
+    MAMAIndicatorKernel(MAMAKernel(T, s.fastlimit, s.slowlimit),
+        unstablecount(s.unstable, automama, s.fastlimit, s.slowlimit))
 CausalFrames.fresh!(k::MAMAIndicatorKernel) = (fresh!(k.mama); k)
 
 @inline function barstep!(k::MAMAIndicatorKernel, x::T) where {T}
@@ -225,10 +255,15 @@ $HT_BARS_DOC
 $HT_DOC
 
 $DAILY_DOC
+$AUTO_DOC
+No level covers an input that rests on one value for a whole cycle, nor
+a price worth a few thousand ticks or less, where the in-phase component is
+zero to rounding and two starts can take different alphas.
+
 TA-Lib: `ta_codegen/input/mama/mama.yaml`, `mama.md`.
 """
 function MAMA(column::ColumnSpec; fastlimit::Real = 0.5, slowlimit::Real = 0.05,
-    unstable::Integer = 0, name::Symbol = :mama)
+    unstable::UnstableArg = 0, name::Symbol = :mama)
     checkrange("MAMA", "fastlimit", fastlimit, 0.01, 0.99)
     checkrange("MAMA", "slowlimit", slowlimit, 0.01, 0.99)
     return barindicator(
