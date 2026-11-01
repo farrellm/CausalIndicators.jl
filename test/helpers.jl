@@ -175,6 +175,16 @@ const CHECKED_GOLDENS = Set{String}()
 const WINDOW = (:optInTimePeriod,)
 
 """
+TA-Lib MA types the goldens carry that have no `matype` yet: `TA_MAType_VIDYA`
+and `TA_MAType_ALMA` (14 and 15, new in TA-Lib 0.8.3), which land with `VIDYA`
+and `ALMA` in stage S11. [`checkgoldens`](@ref) skips their parameter sets.
+"""
+const PENDING_MATYPES = (14, 15)
+
+pendingmatype(p) =
+    any(((k, v),) -> occursin("MAType", String(k)) && v in PENDING_MATYPES, p)
+
+"""
     checkgoldens(run, fn; outputs, input = :close, skip = nothing, accepts = ())
 
 For every `(dataset, params)` golden of TA-Lib function `fn`, call
@@ -183,6 +193,7 @@ named in `outputs` (in that order), and check each against the golden with
 [`goldenmatch`](@ref). `skip(data, params, i)`, if given, excludes bar `i` (1-based)
 from the comparison. The absolute tolerance is [`goldenatol`](@ref) of the
 `input` column, or `atol` if given. It returns the number of series checked.
+Sets over a [`PENDING_MATYPES`](@ref) MA type are skipped.
 
 Every parameter set TA-Lib rejects ([`loadrejected`](@ref)) must make `run`
 throw an `ArgumentError`, except a set over the TA-Lib parameters named in
@@ -211,6 +222,7 @@ function checkgoldens(run, fn; outputs, input = :close, skip = nothing,
     for ((ds, ps), golden) in sort(collect(loadgolden(fn)); by = first)
         data = DATASETS[ds]()
         p = parseparams(ps)
+        pendingmatype(p) && continue
         got = run(p, data)
         tol = something(atol, goldenatol(data[input]))
         for (g, o) in zip(got, outputs)
@@ -229,16 +241,21 @@ function checkgoldens(run, fn; outputs, input = :close, skip = nothing,
 end
 
 """
-    tiedextreme(xs, i, n) -> Bool
+    deadafterfractional(n = 60) -> NamedTuple
 
-Whether the `n`-bar window ending at bar `i` holds its maximum or its minimum
-more than once. There TA-Lib's path-dependent index tie-break and CausalFrames'
-most-recent rule may differ (DESIGN.md (d)), so index tests skip such bars.
+The bars of TA-Lib 0.8.3's dead-window legs (#446, test_cmf.c, test_rvol.c,
+test_composite1.c): fractional volume except on bars 15–34 (1-based 16–35),
+where it is exactly zero, with a rising high, low and close. At period 10 a
+window there holds only zero volume, where running sums can keep a residue of
+the values that left.
 """
-function tiedextreme(xs, i, n)
-    i < n && return false
-    w = @view xs[(i-n+1):i]
-    return count(==(maximum(w)), w) > 1 || count(==(minimum(w)), w) > 1
+function deadafterfractional(n = 60)
+    i = 0:(n-1)
+    high = 100.5 .+ 0.37 .* i
+    low = high .- 1.13
+    close = low .+ 0.61 .+ 0.07 .* (i .% 4)
+    volume = [15 <= k < 35 ? 0.0 : 1002.69 + 1.3 * (k % 3) for k in i]
+    return (; high, low, close, volume)
 end
 
 """

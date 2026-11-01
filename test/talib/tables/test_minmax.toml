@@ -1,5 +1,5 @@
-# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_minmax.c. Do not edit.
-commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 62021c1:src/tools/ta_regtest/ta_test_func/test_minmax.c. Do not edit.
+commit = "62021c1d14ef5499505af5547384cab509adf3fc"
 source = "src/tools/ta_regtest/ta_test_func/test_minmax.c"
 
 [arrays.testSerie1]
@@ -643,7 +643,7 @@ type = "TA_Test"
     expectedBegIdx = 13
     expectedNbElement = 239
     expectedRetCode = "TA_SUCCESS"
-    oneOfTheExpectedOutReal0 = 91.125
+    oneOfTheExpectedOutReal0 = 0
     oneOfTheExpectedOutRealIndex0 = 0
     optInTimePeriod = 14
     startIdx = 0
@@ -654,7 +654,7 @@ type = "TA_Test"
     expectedBegIdx = 13
     expectedNbElement = 239
     expectedRetCode = "TA_SUCCESS"
-    oneOfTheExpectedOutReal0 = 91.125
+    oneOfTheExpectedOutReal0 = 0
     oneOfTheExpectedOutRealIndex0 = 0
     optInTimePeriod = 14
     startIdx = 0
@@ -665,10 +665,109 @@ type = "TA_Test"
     expectedBegIdx = 13
     expectedNbElement = 239
     expectedRetCode = "TA_SUCCESS"
-    oneOfTheExpectedOutReal0 = 91.125
+    oneOfTheExpectedOutReal0 = 0
     oneOfTheExpectedOutRealIndex0 = 0
     optInTimePeriod = 14
     startIdx = 0
+    theFunction = "TA_MAXINDEX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 0
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 2
+    startIdx = 0
+    theFunction = "TA_MINMAXINDEX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 0
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 2
+    startIdx = 0
+    theFunction = "TA_MININDEX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 1
+    endIdx = 251
+    expectedBegIdx = 1
+    expectedNbElement = 251
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 0
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 2
+    startIdx = 0
+    theFunction = "TA_MAXINDEX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 99
+    expectedBegIdx = 20
+    expectedNbElement = 80
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 0
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 20
+    theFunction = "TA_MINMAXINDEX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 99
+    expectedBegIdx = 20
+    expectedNbElement = 80
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 0
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 20
+    theFunction = "TA_MININDEX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 99
+    expectedBegIdx = 20
+    expectedNbElement = 80
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 0
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 14
+    startIdx = 20
+    theFunction = "TA_MAXINDEX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 99
+    expectedBegIdx = 20
+    expectedNbElement = 80
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 0
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 2
+    startIdx = 20
+    theFunction = "TA_MINMAXINDEX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 99
+    expectedBegIdx = 20
+    expectedNbElement = 80
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 0
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 2
+    startIdx = 20
+    theFunction = "TA_MININDEX_TEST"
+    [[tables.tableTest.rows]]
+    doRangeTestFlag = 0
+    endIdx = 99
+    expectedBegIdx = 20
+    expectedNbElement = 80
+    expectedRetCode = "TA_SUCCESS"
+    oneOfTheExpectedOutReal0 = 0
+    oneOfTheExpectedOutRealIndex0 = 0
+    optInTimePeriod = 2
+    startIdx = 20
     theFunction = "TA_MAXINDEX_TEST"
     [[tables.tableTest.rows]]
     doRangeTestFlag = 1

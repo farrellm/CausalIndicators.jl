@@ -142,8 +142,11 @@ mavpperiods(n) = [2.0 + (i % 29) for i in 0:(n-1)]
                 @test isapprox(got[bar+1], want; rtol = 1e-12, atol = 1e-12)
             end
         end
-        # Period 1 copies the input; ZLEMA's lookback inherits EMA's unstable.
+        # Period 1 copies the input, bit for bit, also through test_zlema.c's
+        # -0.0 on every eighth bar; ZLEMA's lookback inherits EMA's unstable.
         @test isequal(foldseries(ZLEMA(:close; period = 1), (; close)).close_zlema, close)
+        x = [i % 8 == 7 ? -0.0 : isodd(i) ? 90.11 + i : 1.23 + 0.01i for i in 0:63]
+        @test isequal(foldseries(ZLEMA(:x; period = 1), (; x)).x_zlema, x)
         got = foldseries(ZLEMA(:close; period = 10, unstable = 3), (; close)).close_zlema
         @test findfirst(!ismissing, got) - 1 == 13 + 3
     end
@@ -223,6 +226,12 @@ mavpperiods(n) = [2.0 + (i % 29) for i in 0:(n-1)]
         @test only(foldseries(VWMA(:close), t; window = Bars(1))) == t.close
         got = only(foldseries(VWMA(:close), t; window = Bars(2)))
         @test ismissing(got[1]) && isnan(got[2]) && got[3] == 12.0
+        # test_composite1.c (#446): a window that goes dead after fractional
+        # volume is NaN, and later bars carry no residue of it.
+        d = deadafterfractional()
+        vw(t) = foldseries(VWMA(:close), t; window = Bars(10)).w_close_vwma
+        @test isequal(vw(d)[25:end], vw(map(c -> c[16:end], d))[10:end])
+        @test all(isnan, vw(d)[25:35])
     end
 
     @testset "constructors" begin
@@ -535,6 +544,14 @@ sarext(p) = SARExt(; startvalue = get(p, :optInStartValue, 0),
             z = foldseries(KeltnerChannels(; period = p, atrperiod = m, nbdev = 0), ref)
             @test isequal(z.kc_upperband, z.kc_middleband) &&
                   isequal(z.kc_lowerband, z.kc_middleband)
+        end
+        # Under an unstable period the lookback is still the longer of the EMA
+        # path and the ATR path. test_kc.c also sets EMA's and ATR's periods
+        # apart, which a single `unstable` cannot.
+        for (p, m) in ((20, 10), (8, 4), (4, 10), (4, 4)), u in (0, 7)
+            mid = foldseries(KeltnerChannels(; period = p, atrperiod = m, unstable = u),
+                ref).kc_middleband
+            @test findfirst(!ismissing, mid) - 1 == max(p - 1 + u, m + u)
         end
     end
 

@@ -2,7 +2,7 @@
 
 CausalIndicators reimplements the technical indicators of
 [TA-Lib](https://ta-lib.org) ([source](https://github.com/TA-Lib/ta-lib)) in
-Julia, against TA-Lib 0.8.1, commit `2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788`.
+Julia, against TA-Lib 0.8.3, commit `62021c1d14ef5499505af5547384cab509adf3fc`.
 It is not affiliated with or endorsed by TA-Lib or its authors.
 
 The following are derived from TA-Lib:

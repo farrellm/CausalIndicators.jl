@@ -1,5 +1,5 @@
-# Extracted by gen/extract_talib_tests.jl from TA-Lib 2aa8eb0:src/tools/ta_regtest/ta_test_func/test_candlestick.c. Do not edit.
-commit = "2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788"
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 62021c1:src/tools/ta_regtest/ta_test_func/test_candlestick.c. Do not edit.
+commit = "62021c1d14ef5499505af5547384cab509adf3fc"
 source = "src/tools/ta_regtest/ta_test_func/test_candlestick.c"
 
 [structs.TA_CDLGlobals]
@@ -166,7 +166,7 @@ type = "TA_CDLGlobals"
     equal_factor = 0.005
     equal_type = "TA_RangeType_HighLow"
     far_avg = 3
-    far_factor = -1.0
+    far_factor = 0.0
     far_type = "TA_RangeType_HighLow"
     near_avg = 3
     near_factor = 0.02

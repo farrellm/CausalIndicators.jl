@@ -87,8 +87,16 @@ const PLAIN_S4 = [
         for r in loadtable("test_per_cv")["tables"]["tableTest"]["rows"]
             s, o = outs[r["theFunction"]]
             got = tablerun(d -> foldseries(s, d)[o], ref, r["startIdx"], r["endIdx"], 0)
+            # NVI's and PVI's goldens carry every digit, and the C test holds
+            # them to 1e-12 relative, as the PVT oracle: no looser than that, nor
+            # than the default row tolerance where the literal is tighter still.
+            w = r["oneOfTheExpectedOutReal0"]
+            tight = r["theFunction"] in ("TA_NVI_TEST", "TA_PVI_TEST")
             checkrow(got, r; out = "oneOfTheExpectedOutReal0",
-                index = "oneOfTheExpectedOutRealIndex0")
+                index = "oneOfTheExpectedOutRealIndex0",
+                atol = tight ?
+                       min(1e-12 * abs(w), max(10.0^-decimals(w), 1e-14 * abs(w))) :
+                       nothing)
             n += 1
         end
         @test n == 18
@@ -186,6 +194,22 @@ const PLAIN_S4 = [
         @test isequal(rv([2.0, 4.0, 6.0, 3.0], 2), [missing, missing, 2.0, 0.6])
         @test isequal(rv([0.0, 0.0, 5.0, 0.0], 2), [missing, missing, Inf, 0.0])
         @test isnan(rv([0.0, 0.0, 0.0], 2)[3])
+    end
+
+    @testset "dead volume window after fractional volume (#446)" begin
+        # TA-Lib 0.8.3 resets its sums once a whole window has traded nothing,
+        # so CMF gives 0 and RVOL NaN there, and every later bar is the value of
+        # a run seeded on the zeros. CausalFrames' sums keep no residue, so the
+        # same holds here: from the first dead window on, each bar equals,
+        # bit for bit, a run started at the first zero bar.
+        d = deadafterfractional()
+        fresh_ = map(c -> c[16:end], d)
+        cmf(t) = foldseries(CMF(), t; window = Bars(10)).w_cmf
+        @test isequal(cmf(d)[25:end], cmf(fresh_)[10:end])
+        @test all(==(0.0), cmf(d)[25:35])
+        rv(t) = foldseries(RVOL(), t; window = Bars(11)).w_rvol
+        @test isequal(rv(d)[26:end], rv(fresh_)[11:end])
+        @test all(isnan, rv(d)[26:35]) && rv(d)[36] == Inf
     end
 
     @testset "test_vwap.c" begin

@@ -1,0 +1,209 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 62021c1:src/tools/ta_regtest/ta_test_func/test_cksp.c. Do not edit.
+commit = "62021c1d14ef5499505af5547384cab509adf3fc"
+source = "src/tools/ta_regtest/ta_test_func/test_cksp.c"
+
+[structs.CkspCfg]
+fields = ["p", "x", "q"]
+types = ["int", "double", "int"]
+
+[structs.CkspGolden]
+fields = ["p", "x", "q", "bar", "high", "low"]
+types = ["int", "double", "int", "int", "double", "double"]
+
+[tables.ckspCfg]
+type = "CkspCfg"
+
+    [[tables.ckspCfg.rows]]
+    p = 10
+    q = 9
+    x = 1.0
+    [[tables.ckspCfg.rows]]
+    p = 10
+    q = 20
+    x = 3.0
+    [[tables.ckspCfg.rows]]
+    p = 5
+    q = 3
+    x = 2.0
+    [[tables.ckspCfg.rows]]
+    p = 22
+    q = 1
+    x = 3.0
+    [[tables.ckspCfg.rows]]
+    p = 2
+    q = 1
+    x = 0.0
+    [[tables.ckspCfg.rows]]
+    p = 10
+    q = 9
+    x = 0.0
+    [[tables.ckspCfg.rows]]
+    p = 2
+    q = 2
+    x = 1.5
+    [[tables.ckspCfg.rows]]
+    p = 40
+    q = 35
+    x = 2.0
+    [[tables.ckspCfg.rows]]
+    p = 5
+    q = 9
+    x = 2.0
+
+[tables.ckspGolden]
+type = "CkspGolden"
+
+    [[tables.ckspGolden.rows]]
+    bar = 18
+    high = 96.6425
+    low = 90.18604970875
+    p = 10
+    q = 9
+    x = 1.0
+    [[tables.ckspGolden.rows]]
+    bar = 19
+    high = 96.6425
+    low = 90.092444737875
+    p = 10
+    q = 9
+    x = 1.0
+    [[tables.ckspGolden.rows]]
+    bar = 100
+    high = 119.41407380766739
+    low = 107.7801244599106
+    p = 10
+    q = 9
+    x = 1.0
+    [[tables.ckspGolden.rows]]
+    bar = 180
+    high = 134.28803829751402
+    low = 125.8477840479703
+    p = 10
+    q = 9
+    x = 1.0
+    [[tables.ckspGolden.rows]]
+    bar = 251
+    high = 118.29444999590379
+    low = 107.66719935768752
+    p = 10
+    q = 9
+    x = 1.0
+    [[tables.ckspGolden.rows]]
+    bar = 29
+    high = 90.6775
+    low = 90.59320510314078
+    p = 10
+    q = 20
+    x = 3.0
+    [[tables.ckspGolden.rows]]
+    bar = 100
+    high = 112.24222142300219
+    low = 93.55248278213986
+    p = 10
+    q = 20
+    x = 3.0
+    [[tables.ckspGolden.rows]]
+    bar = 180
+    high = 127.48411489254205
+    low = 131.1718279637875
+    p = 10
+    q = 20
+    x = 3.0
+    [[tables.ckspGolden.rows]]
+    bar = 251
+    high = 110.64334998771135
+    low = 109.33664333744092
+    p = 10
+    q = 20
+    x = 3.0
+    [[tables.ckspGolden.rows]]
+    bar = 7
+    high = 91.273
+    low = 95.56327999999999
+    p = 5
+    q = 3
+    x = 2.0
+    [[tables.ckspGolden.rows]]
+    bar = 8
+    high = 91.0934
+    low = 95.414624
+    p = 5
+    q = 3
+    x = 2.0
+    [[tables.ckspGolden.rows]]
+    bar = 100
+    high = 112.78832187955533
+    low = 117.08667812044467
+    p = 5
+    q = 3
+    x = 2.0
+    [[tables.ckspGolden.rows]]
+    bar = 251
+    high = 105.98763882594199
+    low = 111.58188893924643
+    p = 5
+    q = 3
+    x = 2.0
+    [[tables.ckspGolden.rows]]
+    bar = 22
+    high = 89.74681818181818
+    low = 94.50318181818182
+    p = 22
+    q = 1
+    x = 3.0
+    [[tables.ckspGolden.rows]]
+    bar = 23
+    high = 89.75673553719008
+    low = 92.14826446280992
+    p = 22
+    q = 1
+    x = 3.0
+    [[tables.ckspGolden.rows]]
+    bar = 251
+    high = 111.62064300832449
+    low = 112.74935699167551
+    p = 22
+    q = 1
+    x = 3.0
+    [[tables.ckspGolden.rows]]
+    bar = 27
+    high = 91.63460375184033
+    low = 88.98775251135677
+    p = 14
+    q = 14
+    x = 2.5
+    [[tables.ckspGolden.rows]]
+    bar = 180
+    high = 128.98162040702482
+    low = 129.78855916697415
+    p = 14
+    q = 14
+    x = 2.5
+    [[tables.ckspGolden.rows]]
+    bar = 251
+    high = 113.63510860489713
+    low = 112.65202370292035
+    p = 14
+    q = 14
+    x = 2.5
+    [[tables.ckspGolden.rows]]
+    bar = 3
+    high = 94.995
+    low = 92.82
+    p = 2
+    q = 2
+    x = 0.5
+    [[tables.ckspGolden.rows]]
+    bar = 4
+    high = 94.995
+    low = 94.30125
+    p = 2
+    q = 2
+    x = 0.5
+    [[tables.ckspGolden.rows]]
+    bar = 251
+    high = 109.55575020732381
+    low = 107.8121248963381
+    p = 2
+    q = 2
+    x = 0.5

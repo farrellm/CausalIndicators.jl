@@ -166,5 +166,7 @@ function step!(z::ZLEMAKernel{T}, x::Real) where {T}
     update!(z.lagged, (x = v,))
     old = value(z.lagged).x_first
     ismissing(old) && return missing
-    return step!(z.ema, 2 * v - old)
+    # At period 1 the de-lag 2x − x would turn a -0.0 into +0.0; ta_ZLEMA.c's
+    # period-1 arm copies the input instead, as EMA(1) does with `v`.
+    return step!(z.ema, isone(z.ema.period) ? v : 2 * v - old)
 end

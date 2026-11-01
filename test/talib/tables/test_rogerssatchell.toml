@@ -1,0 +1,93 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 62021c1:src/tools/ta_regtest/ta_test_func/test_rogerssatchell.c. Do not edit.
+commit = "62021c1d14ef5499505af5547384cab509adf3fc"
+source = "src/tools/ta_regtest/ta_test_func/test_rogerssatchell.c"
+
+[arrays.rsDriftBar]
+type = "int"
+values = [26, 90, 214]
+
+[arrays.rsGuardBar]
+type = "int"
+values = [49, 50, 51, 59, 60]
+
+[arrays.rsGuardValue]
+type = "double"
+values = [0.01707749939951247, 0.016347065982245768, 0.016064887412207542, 0.018290377457680515, 0.0190401606324419]
+
+[structs.RsGolden]
+fields = ["period", "annualization", "bar", "value"]
+types = ["int", "double", "int", "double"]
+
+[tables.rsGolden]
+type = "RsGolden"
+
+    [[tables.rsGolden.rows]]
+    annualization = 1.0
+    bar = 9
+    period = 10
+    value = 0.017975900777358125
+    [[tables.rsGolden.rows]]
+    annualization = 1.0
+    bar = 10
+    period = 10
+    value = 0.018397071908132254
+    [[tables.rsGolden.rows]]
+    annualization = 1.0
+    bar = 50
+    period = 10
+    value = 0.01644760314693925
+    [[tables.rsGolden.rows]]
+    annualization = 1.0
+    bar = 100
+    period = 10
+    value = 0.019839725374094775
+    [[tables.rsGolden.rows]]
+    annualization = 1.0
+    bar = 200
+    period = 10
+    value = 0.022608525797841318
+    [[tables.rsGolden.rows]]
+    annualization = 1.0
+    bar = 251
+    period = 10
+    value = 0.013464874272606921
+    [[tables.rsGolden.rows]]
+    annualization = 252.0
+    bar = 9
+    period = 10
+    value = 0.28535857829557354
+    [[tables.rsGolden.rows]]
+    annualization = 252.0
+    bar = 251
+    period = 10
+    value = 0.21374825256041782
+    [[tables.rsGolden.rows]]
+    annualization = 1.0
+    bar = 19
+    period = 20
+    value = 0.021118612248610193
+    [[tables.rsGolden.rows]]
+    annualization = 1.0
+    bar = 251
+    period = 20
+    value = 0.022956763453686233
+    [[tables.rsGolden.rows]]
+    annualization = 1.0
+    bar = 0
+    period = 1
+    value = 0.017612307025905667
+    [[tables.rsGolden.rows]]
+    annualization = 1.0
+    bar = 26
+    period = 1
+    value = 0.0
+    [[tables.rsGolden.rows]]
+    annualization = 1.0
+    bar = 251
+    period = 1
+    value = 0.01789243130749407
+    [[tables.rsGolden.rows]]
+    annualization = 1.0
+    bar = 251
+    period = 252
+    value = 0.02035918237984025

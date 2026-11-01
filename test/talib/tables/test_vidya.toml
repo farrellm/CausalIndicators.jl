@@ -1,0 +1,209 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 62021c1:src/tools/ta_regtest/ta_test_func/test_vidya.c. Do not edit.
+commit = "62021c1d14ef5499505af5547384cab509adf3fc"
+source = "src/tools/ta_regtest/ta_test_func/test_vidya.c"
+
+[arrays.vidyaGridM]
+type = "int"
+values = [2, 3, 9, 14, 200]
+
+[arrays.vidyaGridN]
+type = "int"
+values = [2, 3, 12, 30, 200]
+
+[arrays.vidyaGridStart]
+type = "int"
+values = [0, 1, 9, 17, 214, 250, 777, 1199]
+
+[arrays.vidyaGridUnst]
+type = "int"
+values = [0, 7]
+
+[arrays.vidyaLeanP]
+type = "int"
+values = [2, 9, 12, 14, 30]
+
+[structs.VidyaGolden]
+fields = ["n", "m", "bar", "want"]
+types = ["int", "int", "int", "double"]
+
+[tables.vidyaGolden]
+type = "VidyaGolden"
+
+    [[tables.vidyaGolden.rows]]
+    bar = 9
+    m = 9
+    n = 12
+    want = 106.58376159480673
+    [[tables.vidyaGolden.rows]]
+    bar = 10
+    m = 9
+    n = 12
+    want = 107.02109985002824
+    [[tables.vidyaGolden.rows]]
+    bar = 11
+    m = 9
+    n = 12
+    want = 107.40628451938244
+    [[tables.vidyaGolden.rows]]
+    bar = 20
+    m = 9
+    n = 12
+    want = 109.16885340451152
+    [[tables.vidyaGolden.rows]]
+    bar = 50
+    m = 9
+    n = 12
+    want = 109.12175801464875
+    [[tables.vidyaGolden.rows]]
+    bar = 100
+    m = 9
+    n = 12
+    want = 120.18602253125532
+    [[tables.vidyaGolden.rows]]
+    bar = 251
+    m = 9
+    n = 12
+    want = 132.9441644591319
+    [[tables.vidyaGolden.rows]]
+    bar = 500
+    m = 9
+    n = 12
+    want = 181.7499950535472
+    [[tables.vidyaGolden.rows]]
+    bar = 800
+    m = 9
+    n = 12
+    want = 223.84149738801602
+    [[tables.vidyaGolden.rows]]
+    bar = 1000
+    m = 9
+    n = 12
+    want = 243.8869455368122
+    [[tables.vidyaGolden.rows]]
+    bar = 1199
+    m = 9
+    n = 12
+    want = 284.6901162441343
+    [[tables.vidyaGolden.rows]]
+    bar = 9
+    m = 9
+    n = 9
+    want = 107.52016675465694
+    [[tables.vidyaGolden.rows]]
+    bar = 800
+    m = 9
+    n = 9
+    want = 225.63456692955305
+    [[tables.vidyaGolden.rows]]
+    bar = 1000
+    m = 9
+    n = 9
+    want = 242.94580784253432
+    [[tables.vidyaGolden.rows]]
+    bar = 1199
+    m = 9
+    n = 9
+    want = 286.0357344900665
+    [[tables.vidyaGolden.rows]]
+    bar = 800
+    m = 14
+    n = 14
+    want = 222.6660965877049
+    [[tables.vidyaGolden.rows]]
+    bar = 1000
+    m = 14
+    n = 14
+    want = 244.69966753954046
+    [[tables.vidyaGolden.rows]]
+    bar = 1199
+    m = 14
+    n = 14
+    want = 283.522049111793
+
+[tables.vidyaTa4jCmo]
+type = "VidyaGolden"
+
+    [[tables.vidyaTa4jCmo.rows]]
+    bar = 2
+    m = 0
+    n = 2
+    want = 100.0
+    [[tables.vidyaTa4jCmo.rows]]
+    bar = 20
+    m = 0
+    n = 2
+    want = -100.0
+    [[tables.vidyaTa4jCmo.rows]]
+    bar = 9
+    m = 0
+    n = 9
+    want = 97.77688852681462
+    [[tables.vidyaTa4jCmo.rows]]
+    bar = 20
+    m = 0
+    n = 9
+    want = -44.9026232221835
+    [[tables.vidyaTa4jCmo.rows]]
+    bar = 500
+    m = 0
+    n = 9
+    want = -7.582133902734318
+    [[tables.vidyaTa4jCmo.rows]]
+    bar = 1000
+    m = 0
+    n = 9
+    want = -57.71923558656064
+    [[tables.vidyaTa4jCmo.rows]]
+    bar = 14
+    m = 0
+    n = 14
+    want = 97.6471366636782
+    [[tables.vidyaTa4jCmo.rows]]
+    bar = 20
+    m = 0
+    n = 14
+    want = -38.67367149684469
+    [[tables.vidyaTa4jCmo.rows]]
+    bar = 500
+    m = 0
+    n = 14
+    want = 39.826960469609844
+    [[tables.vidyaTa4jCmo.rows]]
+    bar = 1000
+    m = 0
+    n = 14
+    want = -82.11589662243543
+
+[tables.vidyaTail]
+type = "VidyaGolden"
+
+    [[tables.vidyaTail.rows]]
+    bar = 800
+    m = 9
+    n = 9
+    want = 225.6345669295531
+    [[tables.vidyaTail.rows]]
+    bar = 1000
+    m = 9
+    n = 9
+    want = 242.94580784253432
+    [[tables.vidyaTail.rows]]
+    bar = 1199
+    m = 9
+    n = 9
+    want = 286.03573449006655
+    [[tables.vidyaTail.rows]]
+    bar = 800
+    m = 14
+    n = 14
+    want = 222.66609658770494
+    [[tables.vidyaTail.rows]]
+    bar = 1000
+    m = 14
+    n = 14
+    want = 244.69966753954046
+    [[tables.vidyaTail.rows]]
+    bar = 1199
+    m = 14
+    n = 14
+    want = 283.5220491117931

@@ -2,10 +2,19 @@
 # MINMAX, MAXINDEX, MININDEX, MINMAXINDEX): this package adds only their TA-Lib
 # tests. The structured MidPoint and MidPrice share the extremum tables.
 
-# A golden index output's bars where the window holds a tied extreme, which the
-# index forms skip (DESIGN.md (d)).
-tiedskip(default) =
-    (data, p, i) -> tiedextreme(data.close, i, get(p, :optInTimePeriod, default))
+# Bars since the newest extreme of the `n`-bar window ending at each bar, by a
+# scan: test_minmax.c's checkIndexOutput, whose tie rule (the most recent bar)
+# TA-Lib shares with CausalFrames since 0.8.3 (#503).
+function scanindex(x, n, better)
+    return map(eachindex(x)) do i
+        i < n && return missing
+        best = i - n + 1
+        for k in (i-n+2):i
+            (x[k] == x[best] || better(x[k], x[best])) && (best = k)
+        end
+        i - best
+    end
+end
 
 @testset "rolling" begin
     @testset "CausalFrames-only goldens" begin
@@ -27,17 +36,15 @@ tiedskip(default) =
             (o.w_close_min, o.w_close_max)
         end
         checkgoldens("MAXINDEX"; accepts = WINDOW, outputs = (:outInteger,),
-            skip = tiedskip(30),
             convert = sincefromindex) do p, data
             (foldseries(MaxIndex(:close), data; window = w(p, 30)).w_close_maxindex,)
         end
         checkgoldens("MININDEX"; accepts = WINDOW, outputs = (:outInteger,),
-            skip = tiedskip(30),
             convert = sincefromindex) do p, data
             (foldseries(MinIndex(:close), data; window = w(p, 30)).w_close_minindex,)
         end
         checkgoldens("MINMAXINDEX"; accepts = WINDOW, outputs = (:outMinIdx, :outMaxIdx),
-            skip = tiedskip(30), convert = sincefromindex) do p, data
+            convert = sincefromindex) do p, data
             o = foldseries([MinIndex(:close), MaxIndex(:close)], data; window = w(p, 30))
             (o.w_close_minindex, o.w_close_maxindex)
         end
@@ -63,10 +70,17 @@ tiedskip(default) =
             got = tablerun((x = open_,), r["startIdx"], r["endIdx"], p - 1) do d
                 foldseries(s, d; window = Bars(p))[out]
             end
-            # test_minmax.c checks only the shape of the index forms.
+            # test_minmax.c holds the index forms to a window scan, not to the
+            # row's value (a placeholder 0).
+            isindex = endswith(r["theFunction"], "INDEX_TEST")
             checkrow(got, r; out = "oneOfTheExpectedOutReal0",
-                index = "oneOfTheExpectedOutRealIndex0",
-                value = !endswith(r["theFunction"], "INDEX_TEST"))
+                index = "oneOfTheExpectedOutRealIndex0", value = !isindex)
+            if isindex
+                better = r["theFunction"] == "TA_MAXINDEX_TEST" ? (>) : (<)
+                want = scanindex(open_[1:(r["endIdx"]+1)], p, better)
+                want[1:r["startIdx"]] .= missing
+                @test isequal(got, want)
+            end
             n += 1
         end
         @test n >= 15
@@ -101,7 +115,7 @@ tiedskip(default) =
         @test foldseries(Sum(:x), (; x = net[4:8])).x_sum == t["c40_slice37"]["values"]
     end
 
-    @testset "test_rolling_extremum.c block-scan oracle" begin
+    @testset "test_rolling_extremum.c and test_minmax.c block-scan oracle" begin
         # The definition, a naive window scan, over periods straddling the
         # block-structure edges and lengths chosen relative to each period.
         rng = Random.MersenneTwister(147)
@@ -111,9 +125,13 @@ tiedskip(default) =
             x = round.(100 .+ 10 .* randn(rng, n); digits = 0)
             h = x .+ rand(rng, 0:3, n)
             l = x .- rand(rng, 0:3, n)
-            o = foldseries([Max(:x), Min(:x), MidPoint(:x), MidPrice()],
+            o = foldseries(
+                [Max(:x), Min(:x), MidPoint(:x), MidPrice(), MaxIndex(:x), MinIndex(:x)],
                 (; x, high = h, low = l);
                 window = Bars(p))
+            # test_minmax.c's index sweep over a tied series: the newest tie.
+            @test isequal(o.w_x_maxindex, scanindex(x, p, >))
+            @test isequal(o.w_x_minindex, scanindex(x, p, <))
             for i in 1:n
                 if i < p
                     @test ismissing(o.w_x_max[i]) && ismissing(o.w_midprice[i])

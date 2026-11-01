@@ -1,0 +1,3195 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 62021c1:src/tools/ta_regtest/ta_test_func/test_bbw.c. Do not edit.
+commit = "62021c1d14ef5499505af5547384cab509adf3fc"
+source = "src/tools/ta_regtest/ta_test_func/test_bbw.c"
+
+[arrays.bbwDiffSeries]
+type = "int"
+values = ["BBW_CORPUS", "BBW_NEGCORPUS", "BBW_WALK", "BBW_NEGWALK", "BBW_ALT", "BBW_FLATPOS", "BBW_FLATNEG", "BBW_ZERO", "BBW_EPS", "BBW_PEG", "BBW_TICK100", "BBW_BIG1E8", "BBW_FINE100", "BBW_STEPFLAT"]
+
+[arrays.bbwK]
+type = "double"
+values = [[2.0, 2.0], [2.5, 2.5], [0.1, 0.1], [2.5, 1.5], [1.0, 3.0], [2.0, 1.0], [0.1, 0.2], [-1.0, 2.0], [-2.0, 2.0], [0.0, 0.0]]
+
+[arrays.bbwKBranch]
+type = "int"
+values = [0, 3]
+
+[arrays.bbwPeriods]
+type = "int"
+values = [2, 5, 20, 33, 34, 50, 200]
+
+[structs.BbwGolden]
+fields = ["tag", "series", "startIdx", "endIdx", "n", "kUp", "kDn", "maType", "unstEma", "beg", "nb", "tsAbs", "ta4jAbs", "leanAbs", "rows", "nbRows"]
+types = ["char *", "int", "int", "int", "int", "double", "double", "TA_MAType", "unsigned int", "int", "int", "double", "double", "double", "BbwRow *", "int"]
+
+[structs.BbwRow]
+fields = ["bar", "exact", "ts", "ta4j", "lean", "tol", "mid0"]
+types = ["int", "double", "double", "double", "double", "double", "int"]
+
+[tables.bbwGoldens]
+type = "BbwGolden"
+
+    [[tables.bbwGoldens.rows]]
+    values = ["sma-n2", "BBW_CORPUS", 0, 251, 2, 2.0, 2.0, "TA_MAType_SMA", 0, 1, 251, 1.78e-15, 2.13e-14, 2.13e-14, "BBW_ROWS ( bbw_sma_n2 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["sma-n5", "BBW_CORPUS", 0, 251, 5, 2.0, 2.0, "TA_MAType_SMA", 0, 4, 248, 2.13e-14, 2.49e-14, 2.66e-14, "BBW_ROWS ( bbw_sma_n5 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["sma-n5-k13", "BBW_CORPUS", 0, 251, 5, 1.0, 3.0, "TA_MAType_SMA", 0, 4, 248, 0.0, 1.95e-14, 0.0, "BBW_ROWS ( bbw_sma_n5_k13 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["sma-n20", "BBW_CORPUS", 0, 251, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 233, 2.13e-14, 1.78e-14, 8.53e-14, "BBW_ROWS ( bbw_sma_n20 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["sma-n20-k13", "BBW_CORPUS", 0, 251, 20, 1.0, 3.0, "TA_MAType_SMA", 0, 19, 233, 0.0, 2.13e-14, 0.0, "BBW_ROWS ( bbw_sma_n20_k13 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["sma-n50", "BBW_CORPUS", 0, 251, 50, 2.0, 2.0, "TA_MAType_SMA", 0, 49, 203, 3.55e-14, 5.68e-14, 1.99e-13, "BBW_ROWS ( bbw_sma_n50 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["sma-n50-k13", "BBW_CORPUS", 0, 251, 50, 1.0, 3.0, "TA_MAType_SMA", 0, 49, 203, 0.0, 4.26e-14, 0.0, "BBW_ROWS ( bbw_sma_n50_k13 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["sma-n200", "BBW_CORPUS", 0, 251, 200, 2.0, 2.0, "TA_MAType_SMA", 0, 199, 53, 7.11e-14, 7.11e-14, 1.63e-13, "BBW_ROWS ( bbw_sma_n200 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["sma-n200-k13", "BBW_CORPUS", 0, 251, 200, 1.0, 3.0, "TA_MAType_SMA", 0, 199, 53, 0.0, 5.68e-14, 0.0, "BBW_ROWS ( bbw_sma_n200_k13 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["sma-n20-k25-15", "BBW_CORPUS", 0, 251, 20, 2.5, 1.5, "TA_MAType_SMA", 0, 19, 233, 0.0, 2.49e-14, 0.0, "BBW_ROWS ( bbw_sma_n20_k25_15 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["sma-n20-k01-02", "BBW_CORPUS", 0, 251, 20, 0.1, 0.2, "TA_MAType_SMA", 0, 19, 233, 0.0, 1.22e-14, 0.0, "BBW_ROWS ( bbw_sma_n20_k01_02 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["sma-n20-km1-2", "BBW_CORPUS", 0, 251, 20, -1.0, 2.0, "TA_MAType_SMA", 0, 19, 233, 0.0, 1.24e-14, 0.0, "BBW_ROWS ( bbw_sma_n20_km1_2 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["sma-n20-km2-2", "BBW_CORPUS", 0, 251, 20, -2.0, 2.0, "TA_MAType_SMA", 0, 19, 233, 0.0, 0.0, 0.0, "BBW_ROWS ( bbw_sma_n20_km2_2 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["sma-n20-k0-0", "BBW_CORPUS", 0, 251, 20, 0.0, 0.0, "TA_MAType_SMA", 0, 19, 233, 0.0, 0.0, 0.0, "BBW_ROWS ( bbw_sma_n20_k0_0 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["sma-n20-kmax", "BBW_CORPUS", 0, 251, 20, "TA_REAL_MAX", "TA_REAL_MAX", "TA_MAType_SMA", 0, 19, 233, 2.27e23, 2.27e23, 0.0, "BBW_ROWS ( bbw_sma_n20_kmax )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["sma-n20-kmin", "BBW_CORPUS", 0, 251, 20, "TA_REAL_MIN", "TA_REAL_MIN", "TA_MAType_SMA", 0, 19, 233, 2.27e23, 2.27e23, 0.0, "BBW_ROWS ( bbw_sma_n20_kmin )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["sma-n20-s100", "BBW_CORPUS", 100, 251, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 100, 152, 1.78e-14, 1.78e-14, 2.13e-14, "BBW_ROWS ( bbw_sma_n20_s100 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["sma-n20-s251", "BBW_CORPUS", 251, 251, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 251, 1, 0.0, 0.0, 7.11e-15, "BBW_ROWS ( bbw_sma_n20_s251 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["ema-n5", "BBW_CORPUS", 0, 251, 5, 2.0, 2.0, "TA_MAType_EMA", 0, 4, 248, 0.0, 0.0, 2.66e-14, "BBW_ROWS ( bbw_ema_n5 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["ema-n20", "BBW_CORPUS", 0, 251, 20, 2.0, 2.0, "TA_MAType_EMA", 0, 19, 233, 0.0, 0.0, 9.24e-14, "BBW_ROWS ( bbw_ema_n20 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["ema-n20-s19-u0", "BBW_CORPUS", 19, 251, 20, 2.0, 2.0, "TA_MAType_EMA", 0, 19, 233, 0.0, 0.0, 9.24e-14, "BBW_ROWS ( bbw_ema_n20_s19_u0 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["ema-n20-s20-u0", "BBW_CORPUS", 20, 251, 20, 2.0, 2.0, "TA_MAType_EMA", 0, 20, 232, 0.0, 0.0, 8.53e-14, "BBW_ROWS ( bbw_ema_n20_s20_u0 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["ema-n20-s100-u0", "BBW_CORPUS", 100, 251, 20, 2.0, 2.0, "TA_MAType_EMA", 0, 100, 152, 0.0, 0.0, 1.95e-14, "BBW_ROWS ( bbw_ema_n20_s100_u0 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["ema-n20-s251-u0", "BBW_CORPUS", 251, 251, 20, 2.0, 2.0, "TA_MAType_EMA", 0, 251, 1, 0.0, 0.0, 7.11e-15, "BBW_ROWS ( bbw_ema_n20_s251_u0 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["ema-n20-s0-u15", "BBW_CORPUS", 0, 251, 20, 2.0, 2.0, "TA_MAType_EMA", 15, 34, 218, 0.0, 0.0, 9.24e-14, "BBW_ROWS ( bbw_ema_n20_s0_u15 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["ema-n20-s100-u15", "BBW_CORPUS", 100, 251, 20, 2.0, 2.0, "TA_MAType_EMA", 15, 100, 152, 0.0, 0.0, 1.95e-14, "BBW_ROWS ( bbw_ema_n20_s100_u15 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["ema-n20-s0-u100", "BBW_CORPUS", 0, 251, 20, 2.0, 2.0, "TA_MAType_EMA", 100, 119, 133, 0.0, 0.0, 1.78e-14, "BBW_ROWS ( bbw_ema_n20_s0_u100 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["wma-n20", "BBW_CORPUS", 0, 251, 20, 2.0, 2.0, "TA_MAType_WMA", 0, 19, 233, 0.0, 2.13e-14, 8.53e-14, "BBW_ROWS ( bbw_wma_n20 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["dema-n20", "BBW_CORPUS", 0, 251, 20, 2.0, 2.0, "TA_MAType_DEMA", 0, 38, 214, 0.0, 0.0, 7.82e-14, "BBW_ROWS ( bbw_dema_n20 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["tick100-n20", "BBW_TICK100", 0, 299, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 281, 1.17e-14, 1.18e-14, 1.02e-14, "BBW_ROWS ( bbw_tick100_n20 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["tick100-n20-k13", "BBW_TICK100", 0, 299, 20, 1.0, 3.0, "TA_MAType_SMA", 0, 19, 281, 0.0, 1.42e-14, 0.0, "BBW_ROWS ( bbw_tick100_n20_k13 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["big1e8-n20", "BBW_BIG1E8", 0, 299, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 281, 1.46e-14, 1.46e-14, 1.27e-14, "BBW_ROWS ( bbw_big1e8_n20 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["big1e8-n20-k13", "BBW_BIG1E8", 0, 299, 20, 1.0, 3.0, "TA_MAType_SMA", 0, 19, 281, 0.0, 1.46e-14, 0.0, "BBW_ROWS ( bbw_big1e8_n20_k13 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["fine100-n20", "BBW_FINE100", 0, 299, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 281, 1.39e-14, 1.39e-14, 7.2e-15, "BBW_ROWS ( bbw_fine100_n20 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["fine100-n20-k13", "BBW_FINE100", 0, 299, 20, 1.0, 3.0, "TA_MAType_SMA", 0, 19, 281, 0.0, 1.41e-14, 0.0, "BBW_ROWS ( bbw_fine100_n20_k13 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["peg-n20", "BBW_PEG", 0, 1079, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 1061, 9.07e-14, 9.07e-14, 5.34e-12, "BBW_ROWS ( bbw_peg_n20 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["flatpos-n20", "BBW_FLATPOS", 0, 59, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 41, 0.0, 0.0, 0.0, "BBW_ROWS ( bbw_flatpos_n20 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["flatneg-n20", "BBW_FLATNEG", 0, 59, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 41, 0.0, 0.0, 0.0, "BBW_ROWS ( bbw_flatneg_n20 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["stepflat-n20", "BBW_STEPFLAT", 0, 79, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 61, 2.13e-14, 1.95e-14, 2.49e-14, "BBW_ROWS ( bbw_stepflat_n20 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["zero-n20", "BBW_ZERO", 0, 59, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 41, 0.0, 0.0, 0.0, "BBW_ROWS ( bbw_zero_n20 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["alt-n20", "BBW_ALT", 0, 59, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 41, 0.0, 0.0, 0.0, "BBW_ROWS ( bbw_alt_n20 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["alt-n5", "BBW_ALT", 0, 59, 5, 2.0, 2.0, "TA_MAType_SMA", 0, 4, 56, 0.0, 0.0, 4.55e-13, "BBW_ROWS ( bbw_alt_n5 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["eps-n20", "BBW_EPS", 0, 199, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 181, 9.09e-13, 9.09e-13, 3980.0, "BBW_ROWS ( bbw_eps_n20 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["neg-n20", "BBW_NEGCORPUS", 0, 251, 20, 2.0, 2.0, "TA_MAType_SMA", 0, 19, 233, 2.13e-14, 1.78e-14, 8.53e-14, "BBW_ROWS ( bbw_neg_n20 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["long-sma-n100000", "BBW_LONG", 0, 100499, 100000, 2.0, 2.0, "TA_MAType_SMA", 0, 99999, 501, 6.89e-13, 6.89e-13, 1.99e-13, "BBW_ROWS ( bbw_long_sma_n100000 )"]
+    [[tables.bbwGoldens.rows]]
+    values = ["long-ema-n100000", "BBW_LONG", 0, 100499, 100000, 2.0, 2.0, "TA_MAType_EMA", 0, 99999, 501, 0.0, 0.0, 2.06e-13, "BBW_ROWS ( bbw_long_ema_n100000 )"]
+
+[tables.bbw_alt_n20]
+type = "BbwRow"
+
+    [[tables.bbw_alt_n20.rows]]
+    bar = 19
+    exact = 0.0
+    lean = nan
+    mid0 = 1
+    ta4j = nan
+    tol = 0.0
+    ts = nan
+    [[tables.bbw_alt_n20.rows]]
+    bar = 20
+    exact = 0.0
+    lean = nan
+    mid0 = 1
+    ta4j = nan
+    tol = 0.0
+    ts = nan
+    [[tables.bbw_alt_n20.rows]]
+    bar = 21
+    exact = 0.0
+    lean = nan
+    mid0 = 1
+    ta4j = nan
+    tol = 0.0
+    ts = nan
+    [[tables.bbw_alt_n20.rows]]
+    bar = 59
+    exact = 0.0
+    lean = nan
+    mid0 = 1
+    ta4j = nan
+    tol = 0.0
+    ts = nan
+
+[tables.bbw_alt_n5]
+type = "BbwRow"
+
+    [[tables.bbw_alt_n5.rows]]
+    bar = 4
+    exact = 1959.5917942265426
+    lean = 1959.591794226542
+    mid0 = 0
+    ta4j = 1959.5917942265426
+    tol = 9.8e-9
+    ts = 1959.5917942265426
+    [[tables.bbw_alt_n5.rows]]
+    bar = 5
+    exact = -1959.5917942265426
+    lean = -1959.591794226542
+    mid0 = 0
+    ta4j = -1959.5917942265426
+    tol = 9.8e-9
+    ts = -1959.5917942265426
+    [[tables.bbw_alt_n5.rows]]
+    bar = 6
+    exact = 1959.5917942265426
+    lean = 1959.591794226542
+    mid0 = 0
+    ta4j = 1959.5917942265426
+    tol = 9.8e-9
+    ts = 1959.5917942265426
+    [[tables.bbw_alt_n5.rows]]
+    bar = 59
+    exact = -1959.5917942265426
+    lean = -1959.591794226542
+    mid0 = 0
+    ta4j = -1959.5917942265426
+    tol = 9.8e-9
+    ts = -1959.5917942265426
+
+[tables.bbw_big1e8_n20]
+type = "BbwRow"
+
+    [[tables.bbw_big1e8_n20.rows]]
+    bar = 19
+    exact = 3.346639407638385e-8
+    lean = 3.34664010580164e-8
+    mid0 = 0
+    ta4j = 3.346639871262626e-8
+    tol = 1.8e-13
+    ts = 3.346639871262626e-8
+    [[tables.bbw_big1e8_n20.rows]]
+    bar = 20
+    exact = 3.2186946512624656e-8
+    lean = 3.218695387548253e-8
+    mid0 = 0
+    ta4j = 3.218695521016713e-8
+    tol = 1.8e-13
+    ts = 3.218695521016712e-8
+    [[tables.bbw_big1e8_n20.rows]]
+    bar = 21
+    exact = 3.346639407638385e-8
+    lean = 3.34664010580164e-8
+    mid0 = 0
+    ta4j = 3.346639871262626e-8
+    tol = 1.8e-13
+    ts = 3.346639871262626e-8
+    [[tables.bbw_big1e8_n20.rows]]
+    bar = 100
+    exact = 3.218694780922487e-8
+    lean = 3.21869538758044e-8
+    mid0 = 0
+    ta4j = 3.218695521048899e-8
+    tol = 1.8e-13
+    ts = 3.218695521048899e-8
+    [[tables.bbw_big1e8_n20.rows]]
+    bar = 122
+    exact = 2.5612498586269865e-8
+    lean = 2.5612496947938524e-8
+    mid0 = 0
+    ta4j = 2.5612503288383513e-8
+    tol = 1.8e-13
+    ts = 2.5612503288383513e-8
+    [[tables.bbw_big1e8_n20.rows]]
+    bar = 194
+    exact = 3.458322614455176e-8
+    lean = 3.4583232928295754e-8
+    mid0 = 0
+    ta4j = 3.458324074416638e-8
+    tol = 1.8e-13
+    ts = 3.458324074416638e-8
+    [[tables.bbw_big1e8_n20.rows]]
+    bar = 200
+    exact = 3.458322528244953e-8
+    lean = 3.458323292794992e-8
+    mid0 = 0
+    ta4j = 3.458321094149816e-8
+    tol = 1.8e-13
+    ts = 3.458321094149816e-8
+    [[tables.bbw_big1e8_n20.rows]]
+    bar = 212
+    exact = 2.65329855953262e-8
+    lean = 2.653299831912858e-8
+    mid0 = 0
+    ta4j = 2.6532977815728138e-8
+    tol = 1.8e-13
+    ts = 2.6532977815728138e-8
+    [[tables.bbw_big1e8_n20.rows]]
+    bar = 255
+    exact = 3.7094466883239434e-8
+    lean = 3.709447397901524e-8
+    mid0 = 0
+    ta4j = 3.7094473835838596e-8
+    tol = 1.8e-13
+    ts = 3.7094473835838596e-8
+    [[tables.bbw_big1e8_n20.rows]]
+    bar = 299
+    exact = 2.9051677056737636e-8
+    lean = 2.905167809077956e-8
+    mid0 = 0
+    ta4j = 2.905169129182807e-8
+    tol = 1.8e-13
+    ts = 2.905169129182807e-8
+
+[tables.bbw_big1e8_n20_k13]
+type = "BbwRow"
+
+    [[tables.bbw_big1e8_n20_k13.rows]]
+    bar = 19
+    exact = 3.346639407638385e-8
+    lean = nan
+    mid0 = 0
+    ta4j = 3.346639871262626e-8
+    tol = 1.8e-13
+    ts = nan
+    [[tables.bbw_big1e8_n20_k13.rows]]
+    bar = 20
+    exact = 3.2186946512624656e-8
+    lean = nan
+    mid0 = 0
+    ta4j = 3.2186940309005934e-8
+    tol = 1.8e-13
+    ts = nan
+    [[tables.bbw_big1e8_n20_k13.rows]]
+    bar = 21
+    exact = 3.346639407638385e-8
+    lean = nan
+    mid0 = 0
+    ta4j = 3.346639871262626e-8
+    tol = 1.8e-13
+    ts = nan
+    [[tables.bbw_big1e8_n20_k13.rows]]
+    bar = 51
+    exact = 3.5552769577861504e-8
+    lean = nan
+    mid0 = 0
+    ta4j = 3.555275499429629e-8
+    tol = 1.8e-13
+    ts = nan
+    [[tables.bbw_big1e8_n20_k13.rows]]
+    bar = 100
+    exact = 3.218694780922487e-8
+    lean = nan
+    mid0 = 0
+    ta4j = 3.21869403093278e-8
+    tol = 1.8e-13
+    ts = nan
+    [[tables.bbw_big1e8_n20_k13.rows]]
+    bar = 122
+    exact = 2.5612498586269865e-8
+    lean = nan
+    mid0 = 0
+    ta4j = 2.5612488387222324e-8
+    tol = 1.8e-13
+    ts = nan
+    [[tables.bbw_big1e8_n20_k13.rows]]
+    bar = 200
+    exact = 3.458322528244953e-8
+    lean = nan
+    mid0 = 0
+    ta4j = 3.4583225842659354e-8
+    tol = 1.8e-13
+    ts = nan
+    [[tables.bbw_big1e8_n20_k13.rows]]
+    bar = 255
+    exact = 3.7094466883239434e-8
+    lean = nan
+    mid0 = 0
+    ta4j = 3.7094473835838596e-8
+    tol = 1.8e-13
+    ts = nan
+    [[tables.bbw_big1e8_n20_k13.rows]]
+    bar = 299
+    exact = 2.9051677056737636e-8
+    lean = nan
+    mid0 = 0
+    ta4j = 2.9051676390666882e-8
+    tol = 1.8e-13
+    ts = nan
+
+[tables.bbw_dema_n20]
+type = "BbwRow"
+
+    [[tables.bbw_dema_n20.rows]]
+    bar = 38
+    exact = 10.33749700658289
+    lean = 10.337497006582911
+    mid0 = 0
+    ta4j = nan
+    tol = 1.1e-11
+    ts = nan
+    [[tables.bbw_dema_n20.rows]]
+    bar = 39
+    exact = 9.81503168550344
+    lean = 9.815031685503424
+    mid0 = 0
+    ta4j = nan
+    tol = 1.0e-11
+    ts = nan
+    [[tables.bbw_dema_n20.rows]]
+    bar = 40
+    exact = 9.785347483281146
+    lean = 9.785347483281157
+    mid0 = 0
+    ta4j = nan
+    tol = 1.0e-11
+    ts = nan
+    [[tables.bbw_dema_n20.rows]]
+    bar = 90
+    exact = 35.71471197053671
+    lean = 35.714711970536634
+    mid0 = 0
+    ta4j = nan
+    tol = 3.6e-11
+    ts = nan
+    [[tables.bbw_dema_n20.rows]]
+    bar = 100
+    exact = 18.84250096435915
+    lean = 18.842500964359143
+    mid0 = 0
+    ta4j = nan
+    tol = 2.0e-11
+    ts = nan
+    [[tables.bbw_dema_n20.rows]]
+    bar = 167
+    exact = 6.807706859091896
+    lean = 6.80770685909191
+    mid0 = 0
+    ta4j = nan
+    tol = 7.0e-12
+    ts = nan
+    [[tables.bbw_dema_n20.rows]]
+    bar = 200
+    exact = 24.471225998904234
+    lean = 24.47122599890424
+    mid0 = 0
+    ta4j = nan
+    tol = 2.5e-11
+    ts = nan
+    [[tables.bbw_dema_n20.rows]]
+    bar = 207
+    exact = 41.22582073173977
+    lean = 41.22582073173976
+    mid0 = 0
+    ta4j = nan
+    tol = 4.2e-11
+    ts = nan
+    [[tables.bbw_dema_n20.rows]]
+    bar = 251
+    exact = 10.960087552706513
+    lean = 10.96008755270652
+    mid0 = 0
+    ta4j = nan
+    tol = 1.2e-11
+    ts = nan
+
+[tables.bbw_ema_n20]
+type = "BbwRow"
+
+    [[tables.bbw_ema_n20.rows]]
+    bar = 19
+    exact = 11.158012753036052
+    lean = 11.158012753036052
+    mid0 = 0
+    ta4j = nan
+    tol = 1.2e-11
+    ts = nan
+    [[tables.bbw_ema_n20.rows]]
+    bar = 20
+    exact = 11.936465211912608
+    lean = 11.936465211912598
+    mid0 = 0
+    ta4j = nan
+    tol = 1.3e-11
+    ts = nan
+    [[tables.bbw_ema_n20.rows]]
+    bar = 21
+    exact = 12.73004563753774
+    lean = 12.730045637537735
+    mid0 = 0
+    ta4j = nan
+    tol = 1.3e-11
+    ts = nan
+    [[tables.bbw_ema_n20.rows]]
+    bar = 90
+    exact = 38.43462435970563
+    lean = 38.43462435970554
+    mid0 = 0
+    ta4j = nan
+    tol = 3.9e-11
+    ts = nan
+    [[tables.bbw_ema_n20.rows]]
+    bar = 100
+    exact = 19.964291747632036
+    lean = 19.96429174763203
+    mid0 = 0
+    ta4j = nan
+    tol = 2.1e-11
+    ts = nan
+    [[tables.bbw_ema_n20.rows]]
+    bar = 167
+    exact = 6.786783188281319
+    lean = 6.786783188281333
+    mid0 = 0
+    ta4j = nan
+    tol = 7.0e-12
+    ts = nan
+    [[tables.bbw_ema_n20.rows]]
+    bar = 200
+    exact = 23.10501642920626
+    lean = 23.105016429206263
+    mid0 = 0
+    ta4j = nan
+    tol = 2.4e-11
+    ts = nan
+    [[tables.bbw_ema_n20.rows]]
+    bar = 251
+    exact = 11.112481976695843
+    lean = 11.11248197669585
+    mid0 = 0
+    ta4j = nan
+    tol = 1.2e-11
+    ts = nan
+
+[tables.bbw_ema_n20_s0_u100]
+type = "BbwRow"
+
+    [[tables.bbw_ema_n20_s0_u100.rows]]
+    bar = 119
+    exact = 12.443391656002383
+    lean = 12.44339165600237
+    mid0 = 0
+    ta4j = nan
+    tol = 1.3e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s0_u100.rows]]
+    bar = 120
+    exact = 12.885321142820153
+    lean = 12.885321142820162
+    mid0 = 0
+    ta4j = nan
+    tol = 1.4e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s0_u100.rows]]
+    bar = 121
+    exact = 13.106517350180393
+    lean = 13.106517350180397
+    mid0 = 0
+    ta4j = nan
+    tol = 1.4e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s0_u100.rows]]
+    bar = 167
+    exact = 6.786783188281319
+    lean = 6.786783188281333
+    mid0 = 0
+    ta4j = nan
+    tol = 7.0e-12
+    ts = nan
+    [[tables.bbw_ema_n20_s0_u100.rows]]
+    bar = 200
+    exact = 23.10501642920626
+    lean = 23.105016429206263
+    mid0 = 0
+    ta4j = nan
+    tol = 2.4e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s0_u100.rows]]
+    bar = 207
+    exact = 37.3442236907486
+    lean = 37.344223690748585
+    mid0 = 0
+    ta4j = nan
+    tol = 3.8e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s0_u100.rows]]
+    bar = 251
+    exact = 11.112481976695843
+    lean = 11.11248197669585
+    mid0 = 0
+    ta4j = nan
+    tol = 1.2e-11
+    ts = nan
+
+[tables.bbw_ema_n20_s0_u15]
+type = "BbwRow"
+
+    [[tables.bbw_ema_n20_s0_u15.rows]]
+    bar = 34
+    exact = 13.005144025648635
+    lean = 13.00514402564863
+    mid0 = 0
+    ta4j = nan
+    tol = 1.4e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s0_u15.rows]]
+    bar = 35
+    exact = 11.604937872620178
+    lean = 11.604937872620175
+    mid0 = 0
+    ta4j = nan
+    tol = 1.2e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s0_u15.rows]]
+    bar = 36
+    exact = 11.369168382697964
+    lean = 11.369168382697946
+    mid0 = 0
+    ta4j = nan
+    tol = 1.2e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s0_u15.rows]]
+    bar = 90
+    exact = 38.43462435970563
+    lean = 38.43462435970554
+    mid0 = 0
+    ta4j = nan
+    tol = 3.9e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s0_u15.rows]]
+    bar = 100
+    exact = 19.964291747632036
+    lean = 19.96429174763203
+    mid0 = 0
+    ta4j = nan
+    tol = 2.1e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s0_u15.rows]]
+    bar = 167
+    exact = 6.786783188281319
+    lean = 6.786783188281333
+    mid0 = 0
+    ta4j = nan
+    tol = 7.0e-12
+    ts = nan
+    [[tables.bbw_ema_n20_s0_u15.rows]]
+    bar = 200
+    exact = 23.10501642920626
+    lean = 23.105016429206263
+    mid0 = 0
+    ta4j = nan
+    tol = 2.4e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s0_u15.rows]]
+    bar = 251
+    exact = 11.112481976695843
+    lean = 11.11248197669585
+    mid0 = 0
+    ta4j = nan
+    tol = 1.2e-11
+    ts = nan
+
+[tables.bbw_ema_n20_s100_u0]
+type = "BbwRow"
+
+    [[tables.bbw_ema_n20_s100_u0.rows]]
+    bar = 100
+    exact = 19.788619476027055
+    lean = 19.788619476027048
+    mid0 = 0
+    ta4j = nan
+    tol = 2.0e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s100_u0.rows]]
+    bar = 101
+    exact = 18.711320439434598
+    lean = 18.711320439434594
+    mid0 = 0
+    ta4j = nan
+    tol = 1.9e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s100_u0.rows]]
+    bar = 102
+    exact = 17.837220741893322
+    lean = 17.837220741893333
+    mid0 = 0
+    ta4j = nan
+    tol = 1.9e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s100_u0.rows]]
+    bar = 167
+    exact = 6.786716798522547
+    lean = 6.786716798522561
+    mid0 = 0
+    ta4j = nan
+    tol = 7.0e-12
+    ts = nan
+    [[tables.bbw_ema_n20_s100_u0.rows]]
+    bar = 200
+    exact = 23.105007451831757
+    lean = 23.10500745183176
+    mid0 = 0
+    ta4j = nan
+    tol = 2.4e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s100_u0.rows]]
+    bar = 207
+    exact = 37.344215806922115
+    lean = 37.3442158069221
+    mid0 = 0
+    ta4j = nan
+    tol = 3.8e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s100_u0.rows]]
+    bar = 251
+    exact = 11.112481948924517
+    lean = 11.112481948924524
+    mid0 = 0
+    ta4j = nan
+    tol = 1.2e-11
+    ts = nan
+
+[tables.bbw_ema_n20_s100_u15]
+type = "BbwRow"
+
+    [[tables.bbw_ema_n20_s100_u15.rows]]
+    bar = 100
+    exact = 20.052495602016684
+    lean = 20.052495602016677
+    mid0 = 0
+    ta4j = nan
+    tol = 2.1e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s100_u15.rows]]
+    bar = 101
+    exact = 18.936160995203494
+    lean = 18.936160995203487
+    mid0 = 0
+    ta4j = nan
+    tol = 2.0e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s100_u15.rows]]
+    bar = 102
+    exact = 18.031100937212635
+    lean = 18.031100937212646
+    mid0 = 0
+    ta4j = nan
+    tol = 1.9e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s100_u15.rows]]
+    bar = 167
+    exact = 6.786816083960545
+    lean = 6.786816083960559
+    mid0 = 0
+    ta4j = nan
+    tol = 7.0e-12
+    ts = nan
+    [[tables.bbw_ema_n20_s100_u15.rows]]
+    bar = 200
+    exact = 23.105020877372493
+    lean = 23.105020877372496
+    mid0 = 0
+    ta4j = nan
+    tol = 2.4e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s100_u15.rows]]
+    bar = 207
+    exact = 37.344227597075715
+    lean = 37.34422759707571
+    mid0 = 0
+    ta4j = nan
+    tol = 3.8e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s100_u15.rows]]
+    bar = 251
+    exact = 11.112481990456148
+    lean = 11.112481990456155
+    mid0 = 0
+    ta4j = nan
+    tol = 1.2e-11
+    ts = nan
+
+[tables.bbw_ema_n20_s19_u0]
+type = "BbwRow"
+
+    [[tables.bbw_ema_n20_s19_u0.rows]]
+    bar = 19
+    exact = 11.158012753036052
+    lean = 11.158012753036052
+    mid0 = 0
+    ta4j = nan
+    tol = 1.2e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s19_u0.rows]]
+    bar = 20
+    exact = 11.936465211912608
+    lean = 11.936465211912598
+    mid0 = 0
+    ta4j = nan
+    tol = 1.3e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s19_u0.rows]]
+    bar = 21
+    exact = 12.73004563753774
+    lean = 12.730045637537735
+    mid0 = 0
+    ta4j = nan
+    tol = 1.3e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s19_u0.rows]]
+    bar = 90
+    exact = 38.43462435970563
+    lean = 38.43462435970554
+    mid0 = 0
+    ta4j = nan
+    tol = 3.9e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s19_u0.rows]]
+    bar = 100
+    exact = 19.964291747632036
+    lean = 19.96429174763203
+    mid0 = 0
+    ta4j = nan
+    tol = 2.1e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s19_u0.rows]]
+    bar = 167
+    exact = 6.786783188281319
+    lean = 6.786783188281333
+    mid0 = 0
+    ta4j = nan
+    tol = 7.0e-12
+    ts = nan
+    [[tables.bbw_ema_n20_s19_u0.rows]]
+    bar = 200
+    exact = 23.10501642920626
+    lean = 23.105016429206263
+    mid0 = 0
+    ta4j = nan
+    tol = 2.4e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s19_u0.rows]]
+    bar = 251
+    exact = 11.112481976695843
+    lean = 11.11248197669585
+    mid0 = 0
+    ta4j = nan
+    tol = 1.2e-11
+    ts = nan
+
+[tables.bbw_ema_n20_s20_u0]
+type = "BbwRow"
+
+    [[tables.bbw_ema_n20_s20_u0.rows]]
+    bar = 20
+    exact = 11.901216891752455
+    lean = 11.901216891752444
+    mid0 = 0
+    ta4j = nan
+    tol = 1.3e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s20_u0.rows]]
+    bar = 21
+    exact = 12.6958546222915
+    lean = 12.695854622291495
+    mid0 = 0
+    ta4j = nan
+    tol = 1.3e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s20_u0.rows]]
+    bar = 22
+    exact = 14.510847131902086
+    lean = 14.510847131902096
+    mid0 = 0
+    ta4j = nan
+    tol = 1.5e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s20_u0.rows]]
+    bar = 90
+    exact = 38.43453316261174
+    lean = 38.43453316261166
+    mid0 = 0
+    ta4j = nan
+    tol = 3.9e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s20_u0.rows]]
+    bar = 100
+    exact = 19.964275449043356
+    lean = 19.96427544904335
+    mid0 = 0
+    ta4j = nan
+    tol = 2.1e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s20_u0.rows]]
+    bar = 167
+    exact = 6.78678318217592
+    lean = 6.786783182175935
+    mid0 = 0
+    ta4j = nan
+    tol = 7.0e-12
+    ts = nan
+    [[tables.bbw_ema_n20_s20_u0.rows]]
+    bar = 200
+    exact = 23.10501642838068
+    lean = 23.105016428380683
+    mid0 = 0
+    ta4j = nan
+    tol = 2.4e-11
+    ts = nan
+    [[tables.bbw_ema_n20_s20_u0.rows]]
+    bar = 251
+    exact = 11.112481976693289
+    lean = 11.112481976693296
+    mid0 = 0
+    ta4j = nan
+    tol = 1.2e-11
+    ts = nan
+
+[tables.bbw_ema_n20_s251_u0]
+type = "BbwRow"
+
+    [[tables.bbw_ema_n20_s251_u0.rows]]
+    bar = 251
+    exact = 10.907102664593173
+    lean = 10.90710266459318
+    mid0 = 0
+    ta4j = nan
+    tol = 1.2e-11
+    ts = nan
+
+[tables.bbw_ema_n5]
+type = "BbwRow"
+
+    [[tables.bbw_ema_n5.rows]]
+    bar = 4
+    exact = 5.475902765543688
+    lean = 5.475902765543684
+    mid0 = 0
+    ta4j = nan
+    tol = 2.8e-11
+    ts = nan
+    [[tables.bbw_ema_n5.rows]]
+    bar = 5
+    exact = 1.8958894899897996
+    lean = 1.8958894899898022
+    mid0 = 0
+    ta4j = nan
+    tol = 9.7e-12
+    ts = nan
+    [[tables.bbw_ema_n5.rows]]
+    bar = 6
+    exact = 3.7771187155659316
+    lean = 3.7771187155659334
+    mid0 = 0
+    ta4j = nan
+    tol = 2.0e-11
+    ts = nan
+    [[tables.bbw_ema_n5.rows]]
+    bar = 77
+    exact = 32.50982109344655
+    lean = 32.50982109344654
+    mid0 = 0
+    ta4j = nan
+    tol = 1.7e-10
+    ts = nan
+    [[tables.bbw_ema_n5.rows]]
+    bar = 100
+    exact = 9.544767138176448
+    lean = 9.54476713817644
+    mid0 = 0
+    ta4j = nan
+    tol = 4.8e-11
+    ts = nan
+    [[tables.bbw_ema_n5.rows]]
+    bar = 121
+    exact = 1.0336541475763736
+    lean = 1.0336541475763694
+    mid0 = 0
+    ta4j = nan
+    tol = 5.4e-12
+    ts = nan
+    [[tables.bbw_ema_n5.rows]]
+    bar = 200
+    exact = 3.4569188352217224
+    lean = 3.45691883522172
+    mid0 = 0
+    ta4j = nan
+    tol = 1.8e-11
+    ts = nan
+    [[tables.bbw_ema_n5.rows]]
+    bar = 242
+    exact = 3.857841365633514
+    lean = 3.857841365633497
+    mid0 = 0
+    ta4j = nan
+    tol = 2.0e-11
+    ts = nan
+    [[tables.bbw_ema_n5.rows]]
+    bar = 251
+    exact = 2.6289474933132397
+    lean = 2.628947493313243
+    mid0 = 0
+    ta4j = nan
+    tol = 1.4e-11
+    ts = nan
+
+[tables.bbw_eps_n20]
+type = "BbwRow"
+
+    [[tables.bbw_eps_n20.rows]]
+    bar = 19
+    exact = 1959.5917942265426
+    lean = nan
+    mid0 = 0
+    ta4j = 1959.5917942265426
+    tol = 2.0e-9
+    ts = 1959.5917942265426
+    [[tables.bbw_eps_n20.rows]]
+    bar = 20
+    exact = 1959.5917942265426
+    lean = nan
+    mid0 = 0
+    ta4j = 1959.5917942265426
+    tol = 2.0e-9
+    ts = 1959.5917942265426
+    [[tables.bbw_eps_n20.rows]]
+    bar = 21
+    exact = 1271.9189352225942
+    lean = nan
+    mid0 = 0
+    ta4j = 1271.9189352225942
+    tol = 1.3e-9
+    ts = 1271.9189352225942
+    [[tables.bbw_eps_n20.rows]]
+    bar = 38
+    exact = 3979.94974842648
+    lean = nan
+    mid0 = 0
+    ta4j = 3979.94974842648
+    tol = 4.0e-9
+    ts = 3979.94974842648
+    [[tables.bbw_eps_n20.rows]]
+    bar = 40
+    exact = 0.0
+    lean = nan
+    mid0 = 1
+    ta4j = nan
+    tol = 0.0
+    ts = nan
+    [[tables.bbw_eps_n20.rows]]
+    bar = 41
+    exact = -3979.94974842648
+    lean = nan
+    mid0 = 0
+    ta4j = -3979.94974842648
+    tol = 4.0e-9
+    ts = -3979.94974842648
+    [[tables.bbw_eps_n20.rows]]
+    bar = 49
+    exact = 0.0
+    lean = nan
+    mid0 = 1
+    ta4j = nan
+    tol = 0.0
+    ts = nan
+    [[tables.bbw_eps_n20.rows]]
+    bar = 86
+    exact = -916.515138991168
+    lean = nan
+    mid0 = 0
+    ta4j = -916.5151389911678
+    tol = 9.2e-10
+    ts = -916.5151389911678
+    [[tables.bbw_eps_n20.rows]]
+    bar = 100
+    exact = -1271.9189352225942
+    lean = nan
+    mid0 = 0
+    ta4j = -1271.9189352225942
+    tol = 1.3e-9
+    ts = -1271.9189352225942
+    [[tables.bbw_eps_n20.rows]]
+    bar = 199
+    exact = 0.0
+    lean = nan
+    mid0 = 1
+    ta4j = nan
+    tol = 0.0
+    ts = nan
+
+[tables.bbw_fine100_n20]
+type = "BbwRow"
+
+    [[tables.bbw_fine100_n20.rows]]
+    bar = 19
+    exact = 3.458323620029911e-8
+    lean = 3.458323292794992e-8
+    mid0 = 0
+    ta4j = 3.458322339248062e-8
+    tol = 1.8e-13
+    ts = 3.458322339248062e-8
+    [[tables.bbw_fine100_n20.rows]]
+    bar = 20
+    exact = 3.5552781246541804e-8
+    lean = 3.555277766535155e-8
+    mid0 = 0
+    ta4j = 3.555277316600043e-8
+    tol = 1.8e-13
+    ts = 3.555277316600043e-8
+    [[tables.bbw_fine100_n20.rows]]
+    bar = 21
+    exact = 3.5552781246541804e-8
+    lean = 3.555277766535155e-8
+    mid0 = 0
+    ta4j = 3.555277316600043e-8
+    tol = 1.8e-13
+    ts = 3.555277316600043e-8
+    [[tables.bbw_fine100_n20.rows]]
+    bar = 31
+    exact = 3.773592794763034e-8
+    lean = 3.773592452407545e-8
+    mid0 = 0
+    ta4j = 3.773592993223792e-8
+    tol = 1.8e-13
+    ts = 3.7735929932237906e-8
+    [[tables.bbw_fine100_n20.rows]]
+    bar = 50
+    exact = 3.3226499223664006e-8
+    lean = 3.32264954480174e-8
+    mid0 = 0
+    ta4j = 3.322651309279662e-8
+    tol = 1.8e-13
+    ts = 3.322651309279662e-8
+    [[tables.bbw_fine100_n20.rows]]
+    bar = 100
+    exact = 3.3226499223664006e-8
+    lean = 3.32264954480174e-8
+    mid0 = 0
+    ta4j = 3.322651309279662e-8
+    tol = 1.8e-13
+    ts = 3.322651309279661e-8
+    [[tables.bbw_fine100_n20.rows]]
+    bar = 135
+    exact = 2.4979991327533416e-8
+    lean = 2.49799919913454e-8
+    mid0 = 0
+    ta4j = 2.4979982524681037e-8
+    tol = 1.8e-13
+    ts = 2.4979982524681043e-8
+    [[tables.bbw_fine100_n20.rows]]
+    bar = 200
+    exact = 3.411744828701523e-8
+    lean = 3.411744421454045e-8
+    mid0 = 0
+    ta4j = 3.411744841804291e-8
+    tol = 1.8e-13
+    ts = 3.411744841804289e-8
+    [[tables.bbw_fine100_n20.rows]]
+    bar = 246
+    exact = 2.905168528624168e-8
+    lean = 2.9051678088745942e-8
+    mid0 = 0
+    ta4j = 2.9051676616006954e-8
+    tol = 1.8e-13
+    ts = 2.9051676616006938e-8
+    [[tables.bbw_fine100_n20.rows]]
+    bar = 299
+    exact = 3.4583235378809993e-8
+    lean = 3.4583232928295754e-8
+    mid0 = 0
+    ta4j = 3.458322339282646e-8
+    tol = 1.8e-13
+    ts = 3.458322339282645e-8
+
+[tables.bbw_fine100_n20_k13]
+type = "BbwRow"
+
+    [[tables.bbw_fine100_n20_k13.rows]]
+    bar = 19
+    exact = 3.458323620029911e-8
+    lean = nan
+    mid0 = 0
+    ta4j = 3.458323760333534e-8
+    tol = 1.8e-13
+    ts = nan
+    [[tables.bbw_fine100_n20_k13.rows]]
+    bar = 20
+    exact = 3.5552781246541804e-8
+    lean = nan
+    mid0 = 0
+    ta4j = 3.555277316600043e-8
+    tol = 1.8e-13
+    ts = nan
+    [[tables.bbw_fine100_n20_k13.rows]]
+    bar = 21
+    exact = 3.5552781246541804e-8
+    lean = nan
+    mid0 = 0
+    ta4j = 3.555277316600043e-8
+    tol = 1.8e-13
+    ts = nan
+    [[tables.bbw_fine100_n20_k13.rows]]
+    bar = 31
+    exact = 3.773592794763034e-8
+    lean = nan
+    mid0 = 0
+    ta4j = 3.7735915721383204e-8
+    tol = 1.8e-13
+    ts = nan
+    [[tables.bbw_fine100_n20_k13.rows]]
+    bar = 57
+    exact = 3.411744828701523e-8
+    lean = nan
+    mid0 = 0
+    ta4j = 3.4117434207188196e-8
+    tol = 1.8e-13
+    ts = nan
+    [[tables.bbw_fine100_n20_k13.rows]]
+    bar = 100
+    exact = 3.3226499223664006e-8
+    lean = nan
+    mid0 = 0
+    ta4j = 3.322649888194191e-8
+    tol = 1.8e-13
+    ts = nan
+    [[tables.bbw_fine100_n20_k13.rows]]
+    bar = 135
+    exact = 2.4979991327533416e-8
+    lean = nan
+    mid0 = 0
+    ta4j = 2.4979996735535752e-8
+    tol = 1.8e-13
+    ts = nan
+    [[tables.bbw_fine100_n20_k13.rows]]
+    bar = 200
+    exact = 3.411744828701523e-8
+    lean = nan
+    mid0 = 0
+    ta4j = 3.4117434207188196e-8
+    tol = 1.8e-13
+    ts = nan
+    [[tables.bbw_fine100_n20_k13.rows]]
+    bar = 299
+    exact = 3.4583235378809993e-8
+    lean = nan
+    mid0 = 0
+    ta4j = 3.4583237603681174e-8
+    tol = 1.8e-13
+    ts = nan
+
+[tables.bbw_flatneg_n20]
+type = "BbwRow"
+
+    [[tables.bbw_flatneg_n20.rows]]
+    bar = 19
+    exact = -0.0
+    lean = 0.0
+    mid0 = 0
+    ta4j = -0.0
+    tol = 0.0
+    ts = -0.0
+    [[tables.bbw_flatneg_n20.rows]]
+    bar = 20
+    exact = -0.0
+    lean = 0.0
+    mid0 = 0
+    ta4j = -0.0
+    tol = 0.0
+    ts = -0.0
+    [[tables.bbw_flatneg_n20.rows]]
+    bar = 21
+    exact = -0.0
+    lean = 0.0
+    mid0 = 0
+    ta4j = -0.0
+    tol = 0.0
+    ts = -0.0
+    [[tables.bbw_flatneg_n20.rows]]
+    bar = 59
+    exact = -0.0
+    lean = 0.0
+    mid0 = 0
+    ta4j = -0.0
+    tol = 0.0
+    ts = -0.0
+
+[tables.bbw_flatpos_n20]
+type = "BbwRow"
+
+    [[tables.bbw_flatpos_n20.rows]]
+    bar = 19
+    exact = 0.0
+    lean = 0.0
+    mid0 = 0
+    ta4j = 0.0
+    tol = 0.0
+    ts = 0.0
+    [[tables.bbw_flatpos_n20.rows]]
+    bar = 20
+    exact = 0.0
+    lean = 0.0
+    mid0 = 0
+    ta4j = 0.0
+    tol = 0.0
+    ts = 0.0
+    [[tables.bbw_flatpos_n20.rows]]
+    bar = 21
+    exact = 0.0
+    lean = 0.0
+    mid0 = 0
+    ta4j = 0.0
+    tol = 0.0
+    ts = 0.0
+    [[tables.bbw_flatpos_n20.rows]]
+    bar = 59
+    exact = 0.0
+    lean = 0.0
+    mid0 = 0
+    ta4j = 0.0
+    tol = 0.0
+    ts = 0.0
+
+[tables.bbw_long_ema_n100000]
+type = "BbwRow"
+
+    [[tables.bbw_long_ema_n100000.rows]]
+    bar = 99999
+    exact = 46.220960505222024
+    lean = 46.220960505222
+    mid0 = 0
+    ta4j = nan
+    tol = 4.7e-11
+    ts = nan
+    [[tables.bbw_long_ema_n100000.rows]]
+    bar = 100000
+    exact = 46.220738785520595
+    lean = 46.22073878552042
+    mid0 = 0
+    ta4j = nan
+    tol = 4.7e-11
+    ts = nan
+    [[tables.bbw_long_ema_n100000.rows]]
+    bar = 100001
+    exact = 46.220586712207535
+    lean = 46.22058671220743
+    mid0 = 0
+    ta4j = nan
+    tol = 4.7e-11
+    ts = nan
+    [[tables.bbw_long_ema_n100000.rows]]
+    bar = 100045
+    exact = 46.21679530605575
+    lean = 46.216795306055666
+    mid0 = 0
+    ta4j = nan
+    tol = 4.7e-11
+    ts = nan
+    [[tables.bbw_long_ema_n100000.rows]]
+    bar = 100047
+    exact = 46.217138013329766
+    lean = 46.21713801332997
+    mid0 = 0
+    ta4j = nan
+    tol = 4.7e-11
+    ts = nan
+    [[tables.bbw_long_ema_n100000.rows]]
+    bar = 100367
+    exact = 46.22583019856978
+    lean = 46.22583019856994
+    mid0 = 0
+    ta4j = nan
+    tol = 4.7e-11
+    ts = nan
+    [[tables.bbw_long_ema_n100000.rows]]
+    bar = 100499
+    exact = 46.219099801024285
+    lean = 46.21909980102417
+    mid0 = 0
+    ta4j = nan
+    tol = 4.7e-11
+    ts = nan
+
+[tables.bbw_long_sma_n100000]
+type = "BbwRow"
+
+    [[tables.bbw_long_sma_n100000.rows]]
+    bar = 99999
+    exact = 46.220960505222024
+    lean = 46.220960505222
+    mid0 = 0
+    ta4j = 46.22096050522187
+    tol = 4.7e-11
+    ts = 46.22096050522187
+    [[tables.bbw_long_sma_n100000.rows]]
+    bar = 100000
+    exact = 46.22073386196878
+    lean = 46.220733861968604
+    mid0 = 0
+    ta4j = 46.2207338619691
+    tol = 4.7e-11
+    ts = 46.2207338619691
+    [[tables.bbw_long_sma_n100000.rows]]
+    bar = 100001
+    exact = 46.22069362888373
+    lean = 46.220693628883616
+    mid0 = 0
+    ta4j = 46.220693628883915
+    tol = 4.7e-11
+    ts = 46.220693628883915
+    [[tables.bbw_long_sma_n100000.rows]]
+    bar = 100026
+    exact = 46.21952779948563
+    lean = 46.21952779948553
+    mid0 = 0
+    ta4j = 46.21952779948632
+    tol = 4.7e-11
+    ts = 46.21952779948632
+    [[tables.bbw_long_sma_n100000.rows]]
+    bar = 100045
+    exact = 46.216829749951266
+    lean = 46.216829749951174
+    mid0 = 0
+    ta4j = 46.21682974995138
+    tol = 4.7e-11
+    ts = 46.21682974995138
+    [[tables.bbw_long_sma_n100000.rows]]
+    bar = 100047
+    exact = 46.21714236008966
+    lean = 46.21714236008986
+    mid0 = 0
+    ta4j = 46.217142360089454
+    tol = 4.7e-11
+    ts = 46.217142360089454
+    [[tables.bbw_long_sma_n100000.rows]]
+    bar = 100415
+    exact = 46.22712533286723
+    lean = 46.227125332867146
+    mid0 = 0
+    ta4j = 46.227125332867224
+    tol = 4.7e-11
+    ts = 46.227125332867224
+    [[tables.bbw_long_sma_n100000.rows]]
+    bar = 100499
+    exact = 46.2213354752037
+    lean = 46.22133547520359
+    mid0 = 0
+    ta4j = 46.22133547520324
+    tol = 4.7e-11
+    ts = 46.22133547520324
+
+[tables.bbw_neg_n20]
+type = "BbwRow"
+
+    [[tables.bbw_neg_n20.rows]]
+    bar = 19
+    exact = -11.158012753036052
+    lean = -11.158012753036052
+    mid0 = 0
+    ta4j = -11.158012753036054
+    tol = 1.2e-11
+    ts = -11.158012753036054
+    [[tables.bbw_neg_n20.rows]]
+    bar = 20
+    exact = -11.901216891752455
+    lean = -11.901216891752444
+    mid0 = 0
+    ta4j = -11.901216891752457
+    tol = 1.3e-11
+    ts = -11.901216891752457
+    [[tables.bbw_neg_n20.rows]]
+    bar = 21
+    exact = -12.6783803829195
+    lean = -12.678380382919494
+    mid0 = 0
+    ta4j = -12.678380382919514
+    tol = 1.3e-11
+    ts = -12.67838038291951
+    [[tables.bbw_neg_n20.rows]]
+    bar = 46
+    exact = -10.95737800951392
+    lean = -10.957378009513945
+    mid0 = 0
+    ta4j = -10.957378009513912
+    tol = 1.2e-11
+    ts = -10.95737800951391
+    [[tables.bbw_neg_n20.rows]]
+    bar = 90
+    exact = -39.34862932698989
+    lean = -39.3486293269898
+    mid0 = 0
+    ta4j = -39.34862932698987
+    tol = 4.0e-11
+    ts = -39.34862932698988
+    [[tables.bbw_neg_n20.rows]]
+    bar = 100
+    exact = -19.788619476027055
+    lean = -19.788619476027048
+    mid0 = 0
+    ta4j = -19.78861947602705
+    tol = 2.0e-11
+    ts = -19.788619476027048
+    [[tables.bbw_neg_n20.rows]]
+    bar = 111
+    exact = -8.726640097256908
+    lean = -8.72664009725692
+    mid0 = 0
+    ta4j = -8.726640097256922
+    tol = 9.0e-12
+    ts = -8.726640097256922
+    [[tables.bbw_neg_n20.rows]]
+    bar = 167
+    exact = -6.820079941774967
+    lean = -6.820079941774981
+    mid0 = 0
+    ta4j = -6.820079941774973
+    tol = 7.0e-12
+    ts = -6.820079941774972
+    [[tables.bbw_neg_n20.rows]]
+    bar = 200
+    exact = -22.83592690238874
+    lean = -22.835926902388742
+    mid0 = 0
+    ta4j = -22.835926902388735
+    tol = 2.4e-11
+    ts = -22.835926902388735
+    [[tables.bbw_neg_n20.rows]]
+    bar = 251
+    exact = -10.907102664593173
+    lean = -10.90710266459318
+    mid0 = 0
+    ta4j = -10.907102664593173
+    tol = 1.2e-11
+    ts = -10.907102664593173
+
+[tables.bbw_peg_n20]
+type = "BbwRow"
+
+    [[tables.bbw_peg_n20.rows]]
+    bar = 19
+    exact = 0.04156046130789352
+    lean = 0.041560461307892795
+    mid0 = 0
+    ta4j = 0.04156046130789436
+    tol = 2.2e-13
+    ts = 0.04156046130789436
+    [[tables.bbw_peg_n20.rows]]
+    bar = 20
+    exact = 0.0399460656659982
+    lean = 0.039946065665997545
+    mid0 = 0
+    ta4j = 0.039946065665999224
+    tol = 2.2e-13
+    ts = 0.039946065665999224
+    [[tables.bbw_peg_n20.rows]]
+    bar = 21
+    exact = 0.03767989458041657
+    lean = 0.03767989458041589
+    mid0 = 0
+    ta4j = 0.037679894580410385
+    tol = 2.2e-13
+    ts = 0.037679894580410385
+    [[tables.bbw_peg_n20.rows]]
+    bar = 50
+    exact = 0.11017654626857504
+    lean = 0.11017654626856942
+    mid0 = 0
+    ta4j = 0.11017654626856725
+    tol = 2.9e-13
+    ts = 0.11017654626856728
+    [[tables.bbw_peg_n20.rows]]
+    bar = 100
+    exact = 0.0006910379422218255
+    lean = 0.000691037942220844
+    mid0 = 0
+    ta4j = 0.0006910379422258427
+    tol = 1.8e-13
+    ts = 0.0006910379422258427
+    [[tables.bbw_peg_n20.rows]]
+    bar = 200
+    exact = 1.3074537169006368e-12
+    lean = nan
+    mid0 = 0
+    ta4j = 1.3321344161085722e-12
+    tol = 1.8e-13
+    ts = 1.2877299355716204e-12
+    [[tables.bbw_peg_n20.rows]]
+    bar = 210
+    exact = 1.3135022479185265e-13
+    lean = nan
+    mid0 = 0
+    ta4j = 1.3321344161085764e-13
+    tol = 1.8e-13
+    ts = 2.2202240268476278e-13
+    [[tables.bbw_peg_n20.rows]]
+    bar = 215
+    exact = 0.0
+    lean = nan
+    mid0 = 0
+    ta4j = 0.0
+    tol = 0.0
+    ts = nan
+    [[tables.bbw_peg_n20.rows]]
+    bar = 726
+    exact = 5.340061118175083e-12
+    lean = nan
+    mid0 = 0
+    ta4j = 5.328537664434237e-12
+    tol = 1.8e-13
+    ts = 5.3285376644342396e-12
+    [[tables.bbw_peg_n20.rows]]
+    bar = 743
+    exact = 1.3135022479185265e-13
+    lean = 0.0
+    mid0 = 0
+    ta4j = 2.2202240268476278e-13
+    tol = 1.8e-13
+    ts = 2.2202240268476278e-13
+    [[tables.bbw_peg_n20.rows]]
+    bar = 1000
+    exact = 0.0
+    lean = 0.0
+    mid0 = 0
+    ta4j = nan
+    tol = 0.0
+    ts = nan
+    [[tables.bbw_peg_n20.rows]]
+    bar = 1079
+    exact = 0.0
+    lean = 0.0
+    mid0 = 0
+    ta4j = nan
+    tol = 0.0
+    ts = nan
+
+[tables.bbw_sma_n2]
+type = "BbwRow"
+
+    [[tables.bbw_sma_n2.rows]]
+    bar = 1
+    exact = 7.116979309234356
+    lean = 7.116979309234361
+    mid0 = 0
+    ta4j = 7.116979309234356
+    tol = 7.2e-10
+    ts = 7.116979309234356
+    [[tables.bbw_sma_n2.rows]]
+    bar = 2
+    exact = 0.9302817273640208
+    lean = 0.9302817273640256
+    mid0 = 0
+    ta4j = 0.9302817273640207
+    tol = 9.4e-11
+    ts = 0.9302817273640207
+    [[tables.bbw_sma_n2.rows]]
+    bar = 3
+    exact = 1.5200295561302557
+    lean = 1.5200295561302581
+    mid0 = 0
+    ta4j = 1.520029556130256
+    tol = 1.6e-10
+    ts = 1.5200295561302557
+    [[tables.bbw_sma_n2.rows]]
+    bar = 71
+    exact = 8.468100996754092
+    lean = 8.468100996754085
+    mid0 = 0
+    ta4j = 8.468100996754094
+    tol = 8.5e-10
+    ts = 8.46810099675409
+    [[tables.bbw_sma_n2.rows]]
+    bar = 100
+    exact = 3.630539241857982
+    lean = 3.630539241857982
+    mid0 = 0
+    ta4j = 3.630539241857981
+    tol = 3.7e-10
+    ts = 3.6305392418579814
+    [[tables.bbw_sma_n2.rows]]
+    bar = 101
+    exact = 0.0
+    lean = 0.0
+    mid0 = 0
+    ta4j = nan
+    tol = 0.0
+    ts = 0.0
+    [[tables.bbw_sma_n2.rows]]
+    bar = 200
+    exact = 0.22417336073230815
+    lean = 0.22417336073229965
+    mid0 = 0
+    ta4j = 0.22417336073230804
+    tol = 2.3e-11
+    ts = 0.22417336073230812
+    [[tables.bbw_sma_n2.rows]]
+    bar = 202
+    exact = 32.323232323232325
+    lean = 32.323232323232325
+    mid0 = 0
+    ta4j = 32.323232323232304
+    tol = 3.3e-9
+    ts = 32.323232323232325
+    [[tables.bbw_sma_n2.rows]]
+    bar = 204
+    exact = 0.1490868430860831
+    lean = 0.14908684308609765
+    mid0 = 0
+    ta4j = 0.14908684308608303
+    tol = 1.6e-11
+    ts = 0.1490868430860831
+    [[tables.bbw_sma_n2.rows]]
+    bar = 214
+    exact = 8.01346435745697
+    lean = 8.013464357456973
+    mid0 = 0
+    ta4j = 8.013464357456963
+    tol = 8.1e-10
+    ts = 8.01346435745697
+    [[tables.bbw_sma_n2.rows]]
+    bar = 251
+    exact = 1.6249653771581487
+    lean = 1.6249653771581571
+    mid0 = 0
+    ta4j = 1.6249653771581478
+    tol = 1.7e-10
+    ts = 1.6249653771581485
+
+[tables.bbw_sma_n20]
+type = "BbwRow"
+
+    [[tables.bbw_sma_n20.rows]]
+    bar = 19
+    exact = 11.158012753036052
+    lean = 11.158012753036052
+    mid0 = 0
+    ta4j = 11.158012753036054
+    tol = 1.2e-11
+    ts = 11.158012753036054
+    [[tables.bbw_sma_n20.rows]]
+    bar = 20
+    exact = 11.901216891752455
+    lean = 11.901216891752444
+    mid0 = 0
+    ta4j = 11.901216891752457
+    tol = 1.3e-11
+    ts = 11.901216891752457
+    [[tables.bbw_sma_n20.rows]]
+    bar = 21
+    exact = 12.6783803829195
+    lean = 12.678380382919494
+    mid0 = 0
+    ta4j = 12.678380382919514
+    tol = 1.3e-11
+    ts = 12.67838038291951
+    [[tables.bbw_sma_n20.rows]]
+    bar = 46
+    exact = 10.95737800951392
+    lean = 10.957378009513945
+    mid0 = 0
+    ta4j = 10.957378009513912
+    tol = 1.2e-11
+    ts = 10.95737800951391
+    [[tables.bbw_sma_n20.rows]]
+    bar = 90
+    exact = 39.34862932698989
+    lean = 39.3486293269898
+    mid0 = 0
+    ta4j = 39.34862932698987
+    tol = 4.0e-11
+    ts = 39.34862932698988
+    [[tables.bbw_sma_n20.rows]]
+    bar = 100
+    exact = 19.788619476027055
+    lean = 19.788619476027048
+    mid0 = 0
+    ta4j = 19.78861947602705
+    tol = 2.0e-11
+    ts = 19.788619476027048
+    [[tables.bbw_sma_n20.rows]]
+    bar = 111
+    exact = 8.726640097256908
+    lean = 8.72664009725692
+    mid0 = 0
+    ta4j = 8.726640097256922
+    tol = 9.0e-12
+    ts = 8.726640097256922
+    [[tables.bbw_sma_n20.rows]]
+    bar = 167
+    exact = 6.820079941774967
+    lean = 6.820079941774981
+    mid0 = 0
+    ta4j = 6.820079941774973
+    tol = 7.0e-12
+    ts = 6.820079941774972
+    [[tables.bbw_sma_n20.rows]]
+    bar = 200
+    exact = 22.83592690238874
+    lean = 22.835926902388742
+    mid0 = 0
+    ta4j = 22.835926902388735
+    tol = 2.4e-11
+    ts = 22.835926902388735
+    [[tables.bbw_sma_n20.rows]]
+    bar = 251
+    exact = 10.907102664593173
+    lean = 10.90710266459318
+    mid0 = 0
+    ta4j = 10.907102664593173
+    tol = 1.2e-11
+    ts = 10.907102664593173
+
+[tables.bbw_sma_n200]
+type = "BbwRow"
+
+    [[tables.bbw_sma_n200.rows]]
+    bar = 199
+    exact = 63.054583449244845
+    lean = 63.054583449244895
+    mid0 = 0
+    ta4j = 63.054583449244916
+    tol = 6.4e-11
+    ts = 63.054583449244916
+    [[tables.bbw_sma_n200.rows]]
+    bar = 200
+    exact = 62.84838787044603
+    lean = 62.84838787044597
+    mid0 = 0
+    ta4j = 62.84838787044605
+    tol = 6.4e-11
+    ts = 62.84838787044605
+    [[tables.bbw_sma_n200.rows]]
+    bar = 201
+    exact = 62.70743612881683
+    lean = 62.707436128816745
+    mid0 = 0
+    ta4j = 62.70743612881684
+    tol = 6.3e-11
+    ts = 62.70743612881684
+    [[tables.bbw_sma_n200.rows]]
+    bar = 236
+    exact = 56.38685965532703
+    lean = 56.386859655326866
+    mid0 = 0
+    ta4j = 56.38685965532706
+    tol = 5.7e-11
+    ts = 56.38685965532705
+    [[tables.bbw_sma_n200.rows]]
+    bar = 237
+    exact = 55.934844324900325
+    lean = 55.93484432490037
+    mid0 = 0
+    ta4j = 55.93484432490038
+    tol = 5.7e-11
+    ts = 55.93484432490039
+    [[tables.bbw_sma_n200.rows]]
+    bar = 251
+    exact = 50.6571670005536
+    lean = 50.657167000553606
+    mid0 = 0
+    ta4j = 50.657167000553606
+    tol = 5.1e-11
+    ts = 50.657167000553606
+
+[tables.bbw_sma_n200_k13]
+type = "BbwRow"
+
+    [[tables.bbw_sma_n200_k13.rows]]
+    bar = 199
+    exact = 63.054583449244845
+    lean = nan
+    mid0 = 0
+    ta4j = 63.054583449244895
+    tol = 6.4e-11
+    ts = nan
+    [[tables.bbw_sma_n200_k13.rows]]
+    bar = 200
+    exact = 62.84838787044603
+    lean = nan
+    mid0 = 0
+    ta4j = 62.848387870446054
+    tol = 6.3e-11
+    ts = nan
+    [[tables.bbw_sma_n200_k13.rows]]
+    bar = 201
+    exact = 62.70743612881683
+    lean = nan
+    mid0 = 0
+    ta4j = 62.70743612881685
+    tol = 6.3e-11
+    ts = nan
+    [[tables.bbw_sma_n200_k13.rows]]
+    bar = 245
+    exact = 52.70331224314266
+    lean = nan
+    mid0 = 0
+    ta4j = 52.70331224314272
+    tol = 5.3e-11
+    ts = nan
+    [[tables.bbw_sma_n200_k13.rows]]
+    bar = 251
+    exact = 50.6571670005536
+    lean = nan
+    mid0 = 0
+    ta4j = 50.65716700055361
+    tol = 5.1e-11
+    ts = nan
+
+[tables.bbw_sma_n20_k01_02]
+type = "BbwRow"
+
+    [[tables.bbw_sma_n20_k01_02.rows]]
+    bar = 19
+    exact = 0.8368509564777039
+    lean = nan
+    mid0 = 0
+    ta4j = 0.8368509564776971
+    tol = 1.1e-12
+    ts = nan
+    [[tables.bbw_sma_n20_k01_02.rows]]
+    bar = 20
+    exact = 0.8925912668814342
+    lean = nan
+    mid0 = 0
+    ta4j = 0.8925912668814274
+    tol = 1.1e-12
+    ts = nan
+    [[tables.bbw_sma_n20_k01_02.rows]]
+    bar = 21
+    exact = 0.9508785287189625
+    lean = nan
+    mid0 = 0
+    ta4j = 0.9508785287189727
+    tol = 1.2e-12
+    ts = nan
+    [[tables.bbw_sma_n20_k01_02.rows]]
+    bar = 90
+    exact = 2.9511471995242418
+    lean = nan
+    mid0 = 0
+    ta4j = 2.9511471995242413
+    tol = 3.2e-12
+    ts = nan
+    [[tables.bbw_sma_n20_k01_02.rows]]
+    bar = 100
+    exact = 1.4841464607020292
+    lean = nan
+    mid0 = 0
+    ta4j = 1.4841464607020334
+    tol = 1.7e-12
+    ts = nan
+    [[tables.bbw_sma_n20_k01_02.rows]]
+    bar = 113
+    exact = 0.6623798868476287
+    lean = nan
+    mid0 = 0
+    ta4j = 0.6623798868476375
+    tol = 8.4e-13
+    ts = nan
+    [[tables.bbw_sma_n20_k01_02.rows]]
+    bar = 167
+    exact = 0.5115059956331226
+    lean = nan
+    mid0 = 0
+    ta4j = 0.5115059956331242
+    tol = 6.9e-13
+    ts = nan
+    [[tables.bbw_sma_n20_k01_02.rows]]
+    bar = 200
+    exact = 1.7126945176791555
+    lean = nan
+    mid0 = 0
+    ta4j = 1.712694517679152
+    tol = 1.9e-12
+    ts = nan
+    [[tables.bbw_sma_n20_k01_02.rows]]
+    bar = 251
+    exact = 0.8180326998444881
+    lean = nan
+    mid0 = 0
+    ta4j = 0.8180326998444978
+    tol = 1.0e-12
+    ts = nan
+
+[tables.bbw_sma_n20_k0_0]
+type = "BbwRow"
+
+    [[tables.bbw_sma_n20_k0_0.rows]]
+    bar = 19
+    exact = 0.0
+    lean = 0.0
+    mid0 = 0
+    ta4j = 0.0
+    tol = 0.0
+    ts = 0.0
+    [[tables.bbw_sma_n20_k0_0.rows]]
+    bar = 20
+    exact = 0.0
+    lean = 0.0
+    mid0 = 0
+    ta4j = 0.0
+    tol = 0.0
+    ts = 0.0
+    [[tables.bbw_sma_n20_k0_0.rows]]
+    bar = 21
+    exact = 0.0
+    lean = 0.0
+    mid0 = 0
+    ta4j = 0.0
+    tol = 0.0
+    ts = 0.0
+    [[tables.bbw_sma_n20_k0_0.rows]]
+    bar = 100
+    exact = 0.0
+    lean = 0.0
+    mid0 = 0
+    ta4j = 0.0
+    tol = 0.0
+    ts = 0.0
+    [[tables.bbw_sma_n20_k0_0.rows]]
+    bar = 200
+    exact = 0.0
+    lean = 0.0
+    mid0 = 0
+    ta4j = 0.0
+    tol = 0.0
+    ts = 0.0
+    [[tables.bbw_sma_n20_k0_0.rows]]
+    bar = 251
+    exact = 0.0
+    lean = 0.0
+    mid0 = 0
+    ta4j = 0.0
+    tol = 0.0
+    ts = 0.0
+
+[tables.bbw_sma_n20_k13]
+type = "BbwRow"
+
+    [[tables.bbw_sma_n20_k13.rows]]
+    bar = 19
+    exact = 11.158012753036052
+    lean = nan
+    mid0 = 0
+    ta4j = 11.158012753036038
+    tol = 1.2e-11
+    ts = nan
+    [[tables.bbw_sma_n20_k13.rows]]
+    bar = 20
+    exact = 11.901216891752455
+    lean = nan
+    mid0 = 0
+    ta4j = 11.90121689175244
+    tol = 1.3e-11
+    ts = nan
+    [[tables.bbw_sma_n20_k13.rows]]
+    bar = 21
+    exact = 12.6783803829195
+    lean = nan
+    mid0 = 0
+    ta4j = 12.678380382919496
+    tol = 1.3e-11
+    ts = nan
+    [[tables.bbw_sma_n20_k13.rows]]
+    bar = 90
+    exact = 39.34862932698989
+    lean = nan
+    mid0 = 0
+    ta4j = 39.348629326989894
+    tol = 4.0e-11
+    ts = nan
+    [[tables.bbw_sma_n20_k13.rows]]
+    bar = 100
+    exact = 19.788619476027055
+    lean = nan
+    mid0 = 0
+    ta4j = 19.78861947602704
+    tol = 2.0e-11
+    ts = nan
+    [[tables.bbw_sma_n20_k13.rows]]
+    bar = 167
+    exact = 6.820079941774967
+    lean = nan
+    mid0 = 0
+    ta4j = 6.820079941774973
+    tol = 7.0e-12
+    ts = nan
+    [[tables.bbw_sma_n20_k13.rows]]
+    bar = 181
+    exact = 12.404044306793498
+    lean = nan
+    mid0 = 0
+    ta4j = 12.404044306793516
+    tol = 1.3e-11
+    ts = nan
+    [[tables.bbw_sma_n20_k13.rows]]
+    bar = 200
+    exact = 22.83592690238874
+    lean = nan
+    mid0 = 0
+    ta4j = 22.835926902388735
+    tol = 2.4e-11
+    ts = nan
+    [[tables.bbw_sma_n20_k13.rows]]
+    bar = 251
+    exact = 10.907102664593173
+    lean = nan
+    mid0 = 0
+    ta4j = 10.907102664593188
+    tol = 1.2e-11
+    ts = nan
+
+[tables.bbw_sma_n20_k25_15]
+type = "BbwRow"
+
+    [[tables.bbw_sma_n20_k25_15.rows]]
+    bar = 19
+    exact = 11.158012753036052
+    lean = nan
+    mid0 = 0
+    ta4j = 11.158012753036054
+    tol = 1.2e-11
+    ts = nan
+    [[tables.bbw_sma_n20_k25_15.rows]]
+    bar = 20
+    exact = 11.901216891752455
+    lean = nan
+    mid0 = 0
+    ta4j = 11.901216891752457
+    tol = 1.3e-11
+    ts = nan
+    [[tables.bbw_sma_n20_k25_15.rows]]
+    bar = 21
+    exact = 12.6783803829195
+    lean = nan
+    mid0 = 0
+    ta4j = 12.678380382919496
+    tol = 1.3e-11
+    ts = nan
+    [[tables.bbw_sma_n20_k25_15.rows]]
+    bar = 90
+    exact = 39.34862932698989
+    lean = nan
+    mid0 = 0
+    ta4j = 39.34862932698987
+    tol = 4.0e-11
+    ts = nan
+    [[tables.bbw_sma_n20_k25_15.rows]]
+    bar = 100
+    exact = 19.788619476027055
+    lean = nan
+    mid0 = 0
+    ta4j = 19.78861947602705
+    tol = 2.0e-11
+    ts = nan
+    [[tables.bbw_sma_n20_k25_15.rows]]
+    bar = 165
+    exact = 7.549748414956958
+    lean = nan
+    mid0 = 0
+    ta4j = 7.549748414956974
+    tol = 7.8e-12
+    ts = nan
+    [[tables.bbw_sma_n20_k25_15.rows]]
+    bar = 167
+    exact = 6.820079941774967
+    lean = nan
+    mid0 = 0
+    ta4j = 6.820079941774973
+    tol = 7.0e-12
+    ts = nan
+    [[tables.bbw_sma_n20_k25_15.rows]]
+    bar = 200
+    exact = 22.83592690238874
+    lean = nan
+    mid0 = 0
+    ta4j = 22.83592690238875
+    tol = 2.4e-11
+    ts = nan
+    [[tables.bbw_sma_n20_k25_15.rows]]
+    bar = 251
+    exact = 10.907102664593173
+    lean = nan
+    mid0 = 0
+    ta4j = 10.907102664593173
+    tol = 1.2e-11
+    ts = nan
+
+[tables.bbw_sma_n20_km1_2]
+type = "BbwRow"
+
+    [[tables.bbw_sma_n20_km1_2.rows]]
+    bar = 19
+    exact = 2.789503188259013
+    lean = nan
+    mid0 = 0
+    ta4j = 2.789503188259021
+    tol = 3.0e-12
+    ts = nan
+    [[tables.bbw_sma_n20_km1_2.rows]]
+    bar = 20
+    exact = 2.9753042229381137
+    lean = nan
+    mid0 = 0
+    ta4j = 2.975304222938122
+    tol = 3.2e-12
+    ts = nan
+    [[tables.bbw_sma_n20_km1_2.rows]]
+    bar = 21
+    exact = 3.169595095729875
+    lean = nan
+    mid0 = 0
+    ta4j = 3.1695950957298784
+    tol = 3.4e-12
+    ts = nan
+    [[tables.bbw_sma_n20_km1_2.rows]]
+    bar = 90
+    exact = 9.837157331747472
+    lean = nan
+    mid0 = 0
+    ta4j = 9.837157331747463
+    tol = 1.0e-11
+    ts = nan
+    [[tables.bbw_sma_n20_km1_2.rows]]
+    bar = 100
+    exact = 4.947154869006764
+    lean = nan
+    mid0 = 0
+    ta4j = 4.947154869006769
+    tol = 5.2e-12
+    ts = nan
+    [[tables.bbw_sma_n20_km1_2.rows]]
+    bar = 167
+    exact = 1.7050199854437418
+    lean = nan
+    mid0 = 0
+    ta4j = 1.7050199854437433
+    tol = 1.9e-12
+    ts = nan
+    [[tables.bbw_sma_n20_km1_2.rows]]
+    bar = 168
+    exact = 1.749066859174375
+    lean = nan
+    mid0 = 0
+    ta4j = 1.7490668591743839
+    tol = 2.0e-12
+    ts = nan
+    [[tables.bbw_sma_n20_km1_2.rows]]
+    bar = 200
+    exact = 5.708981725597185
+    lean = nan
+    mid0 = 0
+    ta4j = 5.7089817255971935
+    tol = 5.9e-12
+    ts = nan
+    [[tables.bbw_sma_n20_km1_2.rows]]
+    bar = 251
+    exact = 2.7267756661482934
+    lean = nan
+    mid0 = 0
+    ta4j = 2.726775666148287
+    tol = 2.9e-12
+    ts = nan
+
+[tables.bbw_sma_n20_km2_2]
+type = "BbwRow"
+
+    [[tables.bbw_sma_n20_km2_2.rows]]
+    bar = 19
+    exact = 0.0
+    lean = nan
+    mid0 = 0
+    ta4j = 0.0
+    tol = 0.0
+    ts = nan
+    [[tables.bbw_sma_n20_km2_2.rows]]
+    bar = 20
+    exact = 0.0
+    lean = nan
+    mid0 = 0
+    ta4j = 0.0
+    tol = 0.0
+    ts = nan
+    [[tables.bbw_sma_n20_km2_2.rows]]
+    bar = 21
+    exact = 0.0
+    lean = nan
+    mid0 = 0
+    ta4j = 0.0
+    tol = 0.0
+    ts = nan
+    [[tables.bbw_sma_n20_km2_2.rows]]
+    bar = 100
+    exact = 0.0
+    lean = nan
+    mid0 = 0
+    ta4j = 0.0
+    tol = 0.0
+    ts = nan
+    [[tables.bbw_sma_n20_km2_2.rows]]
+    bar = 200
+    exact = 0.0
+    lean = nan
+    mid0 = 0
+    ta4j = 0.0
+    tol = 0.0
+    ts = nan
+    [[tables.bbw_sma_n20_km2_2.rows]]
+    bar = 251
+    exact = 0.0
+    lean = nan
+    mid0 = 0
+    ta4j = 0.0
+    tol = 0.0
+    ts = nan
+
+[tables.bbw_sma_n20_kmax]
+type = "BbwRow"
+
+    [[tables.bbw_sma_n20_kmax.rows]]
+    bar = 19
+    exact = 1.6737019129554078e38
+    lean = nan
+    mid0 = 0
+    ta4j = 1.6737019129554078e38
+    tol = 1.7e26
+    ts = 1.6737019129554078e38
+    [[tables.bbw_sma_n20_kmax.rows]]
+    bar = 20
+    exact = 1.785182533762868e38
+    lean = nan
+    mid0 = 0
+    ta4j = 1.785182533762868e38
+    tol = 1.8e26
+    ts = 1.785182533762868e38
+    [[tables.bbw_sma_n20_kmax.rows]]
+    bar = 21
+    exact = 1.901757057437925e38
+    lean = nan
+    mid0 = 0
+    ta4j = 1.901757057437925e38
+    tol = 2.0e26
+    ts = 1.901757057437925e38
+    [[tables.bbw_sma_n20_kmax.rows]]
+    bar = 90
+    exact = 5.902294399048484e38
+    lean = nan
+    mid0 = 0
+    ta4j = 5.902294399048483e38
+    tol = 6.0e26
+    ts = 5.902294399048484e38
+    [[tables.bbw_sma_n20_kmax.rows]]
+    bar = 100
+    exact = 2.9682929214040583e38
+    lean = nan
+    mid0 = 0
+    ta4j = 2.968292921404058e38
+    tol = 3.0e26
+    ts = 2.968292921404058e38
+    [[tables.bbw_sma_n20_kmax.rows]]
+    bar = 167
+    exact = 1.023011991266245e38
+    lean = nan
+    mid0 = 0
+    ta4j = 1.0230119912662454e38
+    tol = 1.1e26
+    ts = 1.0230119912662448e38
+    [[tables.bbw_sma_n20_kmax.rows]]
+    bar = 200
+    exact = 3.4253890353583105e38
+    lean = nan
+    mid0 = 0
+    ta4j = 3.425389035358311e38
+    tol = 3.5e26
+    ts = 3.425389035358311e38
+    [[tables.bbw_sma_n20_kmax.rows]]
+    bar = 230
+    exact = 3.300068806313557e38
+    lean = nan
+    mid0 = 0
+    ta4j = 3.300068806313559e38
+    tol = 3.4e26
+    ts = 3.300068806313557e38
+    [[tables.bbw_sma_n20_kmax.rows]]
+    bar = 249
+    exact = 1.9148938012361616e38
+    lean = nan
+    mid0 = 0
+    ta4j = 1.9148938012361623e38
+    tol = 2.0e26
+    ts = 1.9148938012361604e38
+    [[tables.bbw_sma_n20_kmax.rows]]
+    bar = 251
+    exact = 1.6360653996889762e38
+    lean = nan
+    mid0 = 0
+    ta4j = 1.636065399688977e38
+    tol = 1.7e26
+    ts = 1.6360653996889764e38
+
+[tables.bbw_sma_n20_kmin]
+type = "BbwRow"
+
+    [[tables.bbw_sma_n20_kmin.rows]]
+    bar = 19
+    exact = -1.6737019129554078e38
+    lean = nan
+    mid0 = 0
+    ta4j = -1.6737019129554078e38
+    tol = 1.7e26
+    ts = -1.6737019129554078e38
+    [[tables.bbw_sma_n20_kmin.rows]]
+    bar = 20
+    exact = -1.785182533762868e38
+    lean = nan
+    mid0 = 0
+    ta4j = -1.785182533762868e38
+    tol = 1.8e26
+    ts = -1.785182533762868e38
+    [[tables.bbw_sma_n20_kmin.rows]]
+    bar = 21
+    exact = -1.901757057437925e38
+    lean = nan
+    mid0 = 0
+    ta4j = -1.901757057437925e38
+    tol = 2.0e26
+    ts = -1.901757057437925e38
+    [[tables.bbw_sma_n20_kmin.rows]]
+    bar = 90
+    exact = -5.902294399048484e38
+    lean = nan
+    mid0 = 0
+    ta4j = -5.902294399048483e38
+    tol = 6.0e26
+    ts = -5.902294399048484e38
+    [[tables.bbw_sma_n20_kmin.rows]]
+    bar = 100
+    exact = -2.9682929214040583e38
+    lean = nan
+    mid0 = 0
+    ta4j = -2.968292921404058e38
+    tol = 3.0e26
+    ts = -2.968292921404058e38
+    [[tables.bbw_sma_n20_kmin.rows]]
+    bar = 167
+    exact = -1.023011991266245e38
+    lean = nan
+    mid0 = 0
+    ta4j = -1.0230119912662454e38
+    tol = 1.1e26
+    ts = -1.0230119912662448e38
+    [[tables.bbw_sma_n20_kmin.rows]]
+    bar = 200
+    exact = -3.4253890353583105e38
+    lean = nan
+    mid0 = 0
+    ta4j = -3.425389035358311e38
+    tol = 3.5e26
+    ts = -3.425389035358311e38
+    [[tables.bbw_sma_n20_kmin.rows]]
+    bar = 230
+    exact = -3.300068806313557e38
+    lean = nan
+    mid0 = 0
+    ta4j = -3.300068806313559e38
+    tol = 3.4e26
+    ts = -3.300068806313557e38
+    [[tables.bbw_sma_n20_kmin.rows]]
+    bar = 249
+    exact = -1.9148938012361616e38
+    lean = nan
+    mid0 = 0
+    ta4j = -1.9148938012361623e38
+    tol = 2.0e26
+    ts = -1.9148938012361604e38
+    [[tables.bbw_sma_n20_kmin.rows]]
+    bar = 251
+    exact = -1.6360653996889762e38
+    lean = nan
+    mid0 = 0
+    ta4j = -1.636065399688977e38
+    tol = 1.7e26
+    ts = -1.6360653996889764e38
+
+[tables.bbw_sma_n20_s100]
+type = "BbwRow"
+
+    [[tables.bbw_sma_n20_s100.rows]]
+    bar = 100
+    exact = 19.788619476027055
+    lean = 19.788619476027048
+    mid0 = 0
+    ta4j = 19.78861947602705
+    tol = 2.0e-11
+    ts = 19.788619476027048
+    [[tables.bbw_sma_n20_s100.rows]]
+    bar = 101
+    exact = 18.667970415351654
+    lean = 18.667970415351647
+    mid0 = 0
+    ta4j = 18.667970415351647
+    tol = 1.9e-11
+    ts = 18.667970415351647
+    [[tables.bbw_sma_n20_s100.rows]]
+    bar = 102
+    exact = 17.73378898262807
+    lean = 17.73378898262808
+    mid0 = 0
+    ta4j = 17.73378898262807
+    tol = 1.8e-11
+    ts = 17.73378898262807
+    [[tables.bbw_sma_n20_s100.rows]]
+    bar = 111
+    exact = 8.726640097256908
+    lean = 8.72664009725692
+    mid0 = 0
+    ta4j = 8.726640097256922
+    tol = 9.0e-12
+    ts = 8.726640097256922
+    [[tables.bbw_sma_n20_s100.rows]]
+    bar = 167
+    exact = 6.820079941774967
+    lean = 6.820079941774981
+    mid0 = 0
+    ta4j = 6.820079941774973
+    tol = 7.0e-12
+    ts = 6.820079941774972
+    [[tables.bbw_sma_n20_s100.rows]]
+    bar = 200
+    exact = 22.83592690238874
+    lean = 22.835926902388742
+    mid0 = 0
+    ta4j = 22.835926902388735
+    tol = 2.4e-11
+    ts = 22.835926902388735
+    [[tables.bbw_sma_n20_s100.rows]]
+    bar = 207
+    exact = 36.72006473394941
+    lean = 36.7200647339494
+    mid0 = 0
+    ta4j = 36.72006473394942
+    tol = 3.7e-11
+    ts = 36.720064733949414
+    [[tables.bbw_sma_n20_s100.rows]]
+    bar = 251
+    exact = 10.907102664593173
+    lean = 10.90710266459318
+    mid0 = 0
+    ta4j = 10.907102664593173
+    tol = 1.2e-11
+    ts = 10.907102664593173
+
+[tables.bbw_sma_n20_s251]
+type = "BbwRow"
+
+    [[tables.bbw_sma_n20_s251.rows]]
+    bar = 251
+    exact = 10.907102664593173
+    lean = 10.90710266459318
+    mid0 = 0
+    ta4j = 10.907102664593173
+    tol = 1.2e-11
+    ts = 10.907102664593173
+
+[tables.bbw_sma_n5]
+type = "BbwRow"
+
+    [[tables.bbw_sma_n5.rows]]
+    bar = 4
+    exact = 5.475902765543688
+    lean = 5.475902765543684
+    mid0 = 0
+    ta4j = 5.475902765543682
+    tol = 2.8e-11
+    ts = 5.475902765543682
+    [[tables.bbw_sma_n5.rows]]
+    bar = 5
+    exact = 1.8881151224449741
+    lean = 1.8881151224449766
+    mid0 = 0
+    ta4j = 1.8881151224449704
+    tol = 9.7e-12
+    ts = 1.8881151224449704
+    [[tables.bbw_sma_n5.rows]]
+    bar = 6
+    exact = 3.7582181558852628
+    lean = 3.758218155885265
+    mid0 = 0
+    ta4j = 3.7582181558852676
+    tol = 1.9e-11
+    ts = 3.7582181558852676
+    [[tables.bbw_sma_n5.rows]]
+    bar = 77
+    exact = 33.373824418263744
+    lean = 33.373824418263744
+    mid0 = 0
+    ta4j = 33.373824418263744
+    tol = 1.7e-10
+    ts = 33.373824418263766
+    [[tables.bbw_sma_n5.rows]]
+    bar = 100
+    exact = 9.630647826913657
+    lean = 9.630647826913648
+    mid0 = 0
+    ta4j = 9.630647826913657
+    tol = 4.9e-11
+    ts = 9.630647826913659
+    [[tables.bbw_sma_n5.rows]]
+    bar = 121
+    exact = 1.0307813076796595
+    lean = 1.030781307679655
+    mid0 = 0
+    ta4j = 1.0307813076796657
+    tol = 5.4e-12
+    ts = 1.030781307679666
+    [[tables.bbw_sma_n5.rows]]
+    bar = 133
+    exact = 1.638482960419743
+    lean = 1.6384829604197486
+    mid0 = 0
+    ta4j = 1.6384829604197275
+    tol = 8.4e-12
+    ts = 1.6384829604197275
+    [[tables.bbw_sma_n5.rows]]
+    bar = 200
+    exact = 3.4948394929185604
+    lean = 3.494839492918558
+    mid0 = 0
+    ta4j = 3.4948394929185644
+    tol = 1.8e-11
+    ts = 3.4948394929185675
+    [[tables.bbw_sma_n5.rows]]
+    bar = 242
+    exact = 3.8773596840442632
+    lean = 3.8773596840442455
+    mid0 = 0
+    ta4j = 3.8773596840442703
+    tol = 2.0e-11
+    ts = 3.877359684044272
+    [[tables.bbw_sma_n5.rows]]
+    bar = 251
+    exact = 2.6206231106012297
+    lean = 2.6206231106012328
+    mid0 = 0
+    ta4j = 2.6206231106012337
+    tol = 1.4e-11
+    ts = 2.620623110601234
+
+[tables.bbw_sma_n50]
+type = "BbwRow"
+
+    [[tables.bbw_sma_n50.rows]]
+    bar = 49
+    exact = 17.675330419425478
+    lean = 17.67533041942548
+    mid0 = 0
+    ta4j = 17.675330419425485
+    tol = 1.8e-11
+    ts = 17.675330419425485
+    [[tables.bbw_sma_n50.rows]]
+    bar = 50
+    exact = 17.63103508745511
+    lean = 17.6310350874551
+    mid0 = 0
+    ta4j = 17.631035087455118
+    tol = 1.8e-11
+    ts = 17.631035087455118
+    [[tables.bbw_sma_n50.rows]]
+    bar = 51
+    exact = 17.29573148452901
+    lean = 17.295731484529025
+    mid0 = 0
+    ta4j = 17.29573148452903
+    tol = 1.8e-11
+    ts = 17.29573148452903
+    [[tables.bbw_sma_n50.rows]]
+    bar = 70
+    exact = 13.978753993598273
+    lean = 13.978753993598263
+    mid0 = 0
+    ta4j = 13.97875399359827
+    tol = 1.5e-11
+    ts = 13.978753993598255
+    [[tables.bbw_sma_n50.rows]]
+    bar = 75
+    exact = 14.426425917620248
+    lean = 14.426425917620268
+    mid0 = 0
+    ta4j = 14.42642591762027
+    tol = 1.5e-11
+    ts = 14.426425917620259
+    [[tables.bbw_sma_n50.rows]]
+    bar = 100
+    exact = 49.558534539307125
+    lean = 49.558534539307296
+    mid0 = 0
+    ta4j = 49.55853453930716
+    tol = 5.0e-11
+    ts = 49.55853453930713
+    [[tables.bbw_sma_n50.rows]]
+    bar = 107
+    exact = 45.57787157038842
+    lean = 45.57787157038861
+    mid0 = 0
+    ta4j = 45.57787157038843
+    tol = 4.6e-11
+    ts = 45.57787157038842
+    [[tables.bbw_sma_n50.rows]]
+    bar = 185
+    exact = 12.513230100642648
+    lean = 12.513230100642653
+    mid0 = 0
+    ta4j = 12.513230100642659
+    tol = 1.3e-11
+    ts = 12.513230100642648
+    [[tables.bbw_sma_n50.rows]]
+    bar = 200
+    exact = 24.058408514278216
+    lean = 24.058408514278234
+    mid0 = 0
+    ta4j = 24.058408514278213
+    tol = 2.5e-11
+    ts = 24.058408514278202
+    [[tables.bbw_sma_n50.rows]]
+    bar = 219
+    exact = 53.445416475663826
+    lean = 53.44541647566382
+    mid0 = 0
+    ta4j = 53.4454164756638
+    tol = 5.4e-11
+    ts = 53.44541647566384
+    [[tables.bbw_sma_n50.rows]]
+    bar = 251
+    exact = 30.052542611919854
+    lean = 30.05254261191984
+    mid0 = 0
+    ta4j = 30.05254261191984
+    tol = 3.1e-11
+    ts = 30.052542611919854
+
+[tables.bbw_sma_n50_k13]
+type = "BbwRow"
+
+    [[tables.bbw_sma_n50_k13.rows]]
+    bar = 49
+    exact = 17.675330419425478
+    lean = nan
+    mid0 = 0
+    ta4j = 17.675330419425467
+    tol = 1.8e-11
+    ts = nan
+    [[tables.bbw_sma_n50_k13.rows]]
+    bar = 50
+    exact = 17.63103508745511
+    lean = nan
+    mid0 = 0
+    ta4j = 17.631035087455103
+    tol = 1.8e-11
+    ts = nan
+    [[tables.bbw_sma_n50_k13.rows]]
+    bar = 51
+    exact = 17.29573148452901
+    lean = nan
+    mid0 = 0
+    ta4j = 17.29573148452901
+    tol = 1.8e-11
+    ts = nan
+    [[tables.bbw_sma_n50_k13.rows]]
+    bar = 100
+    exact = 49.558534539307125
+    lean = nan
+    mid0 = 0
+    ta4j = 49.55853453930717
+    tol = 5.0e-11
+    ts = nan
+    [[tables.bbw_sma_n50_k13.rows]]
+    bar = 149
+    exact = 23.54965210439144
+    lean = nan
+    mid0 = 0
+    ta4j = 23.54965210439141
+    tol = 2.4e-11
+    ts = nan
+    [[tables.bbw_sma_n50_k13.rows]]
+    bar = 185
+    exact = 12.513230100642648
+    lean = nan
+    mid0 = 0
+    ta4j = 12.513230100642648
+    tol = 1.3e-11
+    ts = nan
+    [[tables.bbw_sma_n50_k13.rows]]
+    bar = 200
+    exact = 24.058408514278216
+    lean = nan
+    mid0 = 0
+    ta4j = 24.058408514278213
+    tol = 2.5e-11
+    ts = nan
+    [[tables.bbw_sma_n50_k13.rows]]
+    bar = 219
+    exact = 53.445416475663826
+    lean = nan
+    mid0 = 0
+    ta4j = 53.44541647566381
+    tol = 5.4e-11
+    ts = nan
+    [[tables.bbw_sma_n50_k13.rows]]
+    bar = 251
+    exact = 30.052542611919854
+    lean = nan
+    mid0 = 0
+    ta4j = 30.05254261191984
+    tol = 3.1e-11
+    ts = nan
+
+[tables.bbw_sma_n5_k13]
+type = "BbwRow"
+
+    [[tables.bbw_sma_n5_k13.rows]]
+    bar = 4
+    exact = 5.475902765543688
+    lean = nan
+    mid0 = 0
+    ta4j = 5.475902765543682
+    tol = 2.8e-11
+    ts = nan
+    [[tables.bbw_sma_n5_k13.rows]]
+    bar = 5
+    exact = 1.8881151224449741
+    lean = nan
+    mid0 = 0
+    ta4j = 1.8881151224449704
+    tol = 9.7e-12
+    ts = nan
+    [[tables.bbw_sma_n5_k13.rows]]
+    bar = 6
+    exact = 3.7582181558852628
+    lean = nan
+    mid0 = 0
+    ta4j = 3.7582181558852525
+    tol = 1.9e-11
+    ts = nan
+    [[tables.bbw_sma_n5_k13.rows]]
+    bar = 32
+    exact = 2.8862140456792744
+    lean = nan
+    mid0 = 0
+    ta4j = 2.886214045679291
+    tol = 1.5e-11
+    ts = nan
+    [[tables.bbw_sma_n5_k13.rows]]
+    bar = 77
+    exact = 33.373824418263744
+    lean = nan
+    mid0 = 0
+    ta4j = 33.37382441826375
+    tol = 1.7e-10
+    ts = nan
+    [[tables.bbw_sma_n5_k13.rows]]
+    bar = 100
+    exact = 9.630647826913657
+    lean = nan
+    mid0 = 0
+    ta4j = 9.630647826913657
+    tol = 4.9e-11
+    ts = nan
+    [[tables.bbw_sma_n5_k13.rows]]
+    bar = 121
+    exact = 1.0307813076796595
+    lean = nan
+    mid0 = 0
+    ta4j = 1.030781307679654
+    tol = 5.4e-12
+    ts = nan
+    [[tables.bbw_sma_n5_k13.rows]]
+    bar = 200
+    exact = 3.4948394929185604
+    lean = nan
+    mid0 = 0
+    ta4j = 3.4948394929185516
+    tol = 1.8e-11
+    ts = nan
+    [[tables.bbw_sma_n5_k13.rows]]
+    bar = 251
+    exact = 2.6206231106012297
+    lean = nan
+    mid0 = 0
+    ta4j = 2.6206231106012208
+    tol = 1.4e-11
+    ts = nan
+
+[tables.bbw_stepflat_n20]
+type = "BbwRow"
+
+    [[tables.bbw_stepflat_n20.rows]]
+    bar = 19
+    exact = 11.158012753036052
+    lean = 11.158012753036052
+    mid0 = 0
+    ta4j = 11.158012753036054
+    tol = 1.2e-11
+    ts = 11.158012753036054
+    [[tables.bbw_stepflat_n20.rows]]
+    bar = 20
+    exact = 11.901216891752455
+    lean = 11.901216891752444
+    mid0 = 0
+    ta4j = 11.901216891752457
+    tol = 1.3e-11
+    ts = 11.901216891752457
+    [[tables.bbw_stepflat_n20.rows]]
+    bar = 21
+    exact = 12.6783803829195
+    lean = 12.678380382919494
+    mid0 = 0
+    ta4j = 12.678380382919514
+    tol = 1.3e-11
+    ts = 12.67838038291951
+    [[tables.bbw_stepflat_n20.rows]]
+    bar = 29
+    exact = 20.490698603927935
+    lean = 20.49069860392792
+    mid0 = 0
+    ta4j = 20.49069860392795
+    tol = 2.1e-11
+    ts = 20.490698603927914
+    [[tables.bbw_stepflat_n20.rows]]
+    bar = 57
+    exact = 0.327343161722908
+    lean = 0.32734316172291034
+    mid0 = 0
+    ta4j = 0.32734316172289135
+    tol = 5.1e-13
+    ts = 0.32734316172289135
+    [[tables.bbw_stepflat_n20.rows]]
+    bar = 58
+    exact = 0.0
+    lean = 0.0
+    mid0 = 0
+    ta4j = nan
+    tol = 0.0
+    ts = 0.0
+    [[tables.bbw_stepflat_n20.rows]]
+    bar = 79
+    exact = 0.0
+    lean = 0.0
+    mid0 = 0
+    ta4j = nan
+    tol = 0.0
+    ts = 0.0
+
+[tables.bbw_tick100_n20]
+type = "BbwRow"
+
+    [[tables.bbw_tick100_n20.rows]]
+    bar = 19
+    exact = 0.01989865431615519
+    lean = 0.01989865431614501
+    mid0 = 0
+    ta4j = 0.01989865431616056
+    tol = 2.0e-13
+    ts = 0.01989865431616056
+    [[tables.bbw_tick100_n20.rows]]
+    bar = 20
+    exact = 0.019594742257739984
+    lean = 0.019594742257729975
+    mid0 = 0
+    ta4j = 0.019594742257733208
+    tol = 2.0e-13
+    ts = 0.019594742257733208
+    [[tables.bbw_tick100_n20.rows]]
+    bar = 21
+    exact = 0.01989865431615519
+    lean = 0.01989865431614501
+    mid0 = 0
+    ta4j = 0.01989865431616056
+    tol = 2.0e-13
+    ts = 0.01989865431616056
+    [[tables.bbw_tick100_n20.rows]]
+    bar = 23
+    exact = 0.01999900005000773
+    lean = 0.0199990000499975
+    mid0 = 0
+    ta4j = 0.019999000050007733
+    tol = 2.0e-13
+    ts = 0.01999900005000773
+    [[tables.bbw_tick100_n20.rows]]
+    bar = 47
+    exact = 0.01832975288724612
+    lean = 0.018329752887236744
+    mid0 = 0
+    ta4j = 0.01832975288725788
+    tol = 2.0e-13
+    ts = 0.01832975288725787
+    [[tables.bbw_tick100_n20.rows]]
+    bar = 48
+    exact = 0.01832975288724612
+    lean = 0.018329752887236744
+    mid0 = 0
+    ta4j = 0.018329752887257883
+    tol = 2.0e-13
+    ts = 0.01832975288725787
+    [[tables.bbw_tick100_n20.rows]]
+    bar = 100
+    exact = 0.01989865431615519
+    lean = 0.01989865431614501
+    mid0 = 0
+    ta4j = 0.01989865431616056
+    tol = 2.0e-13
+    ts = 0.019898654316160558
+    [[tables.bbw_tick100_n20.rows]]
+    bar = 200
+    exact = 0.01999900005000773
+    lean = 0.0199990000499975
+    mid0 = 0
+    ta4j = 0.019999000050007737
+    tol = 2.0e-13
+    ts = 0.01999900005000773
+    [[tables.bbw_tick100_n20.rows]]
+    bar = 209
+    exact = 0.017320075073820787
+    lean = 0.017320075073811916
+    mid0 = 0
+    ta4j = 0.017320075073821793
+    tol = 2.0e-13
+    ts = 0.01732007507382178
+    [[tables.bbw_tick100_n20.rows]]
+    bar = 299
+    exact = 0.01989885329374436
+    lean = 0.01989885329373418
+    mid0 = 0
+    ta4j = 0.019898853293749734
+    tol = 2.0e-13
+    ts = 0.01989885329374973
+
+[tables.bbw_tick100_n20_k13]
+type = "BbwRow"
+
+    [[tables.bbw_tick100_n20_k13.rows]]
+    bar = 19
+    exact = 0.01989865431615519
+    lean = nan
+    mid0 = 0
+    ta4j = 0.01989865431616056
+    tol = 2.0e-13
+    ts = nan
+    [[tables.bbw_tick100_n20_k13.rows]]
+    bar = 20
+    exact = 0.019594742257739984
+    lean = nan
+    mid0 = 0
+    ta4j = 0.019594742257747415
+    tol = 2.0e-13
+    ts = nan
+    [[tables.bbw_tick100_n20_k13.rows]]
+    bar = 21
+    exact = 0.01989865431615519
+    lean = nan
+    mid0 = 0
+    ta4j = 0.01989865431616056
+    tol = 2.0e-13
+    ts = nan
+    [[tables.bbw_tick100_n20_k13.rows]]
+    bar = 23
+    exact = 0.01999900005000773
+    lean = nan
+    mid0 = 0
+    ta4j = 0.019999000050007733
+    tol = 2.0e-13
+    ts = nan
+    [[tables.bbw_tick100_n20_k13.rows]]
+    bar = 100
+    exact = 0.01989865431615519
+    lean = nan
+    mid0 = 0
+    ta4j = 0.01989865431616056
+    tol = 2.0e-13
+    ts = nan
+    [[tables.bbw_tick100_n20_k13.rows]]
+    bar = 124
+    exact = 0.01999900005000773
+    lean = nan
+    mid0 = 0
+    ta4j = 0.019999000050021944
+    tol = 2.0e-13
+    ts = nan
+    [[tables.bbw_tick100_n20_k13.rows]]
+    bar = 200
+    exact = 0.01999900005000773
+    lean = nan
+    mid0 = 0
+    ta4j = 0.019999000050007737
+    tol = 2.0e-13
+    ts = nan
+    [[tables.bbw_tick100_n20_k13.rows]]
+    bar = 209
+    exact = 0.017320075073820787
+    lean = nan
+    mid0 = 0
+    ta4j = 0.017320075073807582
+    tol = 2.0e-13
+    ts = nan
+    [[tables.bbw_tick100_n20_k13.rows]]
+    bar = 299
+    exact = 0.01989885329374436
+    lean = nan
+    mid0 = 0
+    ta4j = 0.019898853293749734
+    tol = 2.0e-13
+    ts = nan
+
+[tables.bbw_wma_n20]
+type = "BbwRow"
+
+    [[tables.bbw_wma_n20.rows]]
+    bar = 19
+    exact = 11.228927807147167
+    lean = 11.22892780714717
+    mid0 = 0
+    ta4j = 11.228927807147166
+    tol = 1.2e-11
+    ts = nan
+    [[tables.bbw_wma_n20.rows]]
+    bar = 20
+    exact = 12.01268288061466
+    lean = 12.01268288061465
+    mid0 = 0
+    ta4j = 12.012682880614662
+    tol = 1.3e-11
+    ts = nan
+    [[tables.bbw_wma_n20.rows]]
+    bar = 21
+    exact = 12.815396326903183
+    lean = 12.815396326903178
+    mid0 = 0
+    ta4j = 12.815396326903194
+    tol = 1.3e-11
+    ts = nan
+    [[tables.bbw_wma_n20.rows]]
+    bar = 45
+    exact = 10.355101108118822
+    lean = 10.355101108118834
+    mid0 = 0
+    ta4j = 10.35510110811884
+    tol = 1.1e-11
+    ts = nan
+    [[tables.bbw_wma_n20.rows]]
+    bar = 90
+    exact = 37.51760413709696
+    lean = 37.517604137096875
+    mid0 = 0
+    ta4j = 37.51760413709697
+    tol = 3.8e-11
+    ts = nan
+    [[tables.bbw_wma_n20.rows]]
+    bar = 100
+    exact = 19.43150349176985
+    lean = 19.431503491769842
+    mid0 = 0
+    ta4j = 19.431503491769845
+    tol = 2.0e-11
+    ts = nan
+    [[tables.bbw_wma_n20.rows]]
+    bar = 167
+    exact = 6.80265990198324
+    lean = 6.8026599019832545
+    mid0 = 0
+    ta4j = 6.802659901983235
+    tol = 7.0e-12
+    ts = nan
+    [[tables.bbw_wma_n20.rows]]
+    bar = 200
+    exact = 23.528605407465808
+    lean = 23.52860540746581
+    mid0 = 0
+    ta4j = 23.528605407465815
+    tol = 2.4e-11
+    ts = nan
+    [[tables.bbw_wma_n20.rows]]
+    bar = 207
+    exact = 38.54551240090274
+    lean = 38.54551240090272
+    mid0 = 0
+    ta4j = 38.54551240090275
+    tol = 3.9e-11
+    ts = nan
+    [[tables.bbw_wma_n20.rows]]
+    bar = 251
+    exact = 11.017909532643271
+    lean = 11.017909532643278
+    mid0 = 0
+    ta4j = 11.01790953264327
+    tol = 1.2e-11
+    ts = nan
+
+[tables.bbw_zero_n20]
+type = "BbwRow"
+
+    [[tables.bbw_zero_n20.rows]]
+    bar = 19
+    exact = 0.0
+    lean = nan
+    mid0 = 1
+    ta4j = nan
+    tol = 0.0
+    ts = nan
+    [[tables.bbw_zero_n20.rows]]
+    bar = 20
+    exact = 0.0
+    lean = nan
+    mid0 = 1
+    ta4j = nan
+    tol = 0.0
+    ts = nan
+    [[tables.bbw_zero_n20.rows]]
+    bar = 21
+    exact = 0.0
+    lean = nan
+    mid0 = 1
+    ta4j = nan
+    tol = 0.0
+    ts = nan
+    [[tables.bbw_zero_n20.rows]]
+    bar = 59
+    exact = 0.0
+    lean = nan
+    mid0 = 1
+    ta4j = nan
+    tol = 0.0
+    ts = nan

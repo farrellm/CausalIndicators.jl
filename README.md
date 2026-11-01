@@ -126,7 +126,7 @@ only tests them and adds no constructor:
 | `VAR` | `Variance(:x; corrected = false)` | `Bars(5)` |
 | `AVGDEV` | `MeanAbsDev(:x)` | `Bars(14)` |
 | `CORREL` | `Correlation(:x, :y)` (`NaN` on a flat window, where TA-Lib gives 0) | `Bars(30)` |
-| `PERCENTILE` | `Quantile(:x, percentile / 100; interpolation = :nearestrank)` | `Bars(30)` |
+| `PERCENTILE` | `Quantile(:x, percentile / 100; interpolation = :nearestrank)` | `Bars(100)` |
 
 ## Candlestick patterns
 
@@ -232,13 +232,13 @@ Pkg.develop(url = "https://github.com/farrellm/CausalFrames.jl")
 
 ### TA-Lib reference data
 
-The tests check against TA-Lib 0.8.1, commit `2aa8eb0`. The extracted tables,
+The tests check against TA-Lib 0.8.3, commit `62021c1`. The extracted tables,
 datasets and goldens are committed, so running the tests needs no TA-Lib. To
 regenerate them, or to add goldens for a new function:
 
 ```sh
 git clone https://github.com/TA-Lib/ta-lib ~/workspace/ta-lib
-git -C ~/workspace/ta-lib checkout 2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788
+git -C ~/workspace/ta-lib checkout 62021c1d14ef5499505af5547384cab509adf3fc  # v0.8.3
 cmake -S ~/workspace/ta-lib -B ~/workspace/ta-lib/build
 cmake --build ~/workspace/ta-lib/build --target ta-lib ta-lib-static
 

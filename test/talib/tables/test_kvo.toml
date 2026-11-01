@@ -1,0 +1,267 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 62021c1:src/tools/ta_regtest/ta_test_func/test_kvo.c. Do not edit.
+commit = "62021c1d14ef5499505af5547384cab509adf3fc"
+source = "src/tools/ta_regtest/ta_test_func/test_kvo.c"
+
+[structs.KvoGolden]
+fields = ["fast", "slow", "signal", "bar", "kvo", "sig"]
+types = ["int", "int", "int", "int", "double", "double"]
+
+[tables.kvoGolden]
+type = "KvoGolden"
+
+    [[tables.kvoGolden.rows]]
+    bar = 55
+    fast = 34
+    kvo = -1.4085008025879476e7
+    sig = -8.966101214186074e6
+    signal = 13
+    slow = 55
+    [[tables.kvoGolden.rows]]
+    bar = 56
+    fast = 34
+    kvo = -9.120998970013978e6
+    sig = -8.988229465018632e6
+    signal = 13
+    slow = 55
+    [[tables.kvoGolden.rows]]
+    bar = 57
+    fast = 34
+    kvo = -4.966175710021577e6
+    sig = -8.41365035716191e6
+    signal = 13
+    slow = 55
+    [[tables.kvoGolden.rows]]
+    bar = 65
+    fast = 34
+    kvo = 1.350935743638581e7
+    sig = 2.5824263576765927e6
+    signal = 13
+    slow = 55
+    [[tables.kvoGolden.rows]]
+    bar = 100
+    fast = 34
+    kvo = -6.269892869695862e6
+    sig = 6.444021696940396e6
+    signal = 13
+    slow = 55
+    [[tables.kvoGolden.rows]]
+    bar = 180
+    fast = 34
+    kvo = -1.3788840822162263e6
+    sig = -671951.1012681717
+    signal = 13
+    slow = 55
+    [[tables.kvoGolden.rows]]
+    bar = 251
+    fast = 34
+    kvo = 9.424397107016647e6
+    sig = 1.3608043287732257e7
+    signal = 13
+    slow = 55
+    [[tables.kvoGolden.rows]]
+    bar = 20
+    fast = 10
+    kvo = -4.084031884873892e7
+    sig = -3.21571001829649e7
+    signal = 5
+    slow = 20
+    [[tables.kvoGolden.rows]]
+    bar = 21
+    fast = 10
+    kvo = -6.204073931457703e7
+    sig = -4.211831322683561e7
+    signal = 5
+    slow = 20
+    [[tables.kvoGolden.rows]]
+    bar = 22
+    fast = 10
+    kvo = -7.080861900152941e7
+    sig = -5.1681748485066876e7
+    signal = 5
+    slow = 20
+    [[tables.kvoGolden.rows]]
+    bar = 30
+    fast = 10
+    kvo = -6.570297743293119e6
+    sig = -3.1618114124490514e7
+    signal = 5
+    slow = 20
+    [[tables.kvoGolden.rows]]
+    bar = 100
+    fast = 10
+    kvo = -4.63332683002489e7
+    sig = -4.174379601493406e7
+    signal = 5
+    slow = 20
+    [[tables.kvoGolden.rows]]
+    bar = 180
+    fast = 10
+    kvo = -1.5754718974364594e7
+    sig = -745977.704840306
+    signal = 5
+    slow = 20
+    [[tables.kvoGolden.rows]]
+    bar = 251
+    fast = 10
+    kvo = -1.2384408756199948e7
+    sig = -2.364062024791252e6
+    signal = 5
+    slow = 20
+    [[tables.kvoGolden.rows]]
+    bar = 2
+    fast = 2
+    kvo = 0.0
+    sig = 0.0
+    signal = 2
+    slow = 2
+    [[tables.kvoGolden.rows]]
+    bar = 3
+    fast = 2
+    kvo = 0.0
+    sig = 0.0
+    signal = 2
+    slow = 2
+    [[tables.kvoGolden.rows]]
+    bar = 4
+    fast = 2
+    kvo = 0.0
+    sig = 0.0
+    signal = 2
+    slow = 2
+    [[tables.kvoGolden.rows]]
+    bar = 12
+    fast = 2
+    kvo = 0.0
+    sig = 0.0
+    signal = 2
+    slow = 2
+    [[tables.kvoGolden.rows]]
+    bar = 100
+    fast = 2
+    kvo = 0.0
+    sig = 0.0
+    signal = 2
+    slow = 2
+    [[tables.kvoGolden.rows]]
+    bar = 180
+    fast = 2
+    kvo = 0.0
+    sig = 0.0
+    signal = 2
+    slow = 2
+    [[tables.kvoGolden.rows]]
+    bar = 251
+    fast = 2
+    kvo = 0.0
+    sig = 0.0
+    signal = 2
+    slow = 2
+    [[tables.kvoGolden.rows]]
+    bar = 55
+    fast = 55
+    kvo = 1.4085008025879476e7
+    sig = 8.966101214186074e6
+    signal = 13
+    slow = 34
+    [[tables.kvoGolden.rows]]
+    bar = 56
+    fast = 55
+    kvo = 9.120998970013978e6
+    sig = 8.988229465018632e6
+    signal = 13
+    slow = 34
+    [[tables.kvoGolden.rows]]
+    bar = 57
+    fast = 55
+    kvo = 4.966175710021577e6
+    sig = 8.41365035716191e6
+    signal = 13
+    slow = 34
+    [[tables.kvoGolden.rows]]
+    bar = 65
+    fast = 55
+    kvo = -1.350935743638581e7
+    sig = -2.5824263576765927e6
+    signal = 13
+    slow = 34
+    [[tables.kvoGolden.rows]]
+    bar = 100
+    fast = 55
+    kvo = 6.269892869695862e6
+    sig = -6.444021696940396e6
+    signal = 13
+    slow = 34
+    [[tables.kvoGolden.rows]]
+    bar = 180
+    fast = 55
+    kvo = 1.3788840822162263e6
+    sig = 671951.1012681717
+    signal = 13
+    slow = 34
+    [[tables.kvoGolden.rows]]
+    bar = 251
+    fast = 55
+    kvo = -9.424397107016647e6
+    sig = -1.3608043287732257e7
+    signal = 13
+    slow = 34
+
+[tables.kvoTieGolden]
+type = "KvoGolden"
+
+    [[tables.kvoTieGolden.rows]]
+    bar = 11
+    fast = 5
+    kvo = -7824.355571948191
+    sig = -3320.619635820387
+    signal = 3
+    slow = 11
+    [[tables.kvoTieGolden.rows]]
+    bar = 12
+    fast = 5
+    kvo = 3038.5382414931805
+    sig = -141.04069716360337
+    signal = 3
+    slow = 11
+    [[tables.kvoTieGolden.rows]]
+    bar = 13
+    fast = 5
+    kvo = 7328.745642951729
+    sig = 3593.8524728940624
+    signal = 3
+    slow = 11
+    [[tables.kvoTieGolden.rows]]
+    bar = 14
+    fast = 5
+    kvo = 12026.20568476207
+    sig = 7810.029078828066
+    signal = 3
+    slow = 11
+    [[tables.kvoTieGolden.rows]]
+    bar = 15
+    fast = 5
+    kvo = -2094.1215919570627
+    sig = 2857.9537434355016
+    signal = 3
+    slow = 11
+    [[tables.kvoTieGolden.rows]]
+    bar = 40
+    fast = 5
+    kvo = 14134.09093145475
+    sig = 8329.147370760465
+    signal = 3
+    slow = 11
+    [[tables.kvoTieGolden.rows]]
+    bar = 70
+    fast = 5
+    kvo = 7099.037816102091
+    sig = 3318.4518638941504
+    signal = 3
+    slow = 11
+    [[tables.kvoTieGolden.rows]]
+    bar = 71
+    fast = 5
+    kvo = 10038.3129888146
+    sig = 6678.382426354375
+    signal = 3
+    slow = 11

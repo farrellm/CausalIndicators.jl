@@ -1,0 +1,207 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 62021c1:src/tools/ta_regtest/ta_test_func/test_wavetrend.c. Do not edit.
+commit = "62021c1d14ef5499505af5547384cab509adf3fc"
+source = "src/tools/ta_regtest/ta_test_func/test_wavetrend.c"
+
+[structs.WtGolden]
+fields = ["n1", "n2", "n3", "bar", "wt1", "wt2"]
+types = ["int", "int", "int", "int", "double", "double"]
+
+[tables.wtGolden]
+type = "WtGolden"
+
+    [[tables.wtGolden.rows]]
+    bar = 41
+    n1 = 10
+    n2 = 21
+    n3 = 4
+    wt1 = -32.90950290980152
+    wt2 = -35.57788255467459
+    [[tables.wtGolden.rows]]
+    bar = 42
+    n1 = 10
+    n2 = 21
+    n3 = 4
+    wt1 = -20.58368056489296
+    wt2 = -32.46642300089843
+    [[tables.wtGolden.rows]]
+    bar = 43
+    n1 = 10
+    n2 = 21
+    n3 = 4
+    wt1 = -9.666658587067937
+    wt2 = -25.84709782152696
+    [[tables.wtGolden.rows]]
+    bar = 49
+    n1 = 10
+    n2 = 21
+    n3 = 4
+    wt1 = 21.558617340463968
+    wt2 = 18.256459235159582
+    [[tables.wtGolden.rows]]
+    bar = 100
+    n1 = 10
+    n2 = 21
+    n3 = 4
+    wt1 = 31.75447745287666
+    wt2 = 35.185325674282076
+    [[tables.wtGolden.rows]]
+    bar = 180
+    n1 = 10
+    n2 = 21
+    n3 = 4
+    wt1 = 21.493853896217523
+    wt2 = 33.670405176952414
+    [[tables.wtGolden.rows]]
+    bar = 251
+    n1 = 10
+    n2 = 21
+    n3 = 4
+    wt1 = 1.0710257379549455
+    wt2 = 9.758018565859302
+    [[tables.wtGolden.rows]]
+    bar = 29
+    n1 = 9
+    n2 = 12
+    n3 = 3
+    wt1 = -38.24760687020673
+    wt2 = -49.8367430815501
+    [[tables.wtGolden.rows]]
+    bar = 30
+    n1 = 9
+    n2 = 12
+    n3 = 3
+    wt1 = -36.032800850706295
+    wt2 = -41.34321721932476
+    [[tables.wtGolden.rows]]
+    bar = 31
+    n1 = 9
+    n2 = 12
+    n3 = 3
+    wt1 = -28.899828458036893
+    wt2 = -34.39341205964997
+    [[tables.wtGolden.rows]]
+    bar = 37
+    n1 = 9
+    n2 = 12
+    n3 = 3
+    wt1 = -14.452827314168209
+    wt2 = -1.1132545806795364
+    [[tables.wtGolden.rows]]
+    bar = 100
+    n1 = 9
+    n2 = 12
+    n3 = 3
+    wt1 = 19.378125951031716
+    wt2 = 19.398425093876607
+    [[tables.wtGolden.rows]]
+    bar = 180
+    n1 = 9
+    n2 = 12
+    n3 = 3
+    wt1 = 6.239108460160289
+    wt2 = 17.642319988529586
+    [[tables.wtGolden.rows]]
+    bar = 251
+    n1 = 9
+    n2 = 12
+    n3 = 3
+    wt1 = -14.212903944253139
+    wt2 = -1.801157576049696
+    [[tables.wtGolden.rows]]
+    bar = 84
+    n1 = 20
+    n2 = 40
+    n3 = 8
+    wt1 = 41.24319201166848
+    wt2 = 32.020669787566014
+    [[tables.wtGolden.rows]]
+    bar = 85
+    n1 = 20
+    n2 = 40
+    n3 = 8
+    wt1 = 42.28813151489771
+    wt2 = 35.06839055678373
+    [[tables.wtGolden.rows]]
+    bar = 86
+    n1 = 20
+    n2 = 40
+    n3 = 8
+    wt1 = 43.97312300619058
+    wt2 = 37.46303668833255
+    [[tables.wtGolden.rows]]
+    bar = 92
+    n1 = 20
+    n2 = 40
+    n3 = 8
+    wt1 = 57.17828639945882
+    wt2 = 49.41014555992218
+    [[tables.wtGolden.rows]]
+    bar = 100
+    n1 = 20
+    n2 = 40
+    n3 = 8
+    wt1 = 51.79633257739692
+    wt2 = 55.7007671085964
+    [[tables.wtGolden.rows]]
+    bar = 180
+    n1 = 20
+    n2 = 40
+    n3 = 8
+    wt1 = 31.52739564450018
+    wt2 = 37.03006209887869
+    [[tables.wtGolden.rows]]
+    bar = 251
+    n1 = 20
+    n2 = 40
+    n3 = 8
+    wt1 = 15.053683866420355
+    wt2 = 15.910860452397158
+    [[tables.wtGolden.rows]]
+    bar = 2
+    n1 = 2
+    n2 = 1
+    n3 = 1
+    wt1 = 58.66314863676341
+    wt2 = 58.66314863676341
+    [[tables.wtGolden.rows]]
+    bar = 3
+    n1 = 2
+    n2 = 1
+    n3 = 1
+    wt1 = 34.63638976717448
+    wt2 = 34.63638976717448
+    [[tables.wtGolden.rows]]
+    bar = 4
+    n1 = 2
+    n2 = 1
+    n3 = 1
+    wt1 = -44.031531531531535
+    wt2 = -44.031531531531535
+    [[tables.wtGolden.rows]]
+    bar = 10
+    n1 = 2
+    n2 = 1
+    n3 = 1
+    wt1 = 87.43921937446397
+    wt2 = 87.43921937446397
+    [[tables.wtGolden.rows]]
+    bar = 100
+    n1 = 2
+    n2 = 1
+    n3 = 1
+    wt1 = 27.785318786918413
+    wt2 = 27.785318786918413
+    [[tables.wtGolden.rows]]
+    bar = 180
+    n1 = 2
+    n2 = 1
+    n3 = 1
+    wt1 = -58.05733498137232
+    wt2 = -58.05733498137232
+    [[tables.wtGolden.rows]]
+    bar = 251
+    n1 = 2
+    n2 = 1
+    n3 = 1
+    wt1 = -91.18593285384651
+    wt2 = -91.18593285384651

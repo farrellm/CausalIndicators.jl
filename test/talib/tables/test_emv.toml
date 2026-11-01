@@ -1,0 +1,59 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 62021c1:src/tools/ta_regtest/ta_test_func/test_emv.c. Do not edit.
+commit = "62021c1d14ef5499505af5547384cab509adf3fc"
+source = "src/tools/ta_regtest/ta_test_func/test_emv.c"
+
+[structs.EmvRow]
+fields = ["n", "bar", "value"]
+types = ["int", "int", "double"]
+
+[tables.emvSrefRow]
+type = "EmvRow"
+
+    [[tables.emvSrefRow.rows]]
+    bar = 1
+    n = 1
+    value = 0.008363339655763824
+    [[tables.emvSrefRow.rows]]
+    bar = 14
+    n = 1
+    value = -0.00683266335956209
+    [[tables.emvSrefRow.rows]]
+    bar = 15
+    n = 1
+    value = 0.007405163660724573
+    [[tables.emvSrefRow.rows]]
+    bar = 50
+    n = 1
+    value = -0.004108896591565567
+    [[tables.emvSrefRow.rows]]
+    bar = 125
+    n = 1
+    value = 0.009462432310469305
+    [[tables.emvSrefRow.rows]]
+    bar = 251
+    n = 1
+    value = -0.014748650060964954
+    [[tables.emvSrefRow.rows]]
+    bar = 14
+    n = 14
+    value = 0.000722936403126221
+    [[tables.emvSrefRow.rows]]
+    bar = 15
+    n = 14
+    value = 0.0006544952606234173
+    [[tables.emvSrefRow.rows]]
+    bar = 50
+    n = 14
+    value = 0.0011431697623238625
+    [[tables.emvSrefRow.rows]]
+    bar = 125
+    n = 14
+    value = 0.0073545797518352616
+    [[tables.emvSrefRow.rows]]
+    bar = 200
+    n = 14
+    value = -0.0029857687097996307
+    [[tables.emvSrefRow.rows]]
+    bar = 251
+    n = 14
+    value = -0.0012225429060355375

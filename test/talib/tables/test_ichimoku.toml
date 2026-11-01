@@ -1,0 +1,167 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 62021c1:src/tools/ta_regtest/ta_test_func/test_ichimoku.c. Do not edit.
+commit = "62021c1d14ef5499505af5547384cab509adf3fc"
+source = "src/tools/ta_regtest/ta_test_func/test_ichimoku.c"
+
+[arrays.ichSpanAHigh]
+type = "double"
+values = [100.0507, 100.0588, 100.0712, 100.0747, 100.0355, 100.0161, 100.0374, 100.074, 100.0313, 100.0757, 100.0535, 100.0547, 100.0349, 100.0161, 100.0516, 100.033, 100.0439, 100.073, 100.1163, 100.1194, 100.0387, 100.0871, 100.072, 100.0978, 100.1085, 100.1113, 100.1113, 100.1047, 100.0371, 100.1129, 100.1021, 100.0617, 100.0405, 100.1012, 100.0792, 100.0991, 100.117, 100.1312, 100.0808, 100.1702, 100.0991, 100.1347, 100.1393, 100.0977, 100.0543, 100.0303, 100.1217, 100.0866, 100.0887, 100.0522, 100.0357, 100.0704, 100.0634, 100.1145, 100.0756, 100.0771, 100.1314, 100.1335, 100.1506, 100.0999, 100.105, 100.1015, 100.0796, 100.0454, 100.1215, 100.0854, 100.1027, 100.1081, 100.1393]
+
+[arrays.ichSpanALow]
+type = "double"
+values = [99.9905, 100.0037, 100.012, 100.0036, 99.992, 99.9948, 100.0031, 99.9912, 100.016, 100.0078, 99.9851, 99.977, 100.0004, 100.0075, 100.0294, 100.0154, 100.0197, 100.0055, 100.0299, 100.0297, 100.017, 100.018, 100.003, 100.0088, 100.0335, 100.03, 100.0419, 100.039, 100.0148, 100.0332, 100.0288, 100.0312, 100.0129, 100.0379, 100.0627, 100.0679, 100.0542, 100.077, 100.0797, 100.0905, 100.0827, 100.073, 100.0502, 100.0274, 100.0129, 100.0288, 100.0459, 100.037, 100.0226, 100.0322, 100.0344, 100.0435, 100.0577, 100.0388, 100.0574, 100.0604, 100.072, 100.0739, 100.0634, 100.0624, 100.0431, 100.0241, 100.0338, 100.0434, 100.0648, 100.0791, 100.097, 100.0965, 100.1112]
+
+[structs.IchGolden]
+fields = ["bar", "output", "value"]
+types = ["int", "int", "double"]
+
+[structs.IchTriple]
+fields = ["tenkan", "kijun", "senkouB"]
+types = ["int", "int", "int"]
+
+[tables.ichCompose]
+type = "IchTriple"
+
+    [[tables.ichCompose.rows]]
+    kijun = 26
+    senkouB = 52
+    tenkan = 9
+    [[tables.ichCompose.rows]]
+    kijun = 5
+    senkouB = 7
+    tenkan = 3
+    [[tables.ichCompose.rows]]
+    kijun = 9
+    senkouB = 52
+    tenkan = 26
+    [[tables.ichCompose.rows]]
+    kijun = 26
+    senkouB = 9
+    tenkan = 52
+    [[tables.ichCompose.rows]]
+    kijun = 2
+    senkouB = 2
+    tenkan = 2
+    [[tables.ichCompose.rows]]
+    kijun = 100
+    senkouB = 30
+    tenkan = 40
+
+[tables.ichGolden]
+type = "IchGolden"
+
+    [[tables.ichGolden.rows]]
+    bar = 77
+    output = 0
+    value = 93.4375
+    [[tables.ichGolden.rows]]
+    bar = 77
+    output = 1
+    value = 93.4375
+    [[tables.ichGolden.rows]]
+    bar = 51
+    output = 2
+    value = 88.41499999999999
+    [[tables.ichGolden.rows]]
+    bar = 51
+    output = 3
+    value = 90.25
+    [[tables.ichGolden.rows]]
+    bar = 100
+    output = 0
+    value = 115.4075
+    [[tables.ichGolden.rows]]
+    bar = 100
+    output = 1
+    value = 109.6725
+    [[tables.ichGolden.rows]]
+    bar = 74
+    output = 2
+    value = 87.765
+    [[tables.ichGolden.rows]]
+    bar = 74
+    output = 3
+    value = 87.4525
+    [[tables.ichGolden.rows]]
+    bar = 150
+    output = 0
+    value = 123.125
+    [[tables.ichGolden.rows]]
+    bar = 150
+    output = 1
+    value = 128.375
+    [[tables.ichGolden.rows]]
+    bar = 124
+    output = 2
+    value = 123.75
+    [[tables.ichGolden.rows]]
+    bar = 124
+    output = 3
+    value = 106.75
+    [[tables.ichGolden.rows]]
+    bar = 200
+    output = 0
+    value = 111.53
+    [[tables.ichGolden.rows]]
+    bar = 200
+    output = 1
+    value = 119.435
+    [[tables.ichGolden.rows]]
+    bar = 174
+    output = 2
+    value = 129.2975
+    [[tables.ichGolden.rows]]
+    bar = 174
+    output = 3
+    value = 128.375
+    [[tables.ichGolden.rows]]
+    bar = 251
+    output = 0
+    value = 108.685
+    [[tables.ichGolden.rows]]
+    bar = 251
+    output = 1
+    value = 111.965
+    [[tables.ichGolden.rows]]
+    bar = 225
+    output = 2
+    value = 101.1375
+    [[tables.ichGolden.rows]]
+    bar = 225
+    output = 3
+    value = 112.28
+
+[tables.ichLookback]
+type = "IchTriple"
+
+    [[tables.ichLookback.rows]]
+    kijun = 26
+    senkouB = 52
+    tenkan = 9
+    [[tables.ichLookback.rows]]
+    kijun = 26
+    senkouB = 9
+    tenkan = 52
+    [[tables.ichLookback.rows]]
+    kijun = 52
+    senkouB = 9
+    tenkan = 26
+    [[tables.ichLookback.rows]]
+    kijun = 2
+    senkouB = 2
+    tenkan = 2
+    [[tables.ichLookback.rows]]
+    kijun = 3
+    senkouB = 3
+    tenkan = 100
+    [[tables.ichLookback.rows]]
+    kijun = 100
+    senkouB = 3
+    tenkan = 3
+    [[tables.ichLookback.rows]]
+    kijun = 3
+    senkouB = 100
+    tenkan = 3
+    [[tables.ichLookback.rows]]
+    kijun = 5
+    senkouB = 3
+    tenkan = 7

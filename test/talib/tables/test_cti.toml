@@ -1,0 +1,295 @@
+# Extracted by gen/extract_talib_tests.jl from TA-Lib 62021c1:src/tools/ta_regtest/ta_test_func/test_cti.c. Do not edit.
+commit = "62021c1d14ef5499505af5547384cab509adf3fc"
+source = "src/tools/ta_regtest/ta_test_func/test_cti.c"
+
+[arrays.ctiCancelCorpus]
+type = "double"
+values = [100.00000052728242, 99.99999972063162, 100.00000331676542, 100.00000094869883, 99.99999872896572, 100.00000199852343, 100.00000237232099, 99.99999993158009, 100.00000488002743, 100.00000308037387, 100.00000100535377, 100.00000413847395, 99.99999792227185, 100.00000472610638, 100.00000376223514, 100.00000484775724, 99.99999540147753, 100.00000179882429, 100.00000041738383, 100.00000164245195, 99.9999962106636, 100.00000378821413, 100.0000040362304, 99.99999972475116, 99.99999609294525, 100.00000323786804, 100.00000188249547, 99.99999598157812, 99.99999975536775, 99.99999944905079, 100.00000269534941, 100.00000142433277, 99.99999929568433, 100.0000042203537, 100.00000167494639, 100.00000480511711, 99.99999542360842, 99.99999618084148, 99.99999731524505, 100.00000447450944]
+
+[arrays.ctiCancelGolden]
+type = "double"
+values = [0.04188697767321594, -0.1609529790917248, -0.13972795912991218, -0.004570546281627058, -0.08066290853068546, -0.31306516612322316, -0.24064790998780647, -0.20091833872852413, -0.370654659299611, -0.31425513456899035, -0.294917672600824, -0.23526001807554123, -0.12828623582924842, -0.25744914491221194, -0.0422099257555875, 0.07752942283779674, 0.3300407782193946, 0.009707565037271146, -0.08032882030998995, -0.16043887061613263, -0.0051788511639493506]
+
+[structs.CtiGolden]
+fields = ["period", "bar", "exact", "pandas", "pine"]
+types = ["int", "int", "double", "double", "double"]
+
+[tables.ctiGoldens]
+type = "CtiGolden"
+
+    [[tables.ctiGoldens.rows]]
+    bar = 4
+    exact = 0.5324010568171472
+    pandas = 0.5324010568168148
+    period = 5
+    pine = 0.5324010568168871
+    [[tables.ctiGoldens.rows]]
+    bar = 5
+    exact = -0.30899021310025276
+    pandas = -0.3089902130986744
+    period = 5
+    pine = -0.30899021309939745
+    [[tables.ctiGoldens.rows]]
+    bar = 6
+    exact = -0.6655557020866546
+    pandas = -0.665555702086015
+    period = 5
+    pine = -0.6655557020855538
+    [[tables.ctiGoldens.rows]]
+    bar = 85
+    exact = 0
+    pandas = -3.607175196922061e-14
+    period = 5
+    pine = 0
+    [[tables.ctiGoldens.rows]]
+    bar = 98
+    exact = -0.9855504463697112
+    pandas = -0.9855504463696161
+    period = 5
+    pine = -0.985550446369572
+    [[tables.ctiGoldens.rows]]
+    bar = 100
+    exact = 0.4042327218726396
+    pandas = 0.40423272187263076
+    period = 5
+    pine = 0.4042327218720002
+    [[tables.ctiGoldens.rows]]
+    bar = 121
+    exact = -0.642959663732181
+    pandas = -0.6429596637207668
+    period = 5
+    pine = -0.6429596637206958
+    [[tables.ctiGoldens.rows]]
+    bar = 130
+    exact = 0.9785143433942415
+    pandas = 0.9785143433942609
+    period = 5
+    pine = 0.9785143433950068
+    [[tables.ctiGoldens.rows]]
+    bar = 163
+    exact = 0.045773725458540616
+    pandas = 0.045773725458499684
+    period = 5
+    pine = 0.04577372545456058
+    [[tables.ctiGoldens.rows]]
+    bar = 164
+    exact = 0.009085071159603622
+    pandas = 0.009085071159577256
+    period = 5
+    pine = 0.009085071155990868
+    [[tables.ctiGoldens.rows]]
+    bar = 200
+    exact = 0.6243571009080825
+    pandas = 0.6243571009072986
+    period = 5
+    pine = 0.6243571009041275
+    [[tables.ctiGoldens.rows]]
+    bar = 201
+    exact = -0.312695495796411
+    pandas = -0.3126954957991258
+    period = 5
+    pine = -0.31269549583133766
+    [[tables.ctiGoldens.rows]]
+    bar = 251
+    exact = -0.9542178794488372
+    pandas = -0.9542178794528025
+    period = 5
+    pine = -0.954217879466899
+    [[tables.ctiGoldens.rows]]
+    bar = 11
+    exact = 0.20812400793454888
+    pandas = 0.2081240079346183
+    period = 12
+    pine = 0.2081240079345849
+    [[tables.ctiGoldens.rows]]
+    bar = 12
+    exact = 0.30474329407065576
+    pandas = 0.30474329407076844
+    period = 12
+    pine = 0.3047432940706305
+    [[tables.ctiGoldens.rows]]
+    bar = 13
+    exact = 0.050243199619530686
+    pandas = 0.05024319961951954
+    period = 12
+    pine = 0.05024319961952271
+    [[tables.ctiGoldens.rows]]
+    bar = 100
+    exact = -0.41972988731793676
+    pandas = -0.41972988731793415
+    period = 12
+    pine = -0.41972988731749056
+    [[tables.ctiGoldens.rows]]
+    bar = 130
+    exact = 0.9695541176229525
+    pandas = 0.9695541176230091
+    period = 12
+    pine = 0.969554117622582
+    [[tables.ctiGoldens.rows]]
+    bar = 140
+    exact = -0.9325161162836652
+    pandas = -0.9325161162836766
+    period = 12
+    pine = -0.9325161162842851
+    [[tables.ctiGoldens.rows]]
+    bar = 165
+    exact = -0.4824790551094267
+    pandas = -0.48247905510981987
+    period = 12
+    pine = -0.482479055112821
+    [[tables.ctiGoldens.rows]]
+    bar = 179
+    exact = 0.0018916966547785328
+    pandas = 0.0018916966547656367
+    period = 12
+    pine = 0.0018916966531894953
+    [[tables.ctiGoldens.rows]]
+    bar = 200
+    exact = -0.9232967157822222
+    pandas = -0.9232967157822481
+    period = 12
+    pine = -0.9232967157829981
+    [[tables.ctiGoldens.rows]]
+    bar = 250
+    exact = 0.165531938827742
+    pandas = 0.16553193882802686
+    period = 12
+    pine = 0.16553193881790312
+    [[tables.ctiGoldens.rows]]
+    bar = 251
+    exact = 0.015475155243466916
+    pandas = 0.015475155243425548
+    period = 12
+    pine = 0.015475155230277952
+    [[tables.ctiGoldens.rows]]
+    bar = 19
+    exact = -0.4122557873174811
+    pandas = -0.41225578731753487
+    period = 20
+    pine = -0.41225578731744505
+    [[tables.ctiGoldens.rows]]
+    bar = 20
+    exact = -0.5678903074527523
+    pandas = -0.5678903074527243
+    period = 20
+    pine = -0.5678903074526697
+    [[tables.ctiGoldens.rows]]
+    bar = 21
+    exact = -0.6142267884757484
+    pandas = -0.6142267884758054
+    period = 20
+    pine = -0.6142267884758547
+    [[tables.ctiGoldens.rows]]
+    bar = 100
+    exact = 0.6764580239168486
+    pandas = 0.6764580239169117
+    period = 20
+    pine = 0.6764580239167786
+    [[tables.ctiGoldens.rows]]
+    bar = 129
+    exact = 0.9570055338731002
+    pandas = 0.9570055338731592
+    period = 20
+    pine = 0.9570055338728497
+    [[tables.ctiGoldens.rows]]
+    bar = 155
+    exact = -0.4687723980436529
+    pandas = -0.4687723980436079
+    period = 20
+    pine = -0.4687723980460226
+    [[tables.ctiGoldens.rows]]
+    bar = 183
+    exact = 0.007783396259274761
+    pandas = 0.007783396259276537
+    period = 20
+    pine = 0.0077833962583975435
+    [[tables.ctiGoldens.rows]]
+    bar = 191
+    exact = -0.9434371237739724
+    pandas = -0.9434371237739941
+    period = 20
+    pine = -0.9434371237752526
+    [[tables.ctiGoldens.rows]]
+    bar = 200
+    exact = -0.9390102783728508
+    pandas = -0.9390102783728443
+    period = 20
+    pine = -0.9390102783735864
+    [[tables.ctiGoldens.rows]]
+    bar = 251
+    exact = -0.6716013218080917
+    pandas = -0.6716013218078218
+    period = 20
+    pine = -0.6716013218100205
+    [[tables.ctiGoldens.rows]]
+    bar = 49
+    exact = -0.5312126816063498
+    pandas = -0.5312126816063565
+    period = 50
+    pine = -0.5312126816063576
+    [[tables.ctiGoldens.rows]]
+    bar = 50
+    exact = -0.5158857178221447
+    pandas = -0.5158857178221237
+    period = 50
+    pine = -0.5158857178221389
+    [[tables.ctiGoldens.rows]]
+    bar = 51
+    exact = -0.479902639942315
+    pandas = -0.47990263994223115
+    period = 50
+    pine = -0.4799026399422991
+    [[tables.ctiGoldens.rows]]
+    bar = 71
+    exact = 0.5321970691987199
+    pandas = 0.532197069198635
+    period = 50
+    pine = 0.5321970691986615
+    [[tables.ctiGoldens.rows]]
+    bar = 100
+    exact = 0.9137740929103477
+    pandas = 0.9137740929103465
+    period = 50
+    pine = 0.9137740929103636
+    [[tables.ctiGoldens.rows]]
+    bar = 101
+    exact = 0.9196020828438535
+    pandas = 0.9196020828438489
+    period = 50
+    pine = 0.9196020828438645
+    [[tables.ctiGoldens.rows]]
+    bar = 168
+    exact = -0.49911041442536674
+    pandas = -0.49911041442534787
+    period = 50
+    pine = -0.49911041442559284
+    [[tables.ctiGoldens.rows]]
+    bar = 171
+    exact = -0.5092624628138633
+    pandas = -0.509262462813864
+    period = 50
+    pine = -0.5092624628142577
+    [[tables.ctiGoldens.rows]]
+    bar = 180
+    exact = 0.0022286453075005845
+    pandas = 0.002228645307500595
+    period = 50
+    pine = 0.0022286453072470455
+    [[tables.ctiGoldens.rows]]
+    bar = 200
+    exact = -0.56887629805559
+    pandas = -0.5688762980555513
+    period = 50
+    pine = -0.5688762980558455
+    [[tables.ctiGoldens.rows]]
+    bar = 219
+    exact = -0.9619210264577311
+    pandas = -0.9619210264577317
+    period = 50
+    pine = -0.9619210264578566
+    [[tables.ctiGoldens.rows]]
+    bar = 251
+    exact = 0.8412061554205442
+    pandas = 0.8412061554205581
+    period = 50
+    pine = 0.8412061554205815

@@ -47,9 +47,10 @@ re-folds every window from a fresh state, a cold start per window.
 
 ## Scope
 
-**In scope:** every TA-Lib 0.8.1 function except the element-wise math ones,
-which is 182 functions: 121 indicators plus 61 candlestick patterns. All of
-them are listed under "Name table".
+**In scope:** every function of the pinned TA-Lib except the element-wise math
+ones. TA-Lib 0.8.1's 182 (121 indicators plus 61 candlestick patterns) are
+implemented, and all of them are listed under "Name table". The 36 that
+TA-Lib 0.8.3 adds land in stages S11–S14 (see "Staging").
 
 **Non-goals.**
 
@@ -66,14 +67,20 @@ them are listed under "Name table".
 - **Bit-for-bit agreement with TA-Lib.** Every sum is a CausalFrames compensated
   sum (see "Warm-up"), so values match TA-Lib to the golden tolerance, not
   exactly.
-- **Acausal variants.** TA-Lib 0.8.1 is causal throughout. For example, `FRACTAL`
+- **Acausal variants.** TA-Lib is causal throughout. For example, `FRACTAL`
   reports a pivot on its confirmation bar, and `DPO` is written at the bar whose
   average produced it. So nothing here belongs in CausalFrames' `Acausal`
   submodule. If the caller wants a centred or shifted plotting convention, they
   apply `Acausal.lead` themselves.
+- **TA-Lib's display shift** (0.8.3, #489). `TA_<NAME>_DisplayShift` only tells
+  a charting app how many bars to shift an output it draws (`FRACTAL`, `DPO`,
+  and `ICHIMOKU`'s lines); the values are not shifted. There is nothing to
+  port, and the `DPO` and `Fractal` docstrings state the offset.
 
-**Pinned reference.** TA-Lib 0.8.1, commit
-[`2aa8eb0`](https://github.com/TA-Lib/ta-lib/tree/2aa8eb0d79bcfc4d2ff3f7b445d37958c48e0788).
+**Pinned reference.** TA-Lib 0.8.3, commit
+[`62021c1`](https://github.com/TA-Lib/ta-lib/tree/62021c1d14ef5499505af5547384cab509adf3fc)
+(the `v0.8.3` tag). Stages S0–S8 were written against 0.8.1 (`2aa8eb0`); S9
+moved the pin.
 Each function's contract comes from two files, and each docstring cites both:
 
 - `ta_codegen/input/<fn>/<fn>.yaml`: inputs, parameter ranges and defaults,
@@ -218,16 +225,13 @@ c. **The oldest-first `downdate!` law, and per-accumulator tiers** (#74).
 d. **`MaxIndex`/`MinIndex`** (#85), with `MaxWithIndex`/`MinWithIndex`, which
    emit the extreme and its index from one state. Each reports the `Int` bars
    since the extreme (0 for the newest), and all four are groups.
-   - **Tie-break: most recent wins.** TA-Lib's rule cannot be reproduced by
-     any summarizer of the window's contents, because it depends on the path.
-     A new bar takes over the extreme on `>=`, so the newest tie wins, but when
-     the extreme leaves the window TA-Lib rescans with `>`, so the oldest tie
-     wins. With period 3, the window `[5, 1, 5]` reports the newest 5 after
-     `[1, 1, 5, 1, 5]` but the oldest after `[9, 5, 1, 5]`.
-   - **Resolution.** The index forms keep the upstream rule and differ from
-     TA-Lib only on rows whose window holds a tied extreme. Their golden and
-     table tests skip those rows (see "Testing"), and `Aroon`'s docstring says
-     so. The extreme's *value* is unaffected.
+   - **Tie-break: most recent wins.** Since TA-Lib 0.8.3 (#503), `MAXINDEX`,
+     `MININDEX` and `MINMAXINDEX` name the most recent of tied extremes from
+     any start, which is the upstream rule, so they match exactly. Up to
+     0.8.1 the rule depended on the path: a new bar took over the extreme on
+     `>=`, but a rescan when the extreme left the window took the oldest tie,
+     and no summarizer of the window's contents can reproduce that. The tests
+     skipped tied windows then, and skip nothing now.
    - **Users.** `MAXINDEX`, `MININDEX` and `MINMAXINDEX` are CausalFrames only:
      `MaxIndex`/`MinIndex` emit exactly their value (as bars since the
      extreme) under `Bars(n)`, so a TA-Lib-named constructor would be an
@@ -856,11 +860,10 @@ the goldens check every bar.
     `Variance` alone, as `var > 0`. Returns of ~1e-8 that barely vary
     (Wilkinson BIG and LITTLE) give a slope of 1, as in TA-Lib. Returns that
     are constant up to rounding give the noise slope TA-Lib gives.
-  - The index forms (`MAXINDEX`, `MININDEX`, `MINMAXINDEX`) skip rows whose
-    window holds a tied extreme, where TA-Lib's path-dependent tie-break and
-    the upstream most-recent rule may differ (see (d)). Their extracted table
-    rows check only shape. `AROON` and `AROONOSC` share the upstream rule and
-    skip nothing.
+  - The index forms (`MAXINDEX`, `MININDEX`, `MINMAXINDEX`), `AROON` and
+    `AROONOSC` share TA-Lib's tie rule, the most recent bar (see (d)), and skip
+    nothing. As test_minmax.c does, the index forms' table rows are held to a
+    window scan, since the rows carry no index value.
 - **Candlesticks.** Every `CDL*` golden also runs at rows 1–4 of
   test_candlestick.c's `cdlGlobalsMatrix`, over both datasets, as the parameter
   set `cdlrow=r`. `dump_golden`'s `cdl.<Setting>=<range>:<avg>:<factor>`
@@ -874,7 +877,11 @@ the goldens check every bar.
   each builder call (the bars, the settings in force, `startIdx`/`endIdx` and
   TA-Lib's outputs) to `test/talib/candles/mcdc.txt.gz`, and the test still
   has to pass. `test/candles.jl` replays every record exactly. Calls on the
-  252-bar history are not recorded, since the goldens cover them.
+  252-bar history are not recorded, since the goldens cover them. Since 0.8.3
+  the records also hold `test_candle_value_set`'s sweep of every pattern over
+  three seeded random series, which reaches the wrapped entry points through
+  the abstract interface, and the C test routes its calls through
+  `meta_ride.c`'s checks, which the capture links too.
 - **Running it.** The generator runs by hand when the pin moves. It is not
   built in CI, so CI needs no C toolchain.
 
@@ -949,6 +956,23 @@ README rows together, and updates this document where reality differs.
 - **S8:** the 0.8.1 loose ends. VWMA copies its input under a one-row window
   (#18), BETA's no-variance guard is stated on `Variance` (#19), and
   CausalFrames stays unregistered. **Complete.**
+- **S9:** the pin moves to TA-Lib 0.8.3. Every table, dataset, MC/DC record and
+  golden is regenerated, and each golden diff is explained: floating-point
+  reordering of at most ~2e-10 relative (#411, #505, #507, and VAR/STDDEV's
+  rebuild at periods 2 to 5, 905dc958f), PERCENTILE's default (30 → 100), the
+  period caps of PERCENTILE, PERCENTRANK and MAVP (100000 → 10000), the index
+  tie-break (#503, see (d)) and the new `TA_MAType_VIDYA`/`ALMA` (14, 15). The
+  behavior changes ported: RSI gives 50 on a series that has not moved (#480),
+  PPO and PVO give 0 on a dead slow window under the windowed MA types (#454),
+  and `MAVP` rejects periods over 10000. The 0.8.3 tests hold the sign of a
+  zero at period 1, so `DEMA`, `TEMA` and `ZLEMA` (and those `matype`s) copy
+  their input there, as TA-Lib's period-1 arms do, rather than compute
+  `2x − x`, which turns a -0.0 into +0.0. `PercentRank100` keeps any `Bars`
+  window (`accepts = WINDOW`). RVOL, VWMA and CMF on a dead volume window
+  (#446) needed no change: CausalFrames' sums keep no residue there. The
+  0.8.3 C-test legs for existing functions are ported (test/talib/README.md).
+  The goldens' MA types 14 and 15 are skipped until S11 (`PENDING_MATYPES`).
+  **Complete.**
 
 A stage PR may find that an indicator can claim a stronger tier, or needs
 another upstream addition. It then amends the name table and "Upstream
@@ -1067,7 +1091,7 @@ All 182 in-scope TA-Lib functions. The table is generated from the pinned YAML.
 | `MARKETFI` | `MarketFI` | S4 | dependent: `Last` | Group | high, low, volume | any window (bar-local) | (one column) |
 | `NVI` | `NVI` | S4 | new state | plain | close, volume | — | (one column) |
 | `OBV` | `OBV` | S4 | new state (previous close, a `Sum`) | plain | real, volume | — | (one column) |
-| `PERCENTILE` | `Quantile(:x, 0.5; interpolation=:nearestrank)` | S4 | CausalFrames only: `Quantile(percentile / 100; interpolation=:nearestrank)` | Group | real | window: Bars(30), percentile=50 | (one column) |
+| `PERCENTILE` | `Quantile(:x, 0.5; interpolation=:nearestrank)` | S4 | CausalFrames only: `Quantile(percentile / 100; interpolation=:nearestrank)` | Group | real | window: Bars(100), percentile=50 | (one column) |
 | `PERCENTRANK` | `PercentRank100` | S4 | dependent (upstream): `PercentRank` | Group | real | window: Bars(101) (period + 1) | (one column) |
 | `PVI` | `PVI` | S4 | new state | plain | close, volume | — | (one column) |
 | `PVO` | `PVO` | S4 | new state (`PPO`'s, over the volume) | plain | volume | fastperiod=12, slowperiod=26, matype=:ema, unstable=0 | (one column) |
