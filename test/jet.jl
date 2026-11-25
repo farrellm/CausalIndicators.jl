@@ -1,6 +1,6 @@
 # Targeted JET checks: every kernel's per-bar path must be free of runtime
 # dispatch, including the CausalFrames barwindows embedded in the window
-# kernels, and so must every plain state's update! (S1 to S7).
+# kernels, and so must every plain state's update! (S1 to S7, S11).
 
 using JET
 
@@ -50,7 +50,14 @@ using JET
     JET.@test_opt step!(mk, 1.5)
     JET.@test_opt current(mk)
     JET.@test_opt fresh!(mk)
-    for s in vcat(PLAIN_S2, PLAIN_S3, PLAIN_S4, PLAIN_S5, PLAIN_S6, PLAIN_S7)
+    # The S11 kernels: the two MA types and the oscillator VIDYA embeds.
+    for k in
+        (VIDYAKernel(Float64, 5, 4), ALMAKernel(Float64, 6), VIDYAKernel(Float64, 1, 4))
+        JET.@test_opt step!(k, 1.5)
+        JET.@test_opt current(k)
+        JET.@test_opt fresh!(k)
+    end
+    for s in vcat(PLAIN_S2, PLAIN_S3, PLAIN_S4, PLAIN_S5, PLAIN_S6, PLAIN_S7, PLAIN_S11)
         st = fresh(s, S2_INTYPES)
         JET.@test_opt CausalFrames.update!(st, row)
         JET.@test_opt CausalFrames.update!(st, merge(row, (close = missing,)))

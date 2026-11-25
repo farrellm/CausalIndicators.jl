@@ -48,9 +48,10 @@ re-folds every window from a fresh state, a cold start per window.
 ## Scope
 
 **In scope:** every function of the pinned TA-Lib except the element-wise math
-ones. TA-Lib 0.8.1's 182 (121 indicators plus 61 candlestick patterns) are
-implemented, and all of them are listed under "Name table". The 36 that
-TA-Lib 0.8.3 adds land in stages S11–S14 (see "Staging").
+ones. TA-Lib 0.8.1's 182 (121 indicators plus 61 candlestick patterns) and the
+11 of TA-Lib 0.8.3's additions that S11 lands are implemented, and all 193 are
+listed under "Name table". The other 25 of the 36 that 0.8.3 adds land in
+stages S12–S14 (see "Staging").
 
 **Non-goals.**
 
@@ -108,7 +109,8 @@ table records which:
      `MAXINDEX`/`MININDEX`/`MINMAXINDEX` → `MaxIndex`/`MinIndex`,
      `VAR` → `Variance(corrected = false)`, `CORREL` → `Correlation`,
      `PERCENTILE` → `Quantile(percentile / 100; interpolation = :nearestrank)`,
-     `AVGDEV` → `MeanAbsDev`, all under `Bars(period)`
+     `AVGDEV` → `MeanAbsDev`, `MEDIAN` → `Median`, `KURTOSIS` → `Kurtosis`
+     (G2, the default `corrected = true`), all under `Bars(period)`
    - `CUMSUM` → `Sum` under `addsummarycolumns`, with no window
 
    CausalFrames bakes `corrected` into the state type, not the output name. So
@@ -145,6 +147,10 @@ table records which:
    - `FOSC` reads `Count`, `Sum`, `AgeWeightedSum` and `Last` over
      `Bars(period + 1)`: the `TSF` of the window's older bars, against the
      newest.
+   - `CG` reads `Count`, `Sum` and `AgeWeightedSum`, and `CTI` those and
+     `Variance(corrected = false)`.
+   - `BBW` and `PercentB` without `matype` read what `BollingerBands()` reads,
+     and `PercentB` also `Last`.
 3. **Move it into CausalFrames.** If an indicator needs a *generic* accumulator
    or operator that CausalFrames lacks, it is first added to CausalFrames as a
    prerequisite PR, with its own tests, docs and DESIGN.md entry. The indicator
@@ -169,8 +175,8 @@ The rule also binds internal code:
 ### Upstream prerequisites
 
 Items (a)–(g) were added to CausalFrames as stage S0, which is complete as of
-CausalFrames `1e1442d`. Item (h) was added ahead of S2. Each entry gives the
-public name it landed under.
+CausalFrames `1e1442d`. Item (h) was added ahead of S2, and item (i) as stage
+S10. Each entry gives the public name it landed under.
 
 a. **`warmup(lookback, f)`** (#84). This is a transform of transforms: it runs
    `f(p)` over `[start − lookback, stop)` and drops the output rows with
@@ -278,8 +284,10 @@ g. **`CausalFrames.barwindow(s, n, intypes)`, a count-window state** (#81),
      state holding one takes its type as a type parameter.
 
    Recursive states cannot get a window through a transform, so they use this.
-   Its users are KAMA and ER, MFI, ULTOSC, AO and AC, CMOU, VHF, Vortex, DPO,
-   Coppock, SMI, Fractal, TRIMA, the Stoch family's %K,
+   Its users are KAMA and ER, MFI, ULTOSC, AO and AC, CMOU and VIDYA, VHF,
+   Vortex, DPO, ALMA (`WindowValues`), FRAMA and Ichimoku (`Max`/`Min`, and
+   FRAMA a `First` of its newer half's extremes), Coppock, SMI, Fractal,
+   TRIMA, the Stoch family's %K,
    `MAKernel`'s `:sma` and `:wma`, `BollingerBands(; matype)` and RVI (a
    `Std`), CVI and ADXR (a `First` of their own earlier values), MassIndex (a
    `Sum`), Beta (`Covariance` and `Variance` of the returns), the
@@ -296,6 +304,17 @@ h. **`MeanAbsDev(column)`**, the mean absolute deviation about the mean,
    TA-Lib's `AVGDEV`, which is therefore CausalFrames only (case 1), and it is
    the deviation `CCI` reads (case 2). Without it, both would have needed a
    hand-rolled ring of the window's values.
+
+i. **`Skewness(column)` and `Kurtosis(column)`** (#138), exported dependents
+   over an unexported windowed fourth central moment, `CentralMoments`. It
+   folds shifted `Σdᵏ`, `k = 1…4`, as `CoMoment` does, with the deviation and
+   the recentring move as exact `twosum` pairs (a rounded `x − K` left an
+   accumulating `eps·(D/s)⁴` residue on series that cross zero), and refolds
+   when `max d⁴ > 2^20·Σd⁴`. `corrected = true` (the default) is G1/G2, as
+   pandas, Excel and TA-Lib give, and `false` g1/g2. Both are NaN with no
+   spread, and for fewer than 3 or 4 rows when corrected. `Kurtosis` is
+   exactly TA-Lib 0.8.3's `KURTOSIS`, which is therefore CausalFrames only
+   (case 1), NaN on a flat window as TA-Lib is.
 
 ## Model
 
@@ -329,7 +348,8 @@ h. **`MeanAbsDev(column)`**, the mean absolute deviation about the mean,
     `TimePeriod` is the transform's window, and the name table gives the
     default as `window: Bars(n)`.
   - **MA types** are symbols (`:sma`, `:ema`, `:wma`, `:dema`, `:tema`,
-    `:trima`, `:kama`, `:mama`, `:t3`, `:hma`, `:zlema`, `:rma`). They are
+    `:trima`, `:kama`, `:mama`, `:t3`, `:hma`, `:zlema`, `:rma`, `:vidya`,
+    `:alma`). They are
     dispatched at construction into a type parameter so that the fold never
     branches on them.
 - **Output names** follow CausalFrames' suffixing rule.
@@ -387,6 +407,10 @@ given parameters.
   - `ATR`, `NATR`, `PlusDM`, `MinusDM`, `PlusDI`, `MinusDI`, `DX`, `ADX` and
     `RVI` have their own. At period 1 the DMs and DIs ignore it, as TA-Lib's
     period-1 arms do.
+  - `VIDYA`, `McGinley` and `FRAMA` have their own (S11). VIDYA's period 1 is
+    a copy that it still delays, as `TA_VIDYA` does; `MA`'s period 1 is not
+    delayed. `BBW` and `PercentB` with `matype` inherit the dispatched type's,
+    as `BollingerBands` does.
   - One keyword sets them all, as `TA_FUNC_UNST_ALL` does.
   - For the chained EMAs (`DEMA`, `TEMA`, `MACD`, `TRIX`, `SMI`, `TSI`) the inherited period
     changes the values, not only the first bar: each EMA stage passes its
@@ -406,8 +430,9 @@ given parameters.
     10, 19) and `X` (digits: 4, 8). Each rule is a function of it, transcribed
     from `ta_codegen/input/helpers/auto_stabilization.c` and each lookback:
     `autoema`, `autowilder`, `autoratio`, `autoadx`, `autokama`, `autot3`,
-    `autoha`, `autohilbert`, `autohttrend`, `automama` and ADOSC's offset
-    `autoadosc`.
+    `autoha`, `autohilbert`, `autohttrend`, `automama`, `autovidya`,
+    `automcgd`, `autoframa` and ADOSC's offset `autoadosc`. `:vidya` as an
+    `matype` resolves VIDYA's at `TA_MA`'s CMO period.
   - It resolves at construction (`barkernel`, `MAKernel`), so the per-row path
     is the same as under a count. Every kernel resolves its own id at its own
     parameters, as each TA-Lib callee reads its id. So `MACD` drops EMA's
@@ -525,6 +550,9 @@ The name table's "Tier" column records it.
   - `MOM`/`ROC*` (`First`/`Last`)
   - `FOSC` (`Count`, `Sum`, `AgeWeightedSum`, `Last` under `Bars(period + 1)`)
   - `TRange` (`First`/`Last` under `Bars(2)`)
+  - `MEDIAN` (`Median`) and `KURTOSIS` (`Kurtosis`)
+  - `CG` and `CTI` (`Count`, `Sum`, `AgeWeightedSum`, and `CTI` `Variance`)
+  - `BBW` and `PercentB` without `matype`, as `BollingerBands(:x)`
 
   By the no-duplication rule, each of these is a CausalFrames summarizer or a
   dependent over CausalFrames accumulators. A dependent is automatically a
@@ -536,11 +564,16 @@ The name table's "Tier" column records it.
 - **Plain** (`Summarizer`). These have no lawful `combine!`, so they are folded
   row by row:
   - recursive filters: the EMA family, Wilder smoothing, `MACD`, `KAMA`, `T3`,
-    `MAMA`, the Hilbert family, `ERI`, `SMI`, `TSI`, `HeikinAshi`
+    `MAMA`, the Hilbert family, `ERI`, `SMI`, `TSI`, `HeikinAshi`, `VIDYA`,
+    `McGinley`, `FRAMA`
   - everything with an `matype` keyword: `MA`, `MACDExt`, `APO`/`PPO`/`PVO`,
-    `Stoch*`, `KDJ`, and `BollingerBands(:x; matype)`. Passing `matype` at all
-    selects the plain form; without it, `BollingerBands(:x)` is the Group-tier
-    SMA form under a `Bars` window.
+    `Stoch*`, `KDJ`, and `BollingerBands`, `BBW` and `PercentB` with `matype`.
+    Passing `matype` at all selects the plain form; without it, those three
+    are the Group-tier SMA form under a `Bars` window.
+  - `ALMA`, whose Gaussian weights TA-Lib fixes from `period` once, rather
+    than from the window's count as a dependent would have to at every
+    emission, and which is also `matype = :alma`, which needs the kernel
+  - `Ichimoku`, whose three lines need three windows of different lengths
   - path-dependent states: `SAR`, `SARExt`, `SuperTrend`, `OBV`, `PVT`, `NVI`,
     `PVI`, `ADOSC`, `WAD`
   - indicators that feed a per-row term needing the previous bar into a window
@@ -622,6 +655,15 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
     50-bar window of the smoothed price, and the trendline (`HTTrendline`,
     `HTTrendMode`) a 50-bar window of the raw price, both in the same way.
     `MAMAKernel` adds MAMA and FAMA on top, and `MAKernel{:mama}` embeds it.
+  - `CMOUKernel` (S5, a kernel since S11): Chande's unsmoothed CMO over
+    `barwindow` `Sum`s of the up and down moves. `CMOU` emits it, and
+    `VIDYAKernel` embeds one prefilled with zero moves, so through the warm-up
+    it is the CMO of the changes seen so far, as ta_VIDYA.c takes it.
+  - `VIDYAKernel` and `ALMAKernel` (S11): the two MA types TA-Lib 0.8.3 adds.
+    VIDYA steps `fma(x − v, α·|CMO|/100, v)` from the first bar. ALMA keeps a
+    `barwindow` `WindowValues` and fixed Gaussian weights, and each bar's dot
+    product is a plain loop oldest first, as ta_ALMA.c's is (the scan
+    exception under "Warm-up"); a NaN in the window gives NaN.
   - `ERKernel` (S5): Kaufman's efficiency ratio, a `barwindow` `Sum` of `|Δx|`
     and a `First` of the bar `period` back, with ta_ER.c's flat-window guard.
     `ER` emits it, and `KAMAKernel` embeds it, so the two stay one computation.
@@ -635,7 +677,10 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
       (`barwindow`s around `Sum` and `First`), `HMAKernel` (three
       `WMAKernel`s) and `ZLEMAKernel` (`barwindow` around `First`, then an
       `EMAKernel`). S6 adds `:mama`, a `MAMAKernel` at TA_MA's limits (0.5,
-      0.05), which ignores the period and has lookback `32 + unstable`.
+      0.05), which ignores the period and has lookback `32 + unstable`. S11
+      adds `:vidya` (`VIDYAKernel` at `TA_MA`'s CMO period
+      `(3·period + 2) ÷ 4`, lookback that plus `unstable`) and `:alma`
+      (`ALMAKernel` at sigma 6 and offset 0.85, lookback `period − 1`).
     - Unlike the other kernels, its `lookback` is TA-Lib's whole lookback for
       the type, unstable period included, and `step!` gates its own output.
       Its `identity` keyword selects `TA_MA`'s period-1 rule, a copy with
@@ -746,7 +791,7 @@ window, which is rarely what a recursive indicator wants. Its docstring says so.
 | File | Content |
 |---|---|
 | `src/CausalIndicators.jl` | module, includes, exports |
-| `src/kernels/*.jl` | `EMAKernel`, `WilderKernel`, `SMAKernel`, `MAKernel`, `ERKernel`, `GainLossKernel`, `FastKKernel`, `ATRKernel`, `DMKernel`, `HilbertKernel`, `MAMAKernel`, `CandleKernel` (with `CandleSettings`) |
+| `src/kernels/*.jl` | `EMAKernel`, `WilderKernel`, `SMAKernel`, `MAKernel`, `ERKernel`, `CMOUKernel`, `VIDYAKernel`, `ALMAKernel`, `GainLossKernel`, `FastKKernel`, `ATRKernel`, `DMKernel`, `HilbertKernel`, `MAMAKernel`, `CandleKernel` (with `CandleSettings`) |
 | `src/shared.jl` | the dependent states, the internal window dependents, argument checks, output names, docstring paragraphs |
 | `src/barindicator.jl` | `BarIndicator`, the plain summarizer behind every plain indicator but `MAVP` |
 | `src/overlap.jl` | moving averages and bands |
@@ -865,6 +910,14 @@ the goldens check every bar.
     #95), so a constant series does not drift. Every full window gives the
     same flat `LINEARREG` slope, which is 0 up to the one rounding of the fit
     itself (`test/statistics.jl` holds it to 1e-13).
+  - **CTI's cross term.** `CTI` takes the value side's spread from
+    `Variance`, which is measured from a shift, but its cross term is
+    `AgeWeightedSum − Sum·(n − 1)/2`, two price-scale sums each rounded once.
+    On a spread of 1e-5 at a level of 100, test_cti.c's cancellation corpus,
+    that is about 1e-8 of the coefficient, where ta_CTI.c's shifted running
+    sums meet the C test's 1e-9. The goldens (at 1e-9) and every other leg
+    hold. A shifted age-weighted sum would close the gap; it would be an
+    upstream accumulator (PLAN.md).
   - **Correlation of a flat window.** TA-Lib's `CORREL` gives 0 where either
     series has no spread in the window. CausalFrames' `Correlation` gives `NaN`
     there (0/0). `CORREL` stays CausalFrames only, as `VAR` does with its flat
@@ -1019,6 +1072,21 @@ README rows together, and updates this document where reality differs.
   regenerated goldens hold both levels for the 45 functions a level changes
   (test/golden grew from 24 to 36 MB). It needed no upstream addition.
   **Complete.**
+- **S10:** the upstream prerequisite for S11, item (i): `Skewness` and
+  `Kurtosis` over `CentralMoments` (CausalFrames.jl#138, merged 2026-11-03).
+  **Complete.**
+- **S11:** TA-Lib 0.8.3's overlap and statistics additions (11, plus two MA
+  types). MEDIAN and KURTOSIS are CausalFrames only (`Median`, `Kurtosis`).
+  CG and CTI are Group dependents, and BBW and PercentB split as
+  BollingerBands does. ALMA, VIDYA, McGinley (`MCGD`), FRAMA and Ichimoku are
+  plain, and VIDYA, McGinley and FRAMA own an unstable id with its
+  Auto-Stabilization rule. `:vidya` and `:alma` are `matype`s everywhere, so
+  the goldens' MA types 14 and 15 are checked for every `matype`-taking
+  function. CMOU's kernel moved to `src/kernels/cmou.jl`, for VIDYA to embed.
+  The extractor now drops a comment's newlines, as C does, so a multi-line
+  comment inside a continued `#define` no longer hides the arrays after it
+  (test_median.c's and test_kurtosis.c's goldens). CTI's cancellation corpus
+  holds to 1e-8, not 1e-9 (see "Testing"). **Complete.**
 
 A stage PR may find that an indicator can claim a stronger tier, or needs
 another upstream addition. It then amends the name table and "Upstream
@@ -1030,7 +1098,8 @@ None. Registering CausalFrames was decided against (see S0′).
 
 ## Name table
 
-All 182 in-scope TA-Lib functions. The table is generated from the pinned YAML.
+All 193 implemented TA-Lib functions: 0.8.1's 182 and S11's 11. The table is
+generated from the pinned YAML.
 
 - **Relation** is the no-duplication resolution:
   - *CausalFrames only* (case 1)
@@ -1231,3 +1300,14 @@ All 182 in-scope TA-Lib functions. The table is generated from the pinned YAML.
 | `CDLUNIQUE3RIVER` | `Candles.UniqueThreeRiver` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
 | `CDLUPSIDEGAP2CROWS` | `Candles.UpsideGapTwoCrows` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
 | `CDLXSIDEGAP3METHODS` | `Candles.XSideGapThreeMethods` | S7 | new state (`CandleKernel`) | plain | open, high, low, close | settings=CandleSettings() | (one column, `Int`) |
+| `MEDIAN` | `Median(:x)` | S11 | CausalFrames only: `Median` | Group | real | window: Bars(30) | (one column) |
+| `KURTOSIS` | `Kurtosis(:x)` | S11 | CausalFrames only: `Kurtosis` (G2; NaN when flat, as TA-Lib) | Group | real | window: Bars(30) | (one column) |
+| `CG` | `CG` | S11 | dependent (upstream): `AgeWeightedSum`, `Sum`, `Count` | Group | real | window: Bars(10) | (one column) |
+| `CTI` | `CTI` | S11 | dependent (upstream): `AgeWeightedSum`, `Sum`, `Count`, `Variance(corrected=false)` | Group | real | window: Bars(20) | (one column) |
+| `BBW` | `BBW` | S11 | dependent: `Mean`, `Std` (no `matype`); new state with `matype` | Group / plain | real | window: Bars(20), nbdevup=2, nbdevdn=2; with `matype`: period=20, unstable=0 | (one column) |
+| `PERCENTB` | `PercentB` | S11 | dependent: `Mean`, `Std`, `Last` (no `matype`); new state with `matype` | Group / plain | real | window: Bars(20), nbdevup=2, nbdevdn=2; with `matype`: period=20, unstable=0 | (one column) |
+| `ALMA` | `ALMA` | S11 | new state (`ALMAKernel`, Gaussian weights over `WindowValues`) | plain | real | period=9, sigma=6, offset=0.85 | (one column) |
+| `VIDYA` | `VIDYA` | S11 | new state (`VIDYAKernel` over `CMOUKernel`) | plain | real | period=12, cmoperiod=9, unstable=0 | (one column) |
+| `MCGD` | `McGinley` | S11 | new state | plain | real | period=14, unstable=0 | (one column) |
+| `FRAMA` | `FRAMA` | S11 | new state (`Max`/`Min` and `First` windows) | plain | high, low | period=16 (even), unstable=0 | (one column) |
+| `ICHIMOKU` | `Ichimoku` | S11 | new state (three `Max`/`Min` windows) | plain | high, low | tenkanperiod=9, kijunperiod=26, senkoubperiod=52 | tenkansen, kijunsen, senkouspana, senkouspanb |

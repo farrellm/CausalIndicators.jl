@@ -5,7 +5,8 @@ using CausalIndicators: MAVPState, UNSTABLE_MATYPES
 
 # TA_MAType's integer order, as the goldens' optInMAType.
 const MATYPE_CODES = Dict(0 => :sma, 1 => :ema, 2 => :wma, 3 => :dema, 4 => :tema,
-    5 => :trima, 6 => :kama, 7 => :mama, 8 => :t3, 9 => :hma, 12 => :zlema, 13 => :rma)
+    5 => :trima, 6 => :kama, 7 => :mama, 8 => :t3, 9 => :hma, 12 => :zlema, 13 => :rma,
+    14 => :vidya, 15 => :alma)
 
 # A golden's optInMAType code as a matype symbol. A code past TA_MAType (the
 # boundary sweep's rejected value) maps to a symbol no constructor accepts.

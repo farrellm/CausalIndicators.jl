@@ -13,14 +13,14 @@ TA-Lib's `TA_MAType_DISABLED` and `TA_MAType_DEFAULT` (10 and 11, between
 `:hma` and `:zlema`) have no symbol.
 """
 const MATYPES = (:sma, :ema, :wma, :dema, :tema, :trima, :kama, :mama, :t3, :hma,
-    :zlema, :rma)
+    :zlema, :rma, :vidya, :alma)
 
 """
 The MA types whose TA-Lib lookback includes an unstable period: their own
-(`:ema`, `:kama`, `:mama`, `:t3`, `:rma`) or EMA's, which `:dema`, `:tema` and
-`:zlema` inherit.
+(`:ema`, `:kama`, `:mama`, `:t3`, `:rma`, `:vidya`) or EMA's, which `:dema`,
+`:tema` and `:zlema` inherit.
 """
-const UNSTABLE_MATYPES = (:ema, :dema, :tema, :kama, :mama, :t3, :zlema, :rma)
+const UNSTABLE_MATYPES = (:ema, :dema, :tema, :kama, :mama, :t3, :zlema, :rma, :vidya)
 
 mutable struct MAKernel{M,K}
     const inner::K
@@ -67,10 +67,17 @@ makernel(::Val{:t3}, ::Type{T}, p, u, vf) where {T} = T3Kernel(T, p, vf)
 makernel(::Val{:hma}, ::Type{T}, p, u, vf) where {T} = HMAKernel(T, p)
 makernel(::Val{:zlema}, ::Type{T}, p, u, vf) where {T} = ZLEMAKernel(T, p)
 makernel(::Val{:rma}, ::Type{T}, p, u, vf) where {T} = WilderKernel(T, p)
+# TA_MA's VIDYA takes Chande's 12:9 ratio for its CMO period, and its ALMA the
+# default sigma and offset (ta_MA.c).
+makernel(::Val{:vidya}, ::Type{T}, p, u, vf) where {T} =
+    VIDYAKernel(T, p, vidyacmoperiod(p))
+makernel(::Val{:alma}, ::Type{T}, p, u, vf) where {T} = ALMAKernel(T, p, 6.0, 0.85)
+
+vidyacmoperiod(p) = (3p + 2) ÷ 4
 
 # The unstable count of each type at period `p` under `u`: its own id's
-# (`:kama`, `:mama`, `:t3`, `:rma`, `:ema`) or EMA's, which `:dema`, `:tema`
-# and `:zlema` inherit. The other types have none.
+# (`:kama`, `:mama`, `:t3`, `:rma`, `:ema`, `:vidya`) or EMA's, which `:dema`,
+# `:tema` and `:zlema` inherit. The other types have none.
 maunstable(::Val, u, p) = 0
 maunstable(::Union{Val{:ema},Val{:dema},Val{:tema},Val{:zlema}}, u, p) =
     unstablecount(u, autoema, p)
@@ -79,6 +86,7 @@ maunstable(::Val{:kama}, u, p) = unstablecount(u, autokama, p)
 maunstable(::Val{:mama}, u, p) = unstablecount(u, automama, 0.5, 0.05)
 maunstable(::Val{:t3}, u, p) = unstablecount(u, autot3, p)
 maunstable(::Val{:rma}, u, p) = unstablecount(u, autowilder, p)
+maunstable(::Val{:vidya}, u, p) = unstablecount(u, autovidya, p, vidyacmoperiod(p))
 
 # TA-Lib's `TA_<FN>_Lookback` for each type at period `p` and unstable count
 # `u` (ta_MA.c's dispatch, then each function's own).
@@ -94,6 +102,8 @@ malookback(::Val{:t3}, p, u) = 6 * (p - 1) + u
 malookback(::Val{:hma}, p, u) = (p - 1) + (isqrt(p) - 1)
 malookback(::Val{:zlema}, p, u) = (p - 1) ÷ 2 + p - 1 + u
 malookback(::Val{:rma}, p, u) = p - 1 + u
+malookback(::Val{:vidya}, p, u) = (p == 1 ? 0 : vidyacmoperiod(p)) + u
+malookback(::Val{:alma}, p, u) = p - 1
 
 CausalFrames.fresh(m::MAKernel{M,K}) where {M,K} =
     MAKernel{M,K}(fresh(m.inner), m.lookback, 0)

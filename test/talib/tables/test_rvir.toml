@@ -2,6 +2,14 @@
 commit = "62021c1d14ef5499505af5547384cab509adf3fc"
 source = "src/tools/ta_regtest/ta_test_func/test_rvir.c"
 
+[arrays.rvirSdPeriods]
+type = "int"
+values = [2, 3, 10, 14, 30]
+
+[arrays.rvirTimePeriods]
+type = "int"
+values = [1, 2, 14, 30]
+
 [structs.RvirGolden]
 fields = ["period", "sdPeriod", "bar", "want"]
 types = ["int", "int", "int", "double"]

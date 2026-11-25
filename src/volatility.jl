@@ -330,3 +330,138 @@ function RVI(column::ColumnSpec; period::Integer = 14, stddevperiod::Integer = 1
     return barindicator(RVISpec(period, stddevperiod, unstable),
         (outname(colname(column), name),), column)
 end
+
+# ---------------------------------------------------------------------------
+# Bollinger BandWidth and %B (S11)
+
+# Both are read off BBANDS' own bands, rounded as ta_BBANDS.c rounds them
+# (`bbandsvalues`), as ta_BBW.c and ta_PERCENTB.c read them.
+@inline bbwvalue(u, m, l) = m == 0 ? zero(m) : (u - l) / m * 100
+@inline function percentbvalue(x, u, l)
+    den = u - l
+    return den == 0 ? oftype(den, 0.5) : (x - l) / den
+end
+
+# The formulas over the SMA form's `Mean`, `Std` (and `Last` for %B).
+struct BBWFormula{U,D} end
+@inline function (::BBWFormula{U,D})(mid, sd) where {U,D}
+    u, m, l = bbandsvalues(mid, sd, U, D)
+    return bbwvalue(u, m, l)
+end
+struct PercentBFormula{U,D} end
+@inline function (::PercentBFormula{U,D})(mid, sd, x) where {U,D}
+    u, _, l = bbandsvalues(mid, sd, U, D)
+    return percentbvalue(x, u, l)
+end
+
+# The SMA form: a dependent over the accumulators `BollingerBands(:x)` reads,
+# so they share them in one call.
+struct BollingerStat{K,C,U,D} <: GroupSummarizer end
+
+CausalFrames.dependencies(::BollingerStat{:bbw,C}) where {C} =
+    (Mean(C), Std(C; corrected = false))
+CausalFrames.dependencies(::BollingerStat{:percentb,C}) where {C} =
+    (Mean(C), Std(C; corrected = false), Last(C))
+CausalFrames.emptyvalue(::BollingerStat{K,C}) where {K,C} = missings((Symbol(C, :_, K),))
+CausalFrames.fresh(::BollingerStat{:bbw,C,U,D}, ::NamedTuple) where {C,U,D} =
+    derivedvalue(Symbol(C, :_bbw), (Symbol(C, :_mean), Symbol(C, :_std)),
+        lifted(BBWFormula{U,D}()))
+CausalFrames.fresh(::BollingerStat{:percentb,C,U,D}, ::NamedTuple) where {C,U,D} =
+    derivedvalue(Symbol(C, :_percentb), (Symbol(C, :_mean), Symbol(C, :_std), lastname(C)),
+        lifted(PercentBFormula{U,D}()))
+
+# The `matype` form: BBANDS' plain kernel, read off its bands.
+struct BollingerStatSpec{K,M}
+    bands::BollingerSpec{M}
+end
+
+mutable struct BollingerStatKernel{K,B}
+    const bands::B
+end
+
+barkernel(s::BollingerStatSpec{K}, ::Type{T}) where {K,T} =
+    (b = barkernel(s.bands, T); BollingerStatKernel{K,typeof(b)}(b))
+CausalFrames.fresh!(k::BollingerStatKernel) = (fresh!(k.bands); k)
+
+@inline function barstep!(k::BollingerStatKernel{K}, x) where {K}
+    b = barstep!(k.bands, x)
+    b === nothing && return nothing
+    u, m, l = b
+    return (K === :bbw ? bbwvalue(u, m, l) : percentbvalue(x, u, l),)
+end
+
+function bollingerstat(fn, K, column, nbdevup, nbdevdn, matype, period, unstable, name)
+    C = colname(column)
+    up, dn = Float64(nbdevup), Float64(nbdevdn)
+    if matype === nothing
+        period === nothing && unstable == 0 && name === K || throw(
+            ArgumentError(
+                "$fn without matype takes its window from the transform; " *
+                "period, unstable and name need a matype"))
+        return withterms(BollingerStat{K,C,up,dn}(), column)
+    end
+    p = something(period, 20)
+    checkrange(fn, "period", p, 2, 100_000)
+    checkmatype(fn, "matype", matype)
+    unstable = checkunstable(unstable)
+    spec = BollingerStatSpec{K,matype}(BollingerSpec{matype}(p, up, dn, unstable))
+    return barindicator(spec, (outname(C, name),), column)
+end
+
+const BOLLINGERSTAT_DOC = """
+- **Without `matype`** the middle band is the simple average, and the indicator
+  is a dependent over CausalFrames' `Mean` and `Std(corrected = false)` (Group
+  tier), which it shares with [`BollingerBands`](@ref) in the same call. It is
+  window-agnostic: TA-Lib's `period = p` with the SMA is a `Bars(p)` window. It
+  takes no `period`.
+- **With `matype`** (any `matype` symbol of [`MA`](@ref)) it is a plain
+  summarizer over [`BollingerBands`](@ref)'s `matype` state, with its lookback
+  and its `unstable`. `name` replaces the output suffix.
+
+The bands are rounded as `BollingerBands` rounds them, and the value is read
+off them. The deviation stays the population standard deviation about the
+simple mean under every `matype`, as in TA-Lib. CausalFrames bakes `corrected`
+into the state type, so the structured form cannot share a call with a
+corrected `Std` or `Variance` over the same column.
+"""
+
+"""
+    BBW(column::ColumnSpec; nbdevup = 2, nbdevdn = 2) -> Summarizer
+    BBW(column::ColumnSpec; matype, period = 20, nbdevup = 2, nbdevdn = 2,
+        unstable = 0, name = :bbw) -> Summarizer
+
+TA-Lib's `BBW`, Bollinger BandWidth, in `:{column}_bbw`: the distance between
+[`BollingerBands`](@ref)' upper and lower bands as a percentage of the middle
+band, `100·(upper − lower)/middle`, or 0 where the middle band is 0. Low values
+mark Bollinger's squeeze. The input is assumed positive.
+
+$BOLLINGERSTAT_DOC
+$DAILY_DOC
+$AUTO_DOC
+TA-Lib: `ta_codegen/input/bbw/bbw.yaml`, `bbw.md`.
+"""
+BBW(column::ColumnSpec; nbdevup::Real = 2, nbdevdn::Real = 2,
+    matype::Union{Nothing,Symbol} = nothing, period::Union{Nothing,Integer} = nothing,
+    unstable::UnstableArg = 0, name::Symbol = :bbw) =
+    bollingerstat("BBW", :bbw, column, nbdevup, nbdevdn, matype, period, unstable, name)
+
+"""
+    PercentB(column::ColumnSpec; nbdevup = 2, nbdevdn = 2) -> Summarizer
+    PercentB(column::ColumnSpec; matype, period = 20, nbdevup = 2, nbdevdn = 2,
+             unstable = 0, name = :percentb) -> Summarizer
+
+TA-Lib's `PERCENTB`, Bollinger's %B, in `:{column}_percentb`: where the input
+sits between [`BollingerBands`](@ref)' lower band (0) and upper band (1),
+`(x − lower)/(upper − lower)`, or 0.5 where the two bands are equal. Values
+outside [0, 1] are outside the bands.
+
+$BOLLINGERSTAT_DOC
+$DAILY_DOC
+$AUTO_DOC
+TA-Lib: `ta_codegen/input/percentb/percentb.yaml`, `percentb.md`.
+"""
+PercentB(column::ColumnSpec; nbdevup::Real = 2, nbdevdn::Real = 2,
+    matype::Union{Nothing,Symbol} = nothing, period::Union{Nothing,Integer} = nothing,
+    unstable::UnstableArg = 0, name::Symbol = :percentb) =
+    bollingerstat("PercentB", :percentb, column, nbdevup, nbdevdn, matype, period,
+        unstable, name)

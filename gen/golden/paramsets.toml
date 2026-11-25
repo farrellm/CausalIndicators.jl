@@ -43,6 +43,15 @@ MA = [
     {optInMAType = 7},
     {optInTimePeriod = 1, optInMAType = 7},
     {optInMAType = 7, unstable = 2},
+    # S11: VIDYA (14, with its unstable period at TA_MA's CMO period) and ALMA (15).
+    {optInMAType = 14},
+    {optInMAType = 15},
+    {optInTimePeriod = 2, optInMAType = 14},
+    {optInTimePeriod = 2, optInMAType = 15},
+    {optInTimePeriod = 1, optInMAType = 14, unstable = 3},
+    {optInTimePeriod = 10, optInMAType = 14, unstable = 4},
+    {optInTimePeriod = 5, optInMAType = 14, unstable = "auto4"},
+    {optInTimePeriod = 2, optInMAType = 14, unstable = "auto8"},
     {optInTimePeriod = 5, optInMAType = 1, unstable = "auto4"},
     {optInTimePeriod = 5, optInMAType = 3, unstable = "auto4"},
     {optInTimePeriod = 5, optInMAType = 4, unstable = "auto4"},
@@ -504,4 +513,71 @@ CDLMORNINGDOJISTAR = [
 CDLMORNINGSTAR = [
     {optInPenetration = 0.0},
     {optInPenetration = 0.8},
+]
+
+# S11: TA-Lib 0.8.3's overlap and statistics additions. Each list holds the
+# periods its C test's goldens use, and the short periods and matype paths the
+# 252-bar set can show. MEDIAN and KURTOSIS are CausalFrames' Median and
+# Kurtosis under Bars(n).
+MEDIAN = [{optInTimePeriod = 2}, {optInTimePeriod = 3}, {optInTimePeriod = 4}, {optInTimePeriod = 20}]
+KURTOSIS = [{optInTimePeriod = 4}, {optInTimePeriod = 5}, {optInTimePeriod = 10}]
+CG = [{optInTimePeriod = 2}, {optInTimePeriod = 3}, {optInTimePeriod = 14}, {optInTimePeriod = 57}]
+CTI = [{optInTimePeriod = 2}, {optInTimePeriod = 5}, {optInTimePeriod = 12}, {optInTimePeriod = 50}]
+BBW = [
+    {optInTimePeriod = 5},
+    {optInNbDevUp = 1.0, optInNbDevDn = 3.0},
+    {optInNbDevUp = 0.0, optInNbDevDn = 0.0},
+    {optInTimePeriod = 5, optInNbDevUp = 1.5, optInNbDevDn = 2.5, optInMAType = 1},
+    {optInMAType = 1, unstable = 3},
+    {optInTimePeriod = 10, optInMAType = 14, unstable = 2},
+    {optInTimePeriod = 5, optInMAType = 1, unstable = "auto4"},
+    {optInTimePeriod = 5, optInMAType = 14, unstable = "auto8"},
+]
+PERCENTB = [
+    {optInTimePeriod = 5},
+    {optInNbDevUp = 1.0, optInNbDevDn = 3.0},
+    {optInNbDevUp = 0.0, optInNbDevDn = 0.0},
+    {optInTimePeriod = 5, optInNbDevUp = 1.5, optInNbDevDn = 2.5, optInMAType = 1},
+    {optInMAType = 1, unstable = 3},
+    {optInTimePeriod = 10, optInMAType = 14, unstable = 2},
+    {optInTimePeriod = 5, optInMAType = 1, unstable = "auto4"},
+    {optInTimePeriod = 5, optInMAType = 14, unstable = "auto8"},
+]
+ALMA = [
+    {optInTimePeriod = 2},
+    {optInTimePeriod = 21},
+    {optInTimePeriod = 10, optInSigma = 3.0, optInOffset = 0.5},
+    {optInTimePeriod = 30, optInOffset = 1.0},
+    {optInTimePeriod = 30, optInSigma = 10.0, optInOffset = 0.0},
+    {optInTimePeriod = 51, optInOffset = 0.58},
+]
+VIDYA = [
+    {optInTimePeriod = 2, optInCMOPeriod = 2},
+    {optInTimePeriod = 9},
+    {optInTimePeriod = 14, optInCMOPeriod = 14},
+    {optInTimePeriod = 1, unstable = 3},
+    {unstable = 7},
+    {optInTimePeriod = 3, optInCMOPeriod = 3, unstable = "auto4"},
+]
+MCGD = [
+    {optInTimePeriod = 2},
+    {optInTimePeriod = 10},
+    {optInTimePeriod = 50},
+    {unstable = 9},
+    {optInTimePeriod = 3, unstable = "auto4"},
+]
+FRAMA = [
+    {optInTimePeriod = 2},
+    {optInTimePeriod = 4},
+    {optInTimePeriod = 10},
+    {optInTimePeriod = 40},
+    {unstable = 3},
+    {optInTimePeriod = 2, unstable = "auto4"},
+]
+ICHIMOKU = [
+    {optInTenkanPeriod = 52, optInKijunPeriod = 26, optInSenkouBPeriod = 9},
+    {optInTenkanPeriod = 26, optInKijunPeriod = 52, optInSenkouBPeriod = 9},
+    {optInTenkanPeriod = 2, optInKijunPeriod = 2, optInSenkouBPeriod = 2},
+    {optInTenkanPeriod = 100, optInKijunPeriod = 3, optInSenkouBPeriod = 3},
+    {optInTenkanPeriod = 7, optInKijunPeriod = 5, optInSenkouBPeriod = 3},
 ]

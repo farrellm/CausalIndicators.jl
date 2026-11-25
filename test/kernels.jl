@@ -1,7 +1,7 @@
 using CausalIndicators: EMAKernel, WilderKernel, SMAKernel, MAKernel, MATYPES, step!,
     current, nseen, lookback, floattype, WMAKernel, DEMAKernel, TEMAKernel, T3Kernel,
     TRIMAKernel, KAMAKernel, HMAKernel, ZLEMAKernel, checkunstable, unstablecount,
-    autoema, autowilder
+    autoema, autowilder, VIDYAKernel, ALMAKernel
 
 # One of every S1 kernel, for the generic kernel properties.
 const S1_KERNELS =
@@ -9,7 +9,12 @@ const S1_KERNELS =
         () -> TEMAKernel(Float64, 4), () -> T3Kernel(Float64, 3, 0.5),
         () -> TRIMAKernel(Float64, 6), () -> KAMAKernel(Float64, 5),
         () -> HMAKernel(Float64, 9),
-        () -> ZLEMAKernel(Float64, 6), () -> MAKernel(Float64, :dema, 5; unstable = 2))
+        () -> ZLEMAKernel(Float64, 6), () -> MAKernel(Float64, :dema, 5; unstable = 2),
+        # S11: the two MA types TA-Lib 0.8.3 adds.
+        () -> VIDYAKernel(Float64, 5, 4), () -> ALMAKernel(Float64, 6),
+        () -> ALMAKernel(Float64, 7, 3.0, 0.5),
+        () -> MAKernel(Float64, :vidya, 5; unstable = 2),
+        () -> MAKernel(Float64, :alma, 5))
 
 # Run a kernel over a series as an indicator would, with `unstable` extra
 # warm-up bars: `missing` until it has seen lookback + unstable + 1 bars.
@@ -164,23 +169,25 @@ const KERNEL_RULES = Dict("EMA" => autoema, "RMA" => autowilder)
     end
 
     @testset "MAKernel" begin
-        @test length(MATYPES) == 12
+        @test length(MATYPES) == 14
         for (m, K) in ((:sma, SMAKernel), (:ema, EMAKernel), (:rma, WilderKernel),
             (:wma, WMAKernel), (:dema, DEMAKernel), (:tema, TEMAKernel), (:t3, T3Kernel),
             (:trima, TRIMAKernel), (:kama, KAMAKernel), (:hma, HMAKernel),
-            (:zlema, ZLEMAKernel))
+            (:zlema, ZLEMAKernel), (:vidya, VIDYAKernel), (:alma, ALMAKernel))
             @test MAKernel(Float64, m, 5).inner isa K
         end
         # TA-Lib's lookbacks (ta_MA.c dispatch) at period 7, unstable 2.
         for (m, lb) in ((:sma, 6), (:ema, 8), (:wma, 6), (:dema, 16), (:tema, 24),
             (:trima, 6), (:kama, 9), (:mama, 34), (:t3, 38), (:hma, 7), (:zlema, 11),
-            (:rma, 8))
+            (:rma, 8), (:vidya, 7), (:alma, 6))
             @test lookback(MAKernel(Float64, m, 7; unstable = 2)) == lb
             # TA_MA copies at period 1 with lookback 0, whatever the unstable period.
             @test lookback(MAKernel(Float64, m, 1; unstable = 2)) == 0
         end
         @test lookback(MAKernel(Float64, :dema, 1; unstable = 2, identity = false)) == 4
         @test lookback(MAKernel(Float64, :kama, 1; unstable = 2, identity = false)) == 2
+        # TA_VIDYA's period 1 is a copy that the unstable period still delays.
+        @test lookback(MAKernel(Float64, :vidya, 1; unstable = 2, identity = false)) == 2
         @test_throws ArgumentError MAKernel(Float64, :ema, 5; unstable = -1)
         @test_throws ArgumentError T3Kernel(Float64, 5, 1.5)
         @test_throws ArgumentError MAKernel(Float64, :nope, 5)
