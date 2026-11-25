@@ -227,6 +227,67 @@ The legs TA-Lib 0.8.3 added to the files above (S9):
   single-precision call, `test_percentrank.c`'s 10000 cap (a `Bars` window
   takes any period) and the C stream, server and in-place legs throughout.
 
+The files of the functions TA-Lib 0.8.3 adds, in the stage that implements
+them (S11 so far, in `test/additions083.jl`). The C stream (`Open`, `Peek`,
+`Update`), server, in-place and `doRangeTest` legs have no counterpart in a
+fold and are not listed again:
+
+- [x] `test_median.c`: numpy's goldens at periods 7, 8 and 20 bit for bit, the
+      ramp's mid-window value and the constant, MEDIAN as PERCENTILE at odd
+      periods and not at even ones. `Median` is CausalFrames', so the large-
+      window and stream legs, which test ta_MEDIAN.c's own sorted buffer, are
+      not ported.
+- [x] `test_kurtosis.c`: the 60-digit goldens over TA_SREF, the benign and
+      near-degenerate corpora at 1e-12, Excel's example, the arithmetic
+      progression's −6/5, `NaN` on exactly the flat windows after a varied
+      lead-in at six levels, and the one-ulp series, against a BigFloat
+      oracle. The reseed, regime and starvation legs test ta_KURTOSIS.c's
+      running sums, which CausalFrames' `CentralMoments` replaces.
+- [x] `test_cg.c`: the edge windows exactly (impulses, flats, zero sums, signed
+      zeros, 2^50), the flat 0.1 at periods 10 and 1000, negation, and the
+      [−n, −1] range. The limb, integer and locality legs test ta_CG.c's exact
+      sums, which CausalFrames' compensated `Sum` and `AgeWeightedSum` stand in
+      for.
+- [x] `test_cti.c`, in part: the exact goldens over TA_SREF at 1e-12, exact ±1
+      on lines, exactly 0 once a window goes flat (three levels, periods 2–60),
+      the two-bar sign and the [−1, 1] range. The cancellation corpus (spread
+      1e-5 on 100) holds to 1e-8, not the C test's 1e-9: the cross term is
+      `AgeWeightedSum − Sum·(n − 1)/2`, two sums rounded at price scale
+      (`@test_broken`; PLAN.md). The reseed and long-series legs test
+      ta_CTI.c's shifted running sums.
+- [x] `test_bbw.c` and `test_percentb.c`: every golden case over the C tests'
+      corpora (TA_SREF, its negation and floor, the LCG tick, 1e8, fine, eps
+      and 100,500-bar series, the flats, zero, alternating and step series,
+      the sub-ulp series and Bollinger's 20 bars), SMA, EMA, WMA and DEMA,
+      `startIdx` and EMA's unstable period, k at ±TA_REAL_MAX: BBW to each
+      row's tolerance or bitwise, %B to test_percentb.c's error model measured
+      against this package's own deviation and middle band, and the zero-width
+      0.5 bitwise. Both are read off BBANDS bit for bit in both forms. The PEG
+      series (`ta_test_ref_peg_ema`) is left out.
+- [x] `test_alma.c`: its goldens at 1e-14, the SPY vector, Tulip's
+      beta/alma.c over the whole grid bit for bit, period 1's signed zeros, the
+      corners (in-range outputs, the one-bar kernel exactly), the rejected
+      parameters and `MA(:alma)` bit for bit. The 100,000-bar corner is not
+      ported.
+- [x] `test_vidya.c`: its goldens and tails at 1e-13, ta4j's CMO, LEAN's
+      lookback, the composite over CMOU on the whole grid at 1e-13 (TA-Lib's
+      bit-exact composite is over its own running CMOU), the flat hold, the
+      constant, the ramp bit for bit, period 1 with and without the unstable
+      delay, `MA(:vidya)` at Chande's ratio bit for bit and BBANDS' middle band.
+      The MAVP leg is covered by the goldens' matype sets.
+- [x] `test_mcgd.c`: its goldens and LEAN's at 1e-14, McGinley's worked
+      example, the zero price held in and after the warm-up, and the
+      cancellation rows. The sweep compares TA-Lib's batch and stream paths.
+- [x] `test_frama.c`: its goldens at 1e-12, the collapsed bars, Ehlers' own
+      printed filter and trendline to the cent (622 and 616 rows), a
+      brute-force scan over flat stretches bit for bit, odd periods refused and
+      the lookback under unstable periods.
+- [x] `test_ichimoku.c`: its goldens bit for bit, each line as MIDPRICE over
+      its own window and span A as their mean for every compose and lookback
+      triple, span A's discrimination against the four-extreme average, the
+      tenkan/span B swap and the flat series. The display-shift leg (#489) has
+      no counterpart.
+
 Not ported, being out of scope:
 
 - `test_div_zero.c` covers `DIV`, an element-wise operator

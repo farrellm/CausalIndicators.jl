@@ -148,15 +148,18 @@ unchanged and emits `missing`. The output is `missing` for TA-Lib's lookback
 
 TA-Lib's `MA`: the `matype` moving average of `column` in `:{column}_ma`.
 `matype` is one of `:sma`, `:ema`, `:wma`, `:dema`, `:tema`, `:trima`,
-`:kama`, `:mama`, `:t3`, `:hma`, `:zlema` and `:rma`. It always
-returns a plain summarizer. The window-agnostic SMA is CausalFrames' `Mean`
-under a `Bars` window.
+`:kama`, `:mama`, `:t3`, `:hma`, `:zlema`, `:rma`, `:vidya` and `:alma`. It
+always returns a plain summarizer. The window-agnostic SMA is CausalFrames'
+`Mean` under a `Bars` window.
 
 `unstable` is TA-Lib's unstable period for the dispatched function, and it
 applies only to the types that have one (`:ema`, `:dema`, `:tema`, `:kama`,
-`:mama`, `:t3`, `:zlema`, `:rma`). Period 1 copies the input with lookback 0, as
-`TA_MA` does. `:t3` uses `vfactor = 0.7`, as `TA_MA` does. `:mama` ignores the
-period and is [`MAMA`](@ref)'s MAMA line at its default limits, lookback 32.
+`:mama`, `:t3`, `:zlema`, `:rma`, `:vidya`). Period 1 copies the input with
+lookback 0, as `TA_MA` does. `:t3` uses `vfactor = 0.7`, as `TA_MA` does.
+`:mama` ignores the period and is [`MAMA`](@ref)'s MAMA line at its default
+limits, lookback 32. `:vidya` is [`VIDYA`](@ref) with Chande's 12:9 ratio,
+`cmoperiod = (3·period + 2) ÷ 4`, and `:alma` is [`ALMA`](@ref) at its default
+sigma and offset.
 
 $MA_DOC_COMMON
 $AUTO_DOC
@@ -953,4 +956,315 @@ function SuperTrend(; high::ColumnSpec = :high, low::ColumnSpec = :low,
     unstable = checkunstable(unstable)
     return barindicator(SuperTrendSpec(period, multiplier, unstable),
         outnames(nothing, name, (:supertrend, :trend)), high, low, close)
+end
+
+# ---------------------------------------------------------------------------
+# TA-Lib 0.8.3's moving averages and Ichimoku (S11)
+
+struct ALMASpec
+    period::Int
+    sigma::Float64
+    offset::Float64
+end
+
+barkernel(s::ALMASpec, ::Type{T}) where {T} = ALMAKernel(T, s.period, s.sigma, s.offset)
+
+@inline function barstep!(k::ALMAKernel, x)
+    v = step!(k, x)
+    return ismissing(v) ? nothing : (v,)
+end
+
+"""
+    ALMA(column::ColumnSpec; period = 9, sigma = 6, offset = 0.85, name = :alma)
+
+TA-Lib's `ALMA`, Arnaud Legoux's moving average, in `:{column}_alma`: the last
+`period` values weighted by a Gaussian whose peak sits at bar
+`floor(offset·(period − 1))` counting from the oldest, with a standard
+deviation of `period / sigma` bars. The weights are fixed and normalized to sum
+to one. `offset` toward 1 puts the peak on recent bars and cuts the lag. The
+window is a CausalFrames `WindowValues` under `CausalFrames.barwindow`, and
+each bar's weighted sum is taken oldest first, as ta_ALMA.c takes it. The
+lookback is `period − 1`. Period 1 copies the input. A `NaN` in the window
+gives `NaN`. It is also `matype = :alma`, at the default `sigma` and `offset`.
+
+$PRICEBAR_DOC
+TA-Lib: `ta_codegen/input/alma/alma.yaml`, `alma.md`.
+"""
+function ALMA(column::ColumnSpec; period::Integer = 9, sigma::Real = 6.0,
+    offset::Real = 0.85, name::Symbol = :alma)
+    checkrange("ALMA", "period", period, 1, 100_000)
+    checkrange("ALMA", "sigma", sigma, 0.01, floatmax(Float64))
+    checkrange("ALMA", "offset", offset, 0, 1)
+    return barindicator(ALMASpec(period, sigma, offset),
+        (outname(colname(column), name),), column)
+end
+
+struct VIDYASpec
+    period::Int
+    cmoperiod::Int
+    unstable::Unstable
+end
+
+# An `MAKernel{:vidya}` at the call's own CMO period, so it gates on the whole
+# lookback as `MA(; matype = :vidya)` does.
+function barkernel(s::VIDYASpec, ::Type{T}) where {T}
+    v = VIDYAKernel(T, s.period, s.cmoperiod)
+    u = unstablecount(s.unstable, autovidya, s.period, s.cmoperiod)
+    return MAKernel{:vidya,typeof(v)}(v, lookback(v) + u, 0)
+end
+
+"""
+    VIDYA(column::ColumnSpec; period = 12, cmoperiod = 9, unstable = 0, name = :vidya)
+
+TA-Lib's `VIDYA`, Chande's variable index dynamic average, in
+`:{column}_vidya`: an EMA with `α = 2/(period + 1)`, scaled each bar by
+`|CMO| / 100`, where the CMO is Chande's unsmoothed one ([`CMOU`](@ref)) over
+the last `cmoperiod` changes. It follows a one-way move like the EMA and stops
+where the up and down moves balance. It is seeded with the first bar and steps
+through the warm-up with the CMO of the changes seen so far. The lookback is
+`cmoperiod`, plus `unstable`. Period 1 copies the input, delayed by `unstable`.
+It is also `matype = :vidya`, with `cmoperiod = (3·period + 2) ÷ 4`.
+
+$PRICEBAR_DOC
+$DAILY_DOC
+$AUTO_DOC
+TA-Lib: `ta_codegen/input/vidya/vidya.yaml`, `vidya.md`.
+"""
+function VIDYA(column::ColumnSpec; period::Integer = 12, cmoperiod::Integer = 9,
+    unstable::UnstableArg = 0, name::Symbol = :vidya)
+    checkrange("VIDYA", "period", period, 1, 100_000)
+    checkrange("VIDYA", "cmoperiod", cmoperiod, 2, 100_000)
+    unstable = checkunstable(unstable)
+    return barindicator(VIDYASpec(period, cmoperiod, unstable),
+        (outname(colname(column), name),), column)
+end
+
+struct McGinleySpec
+    period::Int
+    unstable::Unstable
+end
+
+mutable struct McGinleyKernel{T}
+    const period::T
+    const lookback::Int
+    n::Int
+    last::T
+end
+
+function barkernel(s::McGinleySpec, ::Type{T}) where {T}
+    u = unstablecount(s.unstable, automcgd, s.period)
+    return McGinleyKernel{T}(T(s.period), s.period - 1 + u, 0, zero(T))
+end
+function CausalFrames.fresh!(k::McGinleyKernel{T}) where {T}
+    k.n = 0
+    k.last = zero(T)
+    return k
+end
+
+# ta_MCGD.c's step, the fourth power as two squares; a step that is not finite
+# (a zero price, or one so small against the line that it overflows) holds the
+# line.
+@inline function barstep!(k::McGinleyKernel{T}, x::T) where {T}
+    if (k.n += 1) == 1
+        k.last = x
+    else
+        prev = k.last
+        r = x / prev
+        v = prev + (x - prev) / (k.period * (r * r * (r * r)))
+        isfinite(v) && (k.last = v)
+    end
+    return k.n > k.lookback ? (k.last,) : nothing
+end
+
+"""
+    McGinley(column::ColumnSpec; period = 14, unstable = 0, name = :mcgd)
+
+TA-Lib's `MCGD`, McGinley's Dynamic, in `:{column}_mcgd`: a moving average
+seeded with the first bar that closes the fraction
+`1 / (period·(x/MD)⁴)` of its gap to the price each bar, so it tracks falling
+prices faster than rising ones. A step that is not finite (a zero price, or one
+that overflows) keeps the previous value. McGinley suggests a period of about
+60% of the simple average it stands in for. The input is assumed positive. The
+lookback is `period − 1`, plus `unstable`.
+
+$PRICEBAR_DOC
+$DAILY_DOC
+$AUTO_DOC
+TA-Lib: `ta_codegen/input/mcgd/mcgd.yaml`, `mcgd.md`.
+"""
+function McGinley(column::ColumnSpec; period::Integer = 14, unstable::UnstableArg = 0,
+    name::Symbol = :mcgd)
+    checkrange("McGinley", "period", period, 2, 100_000)
+    unstable = checkunstable(unstable)
+    return barindicator(McGinleySpec(period, unstable),
+        (outname(colname(column), name),), column)
+end
+
+struct FRAMASpec
+    period::Int
+    unstable::Unstable
+end
+
+# The newer half's extremes over `half` bars, and the same extremes `half`
+# bars back through a `First` window, which are the older half's now.
+mutable struct FRAMAKernel{T,X,F}
+    const period::Int
+    const lookback::Int
+    n::Int
+    last::T
+    const newer::X
+    const older::F
+end
+
+function barkernel(s::FRAMASpec, ::Type{T}) where {T}
+    half = s.period ÷ 2
+    x = extremeswindow(half, T)
+    f = CausalFrames.barwindow(Firsts{(:hi, :lo)}(), half + 1, (hi = T, lo = T))
+    u = unstablecount(s.unstable, autoframa, s.period)
+    return FRAMAKernel{T,typeof(x),typeof(f)}(s.period, s.period + u, 0, zero(T), x, f)
+end
+function CausalFrames.fresh!(k::FRAMAKernel{T}) where {T}
+    k.n = 0
+    k.last = zero(T)
+    fresh!(k.newer)
+    fresh!(k.older)
+    return k
+end
+
+# -4.6/ln 2: α = exp(-4.6·(D − 1)) with D − 1 = log2((R1 + R2)/R).
+const FRAMA_SCALE = -4.6 / 0.6931471805599453
+
+# ta_FRAMA.c: seeded with the median price on bar `period − 1`, stepped from
+# bar `period`, the first whose window holds `period` bars after the first.
+@inline function barstep!(k::FRAMAKernel{T}, h::T, l::T) where {T}
+    n = k.n += 1
+    price = (h + l) / 2
+    update!(k.newer, (high = h, low = l))
+    e1 = value(k.newer).extremes
+    ismissing(e1) && return nothing
+    hi1, lo1 = e1::Tuple{T,T}
+    update!(k.older, (hi = hi1, lo = lo1))
+    if n == k.period
+        k.last = price
+    elseif n > k.period
+        hi2, lo2 = value(k.older).firsts::Tuple{T,T}
+        r1 = hi1 - lo1
+        r2 = hi2 - lo2
+        r = (hi1 > hi2 ? hi1 : hi2) - (lo1 < lo2 ? lo1 : lo2)
+        # R ≥ max(R1, R2), so R1 + R2 ≤ R is exactly the α ≥ 1 clamp, and a
+        # clamped or flat bar takes the price.
+        if r1 > 0 && r2 > 0 && r1 + r2 > r
+            alpha = exp(T(FRAMA_SCALE) * log((r1 + r2) / r))
+            k.last = fma(1 - alpha, k.last, alpha * price)
+        else
+            k.last = price
+        end
+    end
+    return n > k.lookback ? (k.last,) : nothing
+end
+
+"""
+    FRAMA(; high = :high, low = :low, period = 16, unstable = 0, name = :frama)
+
+TA-Lib's `FRAMA`, Ehlers' fractal adaptive moving average of the median price
+`(high + low)/2`, in `:frama`. With `R1` and `R2` the high-low ranges of the
+newer and older halves of the last `period` bars and `R` the whole window's,
+the fractal dimension is `D = 1 + log2((R1 + R2)/R)`, and the average steps
+with `α = exp(−4.6·(D − 1))`, at most 1. A straight run gives `D = 1`, and the
+average follows the price; congestion gives `D = 2` and very slow smoothing. A
+flat half gives `α = 1`. The windows are CausalFrames `Max` and `Min` under
+`CausalFrames.barwindow`. The average is seeded with the median price on the
+bar before its first step. `period` must be even. The lookback is `period`,
+plus `unstable`.
+
+$PRICEBAR_DOC
+$DAILY_DOC
+$AUTO_DOC
+TA-Lib: `ta_codegen/input/frama/frama.yaml`, `frama.md`.
+"""
+function FRAMA(; high::ColumnSpec = :high, low::ColumnSpec = :low, period::Integer = 16,
+    unstable::UnstableArg = 0, name::Symbol = :frama)
+    checkrange("FRAMA", "period", period, 2, 100_000)
+    iseven(period) || throw(ArgumentError("FRAMA period must be even, got $period"))
+    unstable = checkunstable(unstable)
+    return barindicator(FRAMASpec(period, unstable), (name,), high, low)
+end
+
+struct IchimokuSpec
+    tenkanperiod::Int
+    kijunperiod::Int
+    senkoubperiod::Int
+end
+
+mutable struct IchimokuKernel{A,B,C}
+    const lookback::Int
+    n::Int
+    const tenkan::A
+    const kijun::B
+    const senkoub::C
+end
+
+function barkernel(s::IchimokuSpec, ::Type{T}) where {T}
+    a = extremeswindow(s.tenkanperiod, T)
+    b = extremeswindow(s.kijunperiod, T)
+    c = extremeswindow(s.senkoubperiod, T)
+    L = max(s.tenkanperiod, s.kijunperiod, s.senkoubperiod) - 1
+    return IchimokuKernel{typeof(a),typeof(b),typeof(c)}(L, 0, a, b, c)
+end
+function CausalFrames.fresh!(k::IchimokuKernel)
+    k.n = 0
+    fresh!(k.tenkan)
+    fresh!(k.kijun)
+    fresh!(k.senkoub)
+    return k
+end
+
+@inline function midextremes(w, row, ::Type{T}) where {T}
+    update!(w, row)
+    e = value(w).extremes
+    return ismissing(e) ? zero(T) : midvalue((e::Tuple{T,T})...)
+end
+
+# Each line is ta_MIDPRICE.c's midpoint over its own window, and span A halves
+# the two rounded midpoints, as ta_ICHIMOKU.c's TA_MEDPRICE does.
+@inline function barstep!(k::IchimokuKernel, h::T, l::T) where {T}
+    row = (high = h, low = l)
+    t = midextremes(k.tenkan, row, T)
+    kj = midextremes(k.kijun, row, T)
+    b = midextremes(k.senkoub, row, T)
+    (k.n += 1) > k.lookback || return nothing
+    return (t, kj, midvalue(t, kj), b)
+end
+
+"""
+    Ichimoku(; high = :high, low = :low, tenkanperiod = 9, kijunperiod = 26,
+             senkoubperiod = 52, name = :ichimoku)
+
+TA-Lib's `ICHIMOKU`, Hosoda's Ichimoku Kinko Hyo, in `:ichimoku_tenkansen`,
+`:ichimoku_kijunsen`, `:ichimoku_senkouspana` and `:ichimoku_senkouspanb`. The
+conversion line (tenkan-sen), base line (kijun-sen) and span B are each the
+midpoint `(highest high + lowest low)/2` of their own window, as
+[`MidPrice`](@ref) is, and span A is the mean of the conversion and base lines.
+The windows are CausalFrames `Max` and `Min` under `CausalFrames.barwindow`.
+The lookback is the longest period less one.
+
+Every line is written at the bar that computed it. A chart draws the two spans
+`kijunperiod` bars ahead (TA-Lib's display shift, which changes no value), so
+the last `kijunperiod` span values are the cloud past the last bar. The lagging
+span (chikou) is the close drawn `kijunperiod` bars back, which is not an
+output.
+
+$PRICEBAR_DOC
+$DAILY_DOC
+TA-Lib: `ta_codegen/input/ichimoku/ichimoku.yaml`, `ichimoku.md`.
+"""
+function Ichimoku(; high::ColumnSpec = :high, low::ColumnSpec = :low,
+    tenkanperiod::Integer = 9, kijunperiod::Integer = 26, senkoubperiod::Integer = 52,
+    name::Symbol = :ichimoku)
+    checkrange("Ichimoku", "tenkanperiod", tenkanperiod, 2, 100_000)
+    checkrange("Ichimoku", "kijunperiod", kijunperiod, 2, 100_000)
+    checkrange("Ichimoku", "senkoubperiod", senkoubperiod, 2, 100_000)
+    return barindicator(IchimokuSpec(tenkanperiod, kijunperiod, senkoubperiod),
+        outnames(nothing, name, (:tenkansen, :kijunsen, :senkouspana, :senkouspanb)),
+        high, low)
 end

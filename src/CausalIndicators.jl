@@ -24,7 +24,8 @@ export MA, EMA, RMA, DEMA, TEMA, TRIMA, KAMA, T3, HMA, ZLEMA, MAVP, WMA, VWMA,
     AD, ADOSC, CMF, EFI, MarketFI, NVI, OBV, PVI, PVO, PVT, RVOL, VWAP,
     AC, AO, CMOU, Coppock, DPO, ER, ERI, FOSC, Fractal, IMI, KDJ, QStick, SMI, TSI, VHF,
     Vortex, WAD, HeikinAshi,
-    HTDCPeriod, HTDCPhase, HTPhasor, HTSine, HTTrendline, HTTrendMode, MAMA
+    HTDCPeriod, HTDCPhase, HTPhasor, HTSine, HTTrendline, HTTrendMode, MAMA,
+    ALMA, VIDYA, McGinley, FRAMA, Ichimoku, BBW, PercentB, CG, CTI
 
 include("kernels/common.jl")
 include("kernels/ema.jl")
@@ -32,6 +33,9 @@ include("kernels/wilder.jl")
 include("kernels/sma.jl")
 include("kernels/wma.jl")
 include("kernels/kama.jl")
+include("kernels/cmou.jl")
+include("kernels/vidya.jl")
+include("kernels/alma.jl")
 include("kernels/hilbert.jl")
 include("kernels/ma.jl")
 include("kernels/gainloss.jl")

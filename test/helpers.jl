@@ -179,16 +179,6 @@ const CHECKED_GOLDENS = Set{String}()
 const WINDOW = (:optInTimePeriod,)
 
 """
-TA-Lib MA types the goldens carry that have no `matype` yet: `TA_MAType_VIDYA`
-and `TA_MAType_ALMA` (14 and 15, new in TA-Lib 0.8.3), which land with `VIDYA`
-and `ALMA` in stage S11. [`checkgoldens`](@ref) skips their parameter sets.
-"""
-const PENDING_MATYPES = (14, 15)
-
-pendingmatype(p) =
-    any(((k, v),) -> occursin("MAType", String(k)) && v in PENDING_MATYPES, p)
-
-"""
     checkgoldens(run, fn; outputs, input = :close, skip = nothing, accepts = ())
 
 For every `(dataset, params)` golden of TA-Lib function `fn`, call
@@ -197,7 +187,6 @@ named in `outputs` (in that order), and check each against the golden with
 [`goldenmatch`](@ref). `skip(data, params, i)`, if given, excludes bar `i` (1-based)
 from the comparison. The absolute tolerance is [`goldenatol`](@ref) of the
 `input` column, or `atol` if given. It returns the number of series checked.
-Sets over a [`PENDING_MATYPES`](@ref) MA type are skipped.
 
 Every parameter set TA-Lib rejects ([`loadrejected`](@ref)) must make `run`
 throw an `ArgumentError`, except a set over the TA-Lib parameters named in
@@ -226,7 +215,6 @@ function checkgoldens(run, fn; outputs, input = :close, skip = nothing,
     for ((ds, ps), golden) in sort(collect(loadgolden(fn)); by = first)
         data = DATASETS[ds]()
         p = parseparams(ps)
-        pendingmatype(p) && continue
         got = run(p, data)
         tol = something(atol, goldenatol(data[input]))
         for (g, o) in zip(got, outputs)

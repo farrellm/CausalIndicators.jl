@@ -57,7 +57,8 @@ end
         # The rejected sets are only tested through checkgoldens, so a golden
         # read any other way would drop its sweep silently. This file runs last.
         goldens = Set(replace.(readdir(joinpath(TESTDIR, "golden")), ".csv.gz" => ""))
-        @test length(goldens) == 182
+        # TA-Lib 0.8.1's 182, and S11's 11.
+        @test length(goldens) == 193
         @test setdiff(goldens, CHECKED_GOLDENS) == Set{String}()
     end
 

@@ -7,11 +7,13 @@
 
 TA-Lib's technical indicators as causal, streaming building blocks for
 [CausalFrames.jl](https://github.com/farrellm/CausalFrames.jl) pipelines. See
-[DESIGN.md](DESIGN.md) for the design and the implementation stages. All seven
-stages have landed: S1 (moving averages, rolling operators and price
-transforms), S2 (momentum I), S3 (directional movement and volatility), S4
-(statistics and volume), S5 (the TA-Lib 0.8 additions), S6 (the Hilbert cycle
-family and MAMA) and S7 (the candlestick patterns).
+[DESIGN.md](DESIGN.md) for the design and the implementation stages. Every
+function of TA-Lib 0.8.1 has landed: S1 (moving averages, rolling operators and
+price transforms), S2 (momentum I), S3 (directional movement and volatility),
+S4 (statistics and volume), S5 (the TA-Lib 0.8 additions), S6 (the Hilbert
+cycle family and MAMA) and S7 (the candlestick patterns). The pin is TA-Lib
+0.8.3, with Auto-Stabilization (S9′), and its additions are landing in stages:
+S11 (overlap and statistics, with the `:vidya` and `:alma` MA types) is in.
 
 ```julia
 using CausalFrames, CausalIndicators, Dates
@@ -115,6 +117,14 @@ default or constant assumes daily bars. One example is the Hilbert family's
 | `HT_PHASOR`, `HT_SINE` | `HTPhasor(:x)` (inphase, quadrature), `HTSine(:x)` (sine, leadsine) | `addsummarycolumns` |
 | `HT_TRENDMODE` | `HTTrendMode(:x)` (`Int`: 1 trend, 0 cycle) | `addsummarycolumns` |
 | `MAMA` | `MAMA(:x; fastlimit = 0.5, slowlimit = 0.05)` (mama, fama); also `matype = :mama` | `addsummarycolumns` |
+| `ALMA` | `ALMA(:x; period = 9, sigma = 6, offset = 0.85)`; also `matype = :alma` | `addsummarycolumns` |
+| `VIDYA` | `VIDYA(:x; period = 12, cmoperiod = 9)`; also `matype = :vidya` | `addsummarycolumns` |
+| `MCGD` | `McGinley(:x; period = 14)` | `addsummarycolumns` |
+| `FRAMA` | `FRAMA(; high, low, period = 16)` (even period) | `addsummarycolumns` |
+| `ICHIMOKU` | `Ichimoku(; tenkanperiod = 9, kijunperiod = 26, senkoubperiod = 52)` (tenkansen, kijunsen, senkouspana, senkouspanb, unshifted) | `addsummarycolumns` |
+| `BBW`, `PERCENTB` | `BBW(:x; nbdevup = 2, nbdevdn = 2)`, `PercentB(:x; …)` (SMA), or with `matype` and `period = 20` | `Bars(20)`, or `addsummarycolumns` with `matype` |
+| `CG` | `CG(:x)` | `Bars(10)` |
+| `CTI` | `CTI(:x)` (0 on a flat window) | `Bars(20)` |
 
 These TA-Lib functions are CausalFrames summarizers already, so this package
 only tests them and adds no constructor:
@@ -130,6 +140,8 @@ only tests them and adds no constructor:
 | `AVGDEV` | `MeanAbsDev(:x)` | `Bars(14)` |
 | `CORREL` | `Correlation(:x, :y)` (`NaN` on a flat window, where TA-Lib gives 0) | `Bars(30)` |
 | `PERCENTILE` | `Quantile(:x, percentile / 100; interpolation = :nearestrank)` | `Bars(100)` |
+| `MEDIAN` | `Median(:x)` | `Bars(30)` |
+| `KURTOSIS` | `Kurtosis(:x)` (G2; `NaN` on a flat window, as TA-Lib) | `Bars(30)` |
 
 ## Candlestick patterns
 

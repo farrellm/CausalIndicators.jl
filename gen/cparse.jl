@@ -28,8 +28,9 @@ function stripcomments(src::AbstractString)
         c = s[i]
         if c == '/' && i < n && s[i+1] == '*'
             j = i + 2
+            # A comment is one space, newlines included, as C's translation
+            # phase 3 makes it: one inside a continued `#define` must not end it.
             while j < n && !(s[j] == '*' && s[j+1] == '/')
-                s[j] == '\n' && write(out, '\n')
                 j += 1
             end
             write(out, ' ')

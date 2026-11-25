@@ -130,6 +130,15 @@ autohttrend(a) = 120 + 20 * a.X
 # as ta_MAMA.c's `limit` takes it.
 automama(a, fastlimit, slowlimit) =
     autohilbert(a) + ceil(Int, 2 * a.K / max(fastlimit, slowlimit))
+# VIDYA: an EMA whose pole the CMO's magnitude slows, at most to a standstill;
+# the bound grows with the CMO window's square root. Period 1 is a copy.
+autovidya(a, p, cmoperiod) =
+    p == 1 ? 0 : min(2 * a.X * (p + 1) * isqrt(cmoperiod), 100_000_000)
+# McGinley's Dynamic, measured: near the price its pole is Wilder's, 1 − 1/p.
+automcgd(a, p) = 5 * a.X * p
+# FRAMA, measured: its smoothing factor moves with the window's fractal
+# dimension, capped at 99 e-folds' worth.
+autoframa(a, p) = min(9 * (a.X + 4) * (isqrt(p) + 2) ÷ 2, 99 * a.K)
 # ADOSC's offset on EMA's count: what its two EMAs, seeded on one value, can
 # cancel. The sum stands for the fast period times the log of the ratio.
 function autoadosc(a, fastperiod, slowperiod)

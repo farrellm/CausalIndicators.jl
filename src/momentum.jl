@@ -1455,47 +1455,17 @@ function AC(; high::ColumnSpec = :high, low::ColumnSpec = :low, fastperiod::Inte
     return barindicator(AOSpec(fastperiod, slowperiod, signalperiod), (name,), high, low)
 end
 
-# CMOU: Chande's unsmoothed momentum oscillator, over window sums of the up and
-# down moves.
+# CMOU: Chande's unsmoothed momentum oscillator, `CMOUKernel`
+# (kernels/cmou.jl), which VIDYA embeds too.
 struct CMOUSpec
     period::Int
 end
 
-mutable struct CMOUKernel{T,W}
-    const period::Int
-    n::Int
-    prev::T
-    nullrun::Int
-    const window::W
-end
-
-function barkernel(s::CMOUSpec, ::Type{T}) where {T}
-    w = sumswindow((:up, :dn), s.period, T)
-    return CMOUKernel{T,typeof(w)}(s.period, 0, zero(T), 0, w)
-end
-function CausalFrames.fresh!(k::CMOUKernel{T}) where {T}
-    k.n = 0
-    k.prev = zero(T)
-    k.nullrun = 0
-    fresh!(k.window)
-    return k
-end
+barkernel(s::CMOUSpec, ::Type{T}) where {T} = CMOUKernel(T, s.period)
 
 @inline function barstep!(k::CMOUKernel{T}, x::T) where {T}
-    prev = k.prev
-    k.prev = x
-    (k.n += 1) == 1 && return nothing
-    d = x - prev
-    up, dn = d > 0 ? (d, zero(T)) : d < 0 ? (zero(T), -d) : (zero(T), zero(T))
-    update!(k.window, (up = up, dn = dn))
-    k.nullrun = d == 0 ? min(k.nullrun + 1, k.period) : 0
-    sums = value(k.window).sums
-    ismissing(sums) && return nothing
-    # A window of exactly flat moves sums to exactly zero, whatever round-off
-    # the sliding sums hold (ta_CMOU.c's nullRun).
-    u, w = k.nullrun >= k.period ? (zero(T), zero(T)) : sums::Tuple{T,T}
-    t = u + w
-    return (t > 0 ? (100 * (u - w)) / t : zero(T),)
+    v = cmoustep!(k, x)
+    return v === nothing ? nothing : (v,)
 end
 
 """
@@ -2155,3 +2125,75 @@ TA-Lib: `ta_codegen/input/wad/wad.yaml`, `wad.md`.
 """
 WAD(; high::ColumnSpec = :high, low::ColumnSpec = :low, close::ColumnSpec = :close,
     name::Symbol = :wad) = barindicator(WADSpec(), (name,), high, low, close)
+
+# ---------------------------------------------------------------------------
+# Ehlers' center of gravity and correlation trend (S11)
+
+"""
+    CG(column::ColumnSpec) -> Summarizer
+
+TA-Lib's `CG`, Ehlers' center of gravity oscillator, in `:{column}_cg`: the
+balance point of the window's `n` values, each weighted by its value and placed
+at its position counting back from the newest bar (position 1), negated so that
+it rises with price,
+
+    CG = −Σ(k + 1)·x / Σx,   or −(n + 1)/2 where Σx = 0
+
+with `k` a bar's age (0 for the newest). For a positive series it stays in
+[−n, −1], and a flat window gives −(n + 1)/2. The input is assumed positive. It
+is a dependent over CausalFrames' `Count`, `Sum` and `AgeWeightedSum` (Group
+tier), which it shares with [`WMA`](@ref) and the `LINEARREG` family. TA-Lib's
+`CG(period = p)` is `CG(:x)` under `Bars(p)`.
+
+TA-Lib: `ta_codegen/input/cg/cg.yaml`, `cg.md`.
+"""
+struct CG{C} <: GroupSummarizer end
+CG(column::ColumnSpec) = withterms(CG{colname(column)}(), column)
+
+CausalFrames.dependencies(::CG{C}) where {C} = (Count(), Sum(C), AgeWeightedSum(C))
+CausalFrames.emptyvalue(::CG{C}) where {C} = missings((Symbol(C, :_cg),))
+CausalFrames.fresh(::CG{C}, ::NamedTuple) where {C} =
+    derivedvalue(Symbol(C, :_cg), (:count, Symbol(C, :_sum), Symbol(C, :_ageweightedsum)),
+        lifted(cgvalue))
+
+cgvalue(n, s, a) = s == 0 ? -(n + 1) / 2 : -(a + s) / s
+
+"""
+    CTI(column::ColumnSpec) -> Summarizer
+
+TA-Lib's `CTI`, Ehlers' correlation trend indicator, in `:{column}_cti`: the
+Pearson correlation of the window's values against a straight line rising with
+time, in [−1, 1]. 1 is a perfectly linear uptrend, −1 a perfectly linear
+downtrend. A flat window gives 0, as TA-Lib does (where `Correlation` gives
+`NaN`), and rounding is clamped into [−1, 1]. It is a dependent over
+CausalFrames' `Count`, `Sum`, `AgeWeightedSum` and `Variance(corrected = false)`
+(Group tier). The value side's spread is the `Variance`, which is measured from
+a shift and so does not cancel on a level; the cross term is
+`Σk·x − Σx·(n − 1)/2`, with `k` a bar's age. TA-Lib's `CTI(period = p)` is
+`CTI(:x)` under `Bars(p)`.
+
+CausalFrames bakes `corrected` into the state type, so `CTI` cannot share a
+call with a corrected `Std` or `Variance` over the same column.
+
+TA-Lib: `ta_codegen/input/cti/cti.yaml`, `cti.md`.
+"""
+struct CTI{C} <: GroupSummarizer end
+CTI(column::ColumnSpec) = withterms(CTI{colname(column)}(), column)
+
+CausalFrames.dependencies(::CTI{C}) where {C} =
+    (Count(), Sum(C), AgeWeightedSum(C), Variance(C; corrected = false))
+CausalFrames.emptyvalue(::CTI{C}) where {C} = missings((Symbol(C, :_cti),))
+CausalFrames.fresh(::CTI{C}, ::NamedTuple) where {C} =
+    derivedvalue(Symbol(C, :_cti),
+        (:count, Symbol(C, :_sum), Symbol(C, :_ageweightedsum), Symbol(C, :_variance)),
+        lifted(ctivalue))
+
+# ta_CTI.c against the bar's age, which runs backward in time, so the
+# coefficient is negated. The age side is exact: Σk² − (Σk)²/n = n(n² − 1)/12.
+function ctivalue(n, s, a, v)
+    ssx = n * v
+    ssy = n * (n * n - 1) / 12
+    spxy = a - s * ((n - 1) / 2)
+    ssx > 0 && ssx * ssy > 0 || return zero(spxy / ssy)
+    return clamp(-spxy / sqrt(ssx * ssy), -1, 1)
+end
